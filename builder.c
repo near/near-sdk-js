@@ -29,3 +29,8 @@ int main(int argc, char **argv)
 void _start() {
   main(0, NULL);
 }
+
+// for run by near-vm-runner-standalone
+void hello() {
+  main(0, NULL);
+}
