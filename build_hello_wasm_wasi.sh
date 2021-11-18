@@ -2,9 +2,9 @@
 make qjsc
  ./qjsc examples/hello.js -c -o code.h -N code
 
-defs='-D_GNU_SOURCE -DCONFIG_VERSION="2021-03-27" -DCONFIG_BIGNUM -D_WASI_EMULATED_SIGNAL'
+defs='-D_GNU_SOURCE -DCONFIG_VERSION="2021-03-27" -DCONFIG_BIGNUM'
 sources='builder.c quickjs.c libregexp.c libunicode.c cutils.c quickjs-libc-min.c libbf.c'
-libs='-lm -lwasi-emulated-signal'
+libs='-lm'
 includes="-Istubs"
 
 clang --target=wasm32-unknown-wasi \
