@@ -1,1 +1,3 @@
-env.log("Hello World");
+function hello() {
+    env.log("Hello World");
+}
