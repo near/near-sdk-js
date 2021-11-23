@@ -1,9 +1,5 @@
 #include "quickjs-libc-min.h"
 #include "code.h"
-#include "call_decrement_code.h"
-#include "call_increment_code.h"
-#include "call_reset_code.h"
-#include "call_get_num_code.h"
 
 static JSContext *JS_NewCustomContext(JSRuntime *rt)
 {
@@ -13,6 +9,21 @@ static JSContext *JS_NewCustomContext(JSRuntime *rt)
   JS_AddIntrinsicBaseObjects(ctx);
   return ctx;
 }
+
+#define DEFINE_NEAR_METHOD(name) \
+  void name () {\
+    JSRuntime *rt;\
+    JSContext *ctx;\
+    JSValue global_obj, fun_obj;\
+    rt = JS_NewRuntime();\
+    ctx = JS_NewCustomContext(rt);\
+    js_add_near_host_functions(ctx);\
+    js_std_eval_binary(ctx, code, code_size, 0);\
+    global_obj = JS_GetGlobalObject(ctx);\
+    fun_obj = JS_GetProperty(ctx, global_obj, JS_NewAtom(ctx, #name));\
+    JS_Call(ctx, fun_obj, global_obj, 0, NULL);\
+    js_std_loop(ctx);\
+  }
 
 extern void log_utf8(uint64_t len, uint64_t ptr);
 extern uint64_t storage_write(uint64_t key_len, uint64_t key_ptr, uint64_t value_len, uint64_t value_ptr, uint64_t register_id);
@@ -110,96 +121,11 @@ static void js_add_near_host_functions(JSContext* ctx) {
 JSValue JS_Call(JSContext *ctx, JSValueConst func_obj, JSValueConst this_obj,
                 int argc, JSValueConst *argv);
 
-void hello() {
-  JSRuntime *rt;
-  JSContext *ctx;
-  JSValue global_obj, fun_obj;
-
-  rt = JS_NewRuntime();
-  // js_std_set_worker_new_context_func(JS_NewCustomContext); // for sure not needed
-  // js_std_init_handlers(rt); // not needed in NEAR
-  ctx = JS_NewCustomContext(rt);
-  // js_std_add_helpers(ctx, 0, NULL);// not needed in NEAR
-  js_add_near_host_functions(ctx);
-  js_std_eval_binary(ctx, code, code_size, 0);
-
-  global_obj = JS_GetGlobalObject(ctx);
-  fun_obj = JS_GetProperty(ctx, global_obj, JS_NewAtom(ctx, "hello"));
-  JS_Call(ctx, fun_obj, global_obj, 0, NULL);
-
-  // js_std_loop(ctx); // not needed in hello world, looks needed if there's JS promises. 
-  // JS_FreeContext(ctx); // can be skipped run as contract
-  // JS_FreeRuntime(rt);  // same
-}
-
-
-void increment() {
-  JSRuntime *rt;
-  JSContext *ctx;
-  rt = JS_NewRuntime();
-  // js_std_set_worker_new_context_func(JS_NewCustomContext); // for sure not needed
-  // js_std_init_handlers(rt); // not needed in hello world
-  ctx = JS_NewCustomContext(rt);
-  js_std_add_helpers(ctx, 0, NULL);
-  js_add_near_host_functions(ctx);
-  js_std_eval_binary(ctx, code, code_size, 0);
-  js_std_eval_binary(ctx, qjsc_call_increment, qjsc_call_increment_size, 0);
-
-  // js_std_loop(ctx); // not needed in hello world
-  // JS_FreeContext(ctx); // can be skipped run as contract
-  // JS_FreeRuntime(rt);  // same
-}
-
-void decrement() {
-  JSRuntime *rt;
-  JSContext *ctx;
-  rt = JS_NewRuntime();
-  // js_std_set_worker_new_context_func(JS_NewCustomContext); // for sure not needed
-  // js_std_init_handlers(rt); // not needed in hello world
-  ctx = JS_NewCustomContext(rt);
-  js_std_add_helpers(ctx, 0, NULL);
-  js_add_near_host_functions(ctx);
-  js_std_eval_binary(ctx, code, code_size, 0);
-  js_std_eval_binary(ctx, qjsc_call_decrement, qjsc_call_decrement_size, 0);
-
-  // js_std_loop(ctx); // not needed in hello world
-  // JS_FreeContext(ctx); // can be skipped run as contract
-  // JS_FreeRuntime(rt);  // same
-}
-
-void reset() {
-  JSRuntime *rt;
-  JSContext *ctx;
-  rt = JS_NewRuntime();
-  // js_std_set_worker_new_context_func(JS_NewCustomContext); // for sure not needed
-  // js_std_init_handlers(rt); // not needed in hello world
-  ctx = JS_NewCustomContext(rt);
-  js_std_add_helpers(ctx, 0, NULL);
-  js_add_near_host_functions(ctx);
-  js_std_eval_binary(ctx, code, code_size, 0);
-  js_std_eval_binary(ctx, qjsc_call_reset, qjsc_call_reset_size, 0);
-
-  // js_std_loop(ctx); // not needed in hello world
-  // JS_FreeContext(ctx); // can be skipped run as contract
-  // JS_FreeRuntime(rt);  // same
-}
-
-void get_num() {
-  JSRuntime *rt;
-  JSContext *ctx;
-  rt = JS_NewRuntime();
-  // js_std_set_worker_new_context_func(JS_NewCustomContext); // for sure not needed
-  // js_std_init_handlers(rt); // not needed in hello world
-  ctx = JS_NewCustomContext(rt);
-  js_std_add_helpers(ctx, 0, NULL);
-  js_add_near_host_functions(ctx);
-  js_std_eval_binary(ctx, code, code_size, 0);
-  js_std_eval_binary(ctx, qjsc_call_get_num, qjsc_call_get_num_size, 0);
-
-  // js_std_loop(ctx); // not needed in hello world
-  // JS_FreeContext(ctx); // can be skipped run as contract
-  // JS_FreeRuntime(rt);  // same
-}
+DEFINE_NEAR_METHOD(hello)
+DEFINE_NEAR_METHOD(increment)
+DEFINE_NEAR_METHOD(decrement)
+DEFINE_NEAR_METHOD(reset)
+DEFINE_NEAR_METHOD(get_num)
 
 void _start() {
 }
