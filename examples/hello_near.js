@@ -1,3 +1,3 @@
 function hello() {
-    env.log("Hello World");
+    env.log("Hello Near");
 }

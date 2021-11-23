@@ -1,6 +1,5 @@
 #include "quickjs-libc-min.h"
 #include "code.h"
-#include "call_hello_code.h"
 #include "call_decrement_code.h"
 #include "call_increment_code.h"
 #include "call_reset_code.h"
@@ -108,19 +107,27 @@ static void js_add_near_host_functions(JSContext* ctx) {
   JS_SetPropertyStr(ctx, global_obj, "env", env);
 }
 
+JSValue JS_Call(JSContext *ctx, JSValueConst func_obj, JSValueConst this_obj,
+                int argc, JSValueConst *argv);
+
 void hello() {
   JSRuntime *rt;
   JSContext *ctx;
+  JSValue global_obj, fun_obj;
+
   rt = JS_NewRuntime();
   // js_std_set_worker_new_context_func(JS_NewCustomContext); // for sure not needed
-  // js_std_init_handlers(rt); // not needed in hello world
+  // js_std_init_handlers(rt); // not needed in NEAR
   ctx = JS_NewCustomContext(rt);
-  js_std_add_helpers(ctx, 0, NULL);
+  // js_std_add_helpers(ctx, 0, NULL);// not needed in NEAR
   js_add_near_host_functions(ctx);
   js_std_eval_binary(ctx, code, code_size, 0);
-  js_std_eval_binary(ctx, qjsc_call_hello, qjsc_call_hello_size, 0);
 
-  // js_std_loop(ctx); // not needed in hello world
+  global_obj = JS_GetGlobalObject(ctx);
+  fun_obj = JS_GetProperty(ctx, global_obj, JS_NewAtom(ctx, "hello"));
+  JS_Call(ctx, fun_obj, global_obj, 0, NULL);
+
+  // js_std_loop(ctx); // not needed in hello world, looks needed if there's JS promises. 
   // JS_FreeContext(ctx); // can be skipped run as contract
   // JS_FreeRuntime(rt);  // same
 }
