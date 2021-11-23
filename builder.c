@@ -30,6 +30,7 @@ extern uint64_t storage_write(uint64_t key_len, uint64_t key_ptr, uint64_t value
 extern uint64_t storage_read(uint64_t key_len, uint64_t key_ptr, uint64_t register_id);
 extern void read_register(uint64_t register_id, uint64_t ptr);
 extern void value_return(uint64_t value_len, uint64_t value_ptr);
+extern void input(uint64_t register_id);
 
 static JSValue near_log(JSContext *ctx, JSValueConst this_val,
                         int argc, JSValueConst *argv)
@@ -80,6 +81,15 @@ static JSValue near_storage_read(JSContext *ctx, JSValueConst this_val,
   return JS_NewInt32(ctx, storage_read(key_len, key_ptr, register_id));
 }
 
+static JSValue near_input(JSContext *ctx, JSValueConst this_val,
+                          int argc, JSValueConst *argv)
+{
+  uint64_t register_id;
+
+  JS_ToInt64(ctx, &register_id, argv[0]);
+  input(register_id);
+}
+
 static JSValue near_read_register(JSContext *ctx, JSValueConst this_val,
                                   int argc, JSValueConst *argv)
 {
@@ -115,6 +125,8 @@ static void js_add_near_host_functions(JSContext* ctx) {
                     JS_NewCFunction(ctx, near_read_register, "near_read_register", 1));
   JS_SetPropertyStr(ctx, env, "value_return",
                     JS_NewCFunction(ctx, near_value_return, "near_value_return", 1));
+  JS_SetPropertyStr(ctx, env, "input",
+                    JS_NewCFunction(ctx, near_input, "near_input", 1));
   JS_SetPropertyStr(ctx, global_obj, "env", env);
 }
 
