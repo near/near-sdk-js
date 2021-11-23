@@ -37,3 +37,7 @@ function decrement() {
 function reset() {
     env.storage_write("a", "0")
 }
+
+// TODO: nly export functions can be called in NEAR. currently when compile a js as qjs module, have problem
+// to invoke module functions from C, so have to compile it not as a module.
+// module.exports = {get_num,increment,decrement,reset}
