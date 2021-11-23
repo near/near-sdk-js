@@ -2,6 +2,10 @@
 make qjsc
 ./qjsc examples/hello_near.js -c -o code.h -N code
 
+cat <<EOF > methods.h
+DEFINE_NEAR_METHOD(hello)
+EOF
+
 defs='-D_GNU_SOURCE -DCONFIG_VERSION="2021-03-27" -DCONFIG_BIGNUM'
 sources='builder.c quickjs.c libregexp.c libunicode.c cutils.c quickjs-libc-min.c libbf.c'
 libs='-lm'

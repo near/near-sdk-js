@@ -14,15 +14,14 @@ static JSContext *JS_NewCustomContext(JSRuntime *rt)
   void name () {\
     JSRuntime *rt;\
     JSContext *ctx;\
-    JSValue global_obj, mod_obj, fun_obj;\
+    JSValue global_obj, fun_obj;\
     rt = JS_NewRuntime();\
     ctx = JS_NewCustomContext(rt);\
     js_add_near_host_functions(ctx);\
     js_std_eval_binary(ctx, code, code_size, 0);\
     global_obj = JS_GetGlobalObject(ctx);\
-    mod_obj = JS_GetProperty(ctx, global_obj, JS_NewAtom(ctx, "counter"));\
-    fun_obj = JS_GetProperty(ctx, mod_obj, JS_NewAtom(ctx, #name));\
-    JS_Call(ctx, fun_obj, mod_obj, 0, NULL);\
+    fun_obj = JS_GetProperty(ctx, global_obj, JS_NewAtom(ctx, #name));\
+    JS_Call(ctx, fun_obj, global_obj, 0, NULL);\
     js_std_loop(ctx);\
   }
 
