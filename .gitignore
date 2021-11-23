@@ -5,5 +5,4 @@ code.h
 /hello.js
 /hello.c
 hello_near.wasm
-/call_*.h
 counter.wasm
