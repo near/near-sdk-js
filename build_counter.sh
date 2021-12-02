@@ -1,4 +1,6 @@
 #!/bin/bash
+set -euo pipefail
+
 make qjsc
 ./qjsc examples/counter.js -c -o code.h -N code
 
@@ -17,7 +19,7 @@ includes="-Istubs"
 # clang --target=wasm32 \
 clang --target=wasm32-unknown-wasi \
     --sysroot $HOME/Downloads/pkg/wasi-libc \
-    -nostartfiles -Os \
+    -nostartfiles -Oz \
     ${defs} ${includes} ${sources} ${libs} \
     -Wl,--no-entry \
     -Wl,--export-all \
