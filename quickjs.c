@@ -4724,7 +4724,7 @@ static JSValue JS_NewObjectFromShape(JSContext *ctx, JSShape *sh, JSClassID clas
 {
     JSObject *p;
 
-    js_trigger_gc(ctx->rt, sizeof(JSObject));
+    // js_trigger_gc(ctx->rt, sizeof(JSObject));
     p = js_malloc(ctx, sizeof(JSObject));
     if (unlikely(!p))
         goto fail;
