@@ -35,8 +35,6 @@ static JSContext *JS_NewCustomContext(JSRuntime *rt)
     js_std_loop(ctx);\
   }
 
-extern uint64_t storage_write(uint64_t key_len, uint64_t key_ptr, uint64_t value_len, uint64_t value_ptr, uint64_t register_id);
-extern uint64_t storage_read(uint64_t key_len, uint64_t key_ptr, uint64_t register_id);
 // #############
 // # Registers #
 // #############
@@ -85,6 +83,49 @@ extern void abort(uint32_t mst_ptr, uint32_t filename_ptr, uint32_t u32, uint32_
 // # Promises API #
 // ################
 extern uint64_t promise_create(uint64_t account_id_len, uint64_t account_id_ptr, uint64_t method_name_len, uint64_t method_name_ptr, uint64_t arguments_len, uint64_t arguments_ptr, uint64_t amount_ptr, uint64_t gas);
+extern uint64_t promise_then(uint64_t promise_index, uint64_t account_id_len, uint64_t account_id_ptr, uint64_t method_name_len, uint64_t method_name_ptr, uint64_t arguments_len, uint64_t arguments_ptr, uint64_t amount_ptr, uint64_t gas);
+extern uint64_t promise_and(uint64_t promise_idx_ptr, uint64_t promise_idx_count);
+extern uint64_t promise_batch_create(uint64_t account_id_len, uint64_t account_id_ptr);
+extern uint64_t promise_batch_then(uint64_t promise_index, uint64_t account_id_len, uint64_t account_id_ptr);
+// #######################
+// # Promise API actions #
+// #######################
+extern void promise_batch_action_create_account(uint64_t promise_index);
+extern void promise_batch_action_deploy_contract(uint64_t promise_index, uint64_t code_len, uint64_t code_ptr);
+extern void promise_batch_action_function_call(uint64_t promise_index, uint64_t method_name_len, uint64_t method_name_ptr, uint64_t arguments_len, uint64_t arguments_ptr, uint64_t amount_ptr, uint64_t gas);
+extern void promise_batch_action_transfer(uint64_t promise_index, uint64_t amount_ptr);
+extern void promise_batch_action_stake(uint64_t promise_index, uint64_t amount_ptr, uint64_t public_key_len, uint64_t public_key_ptr);
+extern void promise_batch_action_add_key_with_full_access(uint64_t promise_index, uint64_t public_key_len, uint64_t public_key_ptr, uint64_t nonce);
+extern void promise_batch_action_add_key_with_function_call(uint64_t promise_index, uint64_t public_key_len, uint64_t public_key_ptr, uint64_t nonce, uint64_t allowance_ptr, uint64_t receiver_id_len, uint64_t receiver_id_ptr, uint64_t method_names_len, uint64_t method_names_ptr);
+extern void promise_batch_action_delete_key(uint64_t promise_index, uint64_t public_key_len, uint64_t public_key_ptr);
+extern void promise_batch_action_delete_account(uint64_t promise_index, uint64_t beneficiary_id_len, uint64_t beneficiary_id_ptr);
+// #######################
+// # Promise API results #
+// #######################
+extern uint64_t promise_results_count(void);
+extern uint64_t promise_result(uint64_t result_idx, uint64_t register_id);
+extern void promise_return(uint64_t promise_idx);
+// ###############
+// # Storage API #
+// ###############
+extern uint64_t storage_write(uint64_t key_len, uint64_t key_ptr, uint64_t value_len, uint64_t value_ptr, uint64_t register_id);
+extern uint64_t storage_read(uint64_t key_len, uint64_t key_ptr, uint64_t register_id);
+extern uint64_t storage_remove(uint64_t key_len, uint64_t key_ptr, uint64_t register_id);
+extern uint64_t storage_has_key(uint64_t key_len, uint64_t key_ptr);
+extern uint64_t storage_iter_prefix(uint64_t prefix_len, uint64_t prefix_ptr);
+extern uint64_t storage_iter_range(uint64_t start_len, uint64_t start_ptr, uint64_t end_len, uint64_t end_ptr);
+extern uint64_t storage_iter_next(uint64_t iterator_id, uint64_t key_register_id, uint64_t value_register_id);
+// #################
+// # Validator API #
+// #################
+extern void validator_stake(uint64_t account_id_len, uint64_t account_id_ptr, uint64_t stake_ptr);
+extern void validator_total_stake(uint64_t stake_ptr);
+// #############
+// # Alt BN128 #
+// #############
+extern void alt_bn128_g1_multiexp(uint64_t value_len, uint64_t value_ptr, uint64_t register_id);
+extern void alt_bn128_g1_sum(uint64_t value_len, uint64_t value_ptr, uint64_t register_id);
+extern uint64_t alt_bn128_pairing_check(uint64_t value_len, uint64_t value_ptr);
 
 static JSValue near_log(JSContext *ctx, JSValueConst this_val,
                         int argc, JSValueConst *argv)
