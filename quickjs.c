@@ -387,13 +387,6 @@ typedef struct JSFloatEnv {
     unsigned int status;
 } JSFloatEnv;
 
-/* the same structure is used for big integers and big floats. Big
-   integers are never infinite or NaNs */
-typedef struct JSBigFloat {
-    JSRefCountHeader header; /* must come first, 32-bit */
-    bf_t num;
-} JSBigFloat;
-
 typedef struct JSBigDecimal {
     JSRefCountHeader header; /* must come first, 32-bit */
     bfdec_t num;
@@ -1129,12 +1122,6 @@ static JSValue JS_NewBigDecimal(JSContext *ctx);
 static inline bfdec_t *JS_GetBigDecimal(JSValueConst val)
 {
     JSBigDecimal *p = JS_VALUE_GET_PTR(val);
-    return &p->num;
-}
-static JSValue JS_NewBigInt(JSContext *ctx);
-static inline bf_t *JS_GetBigInt(JSValueConst val)
-{
-    JSBigFloat *p = JS_VALUE_GET_PTR(val);
     return &p->num;
 }
 static JSValue JS_CompactBigInt1(JSContext *ctx, JSValue val,
@@ -12308,7 +12295,7 @@ static JSValue JS_NewBigDecimal(JSContext *ctx)
     return JS_MKPTR(JS_TAG_BIG_DECIMAL, p);
 }
 
-static JSValue JS_NewBigInt(JSContext *ctx)
+JSValue JS_NewBigInt(JSContext *ctx)
 {
     JSBigFloat *p;
     p = js_malloc(ctx, sizeof(*p));

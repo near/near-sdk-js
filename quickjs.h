@@ -1046,4 +1046,22 @@ int JS_SetModuleExportList(JSContext *ctx, JSModuleDef *m,
 } /* extern "C" { */
 #endif
 
+#ifdef CONFIG_BIGNUM
+#include "libbf.h"
+
+/* the same structure is used for big integers and big floats. Big
+   integers are never infinite or NaNs */
+typedef struct JSBigFloat {
+    JSRefCountHeader header; /* must come first, 32-bit */
+    bf_t num;
+} JSBigFloat;
+
+JSValue JS_NewBigInt(JSContext *ctx);
+inline bf_t *JS_GetBigInt(JSValueConst val)
+{
+    JSBigFloat *p = JS_VALUE_GET_PTR(val);
+    return &p->num;
+}
+#endif /* CONFIG_BIGNUM */
+
 #endif /* QUICKJS_H */

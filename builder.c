@@ -1,4 +1,5 @@
 #include "quickjs-libc-min.h"
+#include "libbf.h"
 #include "code.h"
 
 static JSContext *JS_NewCustomContext(JSRuntime *rt)
@@ -78,7 +79,8 @@ extern void panic(void);
 extern void panic_utf8(uint64_t len, uint64_t ptr);
 extern void log_utf8(uint64_t len, uint64_t ptr);
 extern void log_utf16(uint64_t len, uint64_t ptr);
-extern void abort(uint32_t mst_ptr, uint32_t filename_ptr, uint32_t u32, uint32_t col);
+// TODO: figure out name confliction of abort
+// extern void abort(uint32_t msg_ptr, uint32_t filename_ptr, uint32_t u32, uint32_t col);
 // ################
 // # Promises API #
 // ################
@@ -127,8 +129,137 @@ extern void alt_bn128_g1_multiexp(uint64_t value_len, uint64_t value_ptr, uint64
 extern void alt_bn128_g1_sum(uint64_t value_len, uint64_t value_ptr, uint64_t register_id);
 extern uint64_t alt_bn128_pairing_check(uint64_t value_len, uint64_t value_ptr);
 
-static JSValue near_log(JSContext *ctx, JSValueConst this_val,
-                        int argc, JSValueConst *argv)
+
+static JSValue near_read_register(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+  uint64_t register_id;
+  char *data[1000];
+
+  JS_ToInt64(ctx, &register_id, argv[0]);
+  read_register(register_id, data);
+  return JS_NewString(ctx, data);
+}
+
+static JSValue near_register_len(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+  uint64_t register_id, len;
+
+  JS_ToInt64(ctx, &register_id, argv[0]);
+  len = register_len(register_id);
+  return JS_NewBigUint64(ctx, len);
+}
+
+static JSValue near_write_register(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+  uint64_t register_id;
+  const char *data_ptr;
+  size_t data_len;
+
+  JS_ToInt64(ctx, &register_id, argv[0]);
+  data_ptr = JS_ToCStringLen(ctx, &data_len, argv[1]);
+  
+  write_register(register_id, data_len, data_ptr);
+  return JS_UNDEFINED;
+}
+
+static JSValue near_current_account_id(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+  uint64_t register_id;
+
+  JS_ToInt64(ctx, &register_id, argv[0]);
+  current_account_id(register_id);
+  return JS_UNDEFINED;
+}
+
+static JSValue near_signer_account_id(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+  uint64_t register_id;
+
+  JS_ToInt64(ctx, &register_id, argv[0]);
+  signer_account_id(register_id);
+  return JS_UNDEFINED;
+}
+
+static JSValue near_signer_account_pk(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+  uint64_t register_id;
+
+  JS_ToInt64(ctx, &register_id, argv[0]);
+  signer_account_pk(register_id);
+  return JS_UNDEFINED;
+}
+
+static JSValue near_predecessor_account_id(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+  uint64_t register_id;
+
+  predecessor_account_id(register_id);
+  return JS_UNDEFINED;
+}
+
+static JSValue near_input(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+  uint64_t register_id;
+
+  JS_ToInt64(ctx, &register_id, argv[0]);
+  input(register_id);
+  return JS_UNDEFINED;
+}
+
+static JSValue near_block_index(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+  uint64_t value;
+
+  value = block_index();
+  return JS_NewBigUint64(ctx, value);
+}
+
+static JSValue near_block_timestamp(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+  uint64_t value;
+
+  value = block_timestamp();
+  return JS_NewBigUint64(ctx, value);
+}
+
+static JSValue near_epoch_height(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+  uint64_t value;
+
+  value = epoch_height();
+  return JS_NewBigUint64(ctx, value);
+}
+
+static JSValue near_storage_usage(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+  uint64_t value;
+
+  value = storage_usage();
+  return JS_NewBigUint64(ctx, value);
+}
+
+static JSValue near_account_balance(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{  
+  uint64_t ptr[2];
+  JSValue value;
+  bf_t* bn;
+  bf_t b;
+  
+  // ptr[0] ptr[1] becomes a little-endian u128.
+  account_balance((uint64_t)ptr); 
+  value = JS_NewBigInt(ctx);
+  bn = JS_GetBigInt(value);
+  // from ptr[] to bn
+  // high 64 bits
+  bf_set_ui(bn, ptr[1]);
+  bf_mul_2exp(bn, 64, BF_PREC_INF, BF_RNDZ);
+  // low 64 bits
+  bf_init(bn->ctx, &b);
+  bf_set_ui(&b, ptr[0]);
+  bf_add(bn, bn, &b, BF_PREC_INF, BF_RNDZ);
+  bf_delete(&b);
+  
+  return value;
+}
+
+static JSValue near_log(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
 {
   int i;
   const char *str;
@@ -146,8 +277,7 @@ static JSValue near_log(JSContext *ctx, JSValueConst this_val,
   return JS_UNDEFINED;
 }
 
-static JSValue near_storage_write(JSContext *ctx, JSValueConst this_val,
-                                  int argc, JSValueConst *argv)
+static JSValue near_storage_write(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
 {
   const char *key_ptr, *value_ptr;
   size_t key_len, value_len;
@@ -161,8 +291,7 @@ static JSValue near_storage_write(JSContext *ctx, JSValueConst this_val,
   return JS_UNDEFINED;
 }
 
-static JSValue near_storage_read(JSContext *ctx, JSValueConst this_val,
-                                 int argc, JSValueConst *argv)
+static JSValue near_storage_read(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
 {
   const char *key_ptr;
   size_t key_len;
@@ -173,45 +302,17 @@ static JSValue near_storage_read(JSContext *ctx, JSValueConst this_val,
   }
   key_ptr = JS_ToCStringLen(ctx, &key_len, argv[0]);
   JS_ToInt64(ctx, &register_id, argv[1]);
-  return JS_NewInt32(ctx, storage_read(key_len, key_ptr, register_id));
+  return JS_NewInt64(ctx, storage_read(key_len, key_ptr, register_id));
 }
 
-static JSValue near_input(JSContext *ctx, JSValueConst this_val,
-                          int argc, JSValueConst *argv)
-{
-  uint64_t register_id;
 
-  JS_ToInt64(ctx, &register_id, argv[0]);
-  input(register_id);
-}
 
-static JSValue near_read_register(JSContext *ctx, JSValueConst this_val,
-                                  int argc, JSValueConst *argv)
-{
-  uint64_t register_id;
-  char *data[1000];
-
-  JS_ToInt64(ctx, &register_id, argv[0]);
-  read_register(register_id, data);
-  return JS_NewString(ctx, data);
-}
-
-static JSValue near_register_len(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
-{
-  uint64_t register_id, len;
-  char *data[1000];
-
-  JS_ToInt64(ctx, &register_id, argv[0]);
-  len = register_len(register_id);
-  return JS_NewInt64(ctx, len);
-}
-
-static JSValue near_value_return(JSContext *ctx, JSValueConst this_val,
-                                  int argc, JSValueConst *argv) {
+static JSValue near_value_return(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
   const char *value_ptr;
   size_t value_len;
   value_ptr = JS_ToCStringLen(ctx, &value_len, argv[0]);
   value_return(value_len, value_ptr);
+  return JS_UNDEFINED;
 }
 
 static void js_add_near_host_functions(JSContext* ctx) {
@@ -236,14 +337,15 @@ static void js_add_near_host_functions(JSContext* ctx) {
   JS_SetPropertyStr(ctx, env, "register_len",
                     JS_NewCFunction(ctx, near_register_len, "near_register_len", 1));
   
-  
+  JS_SetPropertyStr(ctx, env, "account_balance",
+                    JS_NewCFunction(ctx, near_account_balance, "near_account_balance", 0));
+
   JS_SetPropertyStr(ctx, global_obj, "env", env);
 }
 
 JSValue JS_Call(JSContext *ctx, JSValueConst func_obj, JSValueConst this_obj,
                 int argc, JSValueConst *argv);
 
-void _start() {
-}
+void _start() {}
 
 #include "methods.h"
