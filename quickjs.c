@@ -10846,6 +10846,14 @@ int JS_ToInt64Ext(JSContext *ctx, int64_t *pres, JSValueConst val)
         return JS_ToInt64(ctx, pres, val);
 }
 
+int JS_ToUInt64Ext(JSContext *ctx, uint64_t *pres, JSValueConst val)
+{
+    if (JS_IsBigInt(ctx, val))
+        return JS_ToBigUint64(ctx, pres, val);
+    else
+        return JS_ToInt64(ctx, (int64_t *)pres, val);
+}
+
 /* return (<0, 0) in case of exception */
 static int JS_ToInt32Free(JSContext *ctx, int32_t *pres, JSValue val)
 {
@@ -12260,6 +12268,25 @@ static int JS_ToBigInt64Free(JSContext *ctx, int64_t *pres, JSValue val)
 int JS_ToBigInt64(JSContext *ctx, int64_t *pres, JSValueConst val)
 {
     return JS_ToBigInt64Free(ctx, pres, JS_DupValue(ctx, val));
+}
+
+static int JS_ToBigUint64Free(JSContext *ctx, uint64_t *pres, JSValue val)
+{
+    bf_t a_s, *a;
+
+    a = JS_ToBigIntFree(ctx, &a_s, val);
+    if (!a) {
+        *pres = 0;
+        return -1;
+    }
+    bf_get_uint64(pres, a);
+    JS_FreeBigInt(ctx, a, &a_s);
+    return 0;
+}
+
+int JS_ToBigUint64(JSContext *ctx, uint64_t *pres, JSValueConst val)
+{
+    return JS_ToBigUint64Free(ctx, pres, JS_DupValue(ctx, val));
 }
 
 static JSBigFloat *js_new_bf(JSContext *ctx)
@@ -14173,6 +14200,13 @@ JSValue JS_NewBigUint64(JSContext *ctx, uint64_t v)
 }
 
 int JS_ToBigInt64(JSContext *ctx, int64_t *pres, JSValueConst val)
+{
+    JS_ThrowUnsupportedBigint(ctx);
+    *pres = 0;
+    return -1;
+}
+
+int JS_ToBigUint64(JSContext *ctx, uint64_t *pres, JSValueConst val)
 {
     JS_ThrowUnsupportedBigint(ctx);
     *pres = 0;

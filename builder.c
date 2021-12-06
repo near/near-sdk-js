@@ -70,7 +70,7 @@ extern void sha256(uint64_t value_len, uint64_t value_ptr, uint64_t register_id)
 extern void keccak256(uint64_t value_len, uint64_t value_ptr, uint64_t register_id);
 extern void keccak512(uint64_t value_len, uint64_t value_ptr, uint64_t register_id);
 extern void ripemd160(uint64_t value_len, uint64_t value_ptr, uint64_t register_id);
-extern uint64_t ecrecover(uint64_t hash_len, uint64_t u64, uint64_t sign_len, uint64_t sig_ptr, uint64_t v, uint64_t malleability_flag, uint64_t register_id);
+extern uint64_t ecrecover(uint64_t hash_len, uint64_t hash_ptr, uint64_t sign_len, uint64_t sig_ptr, uint64_t v, uint64_t malleability_flag, uint64_t register_id);
 // #####################
 // # Miscellaneous API #
 // #####################
@@ -79,7 +79,8 @@ extern void panic(void);
 extern void panic_utf8(uint64_t len, uint64_t ptr);
 extern void log_utf8(uint64_t len, uint64_t ptr);
 extern void log_utf16(uint64_t len, uint64_t ptr);
-// TODO: figure out name confliction of abort
+// Name confliction with WASI. Can be re-exported with a different name on NEAR side with a protocol upgrade
+// Or, this is actually not a primitive, can be implement with log and panic host functions in C side or JS side. 
 // extern void abort(uint32_t msg_ptr, uint32_t filename_ptr, uint32_t u32, uint32_t col);
 // ################
 // # Promises API #
@@ -135,7 +136,7 @@ static JSValue near_read_register(JSContext *ctx, JSValueConst this_val, int arg
   uint64_t register_id;
   char *data[1000];
 
-  JS_ToInt64(ctx, &register_id, argv[0]);
+  JS_ToUInt64Ext(ctx, &register_id, argv[0]);
   read_register(register_id, data);
   return JS_NewString(ctx, data);
 }
@@ -144,7 +145,7 @@ static JSValue near_register_len(JSContext *ctx, JSValueConst this_val, int argc
 {
   uint64_t register_id, len;
 
-  JS_ToInt64(ctx, &register_id, argv[0]);
+  JS_ToUInt64Ext(ctx, &register_id, argv[0]);
   len = register_len(register_id);
   return JS_NewBigUint64(ctx, len);
 }
@@ -155,7 +156,7 @@ static JSValue near_write_register(JSContext *ctx, JSValueConst this_val, int ar
   const char *data_ptr;
   size_t data_len;
 
-  JS_ToInt64(ctx, &register_id, argv[0]);
+  JS_ToUInt64Ext(ctx, &register_id, argv[0]);
   data_ptr = JS_ToCStringLen(ctx, &data_len, argv[1]);
   
   write_register(register_id, data_len, data_ptr);
@@ -166,7 +167,7 @@ static JSValue near_current_account_id(JSContext *ctx, JSValueConst this_val, in
 {
   uint64_t register_id;
 
-  JS_ToInt64(ctx, &register_id, argv[0]);
+  JS_ToUInt64Ext(ctx, &register_id, argv[0]);
   current_account_id(register_id);
   return JS_UNDEFINED;
 }
@@ -174,7 +175,7 @@ static JSValue near_current_account_id(JSContext *ctx, JSValueConst this_val, in
 static JSValue near_signer_account_id(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
   uint64_t register_id;
 
-  JS_ToInt64(ctx, &register_id, argv[0]);
+  JS_ToUInt64Ext(ctx, &register_id, argv[0]);
   signer_account_id(register_id);
   return JS_UNDEFINED;
 }
@@ -182,7 +183,7 @@ static JSValue near_signer_account_id(JSContext *ctx, JSValueConst this_val, int
 static JSValue near_signer_account_pk(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
   uint64_t register_id;
 
-  JS_ToInt64(ctx, &register_id, argv[0]);
+  JS_ToUInt64Ext(ctx, &register_id, argv[0]);
   signer_account_pk(register_id);
   return JS_UNDEFINED;
 }
@@ -198,7 +199,7 @@ static JSValue near_input(JSContext *ctx, JSValueConst this_val, int argc, JSVal
 {
   uint64_t register_id;
 
-  JS_ToInt64(ctx, &register_id, argv[0]);
+  JS_ToUInt64Ext(ctx, &register_id, argv[0]);
   input(register_id);
   return JS_UNDEFINED;
 }
@@ -235,15 +236,12 @@ static JSValue near_storage_usage(JSContext *ctx, JSValueConst this_val, int arg
   return JS_NewBigUint64(ctx, value);
 }
 
-static JSValue near_account_balance(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
-{  
-  uint64_t ptr[2];
+// ptr[0] ptr[1] is little-endian u128.
+static JSValue u128_to_quickjs(JSContext *ctx, uint64_t* ptr) {
   JSValue value;
   bf_t* bn;
   bf_t b;
-  
-  // ptr[0] ptr[1] becomes a little-endian u128.
-  account_balance((uint64_t)ptr); 
+
   value = JS_NewBigInt(ctx);
   bn = JS_GetBigInt(value);
   // from ptr[] to bn
@@ -257,6 +255,180 @@ static JSValue near_account_balance(JSContext *ctx, JSValueConst this_val, int a
   bf_delete(&b);
   
   return value;
+}
+
+static void quickjs_bigint_to_u128(JSContext *ctx, JSValueConst val, uint64_t* ptr) {
+  bf_t* a;
+  bf_t q, r, b, one;
+
+  a = JS_GetBigInt(val);
+  bf_init(a->ctx, &q);
+  bf_init(a->ctx, &r);
+  bf_init(a->ctx, &b);
+  bf_init(a->ctx, &one);
+  bf_set_ui(&b, UINT64_MAX);
+  bf_set_ui(&one, 1);
+  bf_add(&b, &b, &one, BF_PREC_INF, BF_RNDZ);
+  bf_divrem(&q, &r, a, &b, BF_PREC_INF, BF_RNDZ, BF_RNDZ);
+  
+  bf_get_uint64(ptr, &r);
+  bf_get_uint64(ptr+1, &q);
+}
+
+static void quickjs_int_to_u128(JSContext *ctx, JSValueConst val, uint64_t* ptr) {
+  JS_ToUInt64Ext(ctx, ptr, val);
+  ptr[1] = 0;
+}
+
+static void quickjs_to_u128(JSContext *ctx, JSValueConst val, uint64_t* ptr) {
+  if (JS_IsBigInt(ctx, val))
+    quickjs_bigint_to_u128(ctx, val, ptr);
+  else
+    quickjs_int_to_u128(ctx, val, ptr);
+}
+
+static JSValue near_account_balance(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{  
+  uint64_t ptr[2];
+
+  account_balance((uint64_t)ptr); 
+  return u128_to_quickjs(ctx, ptr);
+}
+
+static JSValue near_locked_account_balance(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+  uint64_t ptr[2];
+
+  account_locked_balance((uint64_t)ptr);
+  return u128_to_quickjs(ctx, ptr);
+}
+
+static JSValue near_attached_deposit(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+  uint64_t ptr[2];
+
+  attached_deposit((uint64_t)ptr);
+  return u128_to_quickjs(ctx, ptr);
+}
+
+static JSValue near_prepaid_gas(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+  uint64_t value;
+
+  value = prepaid_gas();
+  return JS_NewBigUint64(ctx, value);
+}
+
+static JSValue near_used_gas(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+  uint64_t value;
+
+  value = used_gas();
+  return JS_NewBigUint64(ctx, value);
+}
+
+static JSValue near_random_seed(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+  uint64_t register_id;
+
+  JS_ToUInt64Ext(ctx, &register_id, argv[0]);
+  random_seed(register_id);
+  return JS_UNDEFINED;
+}
+
+static JSValue near_sha256(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+  uint64_t register_id;
+  const char *data_ptr;
+  size_t data_len;
+
+  data_ptr = JS_ToCStringLen(ctx, &data_len, argv[0]);
+  JS_ToUInt64Ext(ctx, &register_id, argv[1]);
+  
+  sha256(data_len, data_ptr, register_id);
+  return JS_UNDEFINED;
+}
+
+static JSValue near_keccak256(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+  uint64_t register_id;
+  const char *data_ptr;
+  size_t data_len;
+
+  data_ptr = JS_ToCStringLen(ctx, &data_len, argv[0]);
+  JS_ToUInt64Ext(ctx, &register_id, argv[1]);
+  
+  keccak256(data_len, data_ptr, register_id);
+  return JS_UNDEFINED;
+}
+
+static JSValue near_keccak512(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+  uint64_t register_id;
+  const char *data_ptr;
+  size_t data_len;
+
+  data_ptr = JS_ToCStringLen(ctx, &data_len, argv[0]);
+  JS_ToUInt64Ext(ctx, &register_id, argv[1]);
+  
+  keccak512(data_len, data_ptr, register_id);
+  return JS_UNDEFINED;
+}
+
+static JSValue near_ripemd160(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+  uint64_t register_id;
+  const char *data_ptr;
+  size_t data_len;
+
+  data_ptr = JS_ToCStringLen(ctx, &data_len, argv[0]);
+  JS_ToUInt64Ext(ctx, &register_id, argv[1]);
+  
+  ripemd160(data_len, data_ptr, register_id);
+  return JS_UNDEFINED;
+}
+
+static JSValue near_ecrecover(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+  uint64_t malleability_flag, v, register_id, result;
+  const char *hash_ptr, *sig_ptr;
+  size_t hash_len, sign_len;
+
+  hash_ptr = JS_ToCStringLen(ctx, &hash_len, argv[0]);
+  sig_ptr = JS_ToCStringLen(ctx, &sign_len, argv[1]);
+  JS_ToUInt64Ext(ctx, &malleability_flag, argv[2]);
+  JS_ToUInt64Ext(ctx, &v, argv[3]);
+  JS_ToUInt64Ext(ctx, &register_id, argv[4]);
+ 
+  result = ecrecover(hash_len, hash_ptr, sign_len, sig_ptr, malleability_flag, v, register_id);
+  return JS_NewBigUint64(ctx, result);
+}
+
+static JSValue near_value_return(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) 
+{
+  const char *value_ptr;
+  size_t value_len;
+
+  value_ptr = JS_ToCStringLen(ctx, &value_len, argv[0]);
+  value_return(value_len, value_ptr);
+  return JS_UNDEFINED;
+}
+
+static JSValue near_panic(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+  panic();
+  return JS_UNDEFINED;
+}
+
+static JSValue near_panic_utf8(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+  const char *data_ptr;
+  size_t data_len;
+
+  data_ptr = JS_ToCStringLen(ctx, &data_len, argv[0]);
+  
+  panic_utf8(data_len, data_ptr);
+  return JS_UNDEFINED;
 }
 
 static JSValue near_log(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
@@ -275,6 +447,101 @@ static JSValue near_log(JSContext *ctx, JSValueConst this_val, int argc, JSValue
       JS_FreeCString(ctx, str);
   }
   return JS_UNDEFINED;
+}
+
+static JSValue near_log_utf8(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+  const char *data_ptr;
+  size_t data_len;
+
+  data_ptr = JS_ToCStringLen(ctx, &data_len, argv[0]);
+  
+  log_utf8(data_len, data_ptr);
+  return JS_UNDEFINED;
+}
+
+static JSValue near_log_utf16(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+  const char *data_ptr;
+  size_t data_len;
+
+  data_ptr = JS_ToCStringLen(ctx, &data_len, argv[0]);
+  // TODO: this doesn't work, QuickJS only has api to convert JS string as utf-8 char *, need conversion
+  log_utf16(data_len, data_ptr);
+  return JS_UNDEFINED;
+}
+
+static JSValue near_promise_create(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+  const char *account_id_ptr, *method_name_ptr, *arguments_ptr;
+  size_t account_id_len, method_name_len, arguments_len;
+  uint64_t amount_ptr[2]; // amount is u128
+  uint64_t gas, ret;
+
+  account_id_ptr = JS_ToCStringLen(ctx, &account_id_len, argv[0]);
+  method_name_ptr = JS_ToCStringLen(ctx, &method_name_len, argv[1]);
+  arguments_ptr = JS_ToCStringLen(ctx, &arguments_len, argv[2]);
+  quickjs_to_u128(ctx, argv[3], amount_ptr);
+  JS_ToUInt64Ext(ctx, &gas, argv[4]);
+
+  ret = promise_create(account_id_len, account_id_ptr, method_name_len, method_name_ptr, arguments_len, arguments_ptr, amount_ptr, gas);
+  
+  return JS_NewBigUint64(ctx, ret);
+}
+
+static JSValue near_promise_then(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+  uint64_t promise_index;
+  const char *account_id_ptr, *method_name_ptr, *arguments_ptr;
+  size_t account_id_len, method_name_len, arguments_len;
+  uint64_t amount_ptr[2]; // amount is u128
+  uint64_t gas, ret;
+
+  JS_ToUInt64Ext(ctx, &promise_index, argv[0]);
+  account_id_ptr = JS_ToCStringLen(ctx, &account_id_len, argv[1]);
+  method_name_ptr = JS_ToCStringLen(ctx, &method_name_len, argv[2]);
+  arguments_ptr = JS_ToCStringLen(ctx, &arguments_len, argv[3]);
+  quickjs_to_u128(ctx, argv[4], amount_ptr);
+  JS_ToUInt64Ext(ctx, &gas, argv[5]);
+
+  ret = promise_then(promise_index, account_id_len, account_id_ptr, method_name_len, method_name_ptr, arguments_len, arguments_ptr, amount_ptr, gas);
+  
+  return JS_NewBigUint64(ctx, ret);
+}
+
+static JSValue near_promise_and(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+  uint64_t promise_idx_ptr[argc], ret;
+
+  for(int i = 0; i < argc; i++) {
+    JS_ToUInt64Ext(ctx, &promise_idx_ptr[i], argv[i]);
+  }
+  ret = promise_and(promise_idx_ptr, argc);
+  return JS_NewBigUint64(ctx, ret);
+}
+
+static JSValue near_promise_batch_create(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+  const char *account_id_ptr;
+  size_t account_id_len;
+  uint64_t ret;
+
+  account_id_ptr = JS_ToCStringLen(ctx, &account_id_len, argv[0]);
+  ret = promise_batch_create(account_id_len, account_id_ptr);
+  return JS_NewBigUint64(ctx, ret);
+}
+
+static JSValue near_promise_batch_then(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+  uint64_t promise_index;
+  const char *account_id_ptr;
+  size_t account_id_len;
+  uint64_t ret;
+
+  JS_ToUInt64Ext(ctx, &promise_index, argv[0]);
+  account_id_ptr = JS_ToCStringLen(ctx, &account_id_len, argv[1]);
+  ret = promise_batch_then(promise_index, account_id_len, account_id_ptr);
+  return JS_NewBigUint64(ctx, ret);
 }
 
 static JSValue near_storage_write(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
@@ -301,19 +568,12 @@ static JSValue near_storage_read(JSContext *ctx, JSValueConst this_val, int argc
     return JS_EXCEPTION;
   }
   key_ptr = JS_ToCStringLen(ctx, &key_len, argv[0]);
-  JS_ToInt64(ctx, &register_id, argv[1]);
-  return JS_NewInt64(ctx, storage_read(key_len, key_ptr, register_id));
-}
-
-
-
-static JSValue near_value_return(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
-  const char *value_ptr;
-  size_t value_len;
-  value_ptr = JS_ToCStringLen(ctx, &value_len, argv[0]);
-  value_return(value_len, value_ptr);
+  JS_ToUInt64Ext(ctx, &register_id, argv[1]);
+  JS_NewBigUint64(ctx, storage_read(key_len, key_ptr, register_id));
   return JS_UNDEFINED;
 }
+
+
 
 static void js_add_near_host_functions(JSContext* ctx) {
   JSValue global_obj, env;

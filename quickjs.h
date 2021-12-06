@@ -689,8 +689,11 @@ int JS_ToIndex(JSContext *ctx, uint64_t *plen, JSValueConst val);
 int JS_ToFloat64(JSContext *ctx, double *pres, JSValueConst val);
 /* return an exception if 'val' is a Number */
 int JS_ToBigInt64(JSContext *ctx, int64_t *pres, JSValueConst val);
+int JS_ToBigUint64(JSContext *ctx, uint64_t *pres, JSValueConst val);
 /* same as JS_ToInt64() but allow BigInt */
 int JS_ToInt64Ext(JSContext *ctx, int64_t *pres, JSValueConst val);
+// Convert both JS Number and BigInt to C uint64_t
+int JS_ToUint64Ext(JSContext *ctx, uint64_t *pres, JSValueConst val);
 
 JSValue JS_NewStringLen(JSContext *ctx, const char *str1, size_t len1);
 JSValue JS_NewString(JSContext *ctx, const char *str);
