@@ -295,7 +295,7 @@ static JSValue near_account_balance(JSContext *ctx, JSValueConst this_val, int a
   return u128_to_quickjs(ctx, ptr);
 }
 
-static JSValue near_locked_account_balance(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
+static JSValue near_account_locked_balance(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
 {
   uint64_t ptr[2];
 
@@ -663,6 +663,35 @@ static JSValue near_promise_batch_action_delete_account(JSContext *ctx, JSValueC
   return JS_UNDEFINED;
 }
 
+static JSValue near_promise_results_count(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+  uint64_t value;
+
+  value = promise_results_count();
+  return JS_NewBigUint64(ctx, value);
+}
+
+static JSValue near_promise_result(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+  uint64_t result_idx, register_id;
+  uint64_t ret;
+
+  JS_ToUInt64Ext(ctx, &result_idx, argv[0]);
+  JS_ToUInt64Ext(ctx, &register_id, argv[1]);
+  ret = promise_result(result_idx, register_id);
+
+  return JS_NewBigUint64(ctx, ret);
+}
+
+static JSValue near_promise_return(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+  uint64_t promise_idx;
+  JS_ToUInt64Ext(ctx, &promise_idx, argv[0]);
+  promise_return(promise_idx);
+  
+  return JS_UNDEFINED;
+}
+
 static JSValue near_storage_write(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
 {
   const char *key_ptr, *value_ptr;
@@ -819,24 +848,65 @@ static void js_add_near_host_functions(JSContext* ctx) {
   global_obj = JS_GetGlobalObject(ctx);
   env = JS_NewObject(ctx);
   // Has been test success cases in contracts. Failure cases are not.
-  JS_SetPropertyStr(ctx, env, "log",
-                    JS_NewCFunction(ctx, near_log, "near_log", 1));
-  JS_SetPropertyStr(ctx, env, "storage_write",
-                    JS_NewCFunction(ctx, near_storage_write, "near_storage_write", 2));
-  JS_SetPropertyStr(ctx, env, "storage_read",
-                    JS_NewCFunction(ctx, near_storage_read, "near_storage_read", 2));
-  JS_SetPropertyStr(ctx, env, "read_register",
-                    JS_NewCFunction(ctx, near_read_register, "near_read_register", 1));
-  JS_SetPropertyStr(ctx, env, "value_return",
-                    JS_NewCFunction(ctx, near_value_return, "near_value_return", 1));
-  JS_SetPropertyStr(ctx, env, "input",
-                    JS_NewCFunction(ctx, near_input, "near_input", 1));
+  JS_SetPropertyStr(ctx, env, "read_register", JS_NewCFunction(ctx, near_read_register, "read_register", 1));
+  JS_SetPropertyStr(ctx, env, "input", JS_NewCFunction(ctx, near_input, "input", 1));
+  JS_SetPropertyStr(ctx, env, "value_return", JS_NewCFunction(ctx, near_value_return, "value_return", 1));
+  JS_SetPropertyStr(ctx, env, "log", JS_NewCFunction(ctx, near_log, "log", 1));
+  JS_SetPropertyStr(ctx, env, "storage_write", JS_NewCFunction(ctx, near_storage_write, "storage_write", 2));
+  JS_SetPropertyStr(ctx, env, "storage_read", JS_NewCFunction(ctx, near_storage_read, "storage_read", 2));
+  JS_SetPropertyStr(ctx, env, "account_balance", JS_NewCFunction(ctx, near_account_balance, "account_balance", 0));
+
   // Has not been tested in contracts.
-  JS_SetPropertyStr(ctx, env, "register_len",
-                    JS_NewCFunction(ctx, near_register_len, "near_register_len", 1));
-  
-  JS_SetPropertyStr(ctx, env, "account_balance",
-                    JS_NewCFunction(ctx, near_account_balance, "near_account_balance", 0));
+  JS_SetPropertyStr(ctx, env, "register_len", JS_NewCFunction(ctx, near_register_len, "register_len", 1));
+  JS_SetPropertyStr(ctx, env, "write_register", JS_NewCFunction(ctx, near_write_register, "write_register", 2));
+  JS_SetPropertyStr(ctx, env, "current_account_id", JS_NewCFunction(ctx, near_current_account_id, "current_account_id", 1));
+  JS_SetPropertyStr(ctx, env, "signer_account_id", JS_NewCFunction(ctx, near_signer_account_id, "signer_account_id", 1));
+  JS_SetPropertyStr(ctx, env, "signer_account_pk", JS_NewCFunction(ctx, near_signer_account_pk, "signer_account_pk", 1));
+  JS_SetPropertyStr(ctx, env, "predecessor_account_id", JS_NewCFunction(ctx, near_predecessor_account_id, "predecessor_account_id", 1));
+  JS_SetPropertyStr(ctx, env, "block_index", JS_NewCFunction(ctx, near_block_index, "block_index", 0));
+  JS_SetPropertyStr(ctx, env, "block_timestamp", JS_NewCFunction(ctx, near_block_timestamp, "block_timestamp", 0));
+  JS_SetPropertyStr(ctx, env, "epoch_height", JS_NewCFunction(ctx, near_epoch_height, "epoch_height", 0));
+  JS_SetPropertyStr(ctx, env, "storage_usage", JS_NewCFunction(ctx, near_storage_usage, "storage_usage", 0));
+  JS_SetPropertyStr(ctx, env, "account_locked_balance", JS_NewCFunction(ctx, near_account_locked_balance, "account_locked_balance", 0));
+  JS_SetPropertyStr(ctx, env, "attached_deposit", JS_NewCFunction(ctx, near_attached_deposit, "attached_deposit", 0));
+  JS_SetPropertyStr(ctx, env, "prepaid_gas", JS_NewCFunction(ctx, near_prepaid_gas, "prepaid_gas", 0));
+  JS_SetPropertyStr(ctx, env, "used_gas", JS_NewCFunction(ctx, near_used_gas, "used_gas", 0));
+  JS_SetPropertyStr(ctx, env, "random_seed", JS_NewCFunction(ctx, near_random_seed, "random_seed", 1));
+  JS_SetPropertyStr(ctx, env, "sha256", JS_NewCFunction(ctx, near_sha256, "sha256", 2));
+  JS_SetPropertyStr(ctx, env, "keccak256", JS_NewCFunction(ctx, near_keccak256, "keccak256", 2));
+  JS_SetPropertyStr(ctx, env, "keccak512", JS_NewCFunction(ctx, near_keccak512, "keccak512", 2));
+  JS_SetPropertyStr(ctx, env, "ripemd160", JS_NewCFunction(ctx, near_ripemd160, "ripemd160", 2));
+  JS_SetPropertyStr(ctx, env, "ecrecover", JS_NewCFunction(ctx, near_ecrecover, "ecrecover", 5));
+  JS_SetPropertyStr(ctx, env, "panic", JS_NewCFunction(ctx, near_panic, "panic", 0));
+  JS_SetPropertyStr(ctx, env, "panic_utf8", JS_NewCFunction(ctx, near_panic_utf8, "panic_utf8", 1));
+  JS_SetPropertyStr(ctx, env, "log_utf8", JS_NewCFunction(ctx, near_log_utf8, "log_utf8", 1));
+  JS_SetPropertyStr(ctx, env, "log_utf16", JS_NewCFunction(ctx, near_log_utf16, "log_utf16", 1));
+  JS_SetPropertyStr(ctx, env, "promise_create", JS_NewCFunction(ctx, near_promise_create, "promise_create", 5));
+  JS_SetPropertyStr(ctx, env, "promise_then", JS_NewCFunction(ctx, near_promise_then, "promise_then", 6));
+  JS_SetPropertyStr(ctx, env, "promise_and", JS_NewCFunction(ctx, near_promise_and, "promise_and", 1));
+  JS_SetPropertyStr(ctx, env, "promise_batch_create", JS_NewCFunction(ctx, near_promise_batch_create, "promise_batch_create", 1));
+  JS_SetPropertyStr(ctx, env, "promise_batch_then", JS_NewCFunction(ctx, near_promise_batch_then, "promise_batch_then", 2));
+  JS_SetPropertyStr(ctx, env, "promise_batch_action_create_account", JS_NewCFunction(ctx, near_promise_batch_action_create_account, "promise_batch_action_create_account", 1));
+  JS_SetPropertyStr(ctx, env, "promise_batch_action_deploy_contract", JS_NewCFunction(ctx, near_promise_batch_action_deploy_contract, "promise_batch_action_deploy_contract", 2));
+  JS_SetPropertyStr(ctx, env, "promise_batch_action_function_call", JS_NewCFunction(ctx, near_promise_batch_action_function_call, "promise_batch_action_function_call", 5));
+  JS_SetPropertyStr(ctx, env, "promise_batch_action_transfer", JS_NewCFunction(ctx, near_promise_batch_action_transfer, "promise_batch_action_transfer", 2));
+  JS_SetPropertyStr(ctx, env, "promise_batch_action_stake", JS_NewCFunction(ctx, near_promise_batch_action_stake, "promise_batch_action_stake", 3));
+  JS_SetPropertyStr(ctx, env, "promise_batch_action_add_key_with_full_access", JS_NewCFunction(ctx, near_promise_batch_action_add_key_with_full_access, "promise_batch_action_add_key_with_full_access", 3));
+  JS_SetPropertyStr(ctx, env, "promise_batch_action_add_key_with_function_call", JS_NewCFunction(ctx, near_promise_batch_action_add_key_with_function_call, "promise_batch_action_add_key_with_function_call", 6));
+  JS_SetPropertyStr(ctx, env, "promise_batch_action_delete_account", JS_NewCFunction(ctx, near_promise_batch_action_delete_account, "promise_batch_action_delete_account", 2));
+  JS_SetPropertyStr(ctx, env, "promise_results_count", JS_NewCFunction(ctx, near_promise_results_count, "promise_results_count", 0));
+  JS_SetPropertyStr(ctx, env, "promise_result", JS_NewCFunction(ctx, near_promise_result, "promise_result", 2));
+  JS_SetPropertyStr(ctx, env, "promise_return", JS_NewCFunction(ctx, near_promise_return, "promise_return", 1));
+  JS_SetPropertyStr(ctx, env, "storage_remove", JS_NewCFunction(ctx, near_storage_remove, "storage_remove", 2));
+  JS_SetPropertyStr(ctx, env, "storage_has_key", JS_NewCFunction(ctx, near_storage_has_key, "storage_has_key", 2));
+  JS_SetPropertyStr(ctx, env, "storage_iter_prefix", JS_NewCFunction(ctx, near_storage_iter_prefix, "storage_iter_prefix", 1));
+  JS_SetPropertyStr(ctx, env, "storage_iter_range", JS_NewCFunction(ctx, near_storage_iter_range, "storage_iter_range", 2));
+  JS_SetPropertyStr(ctx, env, "storage_iter_next", JS_NewCFunction(ctx, near_storage_iter_next, "storage_iter_next", 3));
+  JS_SetPropertyStr(ctx, env, "validator_stake", JS_NewCFunction(ctx, near_validator_stake, "validator_stake", 2));
+  JS_SetPropertyStr(ctx, env, "validator_total_stake", JS_NewCFunction(ctx, near_validator_total_stake, "validator_total_stake", 1));
+  JS_SetPropertyStr(ctx, env, "alt_bn128_g1_multiexp", JS_NewCFunction(ctx, near_alt_bn128_g1_multiexp, "alt_bn128_g1_multiexp", 2));
+  JS_SetPropertyStr(ctx, env, "alt_bn128_g1_sum", JS_NewCFunction(ctx, near_alt_bn128_g1_sum, "alt_bn128_g1_sum", 2));
+  JS_SetPropertyStr(ctx, env, "alt_bn128_pairing_check", JS_NewCFunction(ctx, near_alt_bn128_pairing_check, "alt_bn128_pairing_check", 1));
 
   JS_SetPropertyStr(ctx, global_obj, "env", env);
 }
