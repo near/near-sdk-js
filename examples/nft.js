@@ -12,7 +12,9 @@ function mint_to() {
         throw new Error('Maximum token limit reached')
     }
     env.input(0)
-    let owner_id = env.read_register(0)
+    let input = env.read_register(0)
+    let parsedInput = JSON.parse(input)
+    let owner_id = parsedInput['owner']
     env.storage_write(TOTAL_SUPPLY, tokenId.toString())
     env.storage_write('token_to_owner_' + tokenId, owner_id)
     env.log(`Minted NFT ${tokenId} to ${owner_id}`)
