@@ -18,3 +18,30 @@ function mint_to() {
     env.log(`Minted NFT ${tokenId} to ${owner_id}`)
     env.value_return(tokenId.toString())
 }
+
+/*
+What we want, a user friendly high-level API like this one:
+* class based
+* arguments and return are auto converted from env.input() and env.value_return
+* class properties are auto load and save to blockchain state
+@Near
+class MyNFT {
+    constructor(maxSupply) {
+        this.maxSupply = maxSupply
+        this.totalSupply = 0
+        this.tokenOwner = new LookupMap('token_to_owner_')
+    }
+
+    mintTo(owner) {
+        if (this.totalSupply < this.maxSupply) {
+            this.totalSupply++
+        } else {
+            throw new Error('Maximum token limit reached')
+        }
+        let tokenId = this.totalSupply;
+        this.tokenOwner.insert(owner, tokenId);
+        env.log(`Minted NFT ${tokenId} to ${ownerId}`)
+        return tokenId
+    }
+}
+*/

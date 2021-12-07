@@ -544,18 +544,138 @@ static JSValue near_promise_batch_then(JSContext *ctx, JSValueConst this_val, in
   return JS_NewBigUint64(ctx, ret);
 }
 
+static JSValue near_promise_batch_action_create_account(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+  uint64_t promise_index;
+
+  JS_ToUInt64Ext(ctx, &promise_index, argv[0]);
+  promise_batch_action_create_account(promise_index);
+  return JS_UNDEFINED;
+}
+
+static JSValue near_promise_batch_action_deploy_contract(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+  uint64_t promise_index;
+  const char *code_ptr;
+  size_t code_len;
+
+  JS_ToUInt64Ext(ctx, &promise_index, argv[0]);
+  code_ptr = JS_ToCStringLen(ctx, &code_len, argv[1]);
+  promise_batch_action_deploy_contract(promise_index, code_len, code_ptr);
+  return JS_UNDEFINED;
+}
+
+static JSValue near_promise_batch_action_function_call(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+  uint64_t promise_index;
+  const char *method_name_ptr, *arguments_ptr;
+  size_t method_name_len, arguments_len;
+  uint64_t amount_ptr[2]; // amount is u128
+  uint64_t gas;
+
+  JS_ToUInt64Ext(ctx, &promise_index, argv[0]);
+  method_name_ptr = JS_ToCStringLen(ctx, &method_name_len, argv[1]);
+  arguments_ptr = JS_ToCStringLen(ctx, &arguments_len, argv[2]);
+  quickjs_to_u128(ctx, argv[3], amount_ptr);
+  JS_ToUInt64Ext(ctx, &gas, argv[4]);  
+  promise_batch_action_function_call(promise_index, method_name_len, method_name_ptr, arguments_len, arguments_ptr, amount_ptr, gas);
+  return JS_UNDEFINED;
+}
+
+static JSValue near_promise_batch_action_transfer(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+  uint64_t promise_index;
+  uint64_t amount_ptr[2]; // amount is u128
+
+  JS_ToUInt64Ext(ctx, &promise_index, argv[0]);
+  quickjs_to_u128(ctx, argv[1], amount_ptr);
+  promise_batch_action_transfer(promise_index, amount_ptr);
+  return JS_UNDEFINED;
+}
+
+static JSValue near_promise_batch_action_stake(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+  uint64_t promise_index;
+  uint64_t amount_ptr[2];
+  const char *public_key_ptr;
+  size_t public_key_len;
+  JS_ToUInt64Ext(ctx, &promise_index, argv[0]);
+  quickjs_to_u128(ctx, argv[1], amount_ptr);
+  public_key_ptr = JS_ToCStringLen(ctx, &public_key_len, argv[2]);
+
+  promise_batch_action_stake(promise_index, amount_ptr, public_key_len, public_key_ptr);
+  return JS_UNDEFINED;
+}
+
+static JSValue near_promise_batch_action_add_key_with_full_access(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+  uint64_t promise_index;
+  const char *public_key_ptr;
+  size_t public_key_len;
+  uint64_t nonce;
+
+  JS_ToUInt64Ext(ctx, &promise_index, argv[0]);
+  public_key_ptr = JS_ToCStringLen(ctx, &public_key_len, argv[1]);
+  JS_ToUInt64Ext(ctx, &nonce, argv[2]);
+  promise_batch_action_add_key_with_full_access(promise_index, public_key_len, public_key_ptr, nonce);
+  return JS_UNDEFINED;
+}
+
+static JSValue near_promise_batch_action_add_key_with_function_call(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+  uint64_t promise_index;
+  const char *public_key_ptr, *receiver_id_ptr, *method_names_ptr;
+  size_t public_key_len, receiver_id_len, method_names_len;
+  uint64_t nonce, allowance_ptr[2];
+
+  JS_ToUInt64Ext(ctx, &promise_index, argv[0]);
+  public_key_ptr = JS_ToCStringLen(ctx, &public_key_len, argv[1]);
+  JS_ToUInt64Ext(ctx, &nonce, argv[2]);
+  quickjs_to_u128(ctx, argv[3], allowance_ptr);
+  receiver_id_ptr = JS_ToCStringLen(ctx, &receiver_id_len, argv[4]);
+  method_names_ptr = JS_ToCStringLen(ctx, &method_names_len, argv[5]);
+
+  promise_batch_action_add_key_with_function_call(promise_index, public_key_len, public_key_ptr, nonce, allowance_ptr, receiver_id_len, receiver_id_ptr, method_names_len, method_names_ptr);
+  return JS_UNDEFINED;
+}
+
+static JSValue near_promise_batch_action_delete_key(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+  uint64_t promise_index;
+  const char *public_key_ptr;
+  size_t public_key_len;
+
+  JS_ToUInt64Ext(ctx, &promise_index, argv[0]);
+  public_key_ptr = JS_ToCStringLen(ctx, &public_key_len, argv[1]);
+  promise_batch_action_delete_key(promise_index, public_key_len, public_key_ptr);
+  return JS_UNDEFINED;
+}
+
+static JSValue near_promise_batch_action_delete_account(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+  uint64_t promise_index;
+  const char *beneficiary_id_ptr;
+  size_t beneficiary_id_len;
+
+  JS_ToUInt64Ext(ctx, &promise_index, argv[0]);
+  beneficiary_id_ptr = JS_ToCStringLen(ctx, &beneficiary_id_len, argv[1]);
+  promise_batch_action_delete_account(promise_index, beneficiary_id_len, beneficiary_id_ptr);
+  return JS_UNDEFINED;
+}
+
 static JSValue near_storage_write(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
 {
   const char *key_ptr, *value_ptr;
   size_t key_len, value_len;
+  uint64_t ret;
 
   if (argc < 2) {
     return JS_EXCEPTION;
   }
   key_ptr = JS_ToCStringLen(ctx, &key_len, argv[0]);
   value_ptr = JS_ToCStringLen(ctx, &value_len, argv[1]);
-  storage_write(key_len, key_ptr, value_len, value_ptr, 0);
-  return JS_UNDEFINED;
+  ret = storage_write(key_len, key_ptr, value_len, value_ptr, 0);
+  return JS_NewBigUint64(ctx, ret);
 }
 
 static JSValue near_storage_read(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
@@ -563,16 +683,134 @@ static JSValue near_storage_read(JSContext *ctx, JSValueConst this_val, int argc
   const char *key_ptr;
   size_t key_len;
   uint64_t register_id;
+  uint64_t ret;
 
   if (argc < 2) {
     return JS_EXCEPTION;
   }
   key_ptr = JS_ToCStringLen(ctx, &key_len, argv[0]);
   JS_ToUInt64Ext(ctx, &register_id, argv[1]);
-  JS_NewBigUint64(ctx, storage_read(key_len, key_ptr, register_id));
+  ret = storage_read(key_len, key_ptr, register_id);
+  return JS_NewBigUint64(ctx, ret);
+}
+
+static JSValue near_storage_remove(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+  const char *key_ptr;
+  size_t key_len;
+  uint64_t register_id;
+  uint64_t ret;
+
+  key_ptr = JS_ToCStringLen(ctx, &key_len, argv[0]);
+  JS_ToUInt64Ext(ctx, &register_id, argv[1]);
+  ret = storage_remove(key_len, key_ptr, register_id);
+  return JS_NewBigUint64(ctx, ret);
+}
+
+static JSValue near_storage_has_key(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+  const char *key_ptr;
+  size_t key_len;
+  uint64_t ret;
+
+  key_ptr = JS_ToCStringLen(ctx, &key_len, argv[0]);
+  ret = storage_has_key(key_len, key_ptr);
+  return JS_NewBigUint64(ctx, ret);
+}
+
+static JSValue near_storage_iter_prefix(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+  const char *prefix_ptr;
+  size_t prefix_len;
+  uint64_t ret;
+
+  prefix_ptr = JS_ToCStringLen(ctx, &prefix_len, argv[0]);
+  ret = storage_iter_prefix(prefix_len, prefix_ptr);
+  return JS_NewBigUint64(ctx, ret);
+}
+
+static JSValue near_storage_iter_range(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+  const char *start_ptr, *end_ptr;
+  size_t start_len, end_len;
+  uint64_t ret;
+
+  start_ptr = JS_ToCStringLen(ctx, &start_len, argv[0]);
+  end_ptr = JS_ToCStringLen(ctx, &end_len, argv[0]);
+  ret = storage_iter_range(start_len, start_ptr, end_len, end_ptr);
+  return JS_NewBigUint64(ctx, ret);
+}
+
+static JSValue near_storage_iter_next(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+  uint64_t iterator_id, key_register_id, value_register_id;
+  uint64_t ret;
+
+  JS_ToUInt64Ext(ctx, &iterator_id, argv[0]);
+  JS_ToUInt64Ext(ctx, &key_register_id, argv[1]);
+  JS_ToUInt64Ext(ctx, &value_register_id, argv[2]);
+
+  ret = storage_iter_next(iterator_id, key_register_id, value_register_id);
+  return JS_NewBigUint64(ctx, ret);
+}
+
+static JSValue near_validator_stake(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+  const char *account_id_ptr;
+  size_t account_id_len;
+  uint64_t stake_ptr[2];
+
+  account_id_ptr = JS_ToCStringLen(ctx, &account_id_len, argv[0]);
+  validator_stake(account_id_len, account_id_ptr, stake_ptr);
+
+  return u128_to_quickjs(ctx, stake_ptr);
+}
+
+static JSValue near_validator_total_stake(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+  uint64_t stake_ptr[2];
+
+  validator_total_stake(stake_ptr);
+  return u128_to_quickjs(ctx, stake_ptr);
+}
+
+static JSValue near_alt_bn128_g1_multiexp(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+  uint64_t register_id;
+  const char *data_ptr;
+  size_t data_len;
+
+  data_ptr = JS_ToCStringLen(ctx, &data_len, argv[0]);
+  JS_ToUInt64Ext(ctx, &register_id, argv[1]);
+  
+  alt_bn128_g1_multiexp(data_len, data_ptr, register_id);
   return JS_UNDEFINED;
 }
 
+static JSValue near_alt_bn128_g1_sum(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+  uint64_t register_id;
+  const char *data_ptr;
+  size_t data_len;
+
+  data_ptr = JS_ToCStringLen(ctx, &data_len, argv[0]);
+  JS_ToUInt64Ext(ctx, &register_id, argv[1]);
+  
+  alt_bn128_g1_sum(data_len, data_ptr, register_id);
+  return JS_UNDEFINED;
+}
+
+static JSValue near_alt_bn128_pairing_check(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+  const char *data_ptr;
+  size_t data_len;
+  uint64_t ret;
+
+  data_ptr = JS_ToCStringLen(ctx, &data_len, argv[0]);
+  
+  ret = alt_bn128_pairing_check(data_len, data_ptr);
+  return JS_NewBigUint64(ctx, ret);
+}
 
 
 static void js_add_near_host_functions(JSContext* ctx) {
