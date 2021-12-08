@@ -21,12 +21,13 @@ function mint_to() {
     env.value_return(tokenId.toString())
 }
 
+
+// What we want, a user friendly high-level API like this one:
+// * class based
+// * arguments and return are auto converted from env.input() and env.value_return
+// * class properties are auto load and save to blockchain state
 /*
-What we want, a user friendly high-level API like this one:
-* class based
-* arguments and return are auto converted from env.input() and env.value_return
-* class properties are auto load and save to blockchain state
-@Near
+@NearBindgen
 class MyNFT {
     constructor(maxSupply) {
         this.maxSupply = maxSupply

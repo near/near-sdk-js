@@ -14,3 +14,4 @@ bignum.wasm
 /repl.c
 /hello_module.c
 /build_near.sh
+/near_tests.wasm
