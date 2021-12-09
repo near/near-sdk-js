@@ -9,8 +9,8 @@ DEFINE_NEAR_METHOD(test_attached_deposit)
 DEFINE_NEAR_METHOD(test_prepaid_gas)
 DEFINE_NEAR_METHOD(test_used_gas)
 DEFINE_NEAR_METHOD(test_register)
-
-
+DEFINE_NEAR_METHOD(test_current_account_id)
+DEFINE_NEAR_METHOD(test_signer_account_id)
 EOF
 
 defs='-D_GNU_SOURCE -DCONFIG_VERSION="2021-03-27" -DCONFIG_BIGNUM'

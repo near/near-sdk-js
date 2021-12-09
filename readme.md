@@ -98,19 +98,21 @@ function register_len(register_id: Uint64): Uint64;
 function write_register(register_id: Uint64, data: String);
 ```
 
+Context API
+-----------
 ```
-// ###############
-// # Context API #
-// ###############
-extern void current_account_id(uint64_t register_id);
-extern void signer_account_id(uint64_t register_id);
-extern void signer_account_pk(uint64_t register_id);
-extern void predecessor_account_id(uint64_t register_id);
-extern void input(uint64_t register_id);
-extern uint64_t block_index();
-extern uint64_t block_timestamp();
-extern uint64_t epoch_height();
-extern uint64_t storage_usage();
+function current_account_id(register_id: Uint64);
+function signer_account_id(register_id: Uint64);
+function signer_account_pk(register_id: Uint64);
+function predecessor_account_id(register_id: Uint64);
+function input(register_id: Uint64);
+function block_index(): Uint64;
+function block_timestamp(): Uint64;
+function epoch_height(): Uint64;
+function storage_usage(): Uint64;
+```
+
+```
 // #################
 // # Economics API #
 // #################

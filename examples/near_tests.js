@@ -47,3 +47,17 @@ function test_register() {
         env.panic()
     }
 }
+
+function test_current_account_id() {
+    env.current_account_id(0);
+    if (env.read_register(0) != 'alice') {
+        panic()
+    }
+}
+
+function test_signer_account_id() {
+    env.signer_account_id(0);
+    if (env.read_register(0) != 'bob') {
+        panic()
+    }
+}

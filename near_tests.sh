@@ -20,3 +20,5 @@ test attached_deposit
 test prepaid_gas
 test used_gas
 test register
+test current_account_id
+test signer_account_id
