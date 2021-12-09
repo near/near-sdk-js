@@ -8,6 +8,8 @@ DEFINE_NEAR_METHOD(test_account_locked_balance)
 DEFINE_NEAR_METHOD(test_attached_deposit)
 DEFINE_NEAR_METHOD(test_prepaid_gas)
 DEFINE_NEAR_METHOD(test_used_gas)
+DEFINE_NEAR_METHOD(test_register)
+
 
 EOF
 

@@ -134,11 +134,21 @@ extern uint64_t alt_bn128_pairing_check(uint64_t value_len, uint64_t value_ptr);
 static JSValue near_read_register(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
 {
   uint64_t register_id;
-  char *data[1000];
+  char *data;
+  uint64_t data_len;
+  JSValue ret;
 
   JS_ToUInt64Ext(ctx, &register_id, argv[0]);
-  read_register(register_id, data);
-  return JS_NewString(ctx, data);
+  data_len = register_len(register_id);
+  if (data_len != UINT64_MAX) {
+    data = malloc(data_len);
+    read_register(register_id, data);
+    ret = JS_NewStringLenRaw(ctx, data, data_len);
+    free(data);
+    return ret;
+  } else {
+    return JS_UNDEFINED;
+  }
 }
 
 static JSValue near_register_len(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
@@ -157,8 +167,7 @@ static JSValue near_write_register(JSContext *ctx, JSValueConst this_val, int ar
   size_t data_len;
 
   JS_ToUInt64Ext(ctx, &register_id, argv[0]);
-  data_ptr = JS_ToCStringLen(ctx, &data_len, argv[1]);
-  
+  data_ptr = JS_ToCStringLenRaw(ctx, &data_len, argv[1]);
   write_register(register_id, data_len, data_ptr);
   return JS_UNDEFINED;
 }

@@ -695,11 +695,13 @@ int JS_ToInt64Ext(JSContext *ctx, int64_t *pres, JSValueConst val);
 // Convert both JS Number and BigInt to C uint64_t
 int JS_ToUint64Ext(JSContext *ctx, uint64_t *pres, JSValueConst val);
 
+JSValue JS_NewStringLenRaw(JSContext *ctx, const char *buf, size_t buf_len);
 JSValue JS_NewStringLen(JSContext *ctx, const char *str1, size_t len1);
 JSValue JS_NewString(JSContext *ctx, const char *str);
 JSValue JS_NewAtomString(JSContext *ctx, const char *str);
 JSValue JS_ToString(JSContext *ctx, JSValueConst val);
 JSValue JS_ToPropertyKey(JSContext *ctx, JSValueConst val);
+const char *JS_ToCStringLenRaw(JSContext *ctx, size_t *plen, JSValueConst val1);
 const char *JS_ToCStringLen2(JSContext *ctx, size_t *plen, JSValueConst val1, JS_BOOL cesu8);
 static inline const char *JS_ToCStringLen(JSContext *ctx, size_t *plen, JSValueConst val1)
 {

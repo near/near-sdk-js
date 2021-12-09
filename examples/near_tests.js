@@ -27,3 +27,23 @@ function test_used_gas() {
         env.panic()
     }  
 }
+
+function test_register() {
+    env.write_register(0, "\x00\x01\xff");
+    if (env.read_register(0) != "\x00\x01\xff") {
+        env.panic()
+    }
+    if (env.register_len(0) != 3) {
+        env.panic()
+    }
+    if (env.register_len(0) !== 3n) {
+        env.panic()
+    }
+
+    if (env.read_register(1) !== undefined) {
+        env.panic()
+    }
+    if (env.register_len(2) !== 18446744073709551615n ){
+        env.panic()
+    }
+}

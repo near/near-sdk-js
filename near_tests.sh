@@ -10,8 +10,7 @@ function test {
         echo test_$1 OK
     else
         echo test_$1 FAILED
-        echo $output
-        exit 1
+        $runner --wasm-file near_tests.wasm --method-name test_$1
     fi
 }
 
@@ -20,3 +19,4 @@ test account_locked_balance
 test attached_deposit
 test prepaid_gas
 test used_gas
+test register

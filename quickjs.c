@@ -3848,6 +3848,11 @@ static JSValue string_buffer_end(StringBuffer *s)
     return JS_MKPTR(JS_TAG_STRING, str);
 }
 
+JSValue JS_NewStringLenRaw(JSContext *ctx, const char *buf, size_t buf_len)
+{
+    return js_new_string8(ctx, (const uint8_t *)buf, buf_len);
+}
+
 /* create a string from a UTF-8 buffer */
 JSValue JS_NewStringLen(JSContext *ctx, const char *buf, size_t buf_len)
 {
@@ -3953,6 +3958,36 @@ JSValue JS_NewAtomString(JSContext *ctx, const char *str)
     JSValue val = JS_AtomToString(ctx, atom);
     JS_FreeAtom(ctx, atom);
     return val;
+}
+
+const char *JS_ToCStringLenRaw(JSContext *ctx, size_t *plen, JSValueConst val1)
+{
+    JSValue val;
+    JSString *str;
+    int len;
+
+    if (JS_VALUE_GET_TAG(val1) != JS_TAG_STRING) {
+        val = JS_ToString(ctx, val1);
+        if (JS_IsException(val))
+            goto fail;
+    } else {
+        val = JS_DupValue(ctx, val1);
+    }
+    
+    str = JS_VALUE_GET_STRING(val);
+    len = str->len;
+    if (!str->is_wide_char) {
+        const uint8_t *src = str->u.str8;
+        if (plen)
+            *plen = len;
+        return (const char *)src;
+    } else {
+        goto fail;
+    }
+ fail:
+    if (plen)
+        *plen = 0;
+    return NULL;
 }
 
 /* return (NULL, 0) if exception. */
