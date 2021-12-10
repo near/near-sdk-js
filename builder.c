@@ -351,7 +351,7 @@ static JSValue near_sha256(JSContext *ctx, JSValueConst this_val, int argc, JSVa
   const char *data_ptr;
   size_t data_len;
 
-  data_ptr = JS_ToCStringLen(ctx, &data_len, argv[0]);
+  data_ptr = JS_ToCStringLenRaw(ctx, &data_len, argv[0]);
   JS_ToUInt64Ext(ctx, &register_id, argv[1]);
   
   sha256(data_len, data_ptr, register_id);
@@ -364,7 +364,7 @@ static JSValue near_keccak256(JSContext *ctx, JSValueConst this_val, int argc, J
   const char *data_ptr;
   size_t data_len;
 
-  data_ptr = JS_ToCStringLen(ctx, &data_len, argv[0]);
+  data_ptr = JS_ToCStringLenRaw(ctx, &data_len, argv[0]);
   JS_ToUInt64Ext(ctx, &register_id, argv[1]);
   
   keccak256(data_len, data_ptr, register_id);
@@ -377,7 +377,7 @@ static JSValue near_keccak512(JSContext *ctx, JSValueConst this_val, int argc, J
   const char *data_ptr;
   size_t data_len;
 
-  data_ptr = JS_ToCStringLen(ctx, &data_len, argv[0]);
+  data_ptr = JS_ToCStringLenRaw(ctx, &data_len, argv[0]);
   JS_ToUInt64Ext(ctx, &register_id, argv[1]);
   
   keccak512(data_len, data_ptr, register_id);
@@ -390,7 +390,7 @@ static JSValue near_ripemd160(JSContext *ctx, JSValueConst this_val, int argc, J
   const char *data_ptr;
   size_t data_len;
 
-  data_ptr = JS_ToCStringLen(ctx, &data_len, argv[0]);
+  data_ptr = JS_ToCStringLenRaw(ctx, &data_len, argv[0]);
   JS_ToUInt64Ext(ctx, &register_id, argv[1]);
   
   ripemd160(data_len, data_ptr, register_id);
@@ -403,8 +403,8 @@ static JSValue near_ecrecover(JSContext *ctx, JSValueConst this_val, int argc, J
   const char *hash_ptr, *sig_ptr;
   size_t hash_len, sign_len;
 
-  hash_ptr = JS_ToCStringLen(ctx, &hash_len, argv[0]);
-  sig_ptr = JS_ToCStringLen(ctx, &sign_len, argv[1]);
+  hash_ptr = JS_ToCStringLenRaw(ctx, &hash_len, argv[0]);
+  sig_ptr = JS_ToCStringLenRaw(ctx, &sign_len, argv[1]);
   JS_ToUInt64Ext(ctx, &malleability_flag, argv[2]);
   JS_ToUInt64Ext(ctx, &v, argv[3]);
   JS_ToUInt64Ext(ctx, &register_id, argv[4]);
@@ -418,14 +418,22 @@ static JSValue near_value_return(JSContext *ctx, JSValueConst this_val, int argc
   const char *value_ptr;
   size_t value_len;
 
-  value_ptr = JS_ToCStringLen(ctx, &value_len, argv[0]);
+  value_ptr = JS_ToCStringLenRaw(ctx, &value_len, argv[0]);
   value_return(value_len, value_ptr);
   return JS_UNDEFINED;
 }
 
 static JSValue near_panic(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
 {
-  panic();
+  const char *data_ptr;
+  size_t data_len;
+
+  if (argc == 1) {
+    data_ptr = JS_ToCStringLen(ctx, &data_len, argv[0]);
+    panic_utf8(data_len, data_ptr);
+  } else {
+    panic();
+  }
   return JS_UNDEFINED;
 }
 
@@ -434,31 +442,13 @@ static JSValue near_panic_utf8(JSContext *ctx, JSValueConst this_val, int argc, 
   const char *data_ptr;
   size_t data_len;
 
-  data_ptr = JS_ToCStringLen(ctx, &data_len, argv[0]);
+  data_ptr = JS_ToCStringLenRaw(ctx, &data_len, argv[0]);
   
   panic_utf8(data_len, data_ptr);
   return JS_UNDEFINED;
 }
 
 static JSValue near_log(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
-{
-  int i;
-  const char *str;
-  size_t len;
-
-  for(i = 0; i < argc; i++) {
-      if (i != 0)
-          log_utf8(1, " ");
-      str = JS_ToCStringLen(ctx, &len, argv[i]);
-      if (!str)
-          return JS_EXCEPTION;
-      log_utf8(len, str);
-      JS_FreeCString(ctx, str);
-  }
-  return JS_UNDEFINED;
-}
-
-static JSValue near_log_utf8(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
 {
   const char *data_ptr;
   size_t data_len;
@@ -469,13 +459,23 @@ static JSValue near_log_utf8(JSContext *ctx, JSValueConst this_val, int argc, JS
   return JS_UNDEFINED;
 }
 
+static JSValue near_log_utf8(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+  const char *data_ptr;
+  size_t data_len;
+
+  data_ptr = JS_ToCStringLenRaw(ctx, &data_len, argv[0]);
+  
+  log_utf8(data_len, data_ptr);
+  return JS_UNDEFINED;
+}
+
 static JSValue near_log_utf16(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
 {
   const char *data_ptr;
   size_t data_len;
 
-  data_ptr = JS_ToCStringLen(ctx, &data_len, argv[0]);
-  // TODO: this doesn't work, QuickJS only has api to convert JS string as utf-8 char *, need conversion
+  data_ptr = JS_ToCStringLenRaw(ctx, &data_len, argv[0]);
   log_utf16(data_len, data_ptr);
   return JS_UNDEFINED;
 }
@@ -489,7 +489,7 @@ static JSValue near_promise_create(JSContext *ctx, JSValueConst this_val, int ar
 
   account_id_ptr = JS_ToCStringLen(ctx, &account_id_len, argv[0]);
   method_name_ptr = JS_ToCStringLen(ctx, &method_name_len, argv[1]);
-  arguments_ptr = JS_ToCStringLen(ctx, &arguments_len, argv[2]);
+  arguments_ptr = JS_ToCStringLenRaw(ctx, &arguments_len, argv[2]);
   quickjs_to_u128(ctx, argv[3], amount_ptr);
   JS_ToUInt64Ext(ctx, &gas, argv[4]);
 
@@ -509,7 +509,7 @@ static JSValue near_promise_then(JSContext *ctx, JSValueConst this_val, int argc
   JS_ToUInt64Ext(ctx, &promise_index, argv[0]);
   account_id_ptr = JS_ToCStringLen(ctx, &account_id_len, argv[1]);
   method_name_ptr = JS_ToCStringLen(ctx, &method_name_len, argv[2]);
-  arguments_ptr = JS_ToCStringLen(ctx, &arguments_len, argv[3]);
+  arguments_ptr = JS_ToCStringLenRaw(ctx, &arguments_len, argv[3]);
   quickjs_to_u128(ctx, argv[4], amount_ptr);
   JS_ToUInt64Ext(ctx, &gas, argv[5]);
 
@@ -857,39 +857,35 @@ static void js_add_near_host_functions(JSContext* ctx) {
   global_obj = JS_GetGlobalObject(ctx);
   env = JS_NewObject(ctx);
   // Has been test success cases in contracts. Failure cases are not.
-  JS_SetPropertyStr(ctx, env, "read_register", JS_NewCFunction(ctx, near_read_register, "read_register", 1));
-  JS_SetPropertyStr(ctx, env, "input", JS_NewCFunction(ctx, near_input, "input", 1));
-  JS_SetPropertyStr(ctx, env, "value_return", JS_NewCFunction(ctx, near_value_return, "value_return", 1));
-  JS_SetPropertyStr(ctx, env, "log", JS_NewCFunction(ctx, near_log, "log", 1));
   JS_SetPropertyStr(ctx, env, "storage_write", JS_NewCFunction(ctx, near_storage_write, "storage_write", 2));
   JS_SetPropertyStr(ctx, env, "storage_read", JS_NewCFunction(ctx, near_storage_read, "storage_read", 2));
-  JS_SetPropertyStr(ctx, env, "account_balance", JS_NewCFunction(ctx, near_account_balance, "account_balance", 0));
-  JS_SetPropertyStr(ctx, env, "account_locked_balance", JS_NewCFunction(ctx, near_account_locked_balance, "account_locked_balance", 0));
-  JS_SetPropertyStr(ctx, env, "attached_deposit", JS_NewCFunction(ctx, near_attached_deposit, "attached_deposit", 0));
-  JS_SetPropertyStr(ctx, env, "prepaid_gas", JS_NewCFunction(ctx, near_prepaid_gas, "prepaid_gas", 0));
-  JS_SetPropertyStr(ctx, env, "used_gas", JS_NewCFunction(ctx, near_used_gas, "used_gas", 0));
-
-  JS_SetPropertyStr(ctx, env, "panic", JS_NewCFunction(ctx, near_panic, "panic", 0));
-
-  // Has not been tested in contracts.
+  JS_SetPropertyStr(ctx, env, "read_register", JS_NewCFunction(ctx, near_read_register, "read_register", 1));
   JS_SetPropertyStr(ctx, env, "register_len", JS_NewCFunction(ctx, near_register_len, "register_len", 1));
   JS_SetPropertyStr(ctx, env, "write_register", JS_NewCFunction(ctx, near_write_register, "write_register", 2));
   JS_SetPropertyStr(ctx, env, "current_account_id", JS_NewCFunction(ctx, near_current_account_id, "current_account_id", 1));
   JS_SetPropertyStr(ctx, env, "signer_account_id", JS_NewCFunction(ctx, near_signer_account_id, "signer_account_id", 1));
   JS_SetPropertyStr(ctx, env, "signer_account_pk", JS_NewCFunction(ctx, near_signer_account_pk, "signer_account_pk", 1));
   JS_SetPropertyStr(ctx, env, "predecessor_account_id", JS_NewCFunction(ctx, near_predecessor_account_id, "predecessor_account_id", 1));
+  JS_SetPropertyStr(ctx, env, "input", JS_NewCFunction(ctx, near_input, "input", 1));
   JS_SetPropertyStr(ctx, env, "block_index", JS_NewCFunction(ctx, near_block_index, "block_index", 0));
   JS_SetPropertyStr(ctx, env, "block_timestamp", JS_NewCFunction(ctx, near_block_timestamp, "block_timestamp", 0));
   JS_SetPropertyStr(ctx, env, "epoch_height", JS_NewCFunction(ctx, near_epoch_height, "epoch_height", 0));
   JS_SetPropertyStr(ctx, env, "storage_usage", JS_NewCFunction(ctx, near_storage_usage, "storage_usage", 0));
-
+  JS_SetPropertyStr(ctx, env, "account_balance", JS_NewCFunction(ctx, near_account_balance, "account_balance", 0));
+  JS_SetPropertyStr(ctx, env, "account_locked_balance", JS_NewCFunction(ctx, near_account_locked_balance, "account_locked_balance", 0));
+  JS_SetPropertyStr(ctx, env, "attached_deposit", JS_NewCFunction(ctx, near_attached_deposit, "attached_deposit", 0));
+  JS_SetPropertyStr(ctx, env, "prepaid_gas", JS_NewCFunction(ctx, near_prepaid_gas, "prepaid_gas", 0));
+  JS_SetPropertyStr(ctx, env, "used_gas", JS_NewCFunction(ctx, near_used_gas, "used_gas", 0));
   JS_SetPropertyStr(ctx, env, "random_seed", JS_NewCFunction(ctx, near_random_seed, "random_seed", 1));
   JS_SetPropertyStr(ctx, env, "sha256", JS_NewCFunction(ctx, near_sha256, "sha256", 2));
   JS_SetPropertyStr(ctx, env, "keccak256", JS_NewCFunction(ctx, near_keccak256, "keccak256", 2));
   JS_SetPropertyStr(ctx, env, "keccak512", JS_NewCFunction(ctx, near_keccak512, "keccak512", 2));
   JS_SetPropertyStr(ctx, env, "ripemd160", JS_NewCFunction(ctx, near_ripemd160, "ripemd160", 2));
   JS_SetPropertyStr(ctx, env, "ecrecover", JS_NewCFunction(ctx, near_ecrecover, "ecrecover", 5));
+  JS_SetPropertyStr(ctx, env, "value_return", JS_NewCFunction(ctx, near_value_return, "value_return", 1));
+  JS_SetPropertyStr(ctx, env, "panic", JS_NewCFunction(ctx, near_panic, "panic", 1));
   JS_SetPropertyStr(ctx, env, "panic_utf8", JS_NewCFunction(ctx, near_panic_utf8, "panic_utf8", 1));
+  JS_SetPropertyStr(ctx, env, "log", JS_NewCFunction(ctx, near_log, "log", 1));
   JS_SetPropertyStr(ctx, env, "log_utf8", JS_NewCFunction(ctx, near_log_utf8, "log_utf8", 1));
   JS_SetPropertyStr(ctx, env, "log_utf16", JS_NewCFunction(ctx, near_log_utf16, "log_utf16", 1));
   JS_SetPropertyStr(ctx, env, "promise_create", JS_NewCFunction(ctx, near_promise_create, "promise_create", 5));
@@ -897,6 +893,8 @@ static void js_add_near_host_functions(JSContext* ctx) {
   JS_SetPropertyStr(ctx, env, "promise_and", JS_NewCFunction(ctx, near_promise_and, "promise_and", 1));
   JS_SetPropertyStr(ctx, env, "promise_batch_create", JS_NewCFunction(ctx, near_promise_batch_create, "promise_batch_create", 1));
   JS_SetPropertyStr(ctx, env, "promise_batch_then", JS_NewCFunction(ctx, near_promise_batch_then, "promise_batch_then", 2));
+
+  // Has not been tested in contracts.
   JS_SetPropertyStr(ctx, env, "promise_batch_action_create_account", JS_NewCFunction(ctx, near_promise_batch_action_create_account, "promise_batch_action_create_account", 1));
   JS_SetPropertyStr(ctx, env, "promise_batch_action_deploy_contract", JS_NewCFunction(ctx, near_promise_batch_action_deploy_contract, "promise_batch_action_deploy_contract", 2));
   JS_SetPropertyStr(ctx, env, "promise_batch_action_function_call", JS_NewCFunction(ctx, near_promise_batch_action_function_call, "promise_batch_action_function_call", 5));

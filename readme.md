@@ -112,80 +112,93 @@ function epoch_height(): Uint64;
 function storage_usage(): Uint64;
 ```
 
+Economics API
+-------------
 ```
-// #################
-// # Economics API #
-// #################
-extern void account_balance(uint64_t balance_ptr);
-extern void account_locked_balance(uint64_t balance_ptr);
-extern void attached_deposit(uint64_t balance_ptr);
-extern uint64_t prepaid_gas();
-extern uint64_t used_gas();
-// ############
-// # Math API #
-// ############
-extern void random_seed(uint64_t register_id);
-extern void sha256(uint64_t value_len, uint64_t value_ptr, uint64_t register_id);
-extern void keccak256(uint64_t value_len, uint64_t value_ptr, uint64_t register_id);
-extern void keccak512(uint64_t value_len, uint64_t value_ptr, uint64_t register_id);
-extern void ripemd160(uint64_t value_len, uint64_t value_ptr, uint64_t register_id);
-extern uint64_t ecrecover(uint64_t hash_len, uint64_t hash_ptr, uint64_t sign_len, uint64_t sig_ptr, uint64_t v, uint64_t malleability_flag, uint64_t register_id);
-// #####################
-// # Miscellaneous API #
-// #####################
-extern void value_return(uint64_t value_len, uint64_t value_ptr);
-extern void panic(void);
-extern void panic_utf8(uint64_t len, uint64_t ptr);
-extern void log_utf8(uint64_t len, uint64_t ptr);
-extern void log_utf16(uint64_t len, uint64_t ptr);
+function account_balance(): Uint128;
+function account_locked_balance(): Uint128;
+function attached_deposit(): Uint128;
+function prepaid_gas(): Uint64;
+function used_gas(): Uint64;
+```
+
+Math API
+--------
+
+```
+function random_seed(register_id: Uint64);
+function sha256(value: String, register_id: Uint64);
+function keccak256(value: String, register_id: Uint64);
+function keccak512(value: String, register_id: Uint64);
+function ripemd160(value: String, register_id: Uint64);
+function ecrecover(hash: String, sign: String, v: Uint64, malleability_flag: Uint64, register_id: Uint64): Uint64;
+```
+
+Miscellaneous API
+-----------------
+
+```
+function value_return(value: String);
+function panic(msg?: String);
+function panic_utf8(msg: String);
+function log(msg: String);
+function log_utf8(msg: String);
+function log_utf16(msg: String);
 // Name confliction with WASI. Can be re-exported with a different name on NEAR side with a protocol upgrade
 // Or, this is actually not a primitive, can be implement with log and panic host functions in C side or JS side. 
-// extern void abort(uint32_t msg_ptr, uint32_t filename_ptr, uint32_t u32, uint32_t col);
-// ################
-// # Promises API #
-// ################
-extern uint64_t promise_create(uint64_t account_id_len, uint64_t account_id_ptr, uint64_t method_name_len, uint64_t method_name_ptr, uint64_t arguments_len, uint64_t arguments_ptr, uint64_t amount_ptr, uint64_t gas);
-extern uint64_t promise_then(uint64_t promise_index, uint64_t account_id_len, uint64_t account_id_ptr, uint64_t method_name_len, uint64_t method_name_ptr, uint64_t arguments_len, uint64_t arguments_ptr, uint64_t amount_ptr, uint64_t gas);
-extern uint64_t promise_and(uint64_t promise_idx_ptr, uint64_t promise_idx_count);
-extern uint64_t promise_batch_create(uint64_t account_id_len, uint64_t account_id_ptr);
-extern uint64_t promise_batch_then(uint64_t promise_index, uint64_t account_id_len, uint64_t account_id_ptr);
-// #######################
-// # Promise API actions #
-// #######################
-extern void promise_batch_action_create_account(uint64_t promise_index);
-extern void promise_batch_action_deploy_contract(uint64_t promise_index, uint64_t code_len, uint64_t code_ptr);
-extern void promise_batch_action_function_call(uint64_t promise_index, uint64_t method_name_len, uint64_t method_name_ptr, uint64_t arguments_len, uint64_t arguments_ptr, uint64_t amount_ptr, uint64_t gas);
-extern void promise_batch_action_transfer(uint64_t promise_index, uint64_t amount_ptr);
-extern void promise_batch_action_stake(uint64_t promise_index, uint64_t amount_ptr, uint64_t public_key_len, uint64_t public_key_ptr);
-extern void promise_batch_action_add_key_with_full_access(uint64_t promise_index, uint64_t public_key_len, uint64_t public_key_ptr, uint64_t nonce);
-extern void promise_batch_action_add_key_with_function_call(uint64_t promise_index, uint64_t public_key_len, uint64_t public_key_ptr, uint64_t nonce, uint64_t allowance_ptr, uint64_t receiver_id_len, uint64_t receiver_id_ptr, uint64_t method_names_len, uint64_t method_names_ptr);
-extern void promise_batch_action_delete_key(uint64_t promise_index, uint64_t public_key_len, uint64_t public_key_ptr);
-extern void promise_batch_action_delete_account(uint64_t promise_index, uint64_t beneficiary_id_len, uint64_t beneficiary_id_ptr);
+// function abort(msg_ptr: Uint32, filename_ptr: Uint32, u32: Uint32, col: Uint32);
+```
+
+Promises API
+
+```
+function promise_create(account_id: String, method_name: String, arguments: String, amount: Uint128, gas: Uint64): Uint64;
+function promise_then(promise_index: Uint64, account_id: String, method_name: String, arguments: String, amount: Uint128, gas: Uint64): Uint64;
+function promise_and(...promise_idx: Uint64): Uint64;
+function promise_batch_create(account_id: String): Uint64;
+function promise_batch_then(promise_index: Uint64, account_id: String): Uint64;
+```
+
+Promise API actions
+-------------------
+```
+function promise_batch_action_create_account(promise_index: Uint64);
+function promise_batch_action_deploy_contract(promise_index: Uint64, code: String);
+function promise_batch_action_function_call(promise_index: Uint64, method_name: String, arguments: String, amount: Uint128, gas: Uint64);
+function promise_batch_action_transfer(promise_index: Uint64, amount: Uint128);
+function promise_batch_action_stake(promise_index: Uint64, amount: Uint128, public_key: String);
+function promise_batch_action_add_key_with_full_access(promise_index: Uint64, public_key: String, nonce: Uint64);
+function promise_batch_action_add_key_with_function_call(promise_index: Uint64, public_key: String, nonce: Uint64, allowance: Uint128, receiver_id: String, method_names: String);
+function promise_batch_action_delete_key(promise_index: Uint64, public_key: String);
+function promise_batch_action_delete_account(promise_index: Uint64, beneficiary_id: String);
+```
+
+```
 // #######################
 // # Promise API results #
 // #######################
-extern uint64_t promise_results_count(void);
-extern uint64_t promise_result(uint64_t result_idx, uint64_t register_id);
-extern void promise_return(uint64_t promise_idx);
+function promise_results_count(void);
+function promise_result(result_idx: Uint64, register_id: Uint64);
+function promise_return(promise_idx: Uint64);
 // ###############
 // # Storage API #
 // ###############
-extern uint64_t storage_write(uint64_t key_len, uint64_t key_ptr, uint64_t value_len, uint64_t value_ptr, uint64_t register_id);
-extern uint64_t storage_read(uint64_t key_len, uint64_t key_ptr, uint64_t register_id);
-extern uint64_t storage_remove(uint64_t key_len, uint64_t key_ptr, uint64_t register_id);
-extern uint64_t storage_has_key(uint64_t key_len, uint64_t key_ptr);
-extern uint64_t storage_iter_prefix(uint64_t prefix_len, uint64_t prefix_ptr);
-extern uint64_t storage_iter_range(uint64_t start_len, uint64_t start_ptr, uint64_t end_len, uint64_t end_ptr);
-extern uint64_t storage_iter_next(uint64_t iterator_id, uint64_t key_register_id, uint64_t value_register_id);
+function storage_write(key_len: Uint64, key_ptr: Uint64, value: String, register_id: Uint64);
+function storage_read(key_len: Uint64, key_ptr: Uint64, register_id: Uint64);
+function storage_remove(key_len: Uint64, key_ptr: Uint64, register_id: Uint64);
+function storage_has_key(key_len: Uint64, key_ptr: Uint64);
+function storage_iter_prefix(prefix_len: Uint64, prefix_ptr: Uint64);
+function storage_iter_range(start_len: Uint64, start_ptr: Uint64, end_len: Uint64, end_ptr: Uint64);
+function storage_iter_next(iterator_id: Uint64, key_register_id: Uint64, value_register_id: Uint64);
 // #################
 // # Validator API #
 // #################
-extern void validator_stake(uint64_t account_id_len, uint64_t account_id_ptr, uint64_t stake_ptr);
-extern void validator_total_stake(uint64_t stake_ptr);
+function validator_stake(account_id_len: Uint64, account_id_ptr: Uint64, stake_ptr: Uint64);
+function validator_total_stake(stake_ptr: Uint64);
 // #############
 // # Alt BN128 #
 // #############
-extern void alt_bn128_g1_multiexp(uint64_t value_len, uint64_t value_ptr, uint64_t register_id);
-extern void alt_bn128_g1_sum(uint64_t value_len, uint64_t value_ptr, uint64_t register_id);
-extern uint64_t alt_bn128_pairing_check(uint64_t value_len, uint64_t value_ptr);
+function alt_bn128_g1_multiexp(value: String, register_id: Uint64);
+function alt_bn128_g1_sum(value: String, register_id: Uint64);
+function alt_bn128_pairing_check(value: String);
 ```
