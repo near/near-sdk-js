@@ -173,32 +173,34 @@ function promise_batch_action_delete_key(promise_index: Uint64, public_key: Stri
 function promise_batch_action_delete_account(promise_index: Uint64, beneficiary_id: String);
 ```
 
+Promise API results
+-------------------
 ```
-// #######################
-// # Promise API results #
-// #######################
-function promise_results_count(void);
-function promise_result(result_idx: Uint64, register_id: Uint64);
+function promise_results_count(void): Uint64;
+function promise_result(result_idx: Uint64, register_id: Uint64): Uint64;
 function promise_return(promise_idx: Uint64);
-// ###############
-// # Storage API #
-// ###############
-function storage_write(key_len: Uint64, key_ptr: Uint64, value: String, register_id: Uint64);
-function storage_read(key_len: Uint64, key_ptr: Uint64, register_id: Uint64);
-function storage_remove(key_len: Uint64, key_ptr: Uint64, register_id: Uint64);
-function storage_has_key(key_len: Uint64, key_ptr: Uint64);
-function storage_iter_prefix(prefix_len: Uint64, prefix_ptr: Uint64);
-function storage_iter_range(start_len: Uint64, start_ptr: Uint64, end_len: Uint64, end_ptr: Uint64);
-function storage_iter_next(iterator_id: Uint64, key_register_id: Uint64, value_register_id: Uint64);
-// #################
-// # Validator API #
-// #################
-function validator_stake(account_id_len: Uint64, account_id_ptr: Uint64, stake_ptr: Uint64);
-function validator_total_stake(stake_ptr: Uint64);
-// #############
-// # Alt BN128 #
-// #############
+```
+
+Storage API
+-----------
+```
+function storage_write(key: String, value: String, register_id: Uint64): Uint64;
+function storage_read(key: String, register_id: Uint64): Uint64;
+function storage_remove(key: String, register_id: Uint64): Uint64;
+function storage_has_key(key: String): Uint64;
+```
+
+Validator API
+-------------
+```
+function validator_stake(account_id: String): Uint128;
+function validator_total_stake(): Uint128;
+```
+
+Alt BN128
+---------
+```
 function alt_bn128_g1_multiexp(value: String, register_id: Uint64);
 function alt_bn128_g1_sum(value: String, register_id: Uint64);
-function alt_bn128_pairing_check(value: String);
+function alt_bn128_pairing_check(value: String): Uint64;
 ```

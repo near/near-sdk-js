@@ -115,9 +115,6 @@ extern uint64_t storage_write(uint64_t key_len, uint64_t key_ptr, uint64_t value
 extern uint64_t storage_read(uint64_t key_len, uint64_t key_ptr, uint64_t register_id);
 extern uint64_t storage_remove(uint64_t key_len, uint64_t key_ptr, uint64_t register_id);
 extern uint64_t storage_has_key(uint64_t key_len, uint64_t key_ptr);
-extern uint64_t storage_iter_prefix(uint64_t prefix_len, uint64_t prefix_ptr);
-extern uint64_t storage_iter_range(uint64_t start_len, uint64_t start_ptr, uint64_t end_len, uint64_t end_ptr);
-extern uint64_t storage_iter_next(uint64_t iterator_id, uint64_t key_register_id, uint64_t value_register_id);
 // #################
 // # Validator API #
 // #################
@@ -569,7 +566,7 @@ static JSValue near_promise_batch_action_deploy_contract(JSContext *ctx, JSValue
   size_t code_len;
 
   JS_ToUInt64Ext(ctx, &promise_index, argv[0]);
-  code_ptr = JS_ToCStringLen(ctx, &code_len, argv[1]);
+  code_ptr = JS_ToCStringLenRaw(ctx, &code_len, argv[1]);
   promise_batch_action_deploy_contract(promise_index, code_len, code_ptr);
   return JS_UNDEFINED;
 }
@@ -584,7 +581,7 @@ static JSValue near_promise_batch_action_function_call(JSContext *ctx, JSValueCo
 
   JS_ToUInt64Ext(ctx, &promise_index, argv[0]);
   method_name_ptr = JS_ToCStringLen(ctx, &method_name_len, argv[1]);
-  arguments_ptr = JS_ToCStringLen(ctx, &arguments_len, argv[2]);
+  arguments_ptr = JS_ToCStringLenRaw(ctx, &arguments_len, argv[2]);
   quickjs_to_u128(ctx, argv[3], amount_ptr);
   JS_ToUInt64Ext(ctx, &gas, argv[4]);  
   promise_batch_action_function_call(promise_index, method_name_len, method_name_ptr, arguments_len, arguments_ptr, amount_ptr, gas);
@@ -710,8 +707,8 @@ static JSValue near_storage_write(JSContext *ctx, JSValueConst this_val, int arg
   if (argc < 2) {
     return JS_EXCEPTION;
   }
-  key_ptr = JS_ToCStringLen(ctx, &key_len, argv[0]);
-  value_ptr = JS_ToCStringLen(ctx, &value_len, argv[1]);
+  key_ptr = JS_ToCStringLenRaw(ctx, &key_len, argv[0]);
+  value_ptr = JS_ToCStringLenRaw(ctx, &value_len, argv[1]);
   ret = storage_write(key_len, key_ptr, value_len, value_ptr, 0);
   return JS_NewBigUint64(ctx, ret);
 }
@@ -726,7 +723,7 @@ static JSValue near_storage_read(JSContext *ctx, JSValueConst this_val, int argc
   if (argc < 2) {
     return JS_EXCEPTION;
   }
-  key_ptr = JS_ToCStringLen(ctx, &key_len, argv[0]);
+  key_ptr = JS_ToCStringLenRaw(ctx, &key_len, argv[0]);
   JS_ToUInt64Ext(ctx, &register_id, argv[1]);
   ret = storage_read(key_len, key_ptr, register_id);
   return JS_NewBigUint64(ctx, ret);
@@ -739,7 +736,7 @@ static JSValue near_storage_remove(JSContext *ctx, JSValueConst this_val, int ar
   uint64_t register_id;
   uint64_t ret;
 
-  key_ptr = JS_ToCStringLen(ctx, &key_len, argv[0]);
+  key_ptr = JS_ToCStringLenRaw(ctx, &key_len, argv[0]);
   JS_ToUInt64Ext(ctx, &register_id, argv[1]);
   ret = storage_remove(key_len, key_ptr, register_id);
   return JS_NewBigUint64(ctx, ret);
@@ -751,44 +748,8 @@ static JSValue near_storage_has_key(JSContext *ctx, JSValueConst this_val, int a
   size_t key_len;
   uint64_t ret;
 
-  key_ptr = JS_ToCStringLen(ctx, &key_len, argv[0]);
+  key_ptr = JS_ToCStringLenRaw(ctx, &key_len, argv[0]);
   ret = storage_has_key(key_len, key_ptr);
-  return JS_NewBigUint64(ctx, ret);
-}
-
-static JSValue near_storage_iter_prefix(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
-{
-  const char *prefix_ptr;
-  size_t prefix_len;
-  uint64_t ret;
-
-  prefix_ptr = JS_ToCStringLen(ctx, &prefix_len, argv[0]);
-  ret = storage_iter_prefix(prefix_len, prefix_ptr);
-  return JS_NewBigUint64(ctx, ret);
-}
-
-static JSValue near_storage_iter_range(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
-{
-  const char *start_ptr, *end_ptr;
-  size_t start_len, end_len;
-  uint64_t ret;
-
-  start_ptr = JS_ToCStringLen(ctx, &start_len, argv[0]);
-  end_ptr = JS_ToCStringLen(ctx, &end_len, argv[0]);
-  ret = storage_iter_range(start_len, start_ptr, end_len, end_ptr);
-  return JS_NewBigUint64(ctx, ret);
-}
-
-static JSValue near_storage_iter_next(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
-{
-  uint64_t iterator_id, key_register_id, value_register_id;
-  uint64_t ret;
-
-  JS_ToUInt64Ext(ctx, &iterator_id, argv[0]);
-  JS_ToUInt64Ext(ctx, &key_register_id, argv[1]);
-  JS_ToUInt64Ext(ctx, &value_register_id, argv[2]);
-
-  ret = storage_iter_next(iterator_id, key_register_id, value_register_id);
   return JS_NewBigUint64(ctx, ret);
 }
 
@@ -818,7 +779,7 @@ static JSValue near_alt_bn128_g1_multiexp(JSContext *ctx, JSValueConst this_val,
   const char *data_ptr;
   size_t data_len;
 
-  data_ptr = JS_ToCStringLen(ctx, &data_len, argv[0]);
+  data_ptr = JS_ToCStringLenRaw(ctx, &data_len, argv[0]);
   JS_ToUInt64Ext(ctx, &register_id, argv[1]);
   
   alt_bn128_g1_multiexp(data_len, data_ptr, register_id);
@@ -831,7 +792,7 @@ static JSValue near_alt_bn128_g1_sum(JSContext *ctx, JSValueConst this_val, int 
   const char *data_ptr;
   size_t data_len;
 
-  data_ptr = JS_ToCStringLen(ctx, &data_len, argv[0]);
+  data_ptr = JS_ToCStringLenRaw(ctx, &data_len, argv[0]);
   JS_ToUInt64Ext(ctx, &register_id, argv[1]);
   
   alt_bn128_g1_sum(data_len, data_ptr, register_id);
@@ -844,7 +805,7 @@ static JSValue near_alt_bn128_pairing_check(JSContext *ctx, JSValueConst this_va
   size_t data_len;
   uint64_t ret;
 
-  data_ptr = JS_ToCStringLen(ctx, &data_len, argv[0]);
+  data_ptr = JS_ToCStringLenRaw(ctx, &data_len, argv[0]);
   
   ret = alt_bn128_pairing_check(data_len, data_ptr);
   return JS_NewBigUint64(ctx, ret);
@@ -857,8 +818,6 @@ static void js_add_near_host_functions(JSContext* ctx) {
   global_obj = JS_GetGlobalObject(ctx);
   env = JS_NewObject(ctx);
   // Has been test success cases in contracts. Failure cases are not.
-  JS_SetPropertyStr(ctx, env, "storage_write", JS_NewCFunction(ctx, near_storage_write, "storage_write", 2));
-  JS_SetPropertyStr(ctx, env, "storage_read", JS_NewCFunction(ctx, near_storage_read, "storage_read", 2));
   JS_SetPropertyStr(ctx, env, "read_register", JS_NewCFunction(ctx, near_read_register, "read_register", 1));
   JS_SetPropertyStr(ctx, env, "register_len", JS_NewCFunction(ctx, near_register_len, "register_len", 1));
   JS_SetPropertyStr(ctx, env, "write_register", JS_NewCFunction(ctx, near_write_register, "write_register", 2));
@@ -902,15 +861,15 @@ static void js_add_near_host_functions(JSContext* ctx) {
   JS_SetPropertyStr(ctx, env, "promise_batch_action_stake", JS_NewCFunction(ctx, near_promise_batch_action_stake, "promise_batch_action_stake", 3));
   JS_SetPropertyStr(ctx, env, "promise_batch_action_add_key_with_full_access", JS_NewCFunction(ctx, near_promise_batch_action_add_key_with_full_access, "promise_batch_action_add_key_with_full_access", 3));
   JS_SetPropertyStr(ctx, env, "promise_batch_action_add_key_with_function_call", JS_NewCFunction(ctx, near_promise_batch_action_add_key_with_function_call, "promise_batch_action_add_key_with_function_call", 6));
+  JS_SetPropertyStr(ctx, env, "promise_batch_action_delete_key", JS_NewCFunction(ctx, near_promise_batch_action_delete_key, "promise_batch_action_delete_key", 2));
   JS_SetPropertyStr(ctx, env, "promise_batch_action_delete_account", JS_NewCFunction(ctx, near_promise_batch_action_delete_account, "promise_batch_action_delete_account", 2));
   JS_SetPropertyStr(ctx, env, "promise_results_count", JS_NewCFunction(ctx, near_promise_results_count, "promise_results_count", 0));
   JS_SetPropertyStr(ctx, env, "promise_result", JS_NewCFunction(ctx, near_promise_result, "promise_result", 2));
   JS_SetPropertyStr(ctx, env, "promise_return", JS_NewCFunction(ctx, near_promise_return, "promise_return", 1));
+  JS_SetPropertyStr(ctx, env, "storage_write", JS_NewCFunction(ctx, near_storage_write, "storage_write", 2));
+  JS_SetPropertyStr(ctx, env, "storage_read", JS_NewCFunction(ctx, near_storage_read, "storage_read", 2));
   JS_SetPropertyStr(ctx, env, "storage_remove", JS_NewCFunction(ctx, near_storage_remove, "storage_remove", 2));
   JS_SetPropertyStr(ctx, env, "storage_has_key", JS_NewCFunction(ctx, near_storage_has_key, "storage_has_key", 2));
-  JS_SetPropertyStr(ctx, env, "storage_iter_prefix", JS_NewCFunction(ctx, near_storage_iter_prefix, "storage_iter_prefix", 1));
-  JS_SetPropertyStr(ctx, env, "storage_iter_range", JS_NewCFunction(ctx, near_storage_iter_range, "storage_iter_range", 2));
-  JS_SetPropertyStr(ctx, env, "storage_iter_next", JS_NewCFunction(ctx, near_storage_iter_next, "storage_iter_next", 3));
   JS_SetPropertyStr(ctx, env, "validator_stake", JS_NewCFunction(ctx, near_validator_stake, "validator_stake", 2));
   JS_SetPropertyStr(ctx, env, "validator_total_stake", JS_NewCFunction(ctx, near_validator_total_stake, "validator_total_stake", 1));
   JS_SetPropertyStr(ctx, env, "alt_bn128_g1_multiexp", JS_NewCFunction(ctx, near_alt_bn128_g1_multiexp, "alt_bn128_g1_multiexp", 2));
