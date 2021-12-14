@@ -1069,4 +1069,6 @@ inline bf_t *JS_GetBigInt(JSValueConst val)
 }
 #endif /* CONFIG_BIGNUM */
 
+JSValue js_get_module_ns(JSContext *ctx, JSModuleDef *m);
+
 #endif /* QUICKJS_H */
