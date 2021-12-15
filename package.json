@@ -1,0 +1,25 @@
+{
+  "name": "near-sdk-js-builder",
+  "version": "1.0.0",
+  "description": "QuickJS ======= The main documentation is in doc/quickjs.pdf or doc/quickjs.html.",
+  "main": "codegen.js",
+  "type": "module",
+  "directories": {
+    "doc": "doc",
+    "example": "examples",
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ailisp/quickjs.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ailisp/quickjs/issues"
+  },
+  "homepage": "https://github.com/ailisp/quickjs#readme"
+}

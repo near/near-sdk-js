@@ -1,6 +1,7 @@
-MAX_SUPPLY = 10
-TOTAL_SUPPLY = 'c'
-function mint_to() {
+const MAX_SUPPLY = 10
+const TOTAL_SUPPLY = 'c'
+
+export function mint_to() {
     let tokenId
     let hasRead = env.storage_read(TOTAL_SUPPLY, 0)
     if (hasRead != 0) {
