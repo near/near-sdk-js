@@ -1,5 +1,5 @@
-#include "quickjs-libc-min.h"
-#include "libbf.h"
+#include "quickjs/quickjs-libc-min.h"
+#include "quickjs/libbf.h"
 #include "code.h"
 
 static JSContext *JS_NewCustomContext(JSRuntime *rt)
