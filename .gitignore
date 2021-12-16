@@ -8,7 +8,8 @@
 /quickjs/qjscalc.c
 /quickjs/repl.c
 
-/build
+node_modules
+build
 /vendor
 code.h
 methods.h
