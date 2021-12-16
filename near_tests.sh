@@ -2,7 +2,11 @@
 
 set -euo pipefail
 
-runner=$HOME/workspace/nearcore/target/debug/near-vm-runner-standalone
+runner_default=$HOME/workspace/nearcore/target/debug/near-vm-runner-standalone
+runner=${NEAR_VM_RUNNER_STANDALONE:-${runner_default}}
+mkdir -p build
+cd build
+../builder.sh ../tests/near_tests.js
 
 function test {
     output=$($runner --wasm-file near_tests.wasm --method-name test_$1 ${@: 2})

@@ -1,8 +1,9 @@
-import fs from 'fs/promises';
+import fs from 'fs/promises'
+import path from 'path'
 
 async function main() {
-    let source = process.argv[process.argv.length-1]
-    let mod = await import('./'+source)
+    let source = path.resolve(process.argv[process.argv.length-1])
+    let mod = await import(source)
     let exportNames = Object.keys(mod)
     let methods = ''
     for (let name of exportNames) {
