@@ -134,11 +134,11 @@ static JSValue near_read_register(JSContext *ctx, JSValueConst this_val, int arg
   uint64_t data_len;
   JSValue ret;
 
-  JS_ToUInt64Ext(ctx, &register_id, argv[0]);
+  JS_ToUint64Ext(ctx, &register_id, argv[0]);
   data_len = register_len(register_id);
   if (data_len != UINT64_MAX) {
     data = malloc(data_len);
-    read_register(register_id, data);
+    read_register(register_id, (uint64_t)data);
     ret = JS_NewStringLenRaw(ctx, data, data_len);
     free(data);
     return ret;
@@ -151,7 +151,7 @@ static JSValue near_register_len(JSContext *ctx, JSValueConst this_val, int argc
 {
   uint64_t register_id, len;
 
-  JS_ToUInt64Ext(ctx, &register_id, argv[0]);
+  JS_ToUint64Ext(ctx, &register_id, argv[0]);
   len = register_len(register_id);
   return JS_NewBigUint64(ctx, len);
 }
@@ -162,9 +162,9 @@ static JSValue near_write_register(JSContext *ctx, JSValueConst this_val, int ar
   const char *data_ptr;
   size_t data_len;
 
-  JS_ToUInt64Ext(ctx, &register_id, argv[0]);
+  JS_ToUint64Ext(ctx, &register_id, argv[0]);
   data_ptr = JS_ToCStringLenRaw(ctx, &data_len, argv[1]);
-  write_register(register_id, data_len, data_ptr);
+  write_register(register_id, data_len, (uint64_t)data_ptr);
   return JS_UNDEFINED;
 }
 
@@ -172,7 +172,7 @@ static JSValue near_current_account_id(JSContext *ctx, JSValueConst this_val, in
 {
   uint64_t register_id;
 
-  JS_ToUInt64Ext(ctx, &register_id, argv[0]);
+  JS_ToUint64Ext(ctx, &register_id, argv[0]);
   current_account_id(register_id);
   return JS_UNDEFINED;
 }
@@ -180,7 +180,7 @@ static JSValue near_current_account_id(JSContext *ctx, JSValueConst this_val, in
 static JSValue near_signer_account_id(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
   uint64_t register_id;
 
-  JS_ToUInt64Ext(ctx, &register_id, argv[0]);
+  JS_ToUint64Ext(ctx, &register_id, argv[0]);
   signer_account_id(register_id);
   return JS_UNDEFINED;
 }
@@ -188,7 +188,7 @@ static JSValue near_signer_account_id(JSContext *ctx, JSValueConst this_val, int
 static JSValue near_signer_account_pk(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
   uint64_t register_id;
 
-  JS_ToUInt64Ext(ctx, &register_id, argv[0]);
+  JS_ToUint64Ext(ctx, &register_id, argv[0]);
   signer_account_pk(register_id);
   return JS_UNDEFINED;
 }
@@ -204,7 +204,7 @@ static JSValue near_input(JSContext *ctx, JSValueConst this_val, int argc, JSVal
 {
   uint64_t register_id;
 
-  JS_ToUInt64Ext(ctx, &register_id, argv[0]);
+  JS_ToUint64Ext(ctx, &register_id, argv[0]);
   input(register_id);
   return JS_UNDEFINED;
 }
@@ -281,7 +281,7 @@ static void quickjs_bigint_to_u128(JSContext *ctx, JSValueConst val, uint64_t* p
 }
 
 static void quickjs_int_to_u128(JSContext *ctx, JSValueConst val, uint64_t* ptr) {
-  JS_ToUInt64Ext(ctx, ptr, val);
+  JS_ToUint64Ext(ctx, ptr, val);
   ptr[1] = 0;
 }
 
@@ -336,7 +336,7 @@ static JSValue near_random_seed(JSContext *ctx, JSValueConst this_val, int argc,
 {
   uint64_t register_id;
 
-  JS_ToUInt64Ext(ctx, &register_id, argv[0]);
+  JS_ToUint64Ext(ctx, &register_id, argv[0]);
   random_seed(register_id);
   return JS_UNDEFINED;
 }
@@ -348,9 +348,9 @@ static JSValue near_sha256(JSContext *ctx, JSValueConst this_val, int argc, JSVa
   size_t data_len;
 
   data_ptr = JS_ToCStringLenRaw(ctx, &data_len, argv[0]);
-  JS_ToUInt64Ext(ctx, &register_id, argv[1]);
+  JS_ToUint64Ext(ctx, &register_id, argv[1]);
   
-  sha256(data_len, data_ptr, register_id);
+  sha256(data_len, (uint64_t)data_ptr, register_id);
   return JS_UNDEFINED;
 }
 
@@ -361,9 +361,9 @@ static JSValue near_keccak256(JSContext *ctx, JSValueConst this_val, int argc, J
   size_t data_len;
 
   data_ptr = JS_ToCStringLenRaw(ctx, &data_len, argv[0]);
-  JS_ToUInt64Ext(ctx, &register_id, argv[1]);
+  JS_ToUint64Ext(ctx, &register_id, argv[1]);
   
-  keccak256(data_len, data_ptr, register_id);
+  keccak256(data_len, (uint64_t)data_ptr, register_id);
   return JS_UNDEFINED;
 }
 
@@ -374,9 +374,9 @@ static JSValue near_keccak512(JSContext *ctx, JSValueConst this_val, int argc, J
   size_t data_len;
 
   data_ptr = JS_ToCStringLenRaw(ctx, &data_len, argv[0]);
-  JS_ToUInt64Ext(ctx, &register_id, argv[1]);
+  JS_ToUint64Ext(ctx, &register_id, argv[1]);
   
-  keccak512(data_len, data_ptr, register_id);
+  keccak512(data_len, (uint64_t)data_ptr, register_id);
   return JS_UNDEFINED;
 }
 
@@ -387,9 +387,9 @@ static JSValue near_ripemd160(JSContext *ctx, JSValueConst this_val, int argc, J
   size_t data_len;
 
   data_ptr = JS_ToCStringLenRaw(ctx, &data_len, argv[0]);
-  JS_ToUInt64Ext(ctx, &register_id, argv[1]);
+  JS_ToUint64Ext(ctx, &register_id, argv[1]);
   
-  ripemd160(data_len, data_ptr, register_id);
+  ripemd160(data_len, (uint64_t)data_ptr, register_id);
   return JS_UNDEFINED;
 }
 
@@ -401,11 +401,11 @@ static JSValue near_ecrecover(JSContext *ctx, JSValueConst this_val, int argc, J
 
   hash_ptr = JS_ToCStringLenRaw(ctx, &hash_len, argv[0]);
   sig_ptr = JS_ToCStringLenRaw(ctx, &sign_len, argv[1]);
-  JS_ToUInt64Ext(ctx, &malleability_flag, argv[2]);
-  JS_ToUInt64Ext(ctx, &v, argv[3]);
-  JS_ToUInt64Ext(ctx, &register_id, argv[4]);
+  JS_ToUint64Ext(ctx, &malleability_flag, argv[2]);
+  JS_ToUint64Ext(ctx, &v, argv[3]);
+  JS_ToUint64Ext(ctx, &register_id, argv[4]);
  
-  result = ecrecover(hash_len, hash_ptr, sign_len, sig_ptr, malleability_flag, v, register_id);
+  result = ecrecover(hash_len, (uint64_t)hash_ptr, sign_len, (uint64_t)sig_ptr, malleability_flag, v, register_id);
   return JS_NewBigUint64(ctx, result);
 }
 
@@ -415,7 +415,7 @@ static JSValue near_value_return(JSContext *ctx, JSValueConst this_val, int argc
   size_t value_len;
 
   value_ptr = JS_ToCStringLenRaw(ctx, &value_len, argv[0]);
-  value_return(value_len, value_ptr);
+  value_return(value_len, (uint64_t)value_ptr);
   return JS_UNDEFINED;
 }
 
@@ -426,7 +426,7 @@ static JSValue near_panic(JSContext *ctx, JSValueConst this_val, int argc, JSVal
 
   if (argc == 1) {
     data_ptr = JS_ToCStringLen(ctx, &data_len, argv[0]);
-    panic_utf8(data_len, data_ptr);
+    panic_utf8(data_len, (uint64_t)data_ptr);
   } else {
     panic();
   }
@@ -440,7 +440,7 @@ static JSValue near_panic_utf8(JSContext *ctx, JSValueConst this_val, int argc, 
 
   data_ptr = JS_ToCStringLenRaw(ctx, &data_len, argv[0]);
   
-  panic_utf8(data_len, data_ptr);
+  panic_utf8(data_len, (uint64_t)data_ptr);
   return JS_UNDEFINED;
 }
 
@@ -451,7 +451,7 @@ static JSValue near_log(JSContext *ctx, JSValueConst this_val, int argc, JSValue
 
   data_ptr = JS_ToCStringLen(ctx, &data_len, argv[0]);
   
-  log_utf8(data_len, data_ptr);
+  log_utf8(data_len, (uint64_t)data_ptr);
   return JS_UNDEFINED;
 }
 
@@ -462,7 +462,7 @@ static JSValue near_log_utf8(JSContext *ctx, JSValueConst this_val, int argc, JS
 
   data_ptr = JS_ToCStringLenRaw(ctx, &data_len, argv[0]);
   
-  log_utf8(data_len, data_ptr);
+  log_utf8(data_len, (uint64_t)data_ptr);
   return JS_UNDEFINED;
 }
 
@@ -472,7 +472,7 @@ static JSValue near_log_utf16(JSContext *ctx, JSValueConst this_val, int argc, J
   size_t data_len;
 
   data_ptr = JS_ToCStringLenRaw(ctx, &data_len, argv[0]);
-  log_utf16(data_len, data_ptr);
+  log_utf16(data_len, (uint64_t)data_ptr);
   return JS_UNDEFINED;
 }
 
@@ -487,9 +487,9 @@ static JSValue near_promise_create(JSContext *ctx, JSValueConst this_val, int ar
   method_name_ptr = JS_ToCStringLen(ctx, &method_name_len, argv[1]);
   arguments_ptr = JS_ToCStringLenRaw(ctx, &arguments_len, argv[2]);
   quickjs_to_u128(ctx, argv[3], amount_ptr);
-  JS_ToUInt64Ext(ctx, &gas, argv[4]);
+  JS_ToUint64Ext(ctx, &gas, argv[4]);
 
-  ret = promise_create(account_id_len, account_id_ptr, method_name_len, method_name_ptr, arguments_len, arguments_ptr, amount_ptr, gas);
+  ret = promise_create(account_id_len, (uint64_t)account_id_ptr, method_name_len, (uint64_t)method_name_ptr, arguments_len, (uint64_t)arguments_ptr, (uint64_t)amount_ptr, gas);
   
   return JS_NewBigUint64(ctx, ret);
 }
@@ -502,14 +502,14 @@ static JSValue near_promise_then(JSContext *ctx, JSValueConst this_val, int argc
   uint64_t amount_ptr[2]; // amount is u128
   uint64_t gas, ret;
 
-  JS_ToUInt64Ext(ctx, &promise_index, argv[0]);
+  JS_ToUint64Ext(ctx, &promise_index, argv[0]);
   account_id_ptr = JS_ToCStringLen(ctx, &account_id_len, argv[1]);
   method_name_ptr = JS_ToCStringLen(ctx, &method_name_len, argv[2]);
   arguments_ptr = JS_ToCStringLenRaw(ctx, &arguments_len, argv[3]);
   quickjs_to_u128(ctx, argv[4], amount_ptr);
-  JS_ToUInt64Ext(ctx, &gas, argv[5]);
+  JS_ToUint64Ext(ctx, &gas, argv[5]);
 
-  ret = promise_then(promise_index, account_id_len, account_id_ptr, method_name_len, method_name_ptr, arguments_len, arguments_ptr, amount_ptr, gas);
+  ret = promise_then(promise_index, account_id_len, (uint64_t)account_id_ptr, method_name_len, (uint64_t)method_name_ptr, arguments_len, (uint64_t)arguments_ptr, (uint64_t)amount_ptr, gas);
   
   return JS_NewBigUint64(ctx, ret);
 }
@@ -519,9 +519,9 @@ static JSValue near_promise_and(JSContext *ctx, JSValueConst this_val, int argc,
   uint64_t promise_idx_ptr[argc], ret;
 
   for(int i = 0; i < argc; i++) {
-    JS_ToUInt64Ext(ctx, &promise_idx_ptr[i], argv[i]);
+    JS_ToUint64Ext(ctx, &promise_idx_ptr[i], argv[i]);
   }
-  ret = promise_and(promise_idx_ptr, argc);
+  ret = promise_and((uint64_t)promise_idx_ptr, argc);
   return JS_NewBigUint64(ctx, ret);
 }
 
@@ -532,7 +532,7 @@ static JSValue near_promise_batch_create(JSContext *ctx, JSValueConst this_val, 
   uint64_t ret;
 
   account_id_ptr = JS_ToCStringLen(ctx, &account_id_len, argv[0]);
-  ret = promise_batch_create(account_id_len, account_id_ptr);
+  ret = promise_batch_create(account_id_len, (uint64_t)account_id_ptr);
   return JS_NewBigUint64(ctx, ret);
 }
 
@@ -543,9 +543,9 @@ static JSValue near_promise_batch_then(JSContext *ctx, JSValueConst this_val, in
   size_t account_id_len;
   uint64_t ret;
 
-  JS_ToUInt64Ext(ctx, &promise_index, argv[0]);
+  JS_ToUint64Ext(ctx, &promise_index, argv[0]);
   account_id_ptr = JS_ToCStringLen(ctx, &account_id_len, argv[1]);
-  ret = promise_batch_then(promise_index, account_id_len, account_id_ptr);
+  ret = promise_batch_then(promise_index, account_id_len, (uint64_t)account_id_ptr);
   return JS_NewBigUint64(ctx, ret);
 }
 
@@ -553,7 +553,7 @@ static JSValue near_promise_batch_action_create_account(JSContext *ctx, JSValueC
 {
   uint64_t promise_index;
 
-  JS_ToUInt64Ext(ctx, &promise_index, argv[0]);
+  JS_ToUint64Ext(ctx, &promise_index, argv[0]);
   promise_batch_action_create_account(promise_index);
   return JS_UNDEFINED;
 }
@@ -564,9 +564,9 @@ static JSValue near_promise_batch_action_deploy_contract(JSContext *ctx, JSValue
   const char *code_ptr;
   size_t code_len;
 
-  JS_ToUInt64Ext(ctx, &promise_index, argv[0]);
+  JS_ToUint64Ext(ctx, &promise_index, argv[0]);
   code_ptr = JS_ToCStringLenRaw(ctx, &code_len, argv[1]);
-  promise_batch_action_deploy_contract(promise_index, code_len, code_ptr);
+  promise_batch_action_deploy_contract(promise_index, code_len, (uint64_t)code_ptr);
   return JS_UNDEFINED;
 }
 
@@ -578,12 +578,12 @@ static JSValue near_promise_batch_action_function_call(JSContext *ctx, JSValueCo
   uint64_t amount_ptr[2]; // amount is u128
   uint64_t gas;
 
-  JS_ToUInt64Ext(ctx, &promise_index, argv[0]);
+  JS_ToUint64Ext(ctx, &promise_index, argv[0]);
   method_name_ptr = JS_ToCStringLen(ctx, &method_name_len, argv[1]);
   arguments_ptr = JS_ToCStringLenRaw(ctx, &arguments_len, argv[2]);
   quickjs_to_u128(ctx, argv[3], amount_ptr);
-  JS_ToUInt64Ext(ctx, &gas, argv[4]);  
-  promise_batch_action_function_call(promise_index, method_name_len, method_name_ptr, arguments_len, arguments_ptr, amount_ptr, gas);
+  JS_ToUint64Ext(ctx, &gas, argv[4]);  
+  promise_batch_action_function_call(promise_index, method_name_len, (uint64_t)method_name_ptr, arguments_len, (uint64_t)arguments_ptr, (uint64_t)amount_ptr, gas);
   return JS_UNDEFINED;
 }
 
@@ -592,9 +592,9 @@ static JSValue near_promise_batch_action_transfer(JSContext *ctx, JSValueConst t
   uint64_t promise_index;
   uint64_t amount_ptr[2]; // amount is u128
 
-  JS_ToUInt64Ext(ctx, &promise_index, argv[0]);
+  JS_ToUint64Ext(ctx, &promise_index, argv[0]);
   quickjs_to_u128(ctx, argv[1], amount_ptr);
-  promise_batch_action_transfer(promise_index, amount_ptr);
+  promise_batch_action_transfer(promise_index, (uint64_t)amount_ptr);
   return JS_UNDEFINED;
 }
 
@@ -604,11 +604,11 @@ static JSValue near_promise_batch_action_stake(JSContext *ctx, JSValueConst this
   uint64_t amount_ptr[2];
   const char *public_key_ptr;
   size_t public_key_len;
-  JS_ToUInt64Ext(ctx, &promise_index, argv[0]);
+  JS_ToUint64Ext(ctx, &promise_index, argv[0]);
   quickjs_to_u128(ctx, argv[1], amount_ptr);
   public_key_ptr = JS_ToCStringLen(ctx, &public_key_len, argv[2]);
 
-  promise_batch_action_stake(promise_index, amount_ptr, public_key_len, public_key_ptr);
+  promise_batch_action_stake(promise_index, (uint64_t)amount_ptr, public_key_len, (uint64_t)public_key_ptr);
   return JS_UNDEFINED;
 }
 
@@ -619,10 +619,10 @@ static JSValue near_promise_batch_action_add_key_with_full_access(JSContext *ctx
   size_t public_key_len;
   uint64_t nonce;
 
-  JS_ToUInt64Ext(ctx, &promise_index, argv[0]);
+  JS_ToUint64Ext(ctx, &promise_index, argv[0]);
   public_key_ptr = JS_ToCStringLen(ctx, &public_key_len, argv[1]);
-  JS_ToUInt64Ext(ctx, &nonce, argv[2]);
-  promise_batch_action_add_key_with_full_access(promise_index, public_key_len, public_key_ptr, nonce);
+  JS_ToUint64Ext(ctx, &nonce, argv[2]);
+  promise_batch_action_add_key_with_full_access(promise_index, public_key_len, (uint64_t)public_key_ptr, nonce);
   return JS_UNDEFINED;
 }
 
@@ -633,14 +633,14 @@ static JSValue near_promise_batch_action_add_key_with_function_call(JSContext *c
   size_t public_key_len, receiver_id_len, method_names_len;
   uint64_t nonce, allowance_ptr[2];
 
-  JS_ToUInt64Ext(ctx, &promise_index, argv[0]);
+  JS_ToUint64Ext(ctx, &promise_index, argv[0]);
   public_key_ptr = JS_ToCStringLen(ctx, &public_key_len, argv[1]);
-  JS_ToUInt64Ext(ctx, &nonce, argv[2]);
+  JS_ToUint64Ext(ctx, &nonce, argv[2]);
   quickjs_to_u128(ctx, argv[3], allowance_ptr);
   receiver_id_ptr = JS_ToCStringLen(ctx, &receiver_id_len, argv[4]);
   method_names_ptr = JS_ToCStringLen(ctx, &method_names_len, argv[5]);
 
-  promise_batch_action_add_key_with_function_call(promise_index, public_key_len, public_key_ptr, nonce, allowance_ptr, receiver_id_len, receiver_id_ptr, method_names_len, method_names_ptr);
+  promise_batch_action_add_key_with_function_call(promise_index, public_key_len, (uint64_t)public_key_ptr, nonce, (uint64_t)allowance_ptr, receiver_id_len, (uint64_t)receiver_id_ptr, method_names_len, (uint64_t)method_names_ptr);
   return JS_UNDEFINED;
 }
 
@@ -650,9 +650,9 @@ static JSValue near_promise_batch_action_delete_key(JSContext *ctx, JSValueConst
   const char *public_key_ptr;
   size_t public_key_len;
 
-  JS_ToUInt64Ext(ctx, &promise_index, argv[0]);
+  JS_ToUint64Ext(ctx, &promise_index, argv[0]);
   public_key_ptr = JS_ToCStringLen(ctx, &public_key_len, argv[1]);
-  promise_batch_action_delete_key(promise_index, public_key_len, public_key_ptr);
+  promise_batch_action_delete_key(promise_index, public_key_len, (uint64_t)public_key_ptr);
   return JS_UNDEFINED;
 }
 
@@ -662,9 +662,9 @@ static JSValue near_promise_batch_action_delete_account(JSContext *ctx, JSValueC
   const char *beneficiary_id_ptr;
   size_t beneficiary_id_len;
 
-  JS_ToUInt64Ext(ctx, &promise_index, argv[0]);
+  JS_ToUint64Ext(ctx, &promise_index, argv[0]);
   beneficiary_id_ptr = JS_ToCStringLen(ctx, &beneficiary_id_len, argv[1]);
-  promise_batch_action_delete_account(promise_index, beneficiary_id_len, beneficiary_id_ptr);
+  promise_batch_action_delete_account(promise_index, beneficiary_id_len, (uint64_t)beneficiary_id_ptr);
   return JS_UNDEFINED;
 }
 
@@ -681,8 +681,8 @@ static JSValue near_promise_result(JSContext *ctx, JSValueConst this_val, int ar
   uint64_t result_idx, register_id;
   uint64_t ret;
 
-  JS_ToUInt64Ext(ctx, &result_idx, argv[0]);
-  JS_ToUInt64Ext(ctx, &register_id, argv[1]);
+  JS_ToUint64Ext(ctx, &result_idx, argv[0]);
+  JS_ToUint64Ext(ctx, &register_id, argv[1]);
   ret = promise_result(result_idx, register_id);
 
   return JS_NewBigUint64(ctx, ret);
@@ -691,7 +691,7 @@ static JSValue near_promise_result(JSContext *ctx, JSValueConst this_val, int ar
 static JSValue near_promise_return(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
 {
   uint64_t promise_idx;
-  JS_ToUInt64Ext(ctx, &promise_idx, argv[0]);
+  JS_ToUint64Ext(ctx, &promise_idx, argv[0]);
   promise_return(promise_idx);
   
   return JS_UNDEFINED;
@@ -708,7 +708,7 @@ static JSValue near_storage_write(JSContext *ctx, JSValueConst this_val, int arg
   }
   key_ptr = JS_ToCStringLenRaw(ctx, &key_len, argv[0]);
   value_ptr = JS_ToCStringLenRaw(ctx, &value_len, argv[1]);
-  ret = storage_write(key_len, key_ptr, value_len, value_ptr, 0);
+  ret = storage_write(key_len, (uint64_t)key_ptr, value_len, (uint64_t)value_ptr, 0);
   return JS_NewBigUint64(ctx, ret);
 }
 
@@ -723,8 +723,8 @@ static JSValue near_storage_read(JSContext *ctx, JSValueConst this_val, int argc
     return JS_EXCEPTION;
   }
   key_ptr = JS_ToCStringLenRaw(ctx, &key_len, argv[0]);
-  JS_ToUInt64Ext(ctx, &register_id, argv[1]);
-  ret = storage_read(key_len, key_ptr, register_id);
+  JS_ToUint64Ext(ctx, &register_id, argv[1]);
+  ret = storage_read(key_len, (uint64_t)key_ptr, register_id);
   return JS_NewBigUint64(ctx, ret);
 }
 
@@ -736,8 +736,8 @@ static JSValue near_storage_remove(JSContext *ctx, JSValueConst this_val, int ar
   uint64_t ret;
 
   key_ptr = JS_ToCStringLenRaw(ctx, &key_len, argv[0]);
-  JS_ToUInt64Ext(ctx, &register_id, argv[1]);
-  ret = storage_remove(key_len, key_ptr, register_id);
+  JS_ToUint64Ext(ctx, &register_id, argv[1]);
+  ret = storage_remove(key_len, (uint64_t)key_ptr, register_id);
   return JS_NewBigUint64(ctx, ret);
 }
 
@@ -748,7 +748,7 @@ static JSValue near_storage_has_key(JSContext *ctx, JSValueConst this_val, int a
   uint64_t ret;
 
   key_ptr = JS_ToCStringLenRaw(ctx, &key_len, argv[0]);
-  ret = storage_has_key(key_len, key_ptr);
+  ret = storage_has_key(key_len, (uint64_t)key_ptr);
   return JS_NewBigUint64(ctx, ret);
 }
 
@@ -759,7 +759,7 @@ static JSValue near_validator_stake(JSContext *ctx, JSValueConst this_val, int a
   uint64_t stake_ptr[2];
 
   account_id_ptr = JS_ToCStringLen(ctx, &account_id_len, argv[0]);
-  validator_stake(account_id_len, account_id_ptr, stake_ptr);
+  validator_stake(account_id_len, (uint64_t)account_id_ptr, (uint64_t)stake_ptr);
 
   return u128_to_quickjs(ctx, stake_ptr);
 }
@@ -768,7 +768,7 @@ static JSValue near_validator_total_stake(JSContext *ctx, JSValueConst this_val,
 {
   uint64_t stake_ptr[2];
 
-  validator_total_stake(stake_ptr);
+  validator_total_stake((uint64_t)stake_ptr);
   return u128_to_quickjs(ctx, stake_ptr);
 }
 
@@ -779,9 +779,9 @@ static JSValue near_alt_bn128_g1_multiexp(JSContext *ctx, JSValueConst this_val,
   size_t data_len;
 
   data_ptr = JS_ToCStringLenRaw(ctx, &data_len, argv[0]);
-  JS_ToUInt64Ext(ctx, &register_id, argv[1]);
+  JS_ToUint64Ext(ctx, &register_id, argv[1]);
   
-  alt_bn128_g1_multiexp(data_len, data_ptr, register_id);
+  alt_bn128_g1_multiexp(data_len, (uint64_t)data_ptr, register_id);
   return JS_UNDEFINED;
 }
 
@@ -792,9 +792,9 @@ static JSValue near_alt_bn128_g1_sum(JSContext *ctx, JSValueConst this_val, int 
   size_t data_len;
 
   data_ptr = JS_ToCStringLenRaw(ctx, &data_len, argv[0]);
-  JS_ToUInt64Ext(ctx, &register_id, argv[1]);
+  JS_ToUint64Ext(ctx, &register_id, argv[1]);
   
-  alt_bn128_g1_sum(data_len, data_ptr, register_id);
+  alt_bn128_g1_sum(data_len, (uint64_t)data_ptr, register_id);
   return JS_UNDEFINED;
 }
 
@@ -806,7 +806,7 @@ static JSValue near_alt_bn128_pairing_check(JSContext *ctx, JSValueConst this_va
 
   data_ptr = JS_ToCStringLenRaw(ctx, &data_len, argv[0]);
   
-  ret = alt_bn128_pairing_check(data_len, data_ptr);
+  ret = alt_bn128_pairing_check(data_len, (uint64_t)data_ptr);
   return JS_NewBigUint64(ctx, ret);
 }
 

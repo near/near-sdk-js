@@ -1244,25 +1244,25 @@ static const JSClassExoticMethods js_proxy_exotic_methods;
 static const JSClassExoticMethods js_module_ns_exotic_methods;
 static JSClassID js_class_id_alloc = JS_CLASS_INIT_COUNT;
 
-static void js_trigger_gc(JSRuntime *rt, size_t size)
-{
-    BOOL force_gc;
-#ifdef FORCE_GC_AT_MALLOC
-    force_gc = TRUE;
-#else
-    force_gc = ((rt->malloc_state.malloc_size + size) >
-                rt->malloc_gc_threshold);
-#endif
-    if (force_gc) {
-#ifdef DUMP_GC
-        printf("GC: size=%" PRIu64 "\n",
-               (uint64_t)rt->malloc_state.malloc_size);
-#endif
-        JS_RunGC(rt);
-        rt->malloc_gc_threshold = rt->malloc_state.malloc_size +
-            (rt->malloc_state.malloc_size >> 1);
-    }
-}
+// static void js_trigger_gc(JSRuntime *rt, size_t size)
+// {
+//     BOOL force_gc;
+// #ifdef FORCE_GC_AT_MALLOC
+//     force_gc = TRUE;
+// #else
+//     force_gc = ((rt->malloc_state.malloc_size + size) >
+//                 rt->malloc_gc_threshold);
+// #endif
+//     if (force_gc) {
+// #ifdef DUMP_GC
+//         printf("GC: size=%" PRIu64 "\n",
+//                (uint64_t)rt->malloc_state.malloc_size);
+// #endif
+//         JS_RunGC(rt);
+//         rt->malloc_gc_threshold = rt->malloc_state.malloc_size +
+//             (rt->malloc_state.malloc_size >> 1);
+//     }
+// }
 
 static size_t js_malloc_usable_size_unknown(const void *ptr)
 {
@@ -10760,7 +10760,7 @@ static int JS_ToInt64SatFree(JSContext *ctx, int64_t *pres, JSValue val)
             } else {
                 if (d < INT64_MIN)
                     *pres = INT64_MIN;
-                else if (d > INT64_MAX)
+                else if (d > (double)INT64_MAX)
                     *pres = INT64_MAX;
                 else
                     *pres = (int64_t)d;
@@ -10881,7 +10881,7 @@ int JS_ToInt64Ext(JSContext *ctx, int64_t *pres, JSValueConst val)
         return JS_ToInt64(ctx, pres, val);
 }
 
-int JS_ToUInt64Ext(JSContext *ctx, uint64_t *pres, JSValueConst val)
+int JS_ToUint64Ext(JSContext *ctx, uint64_t *pres, JSValueConst val)
 {
     if (JS_IsBigInt(ctx, val))
         return JS_ToBigUint64(ctx, pres, val);

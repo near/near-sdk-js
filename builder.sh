@@ -23,7 +23,6 @@ SOURCES="${SCRIPT_DIR}/builder.c"
 for i in "${QUICKJS_SOURCES[@]}"; do 
   SOURCES="${SOURCES} ${QUICKJS_SRC_DIR}/${i}"
 done
-echo $SOURCES
 
 $CC --target=wasm32-wasi \
     -nostartfiles -Oz \

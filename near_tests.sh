@@ -12,7 +12,7 @@ function test {
     output=$($runner --wasm-file near_tests.wasm --method-name test_$1 ${@: 2})
     if grep -q 'err: None' <<< $output; then
         echo test_$1 OK
-        # $runner --wasm-file near_tests.wasm --method-name test_$1 ${@: 2}
+        $runner --wasm-file near_tests.wasm --method-name test_$1 ${@: 2}
     else
         echo test_$1 FAILED
         $runner --wasm-file near_tests.wasm --method-name test_$1 ${@: 2}
