@@ -6,6 +6,7 @@ WASI_SDK_PATH=${SCRIPT_DIR}/vendor/wasi-sdk-11.0
 CC="${WASI_SDK_PATH}/bin/clang --sysroot=${WASI_SDK_PATH}/share/wasi-sysroot"
 QUICKJS_SRC_DIR=${SCRIPT_DIR}/quickjs
 QJSC=${QUICKJS_SRC_DIR}/qjsc
+WASI_STUB=${SCRIPT_DIR}/vendor/binaryen/wasi-stub/run.sh
 TARGET=$(basename ${1%.*}).wasm
 
 rm -f ${TARGET}
@@ -34,3 +35,4 @@ $CC --target=wasm32-wasi \
     -o ${TARGET}
 
 rm code.h methods.h
+${WASI_STUB} ${TARGET}

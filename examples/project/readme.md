@@ -10,4 +10,4 @@ npm i
 npm run build
 ```
 
-The result contract is `build/project.wasm`. It can be tested with neard and near-vm-runner-standalone (Note: only near-sdk-js branch of nearcore for now).
+The result contract is `build/project.wasm`. It can be tested with neard and near-vm-runner-standalone.

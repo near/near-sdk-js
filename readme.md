@@ -3,14 +3,14 @@
 ## Installation
 It is tested on Ubuntu 20.04. Other linux should also works. Use on Mac is work in progress.
 
-1. Make sure you have gcc and make.
+1. Make sure you have gcc, make and cmake.
 2. `./setup.sh`
 
 ## Usage
 
 1. Write smart contracts with JavaScript. You can use most npm packages that uses portable ES2020 features. Export callable contract methods with export. See `examples/` for examples.
 2. Build the contract with `path/to/near-sdk-js/builder.sh path/to/your/<contract-name>.js`
-3. If no errors happens, a `<contract-name>.wasm` will be generate at current location. You can test it with a neard node or near-vm-runner-standalone. Note, before wasi is implemented as part of near-sdk-js, you need to use near-sdk-js branch of nearcore.
+3. If no errors happens, a `<contract-name>.wasm` will be generate at current location. You can test it with a neard node or near-vm-runner-standalone.
 
 ## Demo
 
@@ -22,7 +22,7 @@ cd build
 ../builder.sh ../examples/counter.js
 ```
 2. Copy built contract to nearcore dir.
-2. Go to nearcore, near-sdk-js branch, build near-vm-runner-standalone and run:
+2. Go to nearcore, build near-vm-runner-standalone and run:
 ```
 cargo build -p near-vm-runner-standalone
 target/debug/near-vm-runner-standalone --method-name get_num --wasm-file counter.wasm
