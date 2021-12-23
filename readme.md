@@ -209,3 +209,36 @@ function alt_bn128_g1_multiexp(value: String, register_id: Uint64);
 function alt_bn128_g1_sum(value: String, register_id: Uint64);
 function alt_bn128_pairing_check(value: String): Uint64;
 ```
+
+## Error Handling in NEAR-SDK-JS
+
+### Error handling behavior
+
+- when js throws an error, uncatched, then transaction fails with GuestPanic error, with the user js error message and stacktrace
+- when call host function with inappropriate type, means incorrect number of arguments or arg is not expected type:
+    - if arguments less than params, remaining argument are set as 'undefined'
+    - if arguments more than params, remaining argument are ignored
+    - if argument is different than the required type, it'll be coerced to required type
+    - if argument is different than the required type but cannot be coerced, will throw runtime type error, also with message and stacktrace
+
+### The error reporting capability of a wasm contract
+Smart contract can only use `panic` or `panic_utf8` to abort from execution. That is of error kind `GuestPanic {msg}`. It displays in RPC as `"Smart contract panicked: {msg}"`
+And only `panic_utf8` can set that message. 
+Other than this, if calls a host function, it can returns error provided by that host function. For example, any host function can return a `GasExceeded`. `log_utf8` can return `BadUTF8`. This behavior is part of protocol and we cannot control or trigger in JavaScript (without calling `env.*`). 
+
+### Use errors
+You can throw an error in JavaScript. Our quickjs runtime will detect and automatically invoke `panic_utf8` with `"{error.message}\n:{error.stack}"`. As a result, transaction will fail with `"Smart contract panicked: {error.message}\{error.stack}"` error message.
+
+### Use verror
+User can use verror this way:
+1. catch an error, attach information to it
+2. return/rethrow the error, attach more information to it
+3. throw the final verror, `throw e`, same as in nodejs.
+
+Under the hood, our quickjs runtime would take the final throwed error, and invoke panic_utf8("{error.message}\n{error.stack}")
+
+### Question
+Given user can use VError to attach "logical backtrace", should we still log "physical stacktrace"?
+
+### TODO
+Other c functions are exposed and can be name confliction with bindgen functions. Need binaryen pass to rename c functions

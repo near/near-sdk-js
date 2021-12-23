@@ -18,3 +18,6 @@ counter.wasm
 nft.wasm
 bignum.wasm
 near_tests.wasm
+errors.wasm
+
+.vscode
