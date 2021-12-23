@@ -1,3 +1,4 @@
+#include <string.h>
 #include "quickjs/quickjs-libc-min.h"
 #include "quickjs/libbf.h"
 #include "code.h"
@@ -25,13 +26,28 @@ static JSContext *JS_NewCustomContext(JSRuntime *rt)
   void name () {\
     JSRuntime *rt;\
     JSContext *ctx;\
-    JSValue mod_obj, fun_obj;\
+    JSValue mod_obj, fun_obj, result, error, error_message, error_stack;\
+    const char *error_message_c, *error_stack_c;\
+    char *error_c;\
+    size_t msg_len, stack_len;\
     rt = JS_NewRuntime();\
     ctx = JS_NewCustomContext(rt);\
     js_add_near_host_functions(ctx);\
     mod_obj = js_load_module_binary(ctx, code, code_size);\
     fun_obj = JS_GetProperty(ctx, mod_obj, JS_NewAtom(ctx, #name));\
-    JS_Call(ctx, fun_obj, mod_obj, 0, NULL);\
+    result = JS_Call(ctx, fun_obj, mod_obj, 0, NULL);\
+    if (JS_IsException(result)) {\
+      error = JS_GetException(ctx);\
+      error_message = JS_GetPropertyStr(ctx, error, "message");\
+      error_stack = JS_GetPropertyStr(ctx, error, "stack");\
+      error_message_c = JS_ToCStringLen(ctx, &msg_len, error_message);\
+      error_stack_c = JS_ToCStringLen(ctx, &stack_len, error_stack);\
+      error_c = malloc(msg_len+1+stack_len);\
+      strncpy(error_c, error_message_c, msg_len);\
+      error_c[msg_len] = '\n';\
+      strncpy(error_c+msg_len+1, error_stack_c, stack_len);\
+      panic_utf8(msg_len+1+stack_len, (uint64_t)error_c);\
+    }\
     js_std_loop(ctx);\
   }
 
@@ -172,7 +188,9 @@ static JSValue near_current_account_id(JSContext *ctx, JSValueConst this_val, in
 {
   uint64_t register_id;
 
-  JS_ToUint64Ext(ctx, &register_id, argv[0]);
+  if(JS_ToUint64Ext(ctx, &register_id, argv[0]) <= 0) {
+    return JS_ThrowTypeError(ctx, "Expect Uint64 for register_id");
+  }
   current_account_id(register_id);
   return JS_UNDEFINED;
 }
@@ -703,9 +721,6 @@ static JSValue near_storage_write(JSContext *ctx, JSValueConst this_val, int arg
   size_t key_len, value_len;
   uint64_t ret;
 
-  if (argc < 2) {
-    return JS_EXCEPTION;
-  }
   key_ptr = JS_ToCStringLenRaw(ctx, &key_len, argv[0]);
   value_ptr = JS_ToCStringLenRaw(ctx, &value_len, argv[1]);
   ret = storage_write(key_len, (uint64_t)key_ptr, value_len, (uint64_t)value_ptr, 0);
@@ -719,9 +734,6 @@ static JSValue near_storage_read(JSContext *ctx, JSValueConst this_val, int argc
   uint64_t register_id;
   uint64_t ret;
 
-  if (argc < 2) {
-    return JS_EXCEPTION;
-  }
   key_ptr = JS_ToCStringLenRaw(ctx, &key_len, argv[0]);
   JS_ToUint64Ext(ctx, &register_id, argv[1]);
   ret = storage_read(key_len, (uint64_t)key_ptr, register_id);
@@ -816,7 +828,7 @@ static void js_add_near_host_functions(JSContext* ctx) {
 
   global_obj = JS_GetGlobalObject(ctx);
   env = JS_NewObject(ctx);
-  // Has been test success cases in contracts. Failure cases are not.
+
   JS_SetPropertyStr(ctx, env, "read_register", JS_NewCFunction(ctx, near_read_register, "read_register", 1));
   JS_SetPropertyStr(ctx, env, "register_len", JS_NewCFunction(ctx, near_register_len, "register_len", 1));
   JS_SetPropertyStr(ctx, env, "write_register", JS_NewCFunction(ctx, near_write_register, "write_register", 2));
@@ -851,8 +863,6 @@ static void js_add_near_host_functions(JSContext* ctx) {
   JS_SetPropertyStr(ctx, env, "promise_and", JS_NewCFunction(ctx, near_promise_and, "promise_and", 1));
   JS_SetPropertyStr(ctx, env, "promise_batch_create", JS_NewCFunction(ctx, near_promise_batch_create, "promise_batch_create", 1));
   JS_SetPropertyStr(ctx, env, "promise_batch_then", JS_NewCFunction(ctx, near_promise_batch_then, "promise_batch_then", 2));
-
-  // Has not been tested in contracts.
   JS_SetPropertyStr(ctx, env, "promise_batch_action_create_account", JS_NewCFunction(ctx, near_promise_batch_action_create_account, "promise_batch_action_create_account", 1));
   JS_SetPropertyStr(ctx, env, "promise_batch_action_deploy_contract", JS_NewCFunction(ctx, near_promise_batch_action_deploy_contract, "promise_batch_action_deploy_contract", 2));
   JS_SetPropertyStr(ctx, env, "promise_batch_action_function_call", JS_NewCFunction(ctx, near_promise_batch_action_function_call, "promise_batch_action_function_call", 5));
