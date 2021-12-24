@@ -227,7 +227,7 @@ And only `panic_utf8` can set that message.
 Other than this, if calls a host function, it can returns error provided by that host function. For example, any host function can return a `GasExceeded`. `log_utf8` can return `BadUTF8`. This behavior is part of protocol and we cannot control or trigger in JavaScript (without calling `env.*`). 
 
 ### Use errors
-You can throw an error in JavaScript. Our quickjs runtime will detect and automatically invoke `panic_utf8` with `"{error.message}\n:{error.stack}"`. As a result, transaction will fail with `"Smart contract panicked: {error.message}\{error.stack}"` error message.
+You can throw an error in JavaScript. Our quickjs runtime will detect and automatically invoke `panic_utf8` with `"{error.message}\n:{error.stack}"`. As a result, transaction will fail with `"Smart contract panicked: {error.message}\n{error.stack}"` error message.
 
 ### Use verror
 User can use verror this way:
@@ -237,8 +237,7 @@ User can use verror this way:
 
 Under the hood, our quickjs runtime would take the final throwed error, and invoke panic_utf8("{error.message}\n{error.stack}")
 
-### Question
-Given user can use VError to attach "logical backtrace", should we still log "physical stacktrace"?
-
-### TODO
-Other c functions are exposed and can be name confliction with bindgen functions. Need binaryen pass to rename c functions
+## TODO
+- Other c functions are exposed and can be name confliction with bindgen functions. Need binaryen pass to rename c functions
+- Source maps for rollup build to correctly display locations in the backtrace
+- Build script for mac. For now you can try on a ubuntu vm, or try doing https://github.com/near/near-sdk-js/blob/master/setup.sh manually on a Mac. Each dependencies work on mac, but the script isn't tested or written in a platform-independant way
