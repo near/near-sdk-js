@@ -10,7 +10,7 @@ WASI_STUB=${SCRIPT_DIR}/vendor/binaryen/wasi-stub/run.sh
 TARGET=$(basename ${1%.*}).wasm
 
 rm -f ${TARGET}
-${QJSC} $1 -c -m -o code.h -N code
+${QJSC} -c -m -o code.h -N code $1
 
 node ${SCRIPT_DIR}/codegen.js $1
 
