@@ -23,7 +23,7 @@ static JSContext *JS_NewCustomContext(JSRuntime *rt)
 }
 
 #define DEFINE_NEAR_METHOD(name) \
-  void name () {\
+  void name () __attribute__((export_name(#name))) {\
     JSRuntime *rt;\
     JSContext *ctx;\
     JSValue mod_obj, fun_obj, result, error, error_message, error_stack;\

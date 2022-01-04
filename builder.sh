@@ -25,12 +25,12 @@ for i in "${QUICKJS_SOURCES[@]}"; do
 done
 
 $CC --target=wasm32-wasi \
-    -nostartfiles -Oz \
+    -nostartfiles -Oz -flto \
     ${DEFS} ${INCLUDES} ${SOURCES} ${LIBS} \
     -Wl,--no-entry \
-    -Wl,--export-all \
     -Wl,--allow-undefined \
     -Wl,-z,stack-size=$[256 * 1024] \
+    -Wl,--lto-O3 \
     -o ${TARGET}
 
 rm code.h methods.h
