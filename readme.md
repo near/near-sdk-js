@@ -1,44 +1,33 @@
 # NEAR-SDK-JS
 
 ## Installation
-It is tested on Ubuntu 20.04. Other linux should also works. Use on Mac is work in progress.
+It is tested on Ubuntu 20.04 and Intel Mac. Other linux and M1 Mac with rosetta should also work but they're not tested.
 
-1. Make sure you have gcc, make and cmake.
+1. Make sure you have make, cmake and nodejs. On Linux, also make sure you have gcc.
 2. `./setup.sh`
 
 ## Usage
 
 1. Write smart contracts with JavaScript. You can use most npm packages that uses portable ES2020 features. Export callable contract methods with export. See `examples/` for examples.
-2. Build the contract with `path/to/near-sdk-js/builder.sh path/to/your/<contract-name>.js`
-3. If no errors happens, a `<contract-name>.wasm` will be generate at current location. You can test it with a neard node or near-vm-runner-standalone.
+2. Build the contract with `path/to/near-sdk-js/builder.sh path/to/your/<contract-name>.js`.
+3. If no errors happens, a `<contract-name>.wasm` will be generate at current directory. You can test it with local neard or testnet.
 
 ## Demo
 
-### With near-vm-runner-standlone
 1. Build the contract
 ```
 mkdir -p build
 cd build
 ../builder.sh ../examples/counter.js
 ```
-2. Copy built contract to nearcore dir.
-2. Go to nearcore, build near-vm-runner-standalone and run:
-```
-cargo build -p near-vm-runner-standalone
-target/debug/near-vm-runner-standalone --method-name get_num --wasm-file counter.wasm
-target/debug/near-vm-runner-standalone --method-name increment --wasm-file counter.wasm
-target/debug/near-vm-runner-standalone --method-name reset --wasm-file counter.wasm
-target/debug/near-vm-runner-standalone --method-name decrement --wasm-file counter.wasm --state '{"YQ==":"MA=="}'
-```
 
-### With neard local net
-1. Build contract same as above
 2. Go to nearcore, Build and start a local node
 ```
 cargo build -p neard
 target/debug/neard init
 target/debug/neard run
 ```
+
 3. Have `near-cli` installed. Deploy and call method in the contract. Example session:
 ```
 nearcore (near-sdk-js) export NEAR_ENV=local
@@ -240,4 +229,3 @@ Under the hood, our quickjs runtime would take the final throwed error, and invo
 ## TODO
 - Other c functions are exposed and can be name confliction with bindgen functions. Need binaryen pass to rename c functions
 - Source maps for rollup build to correctly display locations in the backtrace
-- Build script for mac. For now you can try on a ubuntu vm, or try doing https://github.com/near/near-sdk-js/blob/master/setup.sh manually on a Mac. Each dependencies work on mac, but the script isn't tested or written in a platform-independant way
