@@ -15,6 +15,9 @@ ${QJSC} -c -m -o code.h -N code $1
 node ${SCRIPT_DIR}/codegen.js $1
 
 DEFS='-D_GNU_SOURCE -DCONFIG_VERSION="2021-03-27" -DCONFIG_BIGNUM'
+if [ -v NEAR_NIGHTLY ]; then
+  DEFS+=' -DNIGHTLY'
+fi
 INCLUDES="-I${SCRIPT_DIR}/stubs -I${QUICKJS_SRC_DIR} -I."
 LIBS='-lm'
 QUICKJS_SOURCES=(quickjs.c libregexp.c libunicode.c cutils.c quickjs-libc-min.c libbf.c)

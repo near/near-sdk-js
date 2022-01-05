@@ -138,10 +138,11 @@ extern void validator_total_stake(uint64_t stake_ptr);
 // #############
 // # Alt BN128 #
 // #############
+#ifdef NIGHTLY
 extern void alt_bn128_g1_multiexp(uint64_t value_len, uint64_t value_ptr, uint64_t register_id);
 extern void alt_bn128_g1_sum(uint64_t value_len, uint64_t value_ptr, uint64_t register_id);
 extern uint64_t alt_bn128_pairing_check(uint64_t value_len, uint64_t value_ptr);
-
+#endif
 
 static JSValue near_read_register(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
 {
@@ -882,6 +883,7 @@ static JSValue near_validator_total_stake(JSContext *ctx, JSValueConst this_val,
   return u128_to_quickjs(ctx, stake_ptr);
 }
 
+#ifdef NIGHTLY
 static JSValue near_alt_bn128_g1_multiexp(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
 {
   uint64_t register_id;
@@ -923,7 +925,7 @@ static JSValue near_alt_bn128_pairing_check(JSContext *ctx, JSValueConst this_va
   ret = alt_bn128_pairing_check(data_len, (uint64_t)data_ptr);
   return JS_NewBigUint64(ctx, ret);
 }
-
+#endif
 
 static void js_add_near_host_functions(JSContext* ctx) {
   JSValue global_obj, env;
@@ -983,9 +985,11 @@ static void js_add_near_host_functions(JSContext* ctx) {
   JS_SetPropertyStr(ctx, env, "storage_has_key", JS_NewCFunction(ctx, near_storage_has_key, "storage_has_key", 2));
   JS_SetPropertyStr(ctx, env, "validator_stake", JS_NewCFunction(ctx, near_validator_stake, "validator_stake", 2));
   JS_SetPropertyStr(ctx, env, "validator_total_stake", JS_NewCFunction(ctx, near_validator_total_stake, "validator_total_stake", 1));
+  #ifdef NIGHTLY
   JS_SetPropertyStr(ctx, env, "alt_bn128_g1_multiexp", JS_NewCFunction(ctx, near_alt_bn128_g1_multiexp, "alt_bn128_g1_multiexp", 2));
   JS_SetPropertyStr(ctx, env, "alt_bn128_g1_sum", JS_NewCFunction(ctx, near_alt_bn128_g1_sum, "alt_bn128_g1_sum", 2));
   JS_SetPropertyStr(ctx, env, "alt_bn128_pairing_check", JS_NewCFunction(ctx, near_alt_bn128_pairing_check, "alt_bn128_pairing_check", 1));
+  #endif
 
   JS_SetPropertyStr(ctx, global_obj, "env", env);
 }

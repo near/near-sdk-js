@@ -23,7 +23,7 @@ cd build
 
 2. Go to nearcore, Build and start a local node
 ```
-cargo build -p neard --features nightly_protocol,nightly_protocol_features
+cargo build -p neard
 target/debug/neard init
 target/debug/neard run
 ```
@@ -71,6 +71,7 @@ Loaded master account test.near key from /home/bo/.near/validator_key.json with 
 ## NEAR-SDK-JS Low Level API Reference
 
 Use `env.func_name(args)` to call low level APIs in JavaScript contracts. `env` is already imported before contract start. For example, `env.read_register(0)`.
+To use nightly host functions, such as `alt_bn128_g1_sum`, build the contract with `NEAR_NIGHTLY=1 path/to/near-sdk-js/builder.sh path/to/contract.js`.
 
 ### About Type 
 
