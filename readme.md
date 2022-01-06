@@ -258,4 +258,3 @@ Under the hood, our quickjs runtime would take the final throwed error, and invo
 ## TODO
 - Other c functions are exposed and can be name confliction with bindgen functions. Need binaryen pass to rename c functions
 - Source maps for rollup build to correctly display locations in the backtrace
-- remove unused imports to make it doesn't require nightly nearcore if it doesn't use nightly nearcore features
