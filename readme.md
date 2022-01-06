@@ -14,6 +14,8 @@ It is tested on Ubuntu 20.04 and Intel Mac. Other linux and M1 Mac with rosetta 
 
 ## Demo
 
+### On a local node
+
 1. Build the contract
 ```
 mkdir -p build
@@ -66,6 +68,32 @@ View call: test.near.get_num()
 Loaded master account test.near key from /home/bo/.near/validator_key.json with public key = ed25519:4tfuwpXjdHh22wuDigTTESxARtv2kdS78w3RnanKDQLb
 2
 
+```
+
+### On testnet
+The following shows a session to build, deploy and call a contract on testnet:
+
+```
+near-sdk-js (master) export NEAR_ENV=testnet
+
+near-sdk-js (master) ./builder.sh examples/nft.js 
+
+near-sdk-js (master) near dev-deploy nft.wasm 
+Starting deployment. Account id: dev-1641453759104-17291726737196, node: https://rpc.testnet.near.org, helper: https://helper.testnet.near.org, file: nft.wasm
+Transaction Id 7vxUnEg7XNjtBVxjgo1YvHnx9f6bzeTwWktDoQgaQzho
+To see the transaction in the transaction explorer, please open this url in your browser
+https://explorer.testnet.near.org/transactions/7vxUnEg7XNjtBVxjgo1YvHnx9f6bzeTwWktDoQgaQzho
+Done deploying to dev-1641453759104-17291726737196
+
+near-sdk-js (master) near call dev-1641453759104-17291726737196 mint_to --accountId dev-1641453759104-17291726737196 --args '{"owner":"abcdef.testnet"}'
+Scheduling a call: dev-1641453759104-17291726737196.mint_to({"owner":"abcdef.testnet"})
+Doing account.functionCall()
+Receipt: 7ouVxQnzFDqM9rasLVnDGfMFYPR42ZJ3Vh1z81Eb3d4C
+        Log [dev-1641453759104-17291726737196]: Minted NFT 1 to abcdef.testnet
+Transaction Id 3Fa6k2kGabBt9CafGkukgovJRaq29pAN4Vc6YafhjuiY
+To see the transaction in the transaction explorer, please open this url in your browser
+https://explorer.testnet.near.org/transactions/3Fa6k2kGabBt9CafGkukgovJRaq29pAN4Vc6YafhjuiY
+1
 ```
 
 ## NEAR-SDK-JS Low Level API Reference
