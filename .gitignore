@@ -19,5 +19,6 @@ nft.wasm
 bignum.wasm
 near_tests.wasm
 errors.wasm
+jsvm.wasm
 
 .vscode
