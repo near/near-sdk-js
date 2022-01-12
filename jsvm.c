@@ -970,7 +970,7 @@ JSValue JS_Call(JSContext *ctx, JSValueConst func_obj, JSValueConst this_obj,
 void _start() {}
 
 void deploy_js_contract () __attribute__((export_name("deploy_js_contract"))) {
-  char *account[64], code;
+  char account[64], *code;
   size_t account_len;
   predecessor_account_id(0);
   read_register(0, (uint64_t)account);
@@ -979,21 +979,22 @@ void deploy_js_contract () __attribute__((export_name("deploy_js_contract"))) {
   input(1);
   size_t code_len = register_len(1);
   code = malloc(code_len);
-  read_register(1, code);
-  char *key[69];
+  read_register(1, (uint64_t)code);
+  char key[69];
   strncpy(key, account, account_len);
   strncpy(key+account_len, "/code", 5);
-  storage_write(account_len+5, key, code_len, code, 2);
+  storage_write(account_len+5, (uint64_t)key, code_len, (uint64_t)code, 2);
 }
 
 void call_js_contract () __attribute__((export_name("call_js_contract"))) {
-  char *code, *in;
+  const char *in;
+  const char *code;
   size_t code_len, in_len;
   input(0);
   in_len = register_len(0);
   in = malloc(in_len);
-  read_register(0, in);
-  char *contract, *method, *args;
+  read_register(0, (uint64_t)in);
+  const char *contract, *method, *args;
   size_t contract_len = 0, method_len = 0, args_len = 0;
   for (size_t i = 0; i < in_len; i++) {
     if (in[i] == '\0') {
@@ -1017,16 +1018,16 @@ void call_js_contract () __attribute__((export_name("call_js_contract"))) {
   }
 
   // todo: env.input should return args, instead of in.
-  char *key[69];
+  char key[69];
   strncpy(key, contract, contract_len);
   strncpy(key+contract_len, "/code", 5);
-  int has_read = storage_read(contract_len+5, key, 1);
+  int has_read = storage_read(contract_len+5, (uint64_t)key, 1);
   if (!has_read) {
     panic();
   }
   code_len = register_len(1);
-  code = malloc(register_len);
-  read_register(1, code);
+  code = malloc((size_t)register_len);
+  read_register(1, (uint64_t)code);
 
   JSRuntime *rt;
   JSContext *ctx;
@@ -1037,7 +1038,7 @@ void call_js_contract () __attribute__((export_name("call_js_contract"))) {
   rt = JS_NewRuntime();
   ctx = JS_NewCustomContext(rt);
   js_add_near_host_functions(ctx);
-  mod_obj = js_load_module_binary(ctx, code, code_len);
+  mod_obj = js_load_module_binary(ctx, (const uint8_t *)code, code_len);
   fun_obj = JS_GetProperty(ctx, mod_obj, JS_NewAtom(ctx, method));
   result = JS_Call(ctx, fun_obj, mod_obj, 0, NULL);
   if (JS_IsException(result)) {
