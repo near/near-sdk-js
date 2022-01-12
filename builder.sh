@@ -36,5 +36,5 @@ $CC --target=wasm32-wasi \
     -Wl,--lto-O3 \
     -o ${TARGET}
 
-rm code.h methods.h
+rm methods.h
 ${WASI_STUB} ${TARGET} >/dev/null

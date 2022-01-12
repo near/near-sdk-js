@@ -965,37 +965,46 @@ static void js_add_near_host_functions(JSContext* ctx) {
 }
 
 JSValue JS_Call(JSContext *ctx, JSValueConst func_obj, JSValueConst this_obj,
-                int argc, JSValueConst *argv);
+                int argc, JSValueConst *argv) ;
 
 void _start() {}
 
 void deploy_js_contract () __attribute__((export_name("deploy_js_contract"))) {
   char account[64], *code;
-  size_t account_len;
+  size_t account_len, code_len;
+  char key[69];
+
   predecessor_account_id(0);
   read_register(0, (uint64_t)account);
-  account_len = register_len(1);
+  account_len = register_len(0);
 
   input(1);
-  size_t code_len = register_len(1);
+  code_len = register_len(1);
   code = malloc(code_len);
   read_register(1, (uint64_t)code);
-  char key[69];
   strncpy(key, account, account_len);
   strncpy(key+account_len, "/code", 5);
   storage_write(account_len+5, (uint64_t)key, code_len, (uint64_t)code, 2);
 }
 
 void call_js_contract () __attribute__((export_name("call_js_contract"))) {
-  const char *in;
-  const char *code;
+  char *in, *code, *contract, *method, *args;
+  size_t contract_len = 0, method_len = 0, args_len = 0;
   size_t code_len, in_len;
+  char key[69];
+  int has_read;
+
+  JSRuntime *rt;
+  JSContext *ctx;
+  JSValue mod_obj, fun_obj, result, error, error_message, error_stack;
+  const char *error_message_c, *error_stack_c;
+  char *error_c;
+  size_t msg_len, stack_len;
+
   input(0);
   in_len = register_len(0);
   in = malloc(in_len);
   read_register(0, (uint64_t)in);
-  const char *contract, *method, *args;
-  size_t contract_len = 0, method_len = 0, args_len = 0;
   for (size_t i = 0; i < in_len; i++) {
     if (in[i] == '\0') {
       contract_len = i;
@@ -1018,23 +1027,16 @@ void call_js_contract () __attribute__((export_name("call_js_contract"))) {
   }
 
   // todo: env.input should return args, instead of in.
-  char key[69];
   strncpy(key, contract, contract_len);
   strncpy(key+contract_len, "/code", 5);
-  int has_read = storage_read(contract_len+5, (uint64_t)key, 1);
+  has_read = storage_read(contract_len+5, (uint64_t)key, 1);
   if (!has_read) {
     panic();
   }
   code_len = register_len(1);
-  code = malloc((size_t)register_len);
+  code = malloc(code_len);
   read_register(1, (uint64_t)code);
 
-  JSRuntime *rt;
-  JSContext *ctx;
-  JSValue mod_obj, fun_obj, result, error, error_message, error_stack;
-  const char *error_message_c, *error_stack_c;
-  char *error_c;
-  size_t msg_len, stack_len;
   rt = JS_NewRuntime();
   ctx = JS_NewCustomContext(rt);
   js_add_near_host_functions(ctx);
