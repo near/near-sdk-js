@@ -20,5 +20,6 @@ bignum.wasm
 near_tests.wasm
 errors.wasm
 jsvm.wasm
+*.base64
 
 .vscode

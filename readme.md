@@ -5,22 +5,39 @@ It is tested on Ubuntu 20.04 and Intel Mac. Other linux and M1 Mac with rosetta 
 
 1. Make sure you have make, cmake and nodejs. On Linux, also make sure you have gcc.
 2. `./setup.sh`
+3. `./build.sh`
 
 ## Usage
 
 1. Write smart contracts with JavaScript. You can use most npm packages that uses portable ES2020 features. Export callable contract methods with export. See `examples/` for examples.
 2. Build the contract with `path/to/near-sdk-js/builder.sh path/to/your/<contract-name>.js`.
-3. If no errors happens, a `<contract-name>.wasm` will be generate at current directory. You can test it with local neard or testnet.
+3. If no errors happens, a `<contract-name>.base64` will be generate at current directory. 
+4. Deploy the contract to an existing jsvm contract:
+```
+near call <jsvm-account> deploy_js_contract --accountId <your-account> --args $(cat <contract-name>.base64) --base64
+```
+5. Encode the parameters and call:
+```
+near call <jsvm-account> call_js_contract --accountId <caller-account> --args <encoded-args> --base64
+```
+
+Where `<encoded-args>` is obtained in this way:
+```
+let contractAccount = 'test.near'
+let methodName = 'hello'
+let args = ''
+let input = Buffer.concat([Buffer.from(contractAccount), Buffer.from([0]), Buffer.from(methodName), Buffer.from([0]), Buffer.from(args)])
+let encodedArgs = input.toString('base64')
+```
 
 ## Demo
 
 ### On a local node
 
-1. Build the contract
+1. Build the jsvm contract
 ```
-mkdir -p build
-cd build
-../builder.sh ../examples/counter.js
+./setup.sh
+./build.sh
 ```
 
 2. Go to nearcore, Build and start a local node
@@ -30,73 +47,47 @@ target/debug/neard init
 target/debug/neard run
 ```
 
-3. Have `near-cli` installed. Deploy and call method in the contract. Example session:
+3. Go back to `near-sdk-js`. Have `near-cli` installed. Deploy the jsvm contract. Example session:
 ```
-nearcore (near-sdk-js) export NEAR_ENV=local
-nearcore (near-sdk-js) near deploy test.near counter.wasm 
-Starting deployment. Account id: test.near, node: http://localhost:3030, helper: http://localhost:3000, file: counter.wasm
-Loaded master account test.near key from /home/bo/.near/validator_key.json with public key = ed25519:4tfuwpXjdHh22wuDigTTESxARtv2kdS78w3RnanKDQLb
-Transaction Id WJ5vz8NZbi2oxg9wKhkcLZcF8WatXYVY8PMu96FXPPF
+near-sdk-js (enclave) export NEAR_ENV=local
+near-sdk-js (enclave) near deploy test.near jsvm.wasm 
+Loaded master account test.near key from /home/bo/.near/validator_key.json with public key = ed25519:XXqxAHP1ZRcwCwBTr1MbdF9NM7UVynuTnxhZfFeE5UJ
+This account already has a deployed contract [ 8jLFxk6UFpgSue3jp7TPzQj7t2TF5taA47Vr2Y962vuS ]. Do you want to proceed? (y/n) y
+Starting deployment. Account id: test.near, node: http://localhost:3030, helper: http://localhost:3000, file: jsvm.wasm
+Transaction Id EGVd29tthMp7fqkDgP8frftgZhhb3FVazaFhvXpYXNhw
 To see the transaction in the transaction explorer, please open this url in your browser
-http://localhost:9001/transactions/WJ5vz8NZbi2oxg9wKhkcLZcF8WatXYVY8PMu96FXPPF
+http://localhost:9001/transactions/EGVd29tthMp7fqkDgP8frftgZhhb3FVazaFhvXpYXNhw
 Done deploying to test.near
+```
 
-nearcore (near-sdk-js) near call test.near increment --accountId test.near --args ''
-Scheduling a call: test.near.increment()
-Loaded master account test.near key from /home/bo/.near/validator_key.json with public key = ed25519:4tfuwpXjdHh22wuDigTTESxARtv2kdS78w3RnanKDQLb
+4. Build, deploy hello contract to jsvm contract, and call hello. Example session:
+```
+near-sdk-js (enclave) ./builder.sh examples/hello_near.js 
+near-sdk-js (enclave) near call test.near deploy_js_contract --accountId test.near --args $(cat hello_near.base64) --base64
+Scheduling a call: test.near.deploy_js_contract(AgYsZXhhbXBsZXMvaGVsbG9fbmVhci5qcwpoZWxsbwxoZWxsbzIGZW52BmxvZxRIZWxsbyBOZWFyD7wDAAIAAL4DAAHAAwAADgAGAaABAAAAAQICCwC+AwABwAMBAQjqCMAA4cAB4ikpvAMBBAEACg4OQwYBvgMAAAADAAATADjhAAAAQuIAAAAE4wAAACQBACm8AwECA10OQwYBwAMAAAADAAEQADjhAAAAQuIAAAC/ACQBACm8AwUCA04HCDIyMjI=)
+Loaded master account test.near key from /home/bo/.near/validator_key.json with public key = ed25519:XXqxAHP1ZRcwCwBTr1MbdF9NM7UVynuTnxhZfFeE5UJ
 Doing account.functionCall()
-Receipt: m2oWjsWUdr1AdP2AVB8snnK3PRGNgu9sQJVMuYcbmar
-        Log [test.near]: Increased number to 1
-Transaction Id 6Lhq2cXuaiwAtdcwyoXhpXYkd3MRZNCjGKL3oRrVeXM3
+Transaction Id Df7txPSFWwaBLTz61pSxoVrPPu6qY7fUTJ31xuQtXDBf
 To see the transaction in the transaction explorer, please open this url in your browser
-http://localhost:9001/transactions/6Lhq2cXuaiwAtdcwyoXhpXYkd3MRZNCjGKL3oRrVeXM3
+http://localhost:9001/transactions/Df7txPSFWwaBLTz61pSxoVrPPu6qY7fUTJ31xuQtXDBf
+''
+near-sdk-js (enclave) near call test.near call_js_contract --accountId test.near --args 'dGVzdC5uZWFyIGhlbGxvIA==' --base64
+Scheduling a call: test.near.call_js_contract(dGVzdC5uZWFyIGhlbGxvIA==)
+Loaded master account test.near key from /home/bo/.near/validator_key.json with public key = ed25519:XXqxAHP1ZRcwCwBTr1MbdF9NM7UVynuTnxhZfFeE5UJ
+Doing account.functionCall()
+Receipt: AcRRGeR16FYg5AEMZ163v5Av1NanZtRHocDUvmGTvoYN
+	Log [test.near]: Hello Near
+Transaction Id GkitU1Cm5bdQJWe6bzkYganiS9tfetuY4buqGFypvQWL
+To see the transaction in the transaction explorer, please open this url in your browser
+http://localhost:9001/transactions/GkitU1Cm5bdQJWe6bzkYganiS9tfetuY4buqGFypvQWL
 ''
 
-nearcore (near-sdk-js) near call test.near increment --accountId test.near --args ''
-Scheduling a call: test.near.increment()
-Loaded master account test.near key from /home/bo/.near/validator_key.json with public key = ed25519:4tfuwpXjdHh22wuDigTTESxARtv2kdS78w3RnanKDQLb
-Doing account.functionCall()
-Receipt: Ez8yqQgNiX7sNg3hRYdu6pAGsuvPqd2z5JFacKmnTErg
-        Log [test.near]: Increased number to 2
-Transaction Id 5ERxe2AnfxoqrqHq1qDZtzWqM6j1uAbLscAchJ39yMDZ
-To see the transaction in the transaction explorer, please open this url in your browser
-http://localhost:9001/transactions/5ERxe2AnfxoqrqHq1qDZtzWqM6j1uAbLscAchJ39yMDZ
-''
-
-nearcore (near-sdk-js) near view test.near get_num --accountId test.near --args ''
-View call: test.near.get_num()
-Loaded master account test.near key from /home/bo/.near/validator_key.json with public key = ed25519:4tfuwpXjdHh22wuDigTTESxARtv2kdS78w3RnanKDQLb
-2
-
 ```
 
-### On testnet
-The following shows a session to build, deploy and call a contract on testnet:
-
-```
-near-sdk-js (master) export NEAR_ENV=testnet
-
-near-sdk-js (master) ./builder.sh examples/nft.js 
-
-near-sdk-js (master) near dev-deploy nft.wasm 
-Starting deployment. Account id: dev-1641453759104-17291726737196, node: https://rpc.testnet.near.org, helper: https://helper.testnet.near.org, file: nft.wasm
-Transaction Id 7vxUnEg7XNjtBVxjgo1YvHnx9f6bzeTwWktDoQgaQzho
-To see the transaction in the transaction explorer, please open this url in your browser
-https://explorer.testnet.near.org/transactions/7vxUnEg7XNjtBVxjgo1YvHnx9f6bzeTwWktDoQgaQzho
-Done deploying to dev-1641453759104-17291726737196
-
-near-sdk-js (master) near call dev-1641453759104-17291726737196 mint_to --accountId dev-1641453759104-17291726737196 --args '{"owner":"abcdef.testnet"}'
-Scheduling a call: dev-1641453759104-17291726737196.mint_to({"owner":"abcdef.testnet"})
-Doing account.functionCall()
-Receipt: 7ouVxQnzFDqM9rasLVnDGfMFYPR42ZJ3Vh1z81Eb3d4C
-        Log [dev-1641453759104-17291726737196]: Minted NFT 1 to abcdef.testnet
-Transaction Id 3Fa6k2kGabBt9CafGkukgovJRaq29pAN4Vc6YafhjuiY
-To see the transaction in the transaction explorer, please open this url in your browser
-https://explorer.testnet.near.org/transactions/3Fa6k2kGabBt9CafGkukgovJRaq29pAN4Vc6YafhjuiY
-1
-```
 
 ## NEAR-SDK-JS Low Level API Reference
+
+**Note that, following APIs will be reworked so that 1) higher level api is available; 2) contract cannot write to other contract's storage**
 
 Use `env.func_name(args)` to call low level APIs in JavaScript contracts. `env` is already imported before contract start. For example, `env.read_register(0)`.
 To use nightly host functions, such as `alt_bn128_g1_sum`, build the contract with `NEAR_NIGHTLY=1 path/to/near-sdk-js/builder.sh path/to/contract.js`.
