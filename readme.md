@@ -1,4 +1,4 @@
-# NEAR-SDK-JS
+# NEAR-SDK-JS (Enclave)
 
 ## Installation
 It is tested on Ubuntu 20.04 and Intel Mac. Other linux and M1 Mac with rosetta should also work but they're not tested.
