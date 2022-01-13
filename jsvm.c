@@ -1,4 +1,5 @@
 #include <string.h>
+#include <stdbool.h>
 #include "quickjs/quickjs-libc-min.h"
 #include "quickjs/libbf.h"
 
@@ -780,6 +781,56 @@ static JSValue near_promise_return(JSContext *ctx, JSValueConst this_val, int ar
   return JS_UNDEFINED;
 }
 
+const uint64_t STORAGE_PRICE_PER_BYTE_U64 = 10000000000000000000ul;
+const char *STORAGE_PRICE_PER_BYTE = "10000000000000000000";
+
+static void mult64to128(uint64_t op1, uint64_t op2, uint64_t *hi, uint64_t *lo)
+{
+    uint64_t u1 = (op1 & 0xffffffff);
+    uint64_t v1 = (op2 & 0xffffffff);
+    uint64_t t = (u1 * v1);
+    uint64_t w3 = (t & 0xffffffff);
+    uint64_t k = (t >> 32);
+
+    op1 >>= 32;
+    t = (op1 * v1) + k;
+    k = (t & 0xffffffff);
+    uint64_t w1 = (t >> 32);
+
+    op2 >>= 32;
+    t = (u1 * op2) + k;
+    k = (t >> 32);
+
+    *hi = (op1 * op2) + w1 + k;
+    *lo = (t << 32) + w3;
+}
+
+static void storage_cost_for_bytes(uint64_t n, uint64_t* cost) {
+  // cost = n * STORAGE_PRICE_PER_BYTE
+  mult64to128(n, STORAGE_PRICE_PER_BYTE_U64, cost+1, cost);
+}
+
+static bool u128_less_than(uint64_t* a, uint64_t* b) {
+  return (a[1] < b[1]) || ((a[1] == b[1]) && (a[0] < b[0]));
+} 
+
+static uint64_t storage_write_enclave(uint64_t key_len, uint64_t key_ptr, uint64_t value_len, uint64_t value_ptr, uint64_t register_id) {
+  uint64_t deposit[2];
+  uint64_t bytes;
+  uint64_t cost[2];
+  uint64_t ret;
+
+  ret = storage_write(key_len, key_ptr, value_len, value_ptr, register_id);
+  bytes = key_len + value_len;
+  attached_deposit((uint64_t)deposit);
+  storage_cost_for_bytes(bytes, cost);
+  if (u128_less_than(deposit, cost)) {
+    panic();
+  }
+  // todo: refund
+  return ret;
+}
+
 static JSValue near_storage_write(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
 {
   const char *key_ptr, *value_ptr;
@@ -851,6 +902,16 @@ static JSValue near_validator_total_stake(JSContext *ctx, JSValueConst this_val,
 
   validator_total_stake((uint64_t)stake_ptr);
   return u128_to_quickjs(ctx, stake_ptr);
+}
+
+static JSValue near_storage_byte_cost(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+  JSValue value;
+  bf_t *a;
+  
+  value = JS_NewBigInt(ctx);
+  a = JS_GetBigInt(value);
+  bf_atof(a, STORAGE_PRICE_PER_BYTE, NULL, 10, BF_PREC_INF, BF_RNDZ);
+  return value;
 }
 
 #ifdef NIGHTLY
@@ -984,7 +1045,7 @@ void deploy_js_contract () __attribute__((export_name("deploy_js_contract"))) {
   read_register(1, (uint64_t)code);
   strncpy(key, account, account_len);
   strncpy(key+account_len, "/code", 5);
-  storage_write(account_len+5, (uint64_t)key, code_len, (uint64_t)code, 2);
+  storage_write_enclave(account_len+5, (uint64_t)key, code_len, (uint64_t)code, 2);
 }
 
 void call_js_contract () __attribute__((export_name("call_js_contract"))) {
@@ -1051,7 +1112,7 @@ void call_js_contract () __attribute__((export_name("call_js_contract"))) {
     error_stack_c = JS_ToCStringLen(ctx, &stack_len, error_stack);
     error_c = malloc(msg_len+1+stack_len);
     strncpy(error_c, error_message_c, msg_len);
-    error_c[msg_len] = 'n';
+    error_c[msg_len] = '\n';
     strncpy(error_c+msg_len+1, error_stack_c, stack_len);
     panic_utf8(msg_len+1+stack_len, (uint64_t)error_c);
   }
