@@ -824,25 +824,56 @@ static void panic_str(char *s) {
   panic_utf8(strlen(s), (uint64_t)s);
 }
 
-static void remaining_deposit(uint64_t *deposit) {
+#define GET 0
+#define SET 1
+
+static void remaining_deposit(uint64_t *deposit, int flag) {
   static bool remain_deposit_set = false;
   static uint64_t remain_deposit[2];
 
-  if (!remain_deposit_set) {
-    remain_deposit_set = true;
-    attached_deposit((uint64_t)remain_deposit);
+  if (flag == GET) {
+    if (!remain_deposit_set) {
+      remain_deposit_set = true;
+      attached_deposit((uint64_t)remain_deposit);
+    }
+    deposit[0] = remain_deposit[0];
+    deposit[1] = remain_deposit[1];
+  } else {
+    if (!remain_deposit_set) {
+      remain_deposit_set = true;
+    }
+    remain_deposit[0] = deposit[0];
+    remain_deposit[1] = deposit[1];
   }
-  deposit[0] = remain_deposit[0];
-  deposit[1] = remain_deposit[1];
 }
 
 static void deduct_cost(uint64_t *cost) {
   uint64_t deposit[2];
-  remaining_deposit(deposit);
+  remaining_deposit(deposit, GET);
   if (u128_less_than(deposit, cost)) {
     panic_str("insufficient deposit for storage");
   } else {
     uint128minus(deposit+1, deposit, cost+1, cost);
+    remaining_deposit(deposit, SET);
+  }
+}
+
+static void refund_storage_deposit() {
+  uint64_t deposit[2];
+  uint64_t promise_id;
+  char account[64];
+  uint64_t account_len;
+
+  predecessor_account_id(0);
+  read_register(0, (uint64_t)account);
+  account_len = register_len(0);
+
+  remaining_deposit(deposit, GET);
+  
+  if (deposit[0] > 0 || deposit[1] > 0) {
+    promise_id = promise_batch_create(account_len, (uint64_t)account);
+    promise_batch_action_transfer(promise_id, (uint64_t)deposit);
+    promise_return(promise_id);
   }
 }
 
@@ -1073,6 +1104,7 @@ void deploy_js_contract () __attribute__((export_name("deploy_js_contract"))) {
   strncpy(key, account, account_len);
   strncpy(key+account_len, "/code", 5);
   storage_write_enclave(account_len+5, (uint64_t)key, code_len, (uint64_t)code, 2);
+  refund_storage_deposit();
 }
 
 void call_js_contract () __attribute__((export_name("call_js_contract"))) {
@@ -1144,4 +1176,5 @@ void call_js_contract () __attribute__((export_name("call_js_contract"))) {
     panic_utf8(msg_len+1+stack_len, (uint64_t)error_c);
   }
   js_std_loop(ctx);
+  refund_storage_deposit(); 
 }
