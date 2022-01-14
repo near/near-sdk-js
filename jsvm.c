@@ -805,29 +805,56 @@ static void mult64to128(uint64_t op1, uint64_t op2, uint64_t *hi, uint64_t *lo)
     *lo = (t << 32) + w3;
 }
 
+static void uint128minus(uint64_t *op1_hi, uint64_t *op1_lo, uint64_t *op2_hi, uint64_t *op2_lo) {
+    *op1_lo = *op1_lo - *op2_lo;
+    uint64_t c = (((*op1_lo & *op2_lo) & 1) + (*op2_lo >> 1) + (*op1_lo >> 1)) >> 63;
+    *op1_hi = *op1_hi - (*op2_hi + c);
+}
+
 static void storage_cost_for_bytes(uint64_t n, uint64_t* cost) {
   // cost = n * STORAGE_PRICE_PER_BYTE
   mult64to128(n, STORAGE_PRICE_PER_BYTE_U64, cost+1, cost);
 }
 
-static bool u128_less_than(uint64_t* a, uint64_t* b) {
+static bool u128_less_than(uint64_t *a, uint64_t *b) {
   return (a[1] < b[1]) || ((a[1] == b[1]) && (a[0] < b[0]));
-} 
+}
+
+static void panic_str(char *s) {
+  panic_utf8(strlen(s), (uint64_t)s);
+}
+
+static void remaining_deposit(uint64_t *deposit) {
+  static bool remain_deposit_set = false;
+  static uint64_t remain_deposit[2];
+
+  if (!remain_deposit_set) {
+    remain_deposit_set = true;
+    attached_deposit((uint64_t)remain_deposit);
+  }
+  deposit[0] = remain_deposit[0];
+  deposit[1] = remain_deposit[1];
+}
+
+static void deduct_cost(uint64_t *cost) {
+  uint64_t deposit[2];
+  remaining_deposit(deposit);
+  if (u128_less_than(deposit, cost)) {
+    panic_str("insufficient deposit for storage");
+  } else {
+    uint128minus(deposit+1, deposit, cost+1, cost);
+  }
+}
 
 static uint64_t storage_write_enclave(uint64_t key_len, uint64_t key_ptr, uint64_t value_len, uint64_t value_ptr, uint64_t register_id) {
-  uint64_t deposit[2];
   uint64_t bytes;
   uint64_t cost[2];
   uint64_t ret;
 
   ret = storage_write(key_len, key_ptr, value_len, value_ptr, register_id);
   bytes = key_len + value_len;
-  attached_deposit((uint64_t)deposit);
   storage_cost_for_bytes(bytes, cost);
-  if (u128_less_than(deposit, cost)) {
-    panic();
-  }
-  // todo: refund
+  deduct_cost(cost);
   return ret;
 }
 
