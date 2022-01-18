@@ -881,10 +881,10 @@ static uint64_t storage_write_enclave(uint64_t key_len, uint64_t key_ptr, uint64
   uint64_t bytes;
   uint64_t cost[2];
   uint64_t ret;
-
+  uint64_t initial = storage_usage(), after;
   ret = storage_write(key_len, key_ptr, value_len, value_ptr, register_id);
-  bytes = key_len + value_len;
-  storage_cost_for_bytes(bytes, cost);
+  after = storage_usage();
+  storage_cost_for_bytes(after - initial, cost);
   deduct_cost(cost);
   return ret;
 }
