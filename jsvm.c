@@ -786,29 +786,35 @@ const char *STORAGE_PRICE_PER_BYTE = "10000000000000000000";
 
 static void mult64to128(uint64_t op1, uint64_t op2, uint64_t *hi, uint64_t *lo)
 {
-    uint64_t u1 = (op1 & 0xffffffff);
-    uint64_t v1 = (op2 & 0xffffffff);
-    uint64_t t = (u1 * v1);
-    uint64_t w3 = (t & 0xffffffff);
-    uint64_t k = (t >> 32);
+  uint64_t u1 = (op1 & 0xffffffff);
+  uint64_t v1 = (op2 & 0xffffffff);
+  uint64_t t = (u1 * v1);
+  uint64_t w3 = (t & 0xffffffff);
+  uint64_t k = (t >> 32);
 
-    op1 >>= 32;
-    t = (op1 * v1) + k;
-    k = (t & 0xffffffff);
-    uint64_t w1 = (t >> 32);
+  op1 >>= 32;
+  t = (op1 * v1) + k;
+  k = (t & 0xffffffff);
+  uint64_t w1 = (t >> 32);
 
-    op2 >>= 32;
-    t = (u1 * op2) + k;
-    k = (t >> 32);
+  op2 >>= 32;
+  t = (u1 * op2) + k;
+  k = (t >> 32);
 
-    *hi = (op1 * op2) + w1 + k;
-    *lo = (t << 32) + w3;
+  *hi = (op1 * op2) + w1 + k;
+  *lo = (t << 32) + w3;
 }
 
 static void uint128minus(uint64_t *op1_hi, uint64_t *op1_lo, uint64_t *op2_hi, uint64_t *op2_lo) {
-    *op1_lo = *op1_lo - *op2_lo;
-    uint64_t c = (((*op1_lo & *op2_lo) & 1) + (*op2_lo >> 1) + (*op1_lo >> 1)) >> 63;
-    *op1_hi = *op1_hi - (*op2_hi + c);
+  *op1_lo = *op1_lo - *op2_lo;
+  uint64_t c = (((*op1_lo & *op2_lo) & 1) + (*op2_lo >> 1) + (*op1_lo >> 1)) >> 63;
+  *op1_hi = *op1_hi - (*op2_hi + c);
+}
+
+static void uint128add(uint64_t *op1_hi, uint64_t *op1_lo, uint64_t *op2_hi, uint64_t *op2_lo) {
+  uint64_t c = (((*op1_lo & *op2_lo) & 1) + (*op1_lo >> 1) + (*op2_lo >> 1)) >> 63;
+  *op1_hi = *op1_hi + *op2_hi + c;
+  *op1_lo = *op1_lo + *op2_lo;
 }
 
 static void storage_cost_for_bytes(uint64_t n, uint64_t* cost) {
@@ -858,6 +864,13 @@ static void deduct_cost(uint64_t *cost) {
   }
 }
 
+static void refund_cost(uint64_t *cost) {
+  uint64_t deposit[2];
+  remaining_deposit(deposit, GET);
+  uint128add(deposit+1, deposit, cost+1, cost);
+  remaining_deposit(deposit, SET);
+}
+
 static void refund_storage_deposit() {
   uint64_t deposit[2];
   uint64_t promise_id;
@@ -878,14 +891,33 @@ static void refund_storage_deposit() {
 }
 
 static uint64_t storage_write_enclave(uint64_t key_len, uint64_t key_ptr, uint64_t value_len, uint64_t value_ptr, uint64_t register_id) {
-  uint64_t bytes;
   uint64_t cost[2];
   uint64_t ret;
   uint64_t initial = storage_usage(), after;
+
   ret = storage_write(key_len, key_ptr, value_len, value_ptr, register_id);
   after = storage_usage();
-  storage_cost_for_bytes(after - initial, cost);
-  deduct_cost(cost);
+  if (after > initial) {
+    storage_cost_for_bytes(after - initial, cost);
+    deduct_cost(cost);
+  } else if (after < initial) {
+    storage_cost_for_bytes(initial - after, cost);
+    refund_cost(cost);
+  }
+  return ret;
+}
+
+static uint64_t storage_remove_enclave(uint64_t key_len, uint64_t key_ptr, uint64_t register_id) {
+  uint64_t cost[2];
+  uint64_t ret;
+  uint64_t initial = storage_usage(), after;
+
+  ret = storage_remove(key_len, key_ptr, register_id);
+  after = storage_usage();
+  if (after < initial) {
+    storage_cost_for_bytes(initial - after, cost);
+    refund_cost(cost);
+  }
   return ret;
 }
 
