@@ -1139,6 +1139,20 @@ void deploy_js_contract () __attribute__((export_name("deploy_js_contract"))) {
   refund_storage_deposit();
 }
 
+void remove_js_contract () __attribute__((export_name("remove_js_contract"))) {
+  char account[64];
+  size_t account_len;
+  char key[69];
+
+  predecessor_account_id(0);
+  read_register(0, (uint64_t)account);
+  account_len = register_len(0);
+  strncpy(key, account, account_len);
+  strncpy(key+account_len, "/code", 5);
+  storage_remove_enclave(account_len+5, (uint64_t)key, 1);
+  refund_storage_deposit();
+}
+
 void call_js_contract () __attribute__((export_name("call_js_contract"))) {
   char *in, *code, *contract, *method, *args;
   size_t contract_len = 0, method_len = 0, args_len = 0;
