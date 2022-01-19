@@ -49,10 +49,9 @@ target/debug/neard run
 
 3. Go back to `near-sdk-js`. Have `near-cli` installed. Deploy the jsvm contract. Example session:
 ```
-near-sdk-js (enclave) export NEAR_ENV=local
-near-sdk-js (enclave) near deploy test.near jsvm.wasm 
+near-sdk-js (master) export NEAR_ENV=local
+near-sdk-js (master) near deploy test.near jsvm.wasm 
 Loaded master account test.near key from /home/bo/.near/validator_key.json with public key = ed25519:XXqxAHP1ZRcwCwBTr1MbdF9NM7UVynuTnxhZfFeE5UJ
-This account already has a deployed contract [ 8jLFxk6UFpgSue3jp7TPzQj7t2TF5taA47Vr2Y962vuS ]. Do you want to proceed? (y/n) y
 Starting deployment. Account id: test.near, node: http://localhost:3030, helper: http://localhost:3000, file: jsvm.wasm
 Transaction Id EGVd29tthMp7fqkDgP8frftgZhhb3FVazaFhvXpYXNhw
 To see the transaction in the transaction explorer, please open this url in your browser
@@ -62,17 +61,17 @@ Done deploying to test.near
 
 4. Build, deploy hello contract to jsvm contract, and call hello. Example session:
 ```
-near-sdk-js (enclave) ./builder.sh examples/hello_near.js 
-near-sdk-js (enclave) near call test.near deploy_js_contract --accountId test.near --args $(cat hello_near.base64) --base64
-Scheduling a call: test.near.deploy_js_contract(AgYsZXhhbXBsZXMvaGVsbG9fbmVhci5qcwpoZWxsbwxoZWxsbzIGZW52BmxvZxRIZWxsbyBOZWFyD7wDAAIAAL4DAAHAAwAADgAGAaABAAAAAQICCwC+AwABwAMBAQjqCMAA4cAB4ikpvAMBBAEACg4OQwYBvgMAAAADAAATADjhAAAAQuIAAAAE4wAAACQBACm8AwECA10OQwYBwAMAAAADAAEQADjhAAAAQuIAAAC/ACQBACm8AwUCA04HCDIyMjI=)
+near-sdk-js (master) ./builder.sh examples/hello_near.js 
+near-sdk-js (master) near call test.near deploy_js_contract --accountId test.near --args $(cat hello_near.base64) --base64 --deposit 0.1
+Scheduling a call: test.near.deploy_js_contract(AgYsZXhhbXBsZXMvaGVsbG9fbmVhci5qcwpoZWxsbwxoZWxsbzIGZW52BmxvZxRIZWxsbyBOZWFyD7wDAAIAAL4DAAHAAwAADgAGAaABAAAAAQICCwC+AwABwAMBAQjqCMAA4cAB4ikpvAMBBAEACg4OQwYBvgMAAAADAAATADjhAAAAQuIAAAAE4wAAACQBACm8AwECA10OQwYBwAMAAAADAAEQADjhAAAAQuIAAAC/ACQBACm8AwUCA04HCDIyMjI=) with attached 0.1 NEAR
 Loaded master account test.near key from /home/bo/.near/validator_key.json with public key = ed25519:XXqxAHP1ZRcwCwBTr1MbdF9NM7UVynuTnxhZfFeE5UJ
 Doing account.functionCall()
 Transaction Id Df7txPSFWwaBLTz61pSxoVrPPu6qY7fUTJ31xuQtXDBf
 To see the transaction in the transaction explorer, please open this url in your browser
 http://localhost:9001/transactions/Df7txPSFWwaBLTz61pSxoVrPPu6qY7fUTJ31xuQtXDBf
 ''
-near-sdk-js (enclave) near call test.near call_js_contract --accountId test.near --args 'dGVzdC5uZWFyIGhlbGxvIA==' --base64
-Scheduling a call: test.near.call_js_contract(dGVzdC5uZWFyIGhlbGxvIA==)
+near-sdk-js (master) near call test.near call_js_contract --accountId test.near --args 'anN2bXRlc3Rlci50ZXN0bmV0AGhlbGxvAA==' --base64
+Scheduling a call: test.near.call_js_contract(anN2bXRlc3Rlci50ZXN0bmV0AGhlbGxvAA==)
 Loaded master account test.near key from /home/bo/.near/validator_key.json with public key = ed25519:XXqxAHP1ZRcwCwBTr1MbdF9NM7UVynuTnxhZfFeE5UJ
 Doing account.functionCall()
 Receipt: AcRRGeR16FYg5AEMZ163v5Av1NanZtRHocDUvmGTvoYN
@@ -84,6 +83,67 @@ http://localhost:9001/transactions/GkitU1Cm5bdQJWe6bzkYganiS9tfetuY4buqGFypvQWL
 
 ```
 
+### On Testnet
+Latest master version of near-sdk-js enclave has been deployed on `jsvm.testnet`. You can use it or deploy your own copy of jsvm, which is simiar to the steps for deploy on local node. The following is the step to deploy and call your contract on `jsvm.testnet`.
+
+1. Build the contract
+```
+near-sdk-js (master) ./builder.sh examples/hello_near.js 
+```
+
+2. Create an account on testnet wallet. Login it with near-cli:
+```
+near-sdk-js (master) export NEAR_ENV=testnet
+near-sdk-js (master) near login
+
+Please authorize NEAR CLI on at least one of your accounts.
+
+If your browser doesn't automatically open, please visit this URL
+https://wallet.testnet.near.org/login/?referrer=NEAR+CLI&public_key=ed25519%3A6eNw1uLsVbvHJhPrcN9Rj9wefqfzxJ2tz7VqxY8m3F88&success_url=http%3A%2F%2F127.0.0.1%3A5000
+Please authorize at least one account at the URL above.
+
+Which account did you authorize for use with NEAR CLI?
+Enter it here (if not redirected automatically):
+Logged in as [ jsvmtester.testnet ] with public key [ ed25519:6eNw1u... ] successfully
+```
+
+3. Deploy the JS contract:
+```
+near-sdk-js (master) export JSVM_ACCOUNT=jsvm.testnet
+near-sdk-js (master) near call $JSVM_ACCOUNT deploy_js_contract --accountId jsvmtester.testnet --args $(cat hello_near.base64) --base64 --deposit 0.1
+Scheduling a call: jsvm.testnet.deploy_js_contract(AgYsZXhhbXBsZXMvaGVsbG9fbmVhci5qcwpoZWxsbwxoZWxsbzIGZW52BmxvZxRIZWxsbyBOZWFyD7wDAAIAAL4DAAHAAwAADgAGAaABAAAAAQICCwC+AwABwAMBAQjqCMAA4cAB4ikpvAMBBAEACg4OQwYBvgMAAAADAAATADjhAAAAQuIAAAAE4wAAACQBACm8AwECA10OQwYBwAMAAAADAAEQADjhAAAAQuIAAAC/ACQBACm8AwUCA04HCDIyMjI=) with attached 0.1 NEAR
+Doing account.functionCall()
+Transaction Id 46vC327SWs7JNV7G3XMHkRzETyc6WuxwkdwLhV6Go2kp
+To see the transaction in the transaction explorer, please open this url in your browser
+https://explorer.testnet.near.org/transactions/46vC327SWs7JNV7G3XMHkRzETyc6WuxwkdwLhV6Go2kp
+''
+```
+Note that, in order to deploy the contract, the deployer need to deposit sufficient amount of NEAR to cover storage deposit. It's roughly 0.01 NEAR for 1KB of contract. If you deposit more than required, the additional part will be refunded. If no adequate deposit is attached, the deploy will failed with a panic. If future deployment increase or decrease in size, the difference will need to be paid or refunded, respectively.
+
+4. Call the JS contract:
+```
+near-sdk-js (master) near call $JSVM_ACCOUNT call_js_contract --accountId jsvmtester.testnet --args 'anN2bXRlc3Rlci50ZXN0bmV0AGhlbGxvAA==' --base64
+Scheduling a call: jsvm.testnet.call_js_contract(anN2bXRlc3Rlci50ZXN0bmV0AGhlbGxvAA==)
+Doing account.functionCall()
+Receipt: 4Mn5d3Kc4n67MxQkcEmi4gxKbrrKXvJE9Rin3q3fdCsQ
+        Log [jsvm.testnet]: Hello Near
+Transaction Id 43K5sjgVeWCYzuDJ3S6j5XHxQnRY8w1TQ84MiDxdtHp1
+To see the transaction in the transaction explorer, please open this url in your browser
+https://explorer.testnet.near.org/transactions/43K5sjgVeWCYzuDJ3S6j5XHxQnRY8w1TQ84MiDxdtHp1
+''
+
+near-sdk-js (master) near call $JSVM_ACCOUNT call_js_contract --accountId jsvmtester2.testnet --args 'anN2bXRlc3Rlci50ZXN0bmV0AGhlbGxvAA==' --base64
+Scheduling a call: jsvm.testnet.call_js_contract(anN2bXRlc3Rlci50ZXN0bmV0AGhlbGxvAA==)
+Doing account.functionCall()
+Receipt: DzysE3ZNG8fBY4djq1KDYyDLs53jga2Lxpou2kjm3HzC
+        Log [jsvm.testnet]: Hello Near
+Transaction Id AGRHcCCBCFex2hiXQh5BhFDoq7bN1eVoULhSyL4zgMRA
+To see the transaction in the transaction explorer, please open this url in your browser
+https://explorer.testnet.near.org/transactions/AGRHcCCBCFex2hiXQh5BhFDoq7bN1eVoULhSyL4zgMRA
+''
+```
+
+Note that, the args is encoded by this JavaScript snippet: `Buffer.from("jsvmtester.testnet\x00hello\x00").toString('base64')`. The meaning is call `jsvmtester.testnet` deployed JS contract, `hello` method, with no arguments to the `hello` method. This method can be call by anyone, not just the one who deployed this JS contract (`jsvmtester.testnet`).
 
 ## NEAR-SDK-JS Low Level API Reference
 
