@@ -241,15 +241,15 @@ function promise_batch_then(promise_index: Uint64, account_id: String): Uint64;
 ### Promise API actions
 
 ```
-function promise_batch_action_create_account(promise_index: Uint64);
-function promise_batch_action_deploy_contract(promise_index: Uint64, code: String);
-function promise_batch_action_function_call(promise_index: Uint64, method_name: String, arguments: String, amount: Uint128, gas: Uint64);
-function promise_batch_action_transfer(promise_index: Uint64, amount: Uint128);
-function promise_batch_action_stake(promise_index: Uint64, amount: Uint128, public_key: String);
-function promise_batch_action_add_key_with_full_access(promise_index: Uint64, public_key: String, nonce: Uint64);
-function promise_batch_action_add_key_with_function_call(promise_index: Uint64, public_key: String, nonce: Uint64, allowance: Uint128, receiver_id: String, method_names: String);
-function promise_batch_action_delete_key(promise_index: Uint64, public_key: String);
-function promise_batch_action_delete_account(promise_index: Uint64, beneficiary_id: String);
+// function promise_batch_action_create_account(promise_index: Uint64); // not allow users to create *.jsvm account
+// function promise_batch_action_deploy_contract(promise_index: Uint64, code: String); // batch actions are applied to create_account_action, but that is not allowed
+// function promise_batch_action_function_call(promise_index: Uint64, method_name: String, arguments: String, amount: Uint128, gas: Uint64);
+// function promise_batch_action_transfer(promise_index: Uint64, amount: Uint128);
+// function promise_batch_action_stake(promise_index: Uint64, amount: Uint128, public_key: String);
+// function promise_batch_action_add_key_with_full_access(promise_index: Uint64, public_key: String, nonce: Uint64);
+// function promise_batch_action_add_key_with_function_call(promise_index: Uint64, public_key: String, nonce: Uint64, allowance: Uint128, receiver_id: String, method_names: String);
+// function promise_batch_action_delete_key(promise_index: Uint64, public_key: String);
+// function promise_batch_action_delete_account(promise_index: Uint64, beneficiary_id: String);
 ```
 
 ### Promise API results
