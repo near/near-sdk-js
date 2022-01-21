@@ -181,21 +181,21 @@ function write_register(register_id: Uint64, data: String);
 ### Context API
 
 ```
-function current_account_id(register_id: Uint64);
+// function current_account_id(register_id: Uint64); // this always equals to "jsvm"
 function signer_account_id(register_id: Uint64);
 function signer_account_pk(register_id: Uint64);
 function predecessor_account_id(register_id: Uint64);
-function input(register_id: Uint64);
+// function input(register_id: Uint64); // usable, but not in helpful format
 function block_index(): Uint64;
 function block_timestamp(): Uint64;
 function epoch_height(): Uint64;
-function storage_usage(): Uint64;
+// function storage_usage(): Uint64; // storage usage for the enclave. actually, user cares about their contract storage usage
 ```
 
 ### Economics API
 ```
-function account_balance(): Uint128;
-function account_locked_balance(): Uint128;
+// function account_balance(): Uint128; // balance for the enclave. user cares about their contract balance
+// function account_locked_balance(): Uint128; // same
 function attached_deposit(): Uint128;
 function prepaid_gas(): Uint64;
 function used_gas(): Uint64;
@@ -263,9 +263,9 @@ function promise_return(promise_idx: Uint64);
 ### Storage API
 
 ```
-function storage_write(key: String, value: String, register_id: Uint64): Uint64;
+// function storage_write(key: String, value: String, register_id: Uint64): Uint64; // user can only access contract's storage
 function storage_read(key: String, register_id: Uint64): Uint64;
-function storage_remove(key: String, register_id: Uint64): Uint64;
+// function storage_remove(key: String, register_id: Uint64): Uint64; // same as storage_write
 function storage_has_key(key: String): Uint64;
 ```
 
