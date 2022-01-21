@@ -163,7 +163,7 @@ static JSValue near_write_register(JSContext *ctx, JSValueConst this_val, int ar
   return JS_UNDEFINED;
 }
 
-static JSValue near_current_account_id(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
+static JSValue near_jsvm_account_id(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
 {
   uint64_t register_id;
 
@@ -853,6 +853,27 @@ static void remaining_deposit(uint64_t *deposit, int flag) {
   }
 }
 
+static void input_js_contract_name(char **name, uint64_t *len, int flag) {
+  static char *js_contract_name;
+  static uint64_t js_contract_name_len;
+
+  if (flag == GET) {
+    *name = js_contract_name;
+    *len = js_contract_name_len;
+  } else {
+    js_contract_name = *name;
+    js_contract_name_len = *len;
+  }
+}
+
+static void input_method_name(char **name, uint64_t *len, int flag) {
+  
+}
+
+static void input_args(char **args, uint64_t *len, int flag) {
+  
+}
+
 static void deduct_cost(uint64_t *cost) {
   uint64_t deposit[2];
   remaining_deposit(deposit, GET);
@@ -921,7 +942,7 @@ static uint64_t storage_remove_enclave(uint64_t key_len, uint64_t key_ptr, uint6
   return ret;
 }
 
-static JSValue near_storage_write(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
+static JSValue jsvm_storage_write(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
 {
   const char *key_ptr, *value_ptr;
   size_t key_len, value_len;
@@ -1057,7 +1078,6 @@ static void js_add_near_host_functions(JSContext* ctx) {
   JS_SetPropertyStr(ctx, env, "read_register", JS_NewCFunction(ctx, near_read_register, "read_register", 1));
   JS_SetPropertyStr(ctx, env, "register_len", JS_NewCFunction(ctx, near_register_len, "register_len", 1));
   JS_SetPropertyStr(ctx, env, "write_register", JS_NewCFunction(ctx, near_write_register, "write_register", 2));
-  // JS_SetPropertyStr(ctx, env, "current_account_id", JS_NewCFunction(ctx, near_current_account_id, "current_account_id", 1));
   JS_SetPropertyStr(ctx, env, "signer_account_id", JS_NewCFunction(ctx, near_signer_account_id, "signer_account_id", 1));
   JS_SetPropertyStr(ctx, env, "signer_account_pk", JS_NewCFunction(ctx, near_signer_account_pk, "signer_account_pk", 1));
   JS_SetPropertyStr(ctx, env, "predecessor_account_id", JS_NewCFunction(ctx, near_predecessor_account_id, "predecessor_account_id", 1));
@@ -1111,6 +1131,10 @@ static void js_add_near_host_functions(JSContext* ctx) {
   JS_SetPropertyStr(ctx, env, "alt_bn128_g1_sum", JS_NewCFunction(ctx, near_alt_bn128_g1_sum, "alt_bn128_g1_sum", 2));
   JS_SetPropertyStr(ctx, env, "alt_bn128_pairing_check", JS_NewCFunction(ctx, near_alt_bn128_pairing_check, "alt_bn128_pairing_check", 1));
   #endif
+
+  // APIs that unique to JSVM
+  JS_SetPropertyStr(ctx, env, "jsvm_account_id", JS_NewCFunction(ctx, near_jsvm_account_id, "jsvm_account_id", 1));
+
 
   JS_SetPropertyStr(ctx, global_obj, "env", env);
 }
@@ -1192,7 +1216,8 @@ void call_js_contract () __attribute__((export_name("call_js_contract"))) {
     panic();
   }
 
-  // todo: env.input should return args, instead of in.
+  input_js_contract_name(&contract, &contract_len, SET);
+
   strncpy(key, contract, contract_len);
   strncpy(key+contract_len, "/code", 5);
   has_read = storage_read(contract_len+5, (uint64_t)key, 1);
