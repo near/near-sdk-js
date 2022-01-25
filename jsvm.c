@@ -1063,9 +1063,15 @@ void call_js_contract () __attribute__((export_name("call_js_contract"))) {
       break;
     }
   }
-  if (method_len == 0 || contract_len == 0 || contract_len > 64) {
-    // argument error
-    panic();
+
+  if (contract_len == 0) {
+    panic_str("JS contract name is empty");
+  }
+  if (contract_len > 64) {
+    panic_str("JS contract name is too long, invalid NEAR account");
+  }
+  if (method_len == 0) {
+    panic_str("method name is empty");
   }
   
   input_js_contract_name(&contract, &contract_len, SET);
@@ -1076,7 +1082,7 @@ void call_js_contract () __attribute__((export_name("call_js_contract"))) {
   strncpy(key+contract_len, "/code", 5);
   has_read = storage_read(contract_len+5, (uint64_t)key, 1);
   if (!has_read) {
-    panic();
+    panic_str("JS contract does not exist");
   }
   code_len = register_len(1);
   code = malloc(code_len);
