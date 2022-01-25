@@ -204,17 +204,6 @@ static JSValue near_predecessor_account_id(JSContext *ctx, JSValueConst this_val
   return JS_UNDEFINED;
 }
 
-static JSValue near_input(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
-{
-  uint64_t register_id;
-
-  if (JS_ToUint64Ext(ctx, &register_id, argv[0]) < 0) {
-    return JS_ThrowTypeError(ctx, "Expect Uint64 for register_id");
-  }
-  input(register_id);
-  return JS_UNDEFINED;
-}
-
 static JSValue near_block_index(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
 {
   uint64_t value;
@@ -867,11 +856,29 @@ static void input_js_contract_name(char **name, uint64_t *len, int flag) {
 }
 
 static void input_method_name(char **name, uint64_t *len, int flag) {
-  
+  static char *method_name;
+  static uint64_t method_name_len;
+
+  if (flag == GET) {
+    *name = method_name;
+    *len = method_name_len;
+  } else {
+    method_name = *name;
+    method_name_len = *len;
+  }
 }
 
-static void input_args(char **args, uint64_t *len, int flag) {
-  
+static void input_args(char **name, uint64_t *len, int flag) {
+  static char *args;
+  static uint64_t args_len;
+
+  if (flag == GET) {
+    *name = args;
+    *len = args_len;
+  } else {
+    args = *name;
+    args_len = *len;
+  }
 }
 
 static void deduct_cost(uint64_t *cost) {
@@ -940,6 +947,48 @@ static uint64_t storage_remove_enclave(uint64_t key_len, uint64_t key_ptr, uint6
     refund_cost(cost);
   }
   return ret;
+}
+
+static JSValue near_jsvm_js_contract_name(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+  uint64_t register_id;
+  char* contract_name;
+  uint64_t contract_name_len;
+
+  if (JS_ToUint64Ext(ctx, &register_id, argv[0]) < 0) {
+    return JS_ThrowTypeError(ctx, "Expect Uint64 for register_id");
+  }
+  input_js_contract_name(&contract_name, &contract_name_len, GET);
+  write_register(register_id, contract_name_len, (uint64_t)contract_name);
+  return JS_UNDEFINED;
+}
+
+static JSValue near_jsvm_method_name(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+  uint64_t register_id;
+  char* method_name;
+  uint64_t method_name_len;
+
+  if (JS_ToUint64Ext(ctx, &register_id, argv[0]) < 0) {
+    return JS_ThrowTypeError(ctx, "Expect Uint64 for register_id");
+  }
+  input_method_name(&method_name, &method_name_len, GET);
+  write_register(register_id, method_name_len, (uint64_t)method_name);
+  return JS_UNDEFINED;
+}
+
+static JSValue near_jsvm_args(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+  uint64_t register_id;
+  char* args;
+  uint64_t args_len;
+
+  if (JS_ToUint64Ext(ctx, &register_id, argv[0]) < 0) {
+    return JS_ThrowTypeError(ctx, "Expect Uint64 for register_id");
+  }
+  input_args(&args, &args_len, GET);
+  write_register(register_id, args_len, (uint64_t)args);
+  return JS_UNDEFINED;
 }
 
 static JSValue jsvm_storage_write(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
@@ -1134,13 +1183,15 @@ static void js_add_near_host_functions(JSContext* ctx) {
 
   // APIs that unique to JSVM
   JS_SetPropertyStr(ctx, env, "jsvm_account_id", JS_NewCFunction(ctx, near_jsvm_account_id, "jsvm_account_id", 1));
-
+  JS_SetPropertyStr(ctx, env, "jsvm_js_contract_name", JS_NewCFunction(ctx, near_jsvm_js_contract_name, "jsvm_js_contract_name", 1));
+  JS_SetPropertyStr(ctx, env, "jsvm_method_name", JS_NewCFunction(ctx, near_jsvm_method_name, "jsvm_method_name", 1));
+  JS_SetPropertyStr(ctx, env, "jsvm_args", JS_NewCFunction(ctx, near_jsvm_args, "jsvm_args", 1));
 
   JS_SetPropertyStr(ctx, global_obj, "env", env);
 }
 
 JSValue JS_Call(JSContext *ctx, JSValueConst func_obj, JSValueConst this_obj,
-                int argc, JSValueConst *argv) ;
+                int argc, JSValueConst *argv);
 
 void _start() {}
 
@@ -1179,7 +1230,7 @@ void remove_js_contract () __attribute__((export_name("remove_js_contract"))) {
 
 void call_js_contract () __attribute__((export_name("call_js_contract"))) {
   char *in, *code, *contract, *method, *args;
-  size_t contract_len = 0, method_len = 0, args_len = 0;
+  uint64_t contract_len = 0, method_len = 0, args_len = 0;
   size_t code_len, in_len;
   char key[69];
   int has_read;
@@ -1215,8 +1266,10 @@ void call_js_contract () __attribute__((export_name("call_js_contract"))) {
     // argument error
     panic();
   }
-
+  
   input_js_contract_name(&contract, &contract_len, SET);
+  input_method_name(&method, &method_len, SET);
+  input_args(&args, &args_len, SET);
 
   strncpy(key, contract, contract_len);
   strncpy(key+contract_len, "/code", 5);
