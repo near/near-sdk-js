@@ -79,15 +79,7 @@ extern uint64_t promise_batch_then(uint64_t promise_index, uint64_t account_id_l
 // #######################
 // # Promise API actions #
 // #######################
-extern void promise_batch_action_create_account(uint64_t promise_index);
-extern void promise_batch_action_deploy_contract(uint64_t promise_index, uint64_t code_len, uint64_t code_ptr);
-extern void promise_batch_action_function_call(uint64_t promise_index, uint64_t method_name_len, uint64_t method_name_ptr, uint64_t arguments_len, uint64_t arguments_ptr, uint64_t amount_ptr, uint64_t gas);
 extern void promise_batch_action_transfer(uint64_t promise_index, uint64_t amount_ptr);
-extern void promise_batch_action_stake(uint64_t promise_index, uint64_t amount_ptr, uint64_t public_key_len, uint64_t public_key_ptr);
-extern void promise_batch_action_add_key_with_full_access(uint64_t promise_index, uint64_t public_key_len, uint64_t public_key_ptr, uint64_t nonce);
-extern void promise_batch_action_add_key_with_function_call(uint64_t promise_index, uint64_t public_key_len, uint64_t public_key_ptr, uint64_t nonce, uint64_t allowance_ptr, uint64_t receiver_id_len, uint64_t receiver_id_ptr, uint64_t method_names_len, uint64_t method_names_ptr);
-extern void promise_batch_action_delete_key(uint64_t promise_index, uint64_t public_key_len, uint64_t public_key_ptr);
-extern void promise_batch_action_delete_account(uint64_t promise_index, uint64_t beneficiary_id_len, uint64_t beneficiary_id_ptr);
 // #######################
 // # Promise API results #
 // #######################
@@ -228,14 +220,6 @@ static JSValue near_epoch_height(JSContext *ctx, JSValueConst this_val, int argc
   return JS_NewBigUint64(ctx, value);
 }
 
-static JSValue near_storage_usage(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
-{
-  uint64_t value;
-
-  value = storage_usage();
-  return JS_NewBigUint64(ctx, value);
-}
-
 // ptr[0] ptr[1] is little-endian u128.
 static JSValue u128_to_quickjs(JSContext *ctx, uint64_t* ptr) {
   JSValue value;
@@ -295,22 +279,6 @@ static int quickjs_to_u128(JSContext *ctx, JSValueConst val, uint64_t* ptr) {
   else {
     return quickjs_int_to_u128(ctx, val, ptr);
   }
-}
-
-static JSValue near_account_balance(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
-{  
-  uint64_t ptr[2];
-
-  account_balance((uint64_t)ptr); 
-  return u128_to_quickjs(ctx, ptr);
-}
-
-static JSValue near_account_locked_balance(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
-{
-  uint64_t ptr[2];
-
-  account_locked_balance((uint64_t)ptr);
-  return u128_to_quickjs(ctx, ptr);
 }
 
 static JSValue near_attached_deposit(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
@@ -581,158 +549,6 @@ static JSValue near_promise_batch_then(JSContext *ctx, JSValueConst this_val, in
   account_id_ptr = JS_ToCStringLen(ctx, &account_id_len, argv[1]);
   ret = promise_batch_then(promise_index, account_id_len, (uint64_t)account_id_ptr);
   return JS_NewBigUint64(ctx, ret);
-}
-
-static JSValue near_promise_batch_action_create_account(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
-{
-  uint64_t promise_index;
-
-  if (JS_ToUint64Ext(ctx, &promise_index, argv[0]) < 0) {
-    return JS_ThrowTypeError(ctx, "Expect Uint64 for promise_index");
-  }
-  promise_batch_action_create_account(promise_index);
-  return JS_UNDEFINED;
-}
-
-static JSValue near_promise_batch_action_deploy_contract(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
-{
-  uint64_t promise_index;
-  const char *code_ptr;
-  size_t code_len;
-
-  if (JS_ToUint64Ext(ctx, &promise_index, argv[0]) < 0) {
-    return JS_ThrowTypeError(ctx, "Expect Uint64 for promise_index");
-  }
-  code_ptr = JS_ToCStringLenRaw(ctx, &code_len, argv[1]);
-  promise_batch_action_deploy_contract(promise_index, code_len, (uint64_t)code_ptr);
-  return JS_UNDEFINED;
-}
-
-static JSValue near_promise_batch_action_function_call(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
-{
-  uint64_t promise_index;
-  const char *method_name_ptr, *arguments_ptr;
-  size_t method_name_len, arguments_len;
-  uint64_t amount_ptr[2]; // amount is u128
-  uint64_t gas;
-
-  if (JS_ToUint64Ext(ctx, &promise_index, argv[0]) < 0) {
-    return JS_ThrowTypeError(ctx, "Expect Uint64 for promise_index");
-  }
-  method_name_ptr = JS_ToCStringLen(ctx, &method_name_len, argv[1]);
-  arguments_ptr = JS_ToCStringLenRaw(ctx, &arguments_len, argv[2]);
-  if (quickjs_to_u128(ctx, argv[3], amount_ptr) != 0) {
-    return JS_ThrowTypeError(ctx, "Expect Uint128 for amount");
-  }
-  if (JS_ToUint64Ext(ctx, &gas, argv[4]) < 0) {
-    return JS_ThrowTypeError(ctx, "Expect Uint64 for gas");
-  }
-  promise_batch_action_function_call(promise_index, method_name_len, (uint64_t)method_name_ptr, arguments_len, (uint64_t)arguments_ptr, (uint64_t)amount_ptr, gas);
-  return JS_UNDEFINED;
-}
-
-static JSValue near_promise_batch_action_transfer(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
-{
-  uint64_t promise_index;
-  uint64_t amount_ptr[2]; // amount is u128
-
-  if (JS_ToUint64Ext(ctx, &promise_index, argv[0]) < 0) {
-    return JS_ThrowTypeError(ctx, "Expect Uint64 for promise_index");
-  }
-  if (quickjs_to_u128(ctx, argv[1], amount_ptr) != 0) {
-    return JS_ThrowTypeError(ctx, "Expect Uint128 for amount");
-  }
-  promise_batch_action_transfer(promise_index, (uint64_t)amount_ptr);
-  return JS_UNDEFINED;
-}
-
-static JSValue near_promise_batch_action_stake(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
-{
-  uint64_t promise_index;
-  uint64_t amount_ptr[2];
-  const char *public_key_ptr;
-  size_t public_key_len;
-
-  if (JS_ToUint64Ext(ctx, &promise_index, argv[0]) < 0) {
-    return JS_ThrowTypeError(ctx, "Expect Uint64 for promise_index");
-  }
-  if (quickjs_to_u128(ctx, argv[1], amount_ptr) != 0) {
-    return JS_ThrowTypeError(ctx, "Expect Uint128 for amount");
-  }
-  public_key_ptr = JS_ToCStringLen(ctx, &public_key_len, argv[2]);
-
-  promise_batch_action_stake(promise_index, (uint64_t)amount_ptr, public_key_len, (uint64_t)public_key_ptr);
-  return JS_UNDEFINED;
-}
-
-static JSValue near_promise_batch_action_add_key_with_full_access(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
-{
-  uint64_t promise_index;
-  const char *public_key_ptr;
-  size_t public_key_len;
-  uint64_t nonce;
-
-  if (JS_ToUint64Ext(ctx, &promise_index, argv[0]) < 0) {
-    return JS_ThrowTypeError(ctx, "Expect Uint64 for promise_index");
-  }
-  public_key_ptr = JS_ToCStringLen(ctx, &public_key_len, argv[1]);
-  if (JS_ToUint64Ext(ctx, &nonce, argv[2]) < 0) {
-    return JS_ThrowTypeError(ctx, "Expect Uint64 for nonce");
-  }
-  promise_batch_action_add_key_with_full_access(promise_index, public_key_len, (uint64_t)public_key_ptr, nonce);
-  return JS_UNDEFINED;
-}
-
-static JSValue near_promise_batch_action_add_key_with_function_call(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
-{
-  uint64_t promise_index;
-  const char *public_key_ptr, *receiver_id_ptr, *method_names_ptr;
-  size_t public_key_len, receiver_id_len, method_names_len;
-  uint64_t nonce, allowance_ptr[2];
-
-  if (JS_ToUint64Ext(ctx, &promise_index, argv[0]) < 0) {
-    return JS_ThrowTypeError(ctx, "Expect Uint64 for promise_index");
-  }
-  public_key_ptr = JS_ToCStringLen(ctx, &public_key_len, argv[1]);
-  if (JS_ToUint64Ext(ctx, &nonce, argv[2]) < 0) {
-    return JS_ThrowTypeError(ctx, "Expect Uint64 for nonce");
-  }
-  if (quickjs_to_u128(ctx, argv[3], allowance_ptr) != 0) {
-    return JS_ThrowTypeError(ctx, "Expect Uint128 for allowance");
-  }
-  receiver_id_ptr = JS_ToCStringLen(ctx, &receiver_id_len, argv[4]);
-  method_names_ptr = JS_ToCStringLen(ctx, &method_names_len, argv[5]);
-
-  promise_batch_action_add_key_with_function_call(promise_index, public_key_len, (uint64_t)public_key_ptr, nonce, (uint64_t)allowance_ptr, receiver_id_len, (uint64_t)receiver_id_ptr, method_names_len, (uint64_t)method_names_ptr);
-  return JS_UNDEFINED;
-}
-
-static JSValue near_promise_batch_action_delete_key(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
-{
-  uint64_t promise_index;
-  const char *public_key_ptr;
-  size_t public_key_len;
-
-  if (JS_ToUint64Ext(ctx, &promise_index, argv[0]) < 0) {
-    return JS_ThrowTypeError(ctx, "Expect Uint64 for promise_index");
-  }
-  public_key_ptr = JS_ToCStringLen(ctx, &public_key_len, argv[1]);
-  promise_batch_action_delete_key(promise_index, public_key_len, (uint64_t)public_key_ptr);
-  return JS_UNDEFINED;
-}
-
-static JSValue near_promise_batch_action_delete_account(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
-{
-  uint64_t promise_index;
-  const char *beneficiary_id_ptr;
-  size_t beneficiary_id_len;
-
-  if (JS_ToUint64Ext(ctx, &promise_index, argv[0]) < 0) {
-    return JS_ThrowTypeError(ctx, "Expect Uint64 for promise_index");
-  }
-  beneficiary_id_ptr = JS_ToCStringLen(ctx, &beneficiary_id_len, argv[1]);
-  promise_batch_action_delete_account(promise_index, beneficiary_id_len, (uint64_t)beneficiary_id_ptr);
-  return JS_UNDEFINED;
 }
 
 static JSValue near_promise_results_count(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
@@ -1130,13 +946,9 @@ static void js_add_near_host_functions(JSContext* ctx) {
   JS_SetPropertyStr(ctx, env, "signer_account_id", JS_NewCFunction(ctx, near_signer_account_id, "signer_account_id", 1));
   JS_SetPropertyStr(ctx, env, "signer_account_pk", JS_NewCFunction(ctx, near_signer_account_pk, "signer_account_pk", 1));
   JS_SetPropertyStr(ctx, env, "predecessor_account_id", JS_NewCFunction(ctx, near_predecessor_account_id, "predecessor_account_id", 1));
-  // JS_SetPropertyStr(ctx, env, "input", JS_NewCFunction(ctx, near_input, "input", 1));
   JS_SetPropertyStr(ctx, env, "block_index", JS_NewCFunction(ctx, near_block_index, "block_index", 0));
   JS_SetPropertyStr(ctx, env, "block_timestamp", JS_NewCFunction(ctx, near_block_timestamp, "block_timestamp", 0));
   JS_SetPropertyStr(ctx, env, "epoch_height", JS_NewCFunction(ctx, near_epoch_height, "epoch_height", 0));
-  // JS_SetPropertyStr(ctx, env, "storage_usage", JS_NewCFunction(ctx, near_storage_usage, "storage_usage", 0));
-  // JS_SetPropertyStr(ctx, env, "account_balance", JS_NewCFunction(ctx, near_account_balance, "account_balance", 0));
-  // JS_SetPropertyStr(ctx, env, "account_locked_balance", JS_NewCFunction(ctx, near_account_locked_balance, "account_locked_balance", 0));
   JS_SetPropertyStr(ctx, env, "attached_deposit", JS_NewCFunction(ctx, near_attached_deposit, "attached_deposit", 0));
   JS_SetPropertyStr(ctx, env, "prepaid_gas", JS_NewCFunction(ctx, near_prepaid_gas, "prepaid_gas", 0));
   JS_SetPropertyStr(ctx, env, "used_gas", JS_NewCFunction(ctx, near_used_gas, "used_gas", 0));
@@ -1157,21 +969,10 @@ static void js_add_near_host_functions(JSContext* ctx) {
   JS_SetPropertyStr(ctx, env, "promise_and", JS_NewCFunction(ctx, near_promise_and, "promise_and", 1));
   JS_SetPropertyStr(ctx, env, "promise_batch_create", JS_NewCFunction(ctx, near_promise_batch_create, "promise_batch_create", 1));
   JS_SetPropertyStr(ctx, env, "promise_batch_then", JS_NewCFunction(ctx, near_promise_batch_then, "promise_batch_then", 2));
-  // JS_SetPropertyStr(ctx, env, "promise_batch_action_create_account", JS_NewCFunction(ctx, near_promise_batch_action_create_account, "promise_batch_action_create_account", 1));
-  // JS_SetPropertyStr(ctx, env, "promise_batch_action_deploy_contract", JS_NewCFunction(ctx, near_promise_batch_action_deploy_contract, "promise_batch_action_deploy_contract", 2));
-  // JS_SetPropertyStr(ctx, env, "promise_batch_action_function_call", JS_NewCFunction(ctx, near_promise_batch_action_function_call, "promise_batch_action_function_call", 5));
-  // JS_SetPropertyStr(ctx, env, "promise_batch_action_transfer", JS_NewCFunction(ctx, near_promise_batch_action_transfer, "promise_batch_action_transfer", 2));
-  // JS_SetPropertyStr(ctx, env, "promise_batch_action_stake", JS_NewCFunction(ctx, near_promise_batch_action_stake, "promise_batch_action_stake", 3));
-  // JS_SetPropertyStr(ctx, env, "promise_batch_action_add_key_with_full_access", JS_NewCFunction(ctx, near_promise_batch_action_add_key_with_full_access, "promise_batch_action_add_key_with_full_access", 3));
-  // JS_SetPropertyStr(ctx, env, "promise_batch_action_add_key_with_function_call", JS_NewCFunction(ctx, near_promise_batch_action_add_key_with_function_call, "promise_batch_action_add_key_with_function_call", 6));
-  // JS_SetPropertyStr(ctx, env, "promise_batch_action_delete_key", JS_NewCFunction(ctx, near_promise_batch_action_delete_key, "promise_batch_action_delete_key", 2));
-  // JS_SetPropertyStr(ctx, env, "promise_batch_action_delete_account", JS_NewCFunction(ctx, near_promise_batch_action_delete_account, "promise_batch_action_delete_account", 2));
   JS_SetPropertyStr(ctx, env, "promise_results_count", JS_NewCFunction(ctx, near_promise_results_count, "promise_results_count", 0));
   JS_SetPropertyStr(ctx, env, "promise_result", JS_NewCFunction(ctx, near_promise_result, "promise_result", 2));
   JS_SetPropertyStr(ctx, env, "promise_return", JS_NewCFunction(ctx, near_promise_return, "promise_return", 1));
-  // JS_SetPropertyStr(ctx, env, "storage_write", JS_NewCFunction(ctx, near_storage_write, "storage_write", 2));
   JS_SetPropertyStr(ctx, env, "storage_read", JS_NewCFunction(ctx, near_storage_read, "storage_read", 2));
-  // JS_SetPropertyStr(ctx, env, "storage_remove", JS_NewCFunction(ctx, near_storage_remove, "storage_remove", 2));
   JS_SetPropertyStr(ctx, env, "storage_has_key", JS_NewCFunction(ctx, near_storage_has_key, "storage_has_key", 2));
   JS_SetPropertyStr(ctx, env, "validator_stake", JS_NewCFunction(ctx, near_validator_stake, "validator_stake", 2));
   JS_SetPropertyStr(ctx, env, "validator_total_stake", JS_NewCFunction(ctx, near_validator_total_stake, "validator_total_stake", 1));
