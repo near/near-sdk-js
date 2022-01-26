@@ -807,15 +807,23 @@ static JSValue near_jsvm_args(JSContext *ctx, JSValueConst this_val, int argc, J
   return JS_UNDEFINED;
 }
 
-static JSValue jsvm_storage_write(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
+static JSValue near_jsvm_storage_write(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
 {
   const char *key_ptr, *value_ptr;
-  size_t key_len, value_len;
-  uint64_t ret;
+  char *key_with_account_prefix, *contract_name;
+  size_t key_len, value_len, key_with_prefix_len;
+  uint64_t contract_name_len, ret;
 
+  input_js_contract_name(&contract_name, &contract_name_len, GET);
   key_ptr = JS_ToCStringLenRaw(ctx, &key_len, argv[0]);
   value_ptr = JS_ToCStringLenRaw(ctx, &value_len, argv[1]);
-  ret = storage_write(key_len, (uint64_t)key_ptr, value_len, (uint64_t)value_ptr, 0);
+  key_with_prefix_len = contract_name_len + 7 + key_len;
+  key_with_account_prefix = malloc(key_with_prefix_len);
+  strncpy(key_with_account_prefix, contract_name, contract_name_len);
+  strncpy(key_with_account_prefix+contract_name_len, "/state/", 7);
+  strncpy(key_with_account_prefix+contract_name_len+7, key_ptr, key_len);
+
+  ret = storage_write(key_with_prefix_len, (uint64_t)key_with_account_prefix, value_len, (uint64_t)value_ptr, 0);
   return JS_NewBigUint64(ctx, ret);
 }
 
@@ -987,6 +995,7 @@ static void js_add_near_host_functions(JSContext* ctx) {
   JS_SetPropertyStr(ctx, env, "jsvm_js_contract_name", JS_NewCFunction(ctx, near_jsvm_js_contract_name, "jsvm_js_contract_name", 1));
   JS_SetPropertyStr(ctx, env, "jsvm_method_name", JS_NewCFunction(ctx, near_jsvm_method_name, "jsvm_method_name", 1));
   JS_SetPropertyStr(ctx, env, "jsvm_args", JS_NewCFunction(ctx, near_jsvm_args, "jsvm_args", 1));
+  JS_SetPropertyStr(ctx, env, "jsvm_storage_write", JS_NewCFunction(ctx, near_jsvm_storage_write, "jsvm_storage_write", 2));
 
   JS_SetPropertyStr(ctx, global_obj, "env", env);
 }
