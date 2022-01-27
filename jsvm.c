@@ -397,16 +397,6 @@ static JSValue near_ecrecover(JSContext *ctx, JSValueConst this_val, int argc, J
   return JS_NewBigUint64(ctx, result);
 }
 
-static JSValue near_value_return(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) 
-{
-  const char *value_ptr;
-  size_t value_len;
-
-  value_ptr = JS_ToCStringLenRaw(ctx, &value_len, argv[0]);
-  value_return(value_len, (uint64_t)value_ptr);
-  return JS_UNDEFINED;
-}
-
 static JSValue near_panic(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
 {
   const char *data_ptr;
@@ -697,6 +687,34 @@ static void input_args(char **name, uint64_t *len, int flag) {
   }
 }
 
+static void jsvm_call_returns(char **val, uint64_t *len, int flag) {
+  static char *ret = "";
+  static uint64_t ret_len = 0;
+
+  if (flag == GET) {
+    *val = ret;
+    *len = ret_len;
+  } else {
+    ret = *val;
+    ret_len = *len;
+  }
+}
+
+static JSValue near_jsvm_value_return(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) 
+{
+  const char *value_ptr;
+  size_t value_len;
+  char *value;
+  uint64_t value_len_u64;
+
+  value_ptr = JS_ToCStringLenRaw(ctx, &value_len, argv[0]);
+  value = (char *)value_ptr;
+  value_len_u64 = (uint64_t)value_len;
+  value_return(value_len, (uint64_t)value_ptr);
+  jsvm_call_returns(&value, &value_len_u64, SET);
+  return JS_UNDEFINED;
+}
+
 static void deduct_cost(uint64_t *cost) {
   uint64_t deposit[2];
   remaining_deposit(deposit, GET);
@@ -918,6 +936,77 @@ static JSValue near_storage_has_key(JSContext *ctx, JSValueConst this_val, int a
   return JS_NewBigUint64(ctx, ret);
 }
 
+static void js_add_near_host_functions(JSContext* ctx);
+
+static void jsvm_call(uint64_t contract_len, char *contract, uint64_t method_len, char *method, uint64_t args_len, char *args)
+{
+  char key[69];
+  int has_read;
+  size_t code_len;
+  char *code;
+
+  JSRuntime *rt;
+  JSContext *ctx;
+  JSValue mod_obj, fun_obj, result, error, error_message, error_stack;
+  const char *error_message_c, *error_stack_c;
+  char *error_c;
+  size_t msg_len, stack_len;
+
+  input_js_contract_name(&contract, &contract_len, SET);
+  input_method_name(&method, &method_len, SET);
+  input_args(&args, &args_len, SET);
+
+  strncpy(key, contract, contract_len);
+  strncpy(key+contract_len, "/code", 5);
+  has_read = storage_read(contract_len+5, (uint64_t)key, UINT64_MAX);
+  if (!has_read) {
+    panic_str("JS contract does not exist");
+  }
+  code_len = register_len(UINT64_MAX);
+  code = malloc(code_len);
+  read_register(UINT64_MAX, (uint64_t)code);
+
+  rt = JS_NewRuntime();
+  ctx = JS_NewCustomContext(rt);
+  js_add_near_host_functions(ctx);
+  mod_obj = js_load_module_binary(ctx, (const uint8_t *)code, code_len);
+  fun_obj = JS_GetProperty(ctx, mod_obj, JS_NewAtom(ctx, method));
+  result = JS_Call(ctx, fun_obj, mod_obj, 0, NULL);
+  if (JS_IsException(result)) {
+    error = JS_GetException(ctx);
+    error_message = JS_GetPropertyStr(ctx, error, "message");
+    error_stack = JS_GetPropertyStr(ctx, error, "stack");
+    error_message_c = JS_ToCStringLen(ctx, &msg_len, error_message);
+    error_stack_c = JS_ToCStringLen(ctx, &stack_len, error_stack);
+    error_c = malloc(msg_len+1+stack_len);
+    strncpy(error_c, error_message_c, msg_len);
+    error_c[msg_len] = '\n';
+    strncpy(error_c+msg_len+1, error_stack_c, stack_len);
+    panic_utf8(msg_len+1+stack_len, (uint64_t)error_c);
+  }
+  js_std_loop(ctx);
+}
+
+static JSValue near_jsvm_call(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+  const char *contract_name_ptr, *method_name_ptr, *arguments_ptr;
+  char *call_ret;
+  size_t contract_name_len, method_name_len, arguments_len;
+  uint64_t register_id, ret_len;
+
+  contract_name_ptr = JS_ToCStringLen(ctx, &contract_name_len, argv[0]);
+  method_name_ptr = JS_ToCStringLen(ctx, &method_name_len, argv[1]);
+  arguments_ptr = JS_ToCStringLenRaw(ctx, &arguments_len, argv[2]);
+  if (JS_ToUint64Ext(ctx, &register_id, argv[3]) < 0) {
+    return JS_ThrowTypeError(ctx, "Expect Uint64 for register_id");
+  }
+
+  jsvm_call(contract_name_len, (char *)contract_name_ptr, method_name_len, (char *)method_name_ptr, arguments_len, (char *)arguments_ptr);
+  jsvm_call_returns(&call_ret, &ret_len, GET);
+  write_register(register_id, ret_len, (uint64_t)call_ret);
+  return JS_UNDEFINED;
+}
+
 static JSValue near_validator_stake(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
 {
   const char *account_id_ptr;
@@ -1016,7 +1105,6 @@ static void js_add_near_host_functions(JSContext* ctx) {
   JS_SetPropertyStr(ctx, env, "keccak512", JS_NewCFunction(ctx, near_keccak512, "keccak512", 2));
   JS_SetPropertyStr(ctx, env, "ripemd160", JS_NewCFunction(ctx, near_ripemd160, "ripemd160", 2));
   JS_SetPropertyStr(ctx, env, "ecrecover", JS_NewCFunction(ctx, near_ecrecover, "ecrecover", 5));
-  JS_SetPropertyStr(ctx, env, "value_return", JS_NewCFunction(ctx, near_value_return, "value_return", 1));
   JS_SetPropertyStr(ctx, env, "panic", JS_NewCFunction(ctx, near_panic, "panic", 1));
   JS_SetPropertyStr(ctx, env, "panic_utf8", JS_NewCFunction(ctx, near_panic_utf8, "panic_utf8", 1));
   JS_SetPropertyStr(ctx, env, "log", JS_NewCFunction(ctx, near_log, "log", 1));
@@ -1049,6 +1137,8 @@ static void js_add_near_host_functions(JSContext* ctx) {
   JS_SetPropertyStr(ctx, env, "jsvm_storage_read", JS_NewCFunction(ctx, near_jsvm_storage_read, "jsvm_storage_read", 2));
   JS_SetPropertyStr(ctx, env, "jsvm_storage_has_key", JS_NewCFunction(ctx, near_jsvm_storage_has_key, "jsvm_storage_has_key", 1));
   JS_SetPropertyStr(ctx, env, "jsvm_storage_remove", JS_NewCFunction(ctx, near_jsvm_storage_remove, "jsvm_storage_remove", 2));
+  JS_SetPropertyStr(ctx, env, "jsvm_value_return", JS_NewCFunction(ctx, near_jsvm_value_return, "jsvm_value_return", 1));
+  JS_SetPropertyStr(ctx, env, "jsvm_call", JS_NewCFunction(ctx, near_jsvm_call, "jsvm_call", 4));
 
   JS_SetPropertyStr(ctx, global_obj, "env", env);
 }
@@ -1092,18 +1182,9 @@ void remove_js_contract () __attribute__((export_name("remove_js_contract"))) {
 }
 
 void call_js_contract () __attribute__((export_name("call_js_contract"))) {
-  char *in, *code, *contract, *method, *args;
+  char *in, *contract, *method, *args;
   uint64_t contract_len = 0, method_len = 0, args_len = 0;
-  size_t code_len, in_len;
-  char key[69];
-  int has_read;
-
-  JSRuntime *rt;
-  JSContext *ctx;
-  JSValue mod_obj, fun_obj, result, error, error_message, error_stack;
-  const char *error_message_c, *error_stack_c;
-  char *error_c;
-  size_t msg_len, stack_len;
+  size_t in_len;
 
   input(0);
   in_len = register_len(0);
@@ -1136,38 +1217,6 @@ void call_js_contract () __attribute__((export_name("call_js_contract"))) {
     panic_str("method name is empty");
   }
   
-  input_js_contract_name(&contract, &contract_len, SET);
-  input_method_name(&method, &method_len, SET);
-  input_args(&args, &args_len, SET);
-
-  strncpy(key, contract, contract_len);
-  strncpy(key+contract_len, "/code", 5);
-  has_read = storage_read(contract_len+5, (uint64_t)key, 1);
-  if (!has_read) {
-    panic_str("JS contract does not exist");
-  }
-  code_len = register_len(1);
-  code = malloc(code_len);
-  read_register(1, (uint64_t)code);
-
-  rt = JS_NewRuntime();
-  ctx = JS_NewCustomContext(rt);
-  js_add_near_host_functions(ctx);
-  mod_obj = js_load_module_binary(ctx, (const uint8_t *)code, code_len);
-  fun_obj = JS_GetProperty(ctx, mod_obj, JS_NewAtom(ctx, method));
-  result = JS_Call(ctx, fun_obj, mod_obj, 0, NULL);
-  if (JS_IsException(result)) {
-    error = JS_GetException(ctx);
-    error_message = JS_GetPropertyStr(ctx, error, "message");
-    error_stack = JS_GetPropertyStr(ctx, error, "stack");
-    error_message_c = JS_ToCStringLen(ctx, &msg_len, error_message);
-    error_stack_c = JS_ToCStringLen(ctx, &stack_len, error_stack);
-    error_c = malloc(msg_len+1+stack_len);
-    strncpy(error_c, error_message_c, msg_len);
-    error_c[msg_len] = '\n';
-    strncpy(error_c+msg_len+1, error_stack_c, stack_len);
-    panic_utf8(msg_len+1+stack_len, (uint64_t)error_c);
-  }
-  js_std_loop(ctx);
+  jsvm_call(contract_len, contract, method_len, method, args_len, args);
   refund_storage_deposit(); 
 }

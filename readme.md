@@ -148,10 +148,8 @@ Note that, The second call shows this method can be call by anyone (`jsvmtester2
 
 ## NEAR-SDK-JS Low Level API Reference
 
-**Note that, following APIs will be reworked so that 1) higher level api is available; 2) contract cannot write to other contract's storage**
-
 Use `env.func_name(args)` to call low level APIs in JavaScript contracts. `env` is already imported before contract start. For example, `env.read_register(0)`.
-To use nightly host functions, such as `alt_bn128_g1_sum`, build the contract with `NEAR_NIGHTLY=1 path/to/near-sdk-js/builder.sh path/to/contract.js`.
+To use nightly host functions, such as `alt_bn128_g1_sum`, the enclave contract need to be built with `NEAR_NIGHTLY=1 ./build.sh` and deployed to a nearcore node that has nightly enabled.
 
 ### About Type 
 
@@ -165,6 +163,10 @@ It's intentional to represent string and bytes in this way because QuickJS doesn
 
 - The signature may differs from Rust APIs. This is because JavaScript doesn't have pointers and not possible to pass pointer as arguments. So, Instead of `data_len: u64, data_ptr: u64`, JavaScript API pass the data directly: `data: String`.
 - The lowest level Rust API cannot return value bigger than 64 bit integer. So some of the API pass pointer as Uint64 and the Rust function write return data at the location specified by pointer. In JavaScript we don't have this limitation and value is returned as API function return.
+
+
+### About commented APIs
+Some of the APIs below starts with `//`. This means this API is provided by nearcore, however they are intentionally removed for the JavaScript Enclave. The reason and alternative are documented in each API section.
 
 ### Registers API
 
@@ -187,6 +189,12 @@ function block_timestamp(): Uint64;
 function epoch_height(): Uint64;
 // function storage_usage(): Uint64; // storage usage for the enclave. actually, user cares about their contract storage usage
 ```
+
+The `current_account_id` would always returns the account id of the JavaScript VM contract account. The naming `current_account_id` is therefore confusing and not as helpful as a Rust contract. In some case, developer may want to get JavaScript VM contract account name, for example, determines whether it's running on testnet or mainnet, and behaves differently. So we expose this functionality under `jsvm_account_id()`.
+
+The `input` returns the argument passed to call the contract. In JavaScript VM, this is encoded as `"js_contract_name\0method_name\0args...`. This format isn't very convinient to developer, therefore, separate API `jsvm_js_contract_name`, `jsvm_method_name` and `jsvm_args` are provided.
+
+The `storage_usage` return the storage bytes used by JavaScript VM contract.
 
 ### Economics API
 ```
