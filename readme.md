@@ -221,7 +221,7 @@ function ecrecover(hash: String, sign: String, v: Uint64, malleability_flag: Uin
 
 
 ```
-function value_return(value: String);
+// function value_return(value: String); // use jsvm_value_return instead
 function panic(msg?: String);
 function panic_utf8(msg: String);
 function log(msg: String);
@@ -286,6 +286,31 @@ function validator_total_stake(): Uint128;
 function alt_bn128_g1_multiexp(value: String, register_id: Uint64);
 function alt_bn128_g1_sum(value: String, register_id: Uint64);
 function alt_bn128_pairing_check(value: String): Uint64;
+```
+
+## JSVM Specific APIs
+Due to the design of JavaScript VM Contract, some additonal APIs are provided to obtain context, access storage and cross contract call.
+
+### Obtain Context
+```
+function jsvm_account_id(register_id: Uint64);
+function jsvm_js_contract_name(register_id: Uint64);
+function jsvm_method_name(register_id: Uint64);
+function jsvm_args(register_id: Uint64);
+```
+
+### Storage Access
+```
+function jsvm_storage_write(key: String, value: String, register_id: Uint64): Uint64;
+function jsvm_storage_read(key: String, register_id: Uint64): Uint64;
+function jsvm_storage_remove(key: String, register_id: Uint64): Uint64;
+function jsvm_storage_has_key(key: String): Uint64;
+```
+
+### Cross Contract Call
+```
+function jsvm_value_return(value: String);
+function jsvm_call(contract_name: String, method: String, args: String, register_id: Uint64);
 ```
 
 ## Error Handling in NEAR-SDK-JS
