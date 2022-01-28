@@ -1,11 +1,12 @@
 # NEAR-SDK-JS (Enclave)
 
-## Installation
+## Local Installation
 It is tested on Ubuntu 20.04 and Intel Mac. Other linux and M1 Mac with rosetta should also work but they're not tested.
 
 1. Make sure you have make, cmake and nodejs. On Linux, also make sure you have gcc.
 2. `./setup.sh`
 3. `./build.sh`
+4. Use near-cli to deploy `jsvm.wasm` to your choice of `<jsvm-account>` in a local neard.
 
 ## Usage
 
@@ -179,31 +180,33 @@ function write_register(register_id: Uint64, data: String);
 ### Context API
 
 ```
-// function current_account_id(register_id: Uint64); // this always equals to "jsvm"
+// function current_account_id(register_id: Uint64);
 function signer_account_id(register_id: Uint64);
 function signer_account_pk(register_id: Uint64);
 function predecessor_account_id(register_id: Uint64);
-// function input(register_id: Uint64); // usable, but not in helpful format
+// function input(register_id: Uint64);
 function block_index(): Uint64;
 function block_timestamp(): Uint64;
 function epoch_height(): Uint64;
-// function storage_usage(): Uint64; // storage usage for the enclave. actually, user cares about their contract storage usage
+// function storage_usage(): Uint64;
 ```
 
-The `current_account_id` would always returns the account id of the JavaScript VM contract account. The naming `current_account_id` is therefore confusing and not as helpful as a Rust contract. In some case, developer may want to get JavaScript VM contract account name, for example, determines whether it's running on testnet or mainnet, and behaves differently. So we expose this functionality under `jsvm_account_id()`.
+The `current_account_id` would always puts the account id of the JavaScript VM contract account in given register. The naming `current_account_id` is therefore confusing and not as helpful as a Rust contract. In some case, developer may want to get JavaScript VM contract account name, for example, determines whether it's running on testnet or mainnet, and behaves differently. So we expose this functionality under `jsvm_account_id()`.
 
-The `input` returns the argument passed to call the contract. In JavaScript VM, this is encoded as `"js_contract_name\0method_name\0args...`. This format isn't very convinient to developer, therefore, separate API `jsvm_js_contract_name`, `jsvm_method_name` and `jsvm_args` are provided.
+The `input` puts the argument passed to call the contract in given register. In JavaScript VM, this is encoded as `"js_contract_name\0method_name\0args...`. This format isn't very convinient to developer, therefore, separate API `jsvm_js_contract_name`, `jsvm_method_name` and `jsvm_args` are provided.
 
-The `storage_usage` return the storage bytes used by JavaScript VM contract.
+The `storage_usage` return the storage bytes used by JavaScript VM contract. User doesn't care about the storage usage of the JSVM. Instead, users care about storage usage of a given JavaScript contract. This can be obtained by `storage_read` and count the sum of `register_len`.
 
 ### Economics API
 ```
-// function account_balance(): Uint128; // balance for the enclave. user cares about their contract balance
-// function account_locked_balance(): Uint128; // same
+// function account_balance(): Uint128;
+// function account_locked_balance(): Uint128;
 function attached_deposit(): Uint128;
 function prepaid_gas(): Uint64;
 function used_gas(): Uint64;
 ```
+
+The `account_balance` and `account_locked_balance` returns balance and locked_balance of JavaScript VM. Those are also not cared by users.
 
 ### Math API
 
@@ -221,7 +224,7 @@ function ecrecover(hash: String, sign: String, v: Uint64, malleability_flag: Uin
 
 
 ```
-// function value_return(value: String); // use jsvm_value_return instead
+// function value_return(value: String);
 function panic(msg?: String);
 function panic_utf8(msg: String);
 function log(msg: String);
@@ -231,6 +234,8 @@ function log_utf16(msg: String);
 // Or, this is actually not a primitive, can be implement with log and panic host functions in C side or JS side. 
 // function abort(msg_ptr: Uint32, filename_ptr: Uint32, u32: Uint32, col: Uint32);
 ```
+
+The `value_return` is a NEAR primitive that puts the value to return in a receipt. However we would want to access it as a JavaScript return value in a cross contract call. So we have a new API `jsvm_value_return`, which does return the value in receipt and also as a JavaScript value returned by `jsvm_call`. The `jsvm_value_return` should be used whenever you need `value_return`.
 
 ### Promises API
 
@@ -256,6 +261,8 @@ function promise_batch_then(promise_index: Uint64, account_id: String): Uint64;
 // function promise_batch_action_delete_account(promise_index: Uint64, beneficiary_id: String);
 ```
 
+All Promise batch actions act on the JSVM contract, creating a subaccount of it and acting on it. JSVM would be a common VM used by the community instead of a Rust  contract owned by the deployer. Terefore, creating subaccounts and subsequent actions towards subaccounts are not allowed.
+
 ### Promise API results
 
 ```
@@ -273,6 +280,8 @@ function storage_read(key: String, register_id: Uint64): Uint64;
 function storage_has_key(key: String): Uint64;
 ```
 
+The `storage_write` and `storage_remove` have access to all JavaScript contract codes and states deployed on JSVM. User can only write to their account owned code and state, as a substate of the JSVM. Therefor these two APIs are disallowed. Use `jsvm_storage_write` and `jsvm_storage_remove` instead. Read to other people owned code and state is allowed, as they're public as part of the blockchain anyway.
+
 ### Validator API
 
 ```
@@ -289,7 +298,7 @@ function alt_bn128_pairing_check(value: String): Uint64;
 ```
 
 ## JSVM Specific APIs
-Due to the design of JavaScript VM Contract, some additonal APIs are provided to obtain context, access storage and cross contract call.
+Due to the design of JavaScript VM Contract, some additonal APIs are provided to obtain context, access storage and cross contract call. Since they're not documented at [NEAR nomicon](https://nomicon.io/). They're explained here.
 
 ### Obtain Context
 ```
@@ -299,6 +308,14 @@ function jsvm_method_name(register_id: Uint64);
 function jsvm_args(register_id: Uint64);
 ```
 
+The `jsvm_account_id` put the JavaScript VM's contract account ID into given register.
+
+The `jsvm_js_contract_name`, when called, put the JavaScript contract name that are called at the moment, into given register.
+
+The `jsvm_method_name` put the method name being called into given register.
+
+The `jsvm_args` return the arguments passed to the method, into given register.
+
 ### Storage Access
 ```
 function jsvm_storage_write(key: String, value: String, register_id: Uint64): Uint64;
@@ -307,11 +324,22 @@ function jsvm_storage_remove(key: String, register_id: Uint64): Uint64;
 function jsvm_storage_has_key(key: String): Uint64;
 ```
 
+These are equivalent to `storage_*` but access limit to the substate of current JS contract. The `jsvm_storage_write` and `jsvm_storage_remove` require and refund deposit to cover the storage delta. `jsvm_storage_*` access the substate of current JS contract by prefix the key of current JS contract name (deployer's account id). You can use `storage_read` and `storage_has_key` to get code and state of other JS contracts. More specifically: code of `contractA` is stored under the key `contractA/code`. state of `contractA` is stored under `contractA/state/` concat with developer specifid key. And:
+```
+jsvm_storage_read(k, register_id) 
+// equvalent to
+storage_read(jsvm_js_contract_name + '/state/' + k)
+```
+
 ### Cross Contract Call
 ```
 function jsvm_value_return(value: String);
 function jsvm_call(contract_name: String, method: String, args: String, register_id: Uint64);
 ```
+
+The `jsvm_value_return` is the version of `value_return` that should be used in all JavaScript contracts. It play well with `jsvm_call`. 
+
+The `jsvm_call` invoke a synchronous cross contract call, to the given JavaScript `contract_name`, `method` with `args`. And capture the value returned from the call and stored in `register_id`.
 
 ## Error Handling in NEAR-SDK-JS
 
