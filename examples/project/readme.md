@@ -10,4 +10,4 @@ npm i
 npm run build
 ```
 
-The result contract is `build/project.wasm`. It can be tested with neard and near-vm-runner-standalone.
+The result contract is `build/project.base64`. It can be tested with a near node

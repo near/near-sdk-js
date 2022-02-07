@@ -1,3 +1,3 @@
-export function balance() {
-    env.log(env.account_balance().toString())
+export function deposit() {
+    env.log(env.attached_deposit().toString())
 }
