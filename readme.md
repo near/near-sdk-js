@@ -369,5 +369,4 @@ User can use verror this way:
 Under the hood, our quickjs runtime would take the final throwed error, and invoke panic_utf8("{error.message}\n{error.stack}")
 
 ## TODO
-- Other c functions are exposed and can be name confliction with bindgen functions. Need binaryen pass to rename c functions
 - Source maps for rollup build to correctly display locations in the backtrace
