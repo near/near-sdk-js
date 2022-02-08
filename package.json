@@ -2,7 +2,7 @@
   "name": "near-sdk-js-builder",
   "version": "1.0.0",
   "description": "Scripts to build contracts written with NEAR-SDK-JS",
-  "main": "codegen.js",
+  "main": "encode_call.js",
   "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/near/near-sdk-js/issues"
   },
-  "homepage": "https://github.com/near/near-sdk-js#readme"
+  "homepage": "https://github.com/near/near-sdk-js#readme",
+  "dependencies": {
+    "source-map-js": "^1.0.2"
+  }
 }
