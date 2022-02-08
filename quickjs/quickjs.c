@@ -32678,7 +32678,7 @@ static JSValue js_create_function(JSContext *ctx, JSFunctionDef *fd)
         b->has_debug = 1;
         b->debug.filename = fd->filename;
         b->debug.line_num = fd->line_num;
-        printf("%s %d: %s\n", JS_AtomToCString(ctx, fd->filename), fd->line_num, JS_AtomToCString(ctx, fd->func_name));
+        // printf("%s %d: %s\n", JS_AtomToCString(ctx, fd->filename), fd->line_num, JS_AtomToCString(ctx, fd->func_name));
         //DynBuf pc2line;
         //compute_pc2line_info(fd, &pc2line);
         //js_free(ctx, fd->line_number_slots)
