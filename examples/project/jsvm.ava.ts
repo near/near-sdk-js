@@ -7,7 +7,7 @@ const workspace = Workspace.init(async ({root}) => {
 
     const jsvm = await root.createAndDeploy(
         'jsvm',
-        'compiled-contracts/jsvm.wasm',
+        '__tests__/build/debug/jsvm.wasm',
     );
 
     return {alice, bob, jsvm};
@@ -15,7 +15,8 @@ const workspace = Workspace.init(async ({root}) => {
 
 workspace.test('root sets status', async (test, {jsvm, alice}) => {
     // Don't forget to `await` your calls!
-    await alice.call(jsvm, 'deploy_js_contract', Buffer.from(await readFile('compiled-contracts/counter.base64'), 'base64'), {attachedDeposit: '100000000000000000000000'});
+    let contract_base64 = await readFile('__tests__/build/debug/counter.base64').toString()
+    await alice.call(jsvm, 'deploy_js_contract', Buffer.from(contract_base64, 'base64'), {attachedDeposit: '100000000000000000000000'});
   
     // Assert that two things are identical using `test.is`
     // test.is(
