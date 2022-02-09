@@ -367,6 +367,3 @@ User can use verror this way:
 3. throw the final verror, `throw e`, same as in nodejs.
 
 Under the hood, our quickjs runtime would take the final throwed error, and invoke panic_utf8("{error.message}\n{error.stack}")
-
-## TODO
-- Source maps for rollup build to correctly display locations in the backtrace
