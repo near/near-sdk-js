@@ -8,7 +8,7 @@ QUICKJS_SRC_DIR=${SCRIPT_DIR}/quickjs
 WASI_STUB=${SCRIPT_DIR}/vendor/binaryen/wasi-stub/run.sh
 
 DEFS='-D_GNU_SOURCE -DCONFIG_VERSION="2021-03-27" -DCONFIG_BIGNUM'
-if [ -v NEAR_NIGHTLY ]; then
+if [[ -z NEAR_NIGHTLY ]]; then
   DEFS+=' -DNIGHTLY'
 fi
 INCLUDES="-I${SCRIPT_DIR}/stubs -I${QUICKJS_SRC_DIR} -I."
