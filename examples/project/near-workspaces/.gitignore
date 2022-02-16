@@ -1,0 +1,5 @@
+.near-credentials
+node_modules
+yarn.lock
+package-lock.json
+yarn-error.log
