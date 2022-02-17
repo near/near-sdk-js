@@ -1181,7 +1181,7 @@ void remove_js_contract () __attribute__((export_name("remove_js_contract"))) {
   refund_storage_deposit();
 }
 
-void call_js_contract () __attribute__((export_name("call_js_contract"))) {
+static void call_js_contract_internal() {
   char *in, *contract, *method, *args;
   uint64_t contract_len = 0, method_len = 0, args_len = 0;
   size_t in_len;
@@ -1218,5 +1218,13 @@ void call_js_contract () __attribute__((export_name("call_js_contract"))) {
   }
   
   jsvm_call(contract_len, contract, method_len, method, args_len, args);
+}
+
+void call_js_contract () __attribute__((export_name("call_js_contract"))) {
+  call_js_contract_internal();
   refund_storage_deposit(); 
+}
+
+void view_js_contract () __attribute__((export_name("view_js_contract"))) {
+  call_js_contract_internal();
 }
