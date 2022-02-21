@@ -1087,8 +1087,8 @@ static JSValue near_alt_bn128_pairing_check(JSContext *ctx, JSValueConst this_va
 }
 #endif
 
-#ifdef SANDBOX
 static JSValue near_debug_log(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
+#ifdef SANDBOX
 {
   const char *data_ptr;
   size_t data_len;
@@ -1096,6 +1096,10 @@ static JSValue near_debug_log(JSContext *ctx, JSValueConst this_val, int argc, J
   data_ptr = JS_ToCStringLen(ctx, &data_len, argv[0]);
   
   debug_log(data_len, (uint64_t)data_ptr);
+  return JS_UNDEFINED;
+}
+#else
+{
   return JS_UNDEFINED;
 }
 #endif
@@ -1161,12 +1165,9 @@ static void js_add_near_host_functions(JSContext* ctx) {
 
   JS_SetPropertyStr(ctx, global_obj, "env", env);
 
-#ifdef SANDBOX
   JSValue debug = JS_NewObject(ctx);
   JS_SetPropertyStr(ctx, debug, "log", JS_NewCFunction(ctx, near_debug_log, "log", 1));
   JS_SetPropertyStr(ctx, global_obj, "debug", debug);
-#endif
-
 }
 
 JSValue JS_Call(JSContext *ctx, JSValueConst func_obj, JSValueConst this_obj,
