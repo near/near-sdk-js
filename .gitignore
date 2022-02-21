@@ -21,5 +21,8 @@ near_tests.wasm
 errors.wasm
 jsvm.wasm
 *.base64
+jsvm_nightly.wasm
+jsvm_nightly_sandbox.wasm
+jsvm_sandbox.wasm
 
 .vscode
