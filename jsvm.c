@@ -110,7 +110,7 @@ extern uint64_t alt_bn128_pairing_check(uint64_t value_len, uint64_t value_ptr);
 // #  Sandbox  #
 // #############
 #ifdef SANDBOX
-extern void debug_log(uint64_t len, uint64_t ptr);
+extern void sandbox_debug_log(uint64_t len, uint64_t ptr);
 #endif
 
 static JSValue near_read_register(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
@@ -1095,7 +1095,7 @@ static JSValue near_debug_log(JSContext *ctx, JSValueConst this_val, int argc, J
 
   data_ptr = JS_ToCStringLen(ctx, &data_len, argv[0]);
   
-  debug_log(data_len, (uint64_t)data_ptr);
+  sandbox_debug_log(data_len, (uint64_t)data_ptr);
   return JS_UNDEFINED;
 }
 #else
