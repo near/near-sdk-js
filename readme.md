@@ -367,3 +367,8 @@ User can use verror this way:
 3. throw the final verror, `throw e`, same as in nodejs.
 
 Under the hood, our quickjs runtime would take the final throwed error, and invoke panic_utf8("{error.message}\n{error.stack}")
+
+## Debug and Test
+To get more debug utilities, such as debug print (`debug.log`) and logging stacktrace, you can build JSVM with sandbox flag: `NEAR_SANDBOX=1 ./build.sh`. A `jsvm_sandbox.wasm` will be build in current directory. You can then deploy sandbox versioned jsvm to a local [near-sandbox](https://github.com/near/sandbox). near-sandbox can be launched either manually or via the official testing framework [near-workspaces](https://github.com/near/workspaces-js). We recommend to use near-workspaces to write tests for your smart contracts. An example of use near-workspaces in a JS contract project can be found in `examples/project/`. 
+
+Note that, `jsvm.wasm` can be used for sandbox/near-workspaces as well. But to debug print, you need to use `jsvm_sandbox.wasm` instead.
