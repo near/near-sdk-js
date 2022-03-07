@@ -22,3 +22,14 @@ export function get_text() {
     let text = env.read_register(0)
     env.jsvm_value_return(text)
 }
+
+function annotation(target) {
+  target.annotated = true;
+}
+
+@annotation
+class MyClass {}
+
+export function test_annotation() {
+    env.log(MyClass.annotated)
+}

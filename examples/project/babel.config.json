@@ -1,0 +1,6 @@
+{
+  "plugins": [
+    ["@babel/plugin-proposal-decorators", {"decoratorsBeforeExport": false, "version": "2021-12"}],
+    ["@babel/plugin-proposal-class-static-block"]
+  ]
+}
