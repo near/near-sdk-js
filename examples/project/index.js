@@ -2,6 +2,7 @@ import {dropWhile} from 'lodash-es'
 import {users} from './user.js'
 import {here_throw_error} from './error_happen.js'
 import {NearContract, NearBindgen, call, view} from './sdk.js'
+// import { init } from './build/project.js';
 
 export function hello() {
     let activeUser = dropWhile(users, function(o) { return !o.active; })[0].user;
@@ -26,10 +27,10 @@ export function get_text() {
 
 @NearBindgen
 class MyContract extends NearContract {
-    constructor(total) {
+    constructor() {
         super()
         this.name = 'hello'
-        this.totalSupply = total
+        this.totalSupply = 100
     }
 
     @call
@@ -45,20 +46,3 @@ class MyContract extends NearContract {
     }
 }
 
-let m 
-export function init() {
-    m = new MyContract(100)
-}
-
-let x = 1
-
-export function testIncrease() {
-    // let m = new MyContract(100)
-    let m = MyContract.get()
-    m.increaseTotal()
-    env.log(m.getTotal())
-}
-
-// export function showTotal() {
-//     env.log(m.getTotal())
-// }
