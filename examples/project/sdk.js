@@ -59,7 +59,7 @@ export function NearBindgen (Class) {
         return ret
     }
     NewClass.prototype = OriginalClass.prototype
-    NewClass.get = function() {
+    NewClass._get = function() {
         let ret = new OriginalClass()
         ret.deserialize()
         return ret
