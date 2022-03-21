@@ -29,9 +29,16 @@ export default function () {
                     t.callExpression(t.memberExpression(classId, t.identifier('_get')), []))]),
                   t.expressionStatement(t.callExpression(t.memberExpression(t.identifier('_contract'), t.identifier(method)), [])),
                 ])),
-                [t.exportSpecifier(t.identifier(method), t.identifier(method))])
-            )
+                [t.exportSpecifier(t.identifier(method), t.identifier(method))]))
           }
+
+          path.insertAfter(
+            t.exportNamedDeclaration(
+              t.functionDeclaration(t.identifier('init'), [], t.blockStatement([
+                t.expressionStatement(t.newExpression(classId, [])),
+              ])),
+              [t.exportSpecifier(t.identifier('init'), t.identifier('init'))]))
+
           console.log('nearbindgen done')
         }
       },
