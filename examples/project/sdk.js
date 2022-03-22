@@ -1,9 +1,10 @@
 export class NearContract {
     deserialize() {
         let hasRead = env.jsvm_storage_read('STATE', 0)
-        if (hasRead != 0)
-            Object.assign(this, JSON.parse(env.read_register(0)))
-        else
+        if (hasRead != 0) {
+            let state = env.read_register(0)
+            Object.assign(this, JSON.parse(state))
+        } else
             throw new Error('Contract state is empty')
     }
 
@@ -15,6 +16,7 @@ export class NearContract {
 export function call (target, name, descriptor) {
     let oldMethod = descriptor.value
     descriptor.value = function(...args) {
+        target.deserialize()
         let ret = oldMethod.apply(target, args)
         target.serialize()
         return ret
@@ -25,6 +27,7 @@ export function call (target, name, descriptor) {
 export function view (target, name, descriptor) {
     let oldMethod = descriptor.value
     descriptor.value = function(...args) {
+        target.deserialize()
         return oldMethod.apply(target, args)
     }
     return descriptor
@@ -40,7 +43,6 @@ export function NearBindgen (Class) {
     NewClass.prototype = OriginalClass.prototype
     NewClass._get = function() {
         let ret = new OriginalClass()
-        ret.deserialize()
         return ret
     }
 
