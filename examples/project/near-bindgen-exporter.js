@@ -27,7 +27,10 @@ export default function () {
                 t.functionDeclaration(t.identifier(method), [], t.blockStatement([
                   t.variableDeclaration('let', [t.variableDeclarator(t.identifier('_contract'), 
                     t.callExpression(t.memberExpression(classId, t.identifier('_get')), []))]),
-                  t.expressionStatement(t.callExpression(t.memberExpression(t.identifier('_contract'), t.identifier(method)), [])),
+                  t.expressionStatement(
+                    t.callExpression(t.memberExpression(t.identifier('env'), t.identifier('jsvm_value_return')), [
+                      t.callExpression(t.memberExpression(t.identifier('_contract'), t.identifier(method)), [])
+                    ])),
                 ])),
                 [t.exportSpecifier(t.identifier(method), t.identifier(method))]))
           }
@@ -39,7 +42,7 @@ export default function () {
               ])),
               [t.exportSpecifier(t.identifier('init'), t.identifier('init'))]))
 
-          console.log('nearbindgen done')
+          console.log('Near bindgen export done')
         }
       },
     },

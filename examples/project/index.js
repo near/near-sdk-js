@@ -7,6 +7,7 @@ import {NearContract, NearBindgen, call, view} from './sdk.js'
 export function hello() {
     let activeUser = dropWhile(users, function(o) { return !o.active; })[0].user;
     env.log(`Hello ${activeUser} from NEAR!`)
+    env.jsvm_value_return('hello')
 }
 
 export function no() {
@@ -37,6 +38,7 @@ class MyContract extends NearContract {
     increaseTotal() {
         this.totalSupply += 1
         env.log(this.totalSupply)
+        return this.totalSupply
     }
 
     @view
