@@ -24,7 +24,6 @@ workspace.test('bob set text', async (test, {jsvm, alice, bob}) => {
     await bob.call(jsvm, 'call_js_contract', encode_call(alice.accountId, 'set_text', 'hello'), {attachedDeposit: '100000000000000000000000'});
     
     test.is(
-        // TODO, call_js_contract cannot be used in a view_call, add a view_js_contract in jsvm.c
         await jsvm.view('view_js_contract', encode_call(alice.accountId, 'get_text', '')),
         // await bob.call(jsvm, 'call_js_contract', encode_call(alice.accountId, 'get_text', '')),
         'hello'
