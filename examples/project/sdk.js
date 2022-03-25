@@ -11,6 +11,16 @@ export class NearContract {
     serialize() {
         env.jsvm_storage_write('STATE', JSON.stringify(this), 0)
     }
+
+    static deserializeArgs() {
+        env.jsvm_args(0)
+        let args = env.read_register(0)
+        return JSON.parse(args)
+    }
+
+    static serializeReturn(ret) {
+
+    }
 }
 
 export function call (target, name, descriptor) {
@@ -35,7 +45,8 @@ export function view (target, name, descriptor) {
 
 export function NearBindgen (Class) {
     let OriginalClass = Class
-    let NewClass = function(...args) {
+    let NewClass = function() {
+        let args = OriginalClass.deserializeArgs()
         let ret = new OriginalClass(...args)
         ret.serialize()
         return ret

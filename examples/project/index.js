@@ -28,10 +28,10 @@ export function get_text() {
 
 @NearBindgen
 class MyContract extends NearContract {
-    constructor() {
+    constructor(totalSupply) {
         super()
         this.name = 'hello'
-        this.totalSupply = 100
+        this.totalSupply = totalSupply
     }
 
     @call
