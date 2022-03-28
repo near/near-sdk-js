@@ -1,0 +1,25 @@
+{
+  "name": "template",
+  "version": "1.0.0",
+  "description": "Contract template with near-sdk-js",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "build": "./build.sh"
+  },
+  "author": "Near Inc <hello@nearprotocol.com>",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "lodash": "^4.17.21",
+    "lodash-es": "^4.17.21"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.17.5",
+    "@babel/plugin-proposal-decorators": "^7.17.2",
+    "@rollup/plugin-babel": "^5.3.1",
+    "@rollup/plugin-commonjs": "^21.0.1",
+    "@rollup/plugin-node-resolve": "^13.1.1",
+    "rollup": "^2.61.1",
+    "rollup-plugin-sourcemaps": "^0.6.3"
+  }
+}
