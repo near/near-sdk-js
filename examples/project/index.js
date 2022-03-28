@@ -35,8 +35,8 @@ class MyContract extends NearContract {
     }
 
     @call
-    increaseTotal() {
-        this.totalSupply += 1
+    increaseTotal(n) {
+        this.totalSupply += n
         env.log(this.totalSupply)
         return this.totalSupply
     }

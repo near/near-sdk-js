@@ -15,7 +15,7 @@ export class NearContract {
     static deserializeArgs() {
         env.jsvm_args(0)
         let args = env.read_register(0)
-        return JSON.parse(args)
+        return JSON.parse(args || '[]')
     }
 
     static serializeReturn(ret) {
@@ -25,8 +25,9 @@ export class NearContract {
 
 export function call (target, name, descriptor) {
     let oldMethod = descriptor.value
-    descriptor.value = function(...args) {
+    descriptor.value = function() {
         target.deserialize()
+        let args = target.constructor.deserializeArgs()
         let ret = oldMethod.apply(target, args)
         target.serialize()
         return ret
@@ -36,8 +37,9 @@ export function call (target, name, descriptor) {
 
 export function view (target, name, descriptor) {
     let oldMethod = descriptor.value
-    descriptor.value = function(...args) {
+    descriptor.value = function() {
         target.deserialize()
+        let args = target.constructor.deserializeArgs()
         return oldMethod.apply(target, args)
     }
     return descriptor
