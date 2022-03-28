@@ -19,7 +19,7 @@ export class NearContract {
     }
 
     static serializeReturn(ret) {
-
+        return JSON.stringify(ret)
     }
 }
 
@@ -30,7 +30,7 @@ export function call (target, name, descriptor) {
         let args = target.constructor.deserializeArgs()
         let ret = oldMethod.apply(target, args)
         target.serialize()
-        return ret
+        return target.constructor.serializeReturn(ret)
     }
     return descriptor
 }
@@ -40,7 +40,8 @@ export function view (target, name, descriptor) {
     descriptor.value = function() {
         target.deserialize()
         let args = target.constructor.deserializeArgs()
-        return oldMethod.apply(target, args)
+        let ret = oldMethod.apply(target, args)
+        return target.constructor.serializeReturn(ret)
     }
     return descriptor
 }
