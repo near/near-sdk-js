@@ -1,0 +1,15 @@
+{
+  "name": "near-sdk-js",
+  "version": "1.0.0",
+  "description": "High Level JavaScript SDK for building smart contracts on NEAR",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Near Inc <hello@nearprotocol.com>",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@babel/core": "^7.17.8"
+  }
+}

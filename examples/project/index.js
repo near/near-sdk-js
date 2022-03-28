@@ -1,7 +1,7 @@
 import {dropWhile} from 'lodash-es'
 import {users} from './user.js'
 import {here_throw_error} from './error_happen.js'
-import {NearContract, NearBindgen, call, view} from './sdk.js'
+import {NearContract, NearBindgen, call, view} from '../../sdk'
 // import { init } from './build/project.js';
 
 export function hello() {
