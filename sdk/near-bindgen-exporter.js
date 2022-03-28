@@ -28,9 +28,7 @@ export default function () {
                   t.variableDeclaration('let', [t.variableDeclarator(t.identifier('_contract'), 
                     t.callExpression(t.memberExpression(classId, t.identifier('_get')), []))]),
                   t.expressionStatement(
-                    t.callExpression(t.memberExpression(t.identifier('env'), t.identifier('jsvm_value_return')), [
-                      t.callExpression(t.memberExpression(t.identifier('_contract'), t.identifier(method)), [])
-                    ])),
+                    t.callExpression(t.memberExpression(t.identifier('_contract'), t.identifier(method)), [])),
                 ])),
                 [t.exportSpecifier(t.identifier(method), t.identifier(method))]))
           }

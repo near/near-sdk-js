@@ -5,7 +5,9 @@ export function call (target, name, descriptor) {
         let args = target.constructor.deserializeArgs()
         let ret = oldMethod.apply(target, args)
         target.serialize()
-        return target.constructor.serializeReturn(ret)
+        if (ret !== undefined) {
+            env.jsvm_value_return(target.constructor.serializeReturn(ret))
+        }
     }
     return descriptor
 }
@@ -16,7 +18,9 @@ export function view (target, name, descriptor) {
         target.deserialize()
         let args = target.constructor.deserializeArgs()
         let ret = oldMethod.apply(target, args)
-        return target.constructor.serializeReturn(ret)
+        if (ret !== undefined) {
+            env.jsvm_value_return(target.constructor.serializeReturn(ret))
+        }
     }
     return descriptor
 }
