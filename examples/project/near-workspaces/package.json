@@ -5,6 +5,6 @@
     "test:testnet": "near-workspaces-ava --config ./ava.testnet.config.cjs"
   },
   "devDependencies": {
-    "near-workspaces-ava": "1.0.0"
+    "near-workspaces-ava": "1.1.0"
   }
 }
