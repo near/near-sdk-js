@@ -1,4 +1,4 @@
-import {NearContract, NearBindgen, call, view} from '../../sdk'
+import {NearContract, NearBindgen, call, view, near} from '../../sdk'
 
 @NearBindgen
 class StatusMessage extends NearContract {
@@ -9,8 +9,7 @@ class StatusMessage extends NearContract {
 
     @call
     set_status(message) {
-        env.signer_account_id(0)
-        let account_id = env.read_register(0)
+        let account_id = near.signerAccountId()
         env.log(`${account_id} set_status with message ${message}`)
         this.records[account_id] = message
     }
