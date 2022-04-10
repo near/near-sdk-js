@@ -21,8 +21,17 @@ export NEAR_ENV=local
 near call jsvm.test.near deploy_js_contract --accountId status-message.test.near --args $(cat build/status-message.base64) --base64 --deposit 0.1
 ```
 
-## Call the contract
+## Initialize the contract
+
+Now we need to initialize the contract after deployment is ready, call the `init` method which will execute `new StatusMessage()` for the class.
 Go back to the root dir of near-sdk-js, where we have a helper `encode-call.js`. Call it with:
+
+```
+near call jsvm.test.near call_js_contract --accountId status-message.test.near --base64 --args $(node encode_call.js status-message.test.near init '')
+```
+
+## Call the contract
+Under the root dir of near-sdk-js, call the `set_status` and `get_status` methods with:
 
 ```
 near call jsvm.test.near call_js_contract --accountId alice.test.near --base64 --args $(node encode_call.js status-message.test.near set_status '["hello"]') --deposit 0.1
