@@ -6,6 +6,8 @@ This repo is an example with multiple modules and with an npm dependency: lodash
 
 ## Build
 ```
+cd ../../sdk && npm i
+cd examples/project
 npm i
 npm run build
 ```
