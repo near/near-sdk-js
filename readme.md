@@ -1,7 +1,7 @@
 # NEAR-SDK-JS (Enclave)
 
 ## Local Installation
-It is tested on Ubuntu 20.04 and Intel Mac. Other linux and M1 Mac with rosetta should also work but they're not tested.
+It is tested on Ubuntu 20.04 and Intel Mac. Other linux and M1 Macs should also work but they're not tested.
 
 1. Make sure you have wget, make, cmake and nodejs. On Linux, also make sure you have gcc.
 2. `./setup.sh`
@@ -63,7 +63,7 @@ Done deploying to test.near
 
 4. Build, deploy hello contract to jsvm contract, and call hello. Example session:
 ```
-near-sdk-js (master) ./builder.sh examples/hello_near.js 
+near-sdk-js (master) ./builder.sh examples/low-level/hello_near.js 
 near-sdk-js (master) near call test.near deploy_js_contract --accountId test.near --base64 --args $(cat hello_near.base64) --deposit 0.1
 Scheduling a call: test.near.deploy_js_contract(AgYsZXhhbXBsZXMvaGVsbG9fbmVhci5qcwpoZWxsbwxoZWxsbzIGZW52BmxvZxRIZWxsbyBOZWFyD7wDAAIAAL4DAAHAAwAADgAGAaABAAAAAQICCwC+AwABwAMBAQjqCMAA4cAB4ikpvAMBBAEACg4OQwYBvgMAAAADAAATADjhAAAAQuIAAAAE4wAAACQBACm8AwECA10OQwYBwAMAAAADAAEQADjhAAAAQuIAAAC/ACQBACm8AwUCA04HCDIyMjI=) with attached 0.1 NEAR
 Loaded master account test.near key from /home/bo/.near/validator_key.json with public key = ed25519:XXqxAHP1ZRcwCwBTr1MbdF9NM7UVynuTnxhZfFeE5UJ
@@ -90,7 +90,7 @@ Latest master version of near-sdk-js enclave has been deployed on `jsvm.testnet`
 
 1. Build the contract
 ```
-near-sdk-js (master) ./builder.sh examples/hello_near.js 
+near-sdk-js (master) ./builder.sh examples/low-level/hello_near.js 
 ```
 
 2. Create an account on testnet wallet. Login it with near-cli:
