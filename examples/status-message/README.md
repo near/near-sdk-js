@@ -12,6 +12,11 @@ npm run build
 
 Result contract bytecode file will be in `build/status-message.base64`. Intermediate JavaScript file can be found in `build/status-message.js`. You'll only need the `base64` file to deploy contract to chain. The intermediate JavaScript file is for curious user and near-sdk-js developers to understand what code generation happened under the hood.
 
+## Test the contract with workspaces-js
+```
+npm run test
+```
+
 ## Deploy the contract
 
 Suppose JSVM contract was deployed to `jsvm.test.near`. Developer want to deploy the status message contract to `status-message.test.near`. Create `status-message.test.near`, `alice.test.near` and `bob.test.near` locally. Then:

@@ -5,7 +5,7 @@ import babel from '@rollup/plugin-babel';
 // import commonjs from '@rollup/plugin-commonjs';
 
 export default {
-    input: 'index.js',
+    input: 'src/index.js',
     output: {
       sourcemap: true,
       file: 'build/status-message.js',
