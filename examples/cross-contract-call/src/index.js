@@ -10,13 +10,12 @@ class OnCall extends NearContract {
     
     @call
     set_person_on_call(accountId) {
-        env.log(`Account ID in set_person_on_call: ${account_id}`)
-        const available = near.jsvmCall('status-message.test.near', 'get_status', {'account_id': accountId}) === 'AVAILABLE'
+        const available = near.jsvmCall('status-message.test.near', 'get_status', accountId) === 'AVAILABLE'
         if (available) {
             this.personOnCall = accountId
-            env.log(`${account_id} set on-call`)
+            env.log(`${accountId} set on-call`)
         } else {
-            env.log(`${account_id} is not available`)
+            env.log(`${accountId} is not available`)
         }
     }
 
