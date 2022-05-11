@@ -25,10 +25,30 @@ export default function () {
             path.insertAfter(
               t.exportNamedDeclaration(
                 t.functionDeclaration(t.identifier(method), [], t.blockStatement([
+                  // let _contract = ContractClass._get()
                   t.variableDeclaration('let', [t.variableDeclarator(t.identifier('_contract'), 
                     t.callExpression(t.memberExpression(classId, t.identifier('_get')), []))]),
+                  // _contract.deserialize()
                   t.expressionStatement(
-                    t.callExpression(t.memberExpression(t.identifier('_contract'), t.identifier(method)), [])),
+                    t.callExpression(t.memberExpression(t.identifier('_contract'), t.identifier('deserialize')), [])),
+                  // let args = _contract.constructor.deserializeArgs()
+                  t.variableDeclaration('let', [t.variableDeclarator(t.identifier('args'), 
+                    t.callExpression(t.memberExpression(t.memberExpression(t.identifier('_contract'), t.identifier('constructor')), t.identifier('deserializeArgs')), []))]),
+                  // let ret = _contract.method(...args)
+                  t.variableDeclaration('let', [t.variableDeclarator(t.identifier('ret'), 
+                    t.callExpression(t.memberExpression(t.identifier('_contract'), t.identifier(method)), [t.spreadElement(t.identifier('args'))]))]),
+                  contractMethods[method] == 'call' ?
+                    // _contract.serialize()
+                    t.expressionStatement(
+                      t.callExpression(t.memberExpression(t.identifier('_contract'), t.identifier('serialize')), []))
+                    : t.emptyStatement(),
+                  // if (ret !== undefined)
+                  t.ifStatement(t.binaryExpression('!==', t.identifier('ret'), t.identifier('undefined')),
+                    // env.jsvm_value_return(_contract.constructor.serializeReturn(ret))
+                    t.expressionStatement(t.callExpression(t.memberExpression(t.identifier('env'), t.identifier('jsvm_value_return')), [
+                      t.callExpression(t.memberExpression(t.memberExpression(t.identifier('_contract'), t.identifier('constructor')), t.identifier('serializeReturn')), [t.identifier('ret')])
+                    ]))
+                  )
                 ])),
                 [t.exportSpecifier(t.identifier(method), t.identifier(method))]))
           }
