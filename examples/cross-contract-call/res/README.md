@@ -1,0 +1,1 @@
+JS Contract from `../../status-message` example.
