@@ -30,15 +30,14 @@ test.before(async t => {
     const bob = await root.createSubAccount('bob');
     const carl = await root.createSubAccount('carl');
 
-    // Save state for test runs, it is unique for each test
+    // Save state for test runs
     t.context.worker = worker;
     t.context.accounts = { root, jsvm, statusMessage, ali, bob, carl };
 });
 
 test.after(async t => {
-    // Stop Sandbox server
     await t.context.worker.tearDown().catch(error => {
-        console.log('Failed to stop the Sandbox:', error);
+        console.log('Failed to tear down the worker:', error);
     });
 });
 
