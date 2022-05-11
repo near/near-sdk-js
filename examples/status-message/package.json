@@ -5,7 +5,8 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "build": "./build.sh"
+    "build": "./build.sh",
+    "test": "ava"
   },
   "author": "Near Inc <hello@nearprotocol.com>",
   "license": "Apache-2.0",
@@ -19,6 +20,8 @@
     "@rollup/plugin-babel": "^5.3.1",
     "@rollup/plugin-commonjs": "^21.0.1",
     "@rollup/plugin-node-resolve": "^13.1.1",
+    "ava": "^4.2.0",
+    "near-workspaces": "^2.0.0",
     "rollup": "^2.61.1",
     "rollup-plugin-sourcemaps": "^0.6.3"
   }

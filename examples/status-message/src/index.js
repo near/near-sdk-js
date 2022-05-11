@@ -1,4 +1,4 @@
-import {NearContract, NearBindgen, call, view, near} from '../../sdk'
+import {NearContract, NearBindgen, call, view, near} from '../../../sdk'
 
 @NearBindgen
 class StatusMessage extends NearContract {
