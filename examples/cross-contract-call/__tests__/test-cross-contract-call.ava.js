@@ -70,7 +70,7 @@ test('Person can be set on-call if AVAILABLE', async t => {
     
     // Check that Ali is on-call
     t.is(
-        await jsvm.view('view_js_contract', encodeCall(onCallContract.accountId, 'person_on_call')),
+        await jsvm.view('view_js_contract', encodeCall(onCallContract.accountId, 'person_on_call', [])),
         ali.accountId
     );
 });
@@ -85,7 +85,7 @@ test('Person can NOT be set on-call if UNAVAILABLE', async t => {
     
     // Check that Ali is NOT on-call
     t.not(
-        await jsvm.view('view_js_contract', encodeCall(onCallContract.accountId, 'person_on_call')),
+        await jsvm.view('view_js_contract', encodeCall(onCallContract.accountId, 'person_on_call', [])),
         ali.accountId
     );
 });
