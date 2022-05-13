@@ -944,7 +944,7 @@ static JSValue near_storage_has_key(JSContext *ctx, JSValueConst this_val, int a
 
 static void js_add_near_host_functions(JSContext* ctx);
 
-static void jsvm_call(uint64_t contract_len, char *contract, uint64_t method_len, char *method, uint64_t args_len, char *args)
+static void jsvm_call(uint64_t contract_len, char *contract, uint64_t method_len, char *method, uint64_t args_len, char *args, bool has_prev_call)
 {
   char key[69];
   int has_read;
@@ -957,6 +957,17 @@ static void jsvm_call(uint64_t contract_len, char *contract, uint64_t method_len
   const char *error_message_c, *error_stack_c;
   char *error_c;
   size_t msg_len, stack_len;
+
+  char *prev_contract, *prev_method, *prev_args;
+  uint64_t prev_contract_len, prev_method_len, prev_args_len;
+
+  if (has_prev_call) {
+    // called from a cross contract call
+    // keep track of previous contract name, method and args
+    input_js_contract_name(&prev_contract, &prev_contract_len, GET);
+    input_method_name(&prev_method, &prev_method_len, GET);
+    input_args(&prev_args, &prev_args_len, GET);
+  }
 
   input_js_contract_name(&contract, &contract_len, SET);
   input_method_name(&method, &method_len, SET);
@@ -991,6 +1002,13 @@ static void jsvm_call(uint64_t contract_len, char *contract, uint64_t method_len
     panic_utf8(msg_len+1+stack_len, (uint64_t)error_c);
   }
   js_std_loop(ctx);
+
+  if (has_prev_call) {
+    // restore previous contract name, method and args
+    input_js_contract_name(&prev_contract, &prev_contract_len, SET);
+    input_method_name(&prev_method, &prev_method_len, SET);
+    input_args(&prev_args, &prev_args_len, SET);
+  }
 }
 
 static JSValue near_jsvm_call(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
@@ -1007,7 +1025,7 @@ static JSValue near_jsvm_call(JSContext *ctx, JSValueConst this_val, int argc, J
     return JS_ThrowTypeError(ctx, "Expect Uint64 for register_id");
   }
 
-  jsvm_call(contract_name_len, (char *)contract_name_ptr, method_name_len, (char *)method_name_ptr, arguments_len, (char *)arguments_ptr);
+  jsvm_call(contract_name_len, (char *)contract_name_ptr, method_name_len, (char *)method_name_ptr, arguments_len, (char *)arguments_ptr, true);
   jsvm_call_returns(&call_ret, &ret_len, GET);
   write_register(register_id, ret_len, (uint64_t)call_ret);
   return JS_UNDEFINED;
@@ -1244,7 +1262,7 @@ static void call_js_contract_internal() {
     panic_str("method name is empty");
   }
   
-  jsvm_call(contract_len, contract, method_len, method, args_len, args);
+  jsvm_call(contract_len, contract, method_len, method, args_len, args, false);
 }
 
 void call_js_contract () __attribute__((export_name("call_js_contract"))) {
