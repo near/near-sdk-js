@@ -120,6 +120,6 @@ export function jsvmStorageHasKey(key) {
 }
 
 export function jsvmCall(contractName, method, args) {
-    env.jsvm_call(contractName, method, args, 0)
-    return env.read_register(0)
+    env.jsvm_call(contractName, method, JSON.stringify(args), 0)
+    return JSON.parse(env.read_register(0) || 'null')
 }
