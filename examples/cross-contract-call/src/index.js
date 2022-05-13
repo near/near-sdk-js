@@ -1,6 +1,5 @@
 import {NearContract, NearBindgen, call, view, near} from '../../../sdk'
 
-
 @NearBindgen
 class OnCall extends NearContract {
     constructor() {
@@ -11,9 +10,9 @@ class OnCall extends NearContract {
     @call
     set_person_on_call(accountId) {
         env.log(`Trying to set ${accountId} on-call`)
-        const status = near.jsvmCall('status-message.test.near', 'get_status', JSON.stringify([accountId]))
+        const status = near.jsvmCall('status-message.test.near', 'get_status', [accountId])
         env.log(`${accountId} status is ${status}`)
-        if (status === '\"AVAILABLE\"') { //TODO: fix "<expected string>" bug
+        if (status === 'AVAILABLE') {
             this.personOnCall = accountId
             env.log(`${accountId} set on-call`)
         } else {
