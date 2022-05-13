@@ -40,7 +40,7 @@ export function ripemd160(value) {
 
 export function ecrecover(hash, sign, v, malleabilityFlag) {
     let ret = env.ecrecover(hash, sign, v, malleabilityFlag, 0)
-    if (ret === 0) {
+    if (ret === 0n) {
         return null
     }
     return env.read_register(0)
@@ -50,7 +50,7 @@ export function ecrecover(hash, sign, v, malleabilityFlag) {
 
 export function storageRead(key) {
     let ret = env.storage_read(key, 0)
-    if (ret === 1) {
+    if (ret === 1n) {
         return env.read_register(0)
     } else {
         return null
@@ -89,7 +89,7 @@ export function jsvmArgs() {
 
 export function jsvmStorageWrite(key, value) {
     let exist = env.jsvm_storage_write(key, value, 0)
-    if (exist === 1) {
+    if (exist === 1n) {
         return true
     }
     return false
@@ -97,7 +97,7 @@ export function jsvmStorageWrite(key, value) {
 
 export function jsvmStorageRead(key) {
     let exist = env.jsvm_storage_read(key, 0)
-    if (exist === 1) {
+    if (exist === 1n) {
         return env.read_register(0)
     }
     return null
@@ -105,7 +105,7 @@ export function jsvmStorageRead(key) {
 
 export function jsvmStorageRemove(key) {
     let exist = env.jsvm_storage_remove(key, 0)
-    if (exist === 1) {
+    if (exist === 1n) {
         return true
     }
     return false
@@ -113,7 +113,7 @@ export function jsvmStorageRemove(key) {
 
 export function jsvmStorageHasKey(key) {
     let exist = env.jsvm_storage_has_key(key)
-    if (exist === 1) {
+    if (exist === 1n) {
         return true
     }
     return false

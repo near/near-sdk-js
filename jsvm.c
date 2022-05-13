@@ -951,12 +951,26 @@ static void jsvm_call(uint64_t contract_len, char *contract, uint64_t method_len
   size_t code_len;
   char *code;
 
-  JSRuntime *rt;
-  JSContext *ctx;
+  static bool runtime_created = false;
+  static JSRuntime *rt;
+  static JSContext *ctx;
   JSValue mod_obj, fun_obj, result, error, error_message, error_stack;
   const char *error_message_c, *error_stack_c;
   char *error_c;
   size_t msg_len, stack_len;
+
+  char *prev_contract, *prev_method, *prev_args;
+  uint64_t prev_contract_len, prev_method_len, prev_args_len;
+  bool has_prev_call = false;
+
+  if (runtime_created) {
+    // runtime created tells this is called by a cross contract call
+    has_prev_call = true;
+    // keep track of previous contract name, method and args
+    input_js_contract_name(&prev_contract, &prev_contract_len, GET);
+    input_method_name(&prev_method, &prev_method_len, GET);
+    input_args(&prev_args, &prev_args_len, GET);
+  }
 
   input_js_contract_name(&contract, &contract_len, SET);
   input_method_name(&method, &method_len, SET);
@@ -972,9 +986,13 @@ static void jsvm_call(uint64_t contract_len, char *contract, uint64_t method_len
   code = malloc(code_len);
   read_register(UINT64_MAX, (uint64_t)code);
 
-  rt = JS_NewRuntime();
-  ctx = JS_NewCustomContext(rt);
-  js_add_near_host_functions(ctx);
+  if (!runtime_created) {
+    rt = JS_NewRuntime();
+    ctx = JS_NewCustomContext(rt);
+    js_add_near_host_functions(ctx);
+    runtime_created = true;
+  }
+
   mod_obj = js_load_module_binary(ctx, (const uint8_t *)code, code_len);
   fun_obj = JS_GetProperty(ctx, mod_obj, JS_NewAtom(ctx, method));
   result = JS_Call(ctx, fun_obj, mod_obj, 0, NULL);
@@ -991,6 +1009,13 @@ static void jsvm_call(uint64_t contract_len, char *contract, uint64_t method_len
     panic_utf8(msg_len+1+stack_len, (uint64_t)error_c);
   }
   js_std_loop(ctx);
+
+  if (has_prev_call) {
+    // restore previous contract name, method and args
+    input_js_contract_name(&prev_contract, &prev_contract_len, SET);
+    input_method_name(&prev_method, &prev_method_len, SET);
+    input_args(&prev_args, &prev_args_len, SET);
+  }
 }
 
 static JSValue near_jsvm_call(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
