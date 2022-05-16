@@ -10,6 +10,7 @@
   "author": "Near Inc <hello@nearprotocol.com>",
   "license": "Apache-2.0",
   "dependencies": {
+    "near-sdk-js": "file:../../sdk",
     "lodash": "^4.17.21",
     "lodash-es": "^4.17.21"
   },

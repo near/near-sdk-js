@@ -1,6 +1,6 @@
 {
   "plugins": [
-    "../../sdk/src/build-tools/near-bindgen-exporter",
+    "near-sdk-js/src/build-tools/near-bindgen-exporter",
     ["@babel/plugin-proposal-decorators", {"version": "legacy"}]
   ]
 }

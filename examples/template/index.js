@@ -1,4 +1,4 @@
-import {NearContract, NearBindgen, call, view} from '../../sdk'
+import {NearContract, NearBindgen, call, view} from 'near-sdk-js'
 
 @NearBindgen
 class Counter extends NearContract {
