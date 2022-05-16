@@ -1,4 +1,4 @@
-const U64_MAX = 2n**64n - 1n
+const U64_MAX = 2n ** 64n - 1n
 const EVICTED_REGISTER = U64_MAX - 1n
 
 export function signerAccountId() {
@@ -129,4 +129,13 @@ export function jsvmCall(contractName, method, args) {
 
 export function storageGetEvicted() {
     return env.read_register(EVICTED_REGISTER)
+}
+
+export function attachedDeposit() {
+    env.attached_deposit(0)
+    return env.read_register(0)
+}
+
+export function panicUtf8(message) {
+    env.panic_utf8(message)
 }
