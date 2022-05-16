@@ -19,7 +19,7 @@ tar xvf wasi-sdk-11.0-"${system}".tar.gz
 # binaryen
 git clone --branch wasi-stub --single-branch https://github.com/near/binaryen
 cd binaryen
-cmake . && make -j
+cmake . && make
 cd wasi-stub
 ./build.sh
 cd ../../..
