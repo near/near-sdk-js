@@ -4,5 +4,5 @@ set -euo pipefail
 mkdir -p build
 rollup -c
 cd build
-cp ../../../jsvm.wasm .
+cp ../../../jsvm/jsvm.wasm .
 ../../../builder.sh on-call.js

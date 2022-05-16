@@ -22,8 +22,3 @@ cd binaryen
 cmake . && make
 cd wasi-stub
 ./build.sh
-cd ../../..
-
-cd quickjs
-make qjsc
-cd ..

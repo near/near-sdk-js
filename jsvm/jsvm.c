@@ -1,7 +1,7 @@
 #include <string.h>
 #include <stdbool.h>
-#include "quickjs/quickjs-libc-min.h"
-#include "quickjs/libbf.h"
+#include "../quickjs/quickjs-libc-min.h"
+#include "../quickjs/libbf.h"
 
 static JSContext *JS_NewCustomContext(JSRuntime *rt)
 {
