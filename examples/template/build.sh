@@ -4,4 +4,4 @@ set -euo pipefail
 mkdir -p build
 rollup -c
 cd build
-../../../builder.sh template.js
+../../../contract-builder/builder.sh template.js
