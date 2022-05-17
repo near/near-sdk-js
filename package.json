@@ -20,16 +20,11 @@
   ],
   "license": "(MIT AND Apache-2.0)",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "lint": "eslint test && eslint src/**/*.ts",
-    "fix": "eslint test --fix && eslint src/**/*.ts --fix"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Near Inc <hello@nearprotocol.com>",
   "dependencies": {
     "@babel/core": "^7.17.8"
-  },
-  "devDependencies": {
-    "eslint": "^6.5.1"
   },
   "files": [
     "contract-builder",
