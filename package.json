@@ -4,12 +4,37 @@
   "description": "High Level JavaScript SDK for building smart contracts on NEAR",
   "main": "src/index.js",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/near/near-sdk-js.git"
+  },
+  "homepage": "https://github.com/near/near-sdk-js",
+  "keywords": [
+    "JS",
+    "JavaScript",
+    "NEAR",
+    "SDK",
+    "contract",
+    "smart",
+    "smart-contract"
+  ],
+  "license": "(MIT AND Apache-2.0)",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint test && eslint src/**/*.ts",
+    "fix": "eslint test --fix && eslint src/**/*.ts --fix"
   },
   "author": "Near Inc <hello@nearprotocol.com>",
-  "license": "Apache-2.0",
   "dependencies": {
     "@babel/core": "^7.17.8"
-  }
+  },
+  "devDependencies": {
+    "eslint": "^6.5.1"
+  },
+  "files": [
+    "contract-builder",
+    "res",
+    "scripts",
+    "src"
+  ]
 }
