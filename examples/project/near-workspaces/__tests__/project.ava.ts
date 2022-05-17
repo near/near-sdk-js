@@ -16,16 +16,16 @@ const workspace = Workspace.init(async ({root}) => {
     return {alice, bob, jsvm};
 });
 
-function encode_call(contract, method, args) {
+function encodeCall(contract, method, args) {
     return Buffer.concat([Buffer.from(contract), Buffer.from([0]), Buffer.from(method), Buffer.from([0]), Buffer.from(args)])
 }
 
 workspace.test('bob set text', async (test, {jsvm, alice, bob}) => {
-    await bob.call(jsvm, 'call_js_contract', encode_call(alice.accountId, 'set_text', 'hello'), {attachedDeposit: '100000000000000000000000'});
+    await bob.call(jsvm, 'call_js_contract', encodeCall(alice.accountId, 'set_text', 'hello'), {attachedDeposit: '100000000000000000000000'});
     
     test.is(
-        await jsvm.view('view_js_contract', encode_call(alice.accountId, 'get_text', '')),
-        // await bob.call(jsvm, 'call_js_contract', encode_call(alice.accountId, 'get_text', '')),
+        await jsvm.view('view_js_contract', encodeCall(alice.accountId, 'get_text', '')),
+        // await bob.call(jsvm, 'call_js_contract', encodeCall(alice.accountId, 'get_text', '')),
         'hello'
     )
 });
