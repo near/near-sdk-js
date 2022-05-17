@@ -1572,7 +1572,7 @@ near-sandbox@^0.0.8:
     got "^11.8.2"
     tar "^6.1.0"
 
-"near-sdk-js@file:../../sdk":
+"near-sdk-js@file:../../":
   version "0.1.0"
   dependencies:
     "@babel/core" "^7.17.8"

@@ -1,3 +1,4 @@
+TODO: update according new design
 # NEAR-SDK-JS (Enclave)
 
 ## Local Installation
