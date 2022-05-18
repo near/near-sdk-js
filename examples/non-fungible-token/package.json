@@ -1,7 +1,7 @@
 {
-  "name": "nft",
+  "name": "non-fungible-token",
   "version": "1.0.0",
-  "description": "NFT example with near-sdk-js",
+  "description": "Non-fungible token example with near-sdk-js",
   "main": "index.js",
   "type": "module",
   "scripts": {
@@ -9,10 +9,7 @@
   },
   "author": "Near Inc <hello@nearprotocol.com>",
   "license": "Apache-2.0",
-  "dependencies": {
-    "lodash": "^4.17.21",
-    "lodash-es": "^4.17.21"
-  },
+  "dependencies": {},
   "devDependencies": {
     "@babel/core": "^7.17.5",
     "@babel/plugin-proposal-decorators": "^7.17.2",

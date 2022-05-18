@@ -4,4 +4,5 @@ set -euo pipefail
 mkdir -p build
 rollup -c
 cd build
-../../../builder.sh status-message.js
+cp ../../../jsvm.wasm .
+../../../builder.sh non-fungible-token.js

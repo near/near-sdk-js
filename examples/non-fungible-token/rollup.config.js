@@ -5,10 +5,10 @@ import babel from '@rollup/plugin-babel';
 // import commonjs from '@rollup/plugin-commonjs';
 
 export default {
-  input: 'index.js',
+  input: 'src/index.js',
   output: {
     sourcemap: true,
-    file: 'build/nft.js',
+    file: 'build/non-fungible-token.js',
     format: 'es'
   },
   plugins: [
