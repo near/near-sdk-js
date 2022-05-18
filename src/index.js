@@ -9,6 +9,7 @@ import {
 } from './near-contract'
 
 import * as near from './api'
+import { LookupMap } from './collections/lookup-map'
 
 export {
     call,
@@ -16,4 +17,5 @@ export {
     NearBindgen,
     NearContract,
     near,
+    LookupMap
 }

@@ -4,5 +4,5 @@ set -euo pipefail
 mkdir -p build
 rollup -c
 cd build
-cp ../../../jsvm.wasm .
-../../../builder.sh fungible-token.js
+../node_modules/near-sdk-js/contract-builder/builder.sh fungible-token.js
+
