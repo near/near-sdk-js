@@ -1,34 +1,29 @@
-TODO: update according new design
+## Disclaimer:
+This README is a work in porgress. The best way to start using `near-sdk-js` is to check `./examples`.
 # NEAR-SDK-JS (Enclave)
 
 ## Local Installation
 It is tested on Ubuntu 20.04 and Intel Mac. Other linux and M1 Macs should also work but they're not tested.
 
-1. Make sure you have wget, make, cmake and nodejs. On Linux, also make sure you have gcc.
-2. `./setup.sh`
-3. `./build.sh`
-4. `yarn && cd sdk && yarn && cd ..`
-5. Use near-cli to deploy `jsvm.wasm` to your choice of `<jsvm-account>` in a local neard.
+1. Make sure you have `wget`, `make`, `cmake` and `nodejs`. On Linux, also make sure you have `gcc`.
+2. Run `./rebuild_recources.sh` to get platform specific `qjsc` and `jsvm` contract in `res` folder.
 
 ## Usage
-
-1. Write smart contracts with JavaScript. You can use most npm packages that uses portable ES2020 features. Export callable contract methods with export. See `examples/` for examples.
-2. Build the contract with `path/to/near-sdk-js/builder.sh path/to/your/<contract-name>.js`.
-3. If no errors happens, a `<contract-name>.base64` will be generate at current directory. 
-4. Deploy the contract to an existing jsvm contract. You will need to attach some NEAR to cover the storage deposit. It's about 1 NEAR for every 100KB of contract. This deposit can be withdrawed when you remove the js contract. 
+1. `cd examples/<example>`
+2. `yarn && yarn build` to get <contract>.base64 file (JS smart-contract).
+3. Use near-cli to deploy `jsvm.wasm` from the `res` folder to your account.
+4. Deploy <contract>.base64 file to `JSVM` account from the previous step.
 ```
 near call <jsvm-account> deploy_js_contract --accountId <your-account> --args $(cat <contract-name>.base64) --base64 --deposit 0.1
 ```
-5. Encode the parameters and call. If the call cause the state increasement, you also need to attach NEAR to cover the storage deposit for the delta.
+5. Interact with your contract using NEAR CLI or `near-api-js`. Encode the parameters and call. If the call cause the state increasement, you also need to attach NEAR to cover the storage deposit for the delta.
 ```
 near call <jsvm-account> call_js_contract --accountId <caller-account> --args <encoded-args> --base64
 ```
-
 Where `<encoded-args>` can be obtained by:
 ```
 node encode_call.js js_contract_name method_name args
 ```
-
 6. If you want to remove the js contract and withdraw the storage deposit, use:
 ```
 near call <jsvm-account> remove_js_contract --accountId <your-account>
@@ -40,8 +35,7 @@ near call <jsvm-account> remove_js_contract --accountId <your-account>
 
 1. Build the jsvm contract
 ```
-./setup.sh
-./build.sh
+./rebuild_recources.sh
 ```
 
 2. Go to nearcore, Build and start a local node
