@@ -28,7 +28,7 @@ test.beforeEach(async t => {
 
     // Deploy on-call contrat
     const onCallContract = await root.createSubAccount('on-call');
-    let cross_cc_contract_base64 = (await readFile('build/on-call.base64')).toString();
+    let cross_cc_contract_base64 = (await readFile('build/contract.base64')).toString();
     await onCallContract.call(jsvm, 'deploy_js_contract', Buffer.from(cross_cc_contract_base64, 'base64'), {attachedDeposit: '400000000000000000000000'});
     await onCallContract.call(jsvm, 'call_js_contract', encodeCall(onCallContract.accountId, 'init', []), {attachedDeposit: '400000000000000000000000'});
     

@@ -1,6 +1,8 @@
 import fs from 'fs/promises'
 import path from 'path'
 
+
+//TODO: execute it in js env
 async function main() {
     let source = path.resolve(process.argv[process.argv.length-2])
     let target = path.resolve(process.argv[process.argv.length-1])
