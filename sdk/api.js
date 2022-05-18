@@ -1,3 +1,6 @@
+const U64_MAX = 2n**64n - 1n
+const EVICTED_REGISTER = U64_MAX - 1n
+
 export function signerAccountId() {
     env.signer_account_id(0)
     return env.read_register(0)
@@ -88,7 +91,7 @@ export function jsvmArgs() {
 }
 
 export function jsvmStorageWrite(key, value) {
-    let exist = env.jsvm_storage_write(key, value, 0)
+    let exist = env.jsvm_storage_write(key, value, EVICTED_REGISTER)
     if (exist === 1n) {
         return true
     }
@@ -104,7 +107,7 @@ export function jsvmStorageRead(key) {
 }
 
 export function jsvmStorageRemove(key) {
-    let exist = env.jsvm_storage_remove(key, 0)
+    let exist = env.jsvm_storage_remove(key, EVICTED_REGISTER)
     if (exist === 1n) {
         return true
     }
@@ -122,4 +125,8 @@ export function jsvmStorageHasKey(key) {
 export function jsvmCall(contractName, method, args) {
     env.jsvm_call(contractName, method, JSON.stringify(args), 0)
     return JSON.parse(env.read_register(0) || 'null')
+}
+
+export function storageGetEvicted() {
+    return env.read_register(EVICTED_REGISTER)
 }
