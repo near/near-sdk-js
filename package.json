@@ -22,6 +22,9 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "bin": {
+    "build-contract": "contract-builder/build-contract"
+  },
   "author": "Near Inc <hello@nearprotocol.com>",
   "dependencies": {
     "@babel/core": "^7.17.8"
