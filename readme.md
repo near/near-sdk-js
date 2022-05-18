@@ -4,10 +4,8 @@
 It is tested on Ubuntu 20.04 and Intel Mac. Other linux and M1 Macs should also work but they're not tested.
 
 1. Make sure you have wget, make, cmake and nodejs. On Linux, also make sure you have gcc.
-2. `./setup.sh`
-3. `./build.sh`
-4. `yarn && cd sdk && yarn && cd ..`
-5. Use near-cli to deploy `jsvm.wasm` to your choice of `<jsvm-account>` in a local neard.
+2. Run `make`.
+3. Use near-cli to deploy `jsvm.wasm` to your choice of `<jsvm-account>` in a local neard.
 
 ## Usage
 
