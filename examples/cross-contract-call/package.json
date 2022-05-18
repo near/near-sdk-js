@@ -14,8 +14,6 @@
     "near-sdk-js": "file:../../"
   },
   "devDependencies": {
-    "@babel/core": "^7.17.5",
-    "@babel/plugin-proposal-decorators": "^7.17.2",
     "ava": "^4.2.0",
     "near-workspaces": "^2.0.0"
   }

@@ -22,7 +22,7 @@
   resolved "https://registry.npmjs.org/@babel/compat-data/-/compat-data-7.17.10.tgz#711dc726a492dfc8be8220028b1b92482362baab"
   integrity sha512-GZt/TCsG70Ms19gfZO1tM4CVnXsPgEPBCpJu+Qz3L0LUDsY5nZqFZglIoPC1kIYOtNBZlrnFT+klg12vFGZXrw==
 
-"@babel/core@^7.17.5", "@babel/core@^7.17.8":
+"@babel/core@^7.17.5":
   version "7.17.12"
   resolved "https://registry.npmjs.org/@babel/core/-/core-7.17.12.tgz#b4eb2d7ebc3449b062381644c93050db545b70ee"
   integrity sha512-44ODe6O1IVz9s2oJE3rZ4trNNKTX9O7KpQpfAP4t8QII/zwrVRHL7i2pxhqtcY7tqMLrrKfMlBKnm1QlrRFs5w==
@@ -1579,7 +1579,14 @@ near-sandbox@^0.0.8:
 "near-sdk-js@file:../..":
   version "0.1.0"
   dependencies:
-    "@babel/core" "^7.17.8"
+    "@babel/core" "^7.17.5"
+    "@babel/plugin-proposal-decorators" "^7.17.2"
+    "@rollup/plugin-babel" "^5.3.1"
+    "@rollup/plugin-commonjs" "^21.0.1"
+    "@rollup/plugin-node-resolve" "^13.1.1"
+    rollup "^2.61.1"
+    rollup-plugin-sourcemaps "^0.6.3"
+    yargs "^17.5.1"
 
 near-units@^0.1.9:
   version "0.1.9"
@@ -2134,7 +2141,7 @@ yargs-parser@^21.0.0:
   resolved "https://registry.npmjs.org/yargs-parser/-/yargs-parser-21.0.1.tgz#0267f286c877a4f0f728fceb6f8a3e4cb95c6e35"
   integrity sha512-9BK1jFpLzJROCI5TzwZL/TU4gqjK5xiHV/RfWLOahrjAko/e4DJkRDZQXfvqAsiZzzYhgAzbgz6lg48jcm4GLg==
 
-yargs@^17.3.1:
+yargs@^17.3.1, yargs@^17.5.1:
   version "17.5.1"
   resolved "https://registry.npmjs.org/yargs/-/yargs-17.5.1.tgz#e109900cab6fcb7fd44b1d8249166feb0b36e58e"
   integrity sha512-t6YAJcxDkNX7NFYiVtKvWUz8l+PaKTLiL63mJYWR2GnHq2gjEWISzsLp9wg3aY36dY1j+gfIEL3pIF+XlJJfbA==
