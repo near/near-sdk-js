@@ -16,7 +16,7 @@ export function NearBindgen (Class) {
     }
     NewClass.prototype = OriginalClass.prototype
     NewClass._get = function() {
-        let ret = new OriginalClass()
+        let ret = Object.create(NewClass.prototype)
         return ret
     }
 
