@@ -95,4 +95,34 @@ export class Vector {
             this.push(element)
         }
     }
+
+    iter() {
+        return new VectorIterator(this)
+    }
+
+    toArray() {
+        let ret = []
+        let iterator = this.iter()
+        while (iterator.hasNext()) {
+            ret.push(this.iterator.next())
+        }
+        return ret
+    }
+}
+
+class VectorIterator {
+    constructor(vector) {
+        this.current = 0
+        this.vector = vector
+    }
+
+    hasNext() {
+        return this.current < this.vector.len()
+    }
+
+    next() {
+        let value = this.vector.get(this.current)
+        this.current += 1
+        return value
+    }
 }
