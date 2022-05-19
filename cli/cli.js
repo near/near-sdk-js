@@ -23,7 +23,7 @@ async function build(argv) {
     console.log(`Building ${argv.contract} contract...`);
 
     console.log('Creating build directory...');
-    executeCommand('mkdir build');
+    await executeCommand('mkdir -p build');
 
     console.log('Executing rollup...');
     const bundle = await rollup({
@@ -48,8 +48,8 @@ async function build(argv) {
     const TEMP = 'build/contract.h';
     const TARGET = 'build/contract.base64';
     const CONTRACT_JS_FILE = 'build/contract.js';
-    executeCommand(`${QJSC} -c -m -o ${TEMP} -N code ${CONTRACT_JS_FILE}`);
-    executeCommand(`node ${SAVE_BYTECODE} ${TEMP} ${TARGET}`);
+    await executeCommand(`${QJSC} -c -m -o ${TEMP} -N code ${CONTRACT_JS_FILE}`);
+    await executeCommand(`node ${SAVE_BYTECODE} ${TEMP} ${TARGET}`);
 }
 
 async function executeCommand(command) {
