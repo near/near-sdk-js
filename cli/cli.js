@@ -9,7 +9,10 @@ import { babel } from '@rollup/plugin-babel';
 
 import { rollup } from 'rollup';
 
-import { exec } from 'child_process';
+import { exec as exec_ } from 'child_process';
+import { promisify } from 'util';
+
+const exec = promisify(exec_);
 
 //TODO: build passed file instead of hardcoded one
 yargs(hideBin(process.argv))
@@ -44,7 +47,9 @@ async function build(argv) {
 
     console.log('Creating <>.base64 file with the use of QJSC...');
     const SAVE_BYTECODE = './node_modules/near-sdk-js/cli/save_bytecode.js';
-    const QJSC = './node_modules/near-sdk-js/res/qjsc';
+    const os = await executeCommand('uname -s', true);
+    const arch = await executeCommand('uname -m', true);
+    const QJSC = `./node_modules/near-sdk-js/res/${os}-${arch}-qjsc`;
     const TEMP = 'build/contract.h';
     const TARGET = 'build/contract.base64';
     const CONTRACT_JS_FILE = 'build/contract.js';
@@ -52,17 +57,21 @@ async function build(argv) {
     await executeCommand(`node ${SAVE_BYTECODE} ${TEMP} ${TARGET}`);
 }
 
-async function executeCommand(command) {
+async function executeCommand(command, silent=false) {
     console.log(command);
-    exec(command, (error, stdout, stderr) => {
-        if (error) {
-            console.log(error);
-            process.exit(1);
-        }
-        if (stderr) {
-            console.log(stderr);
-            process.exit(1);
-        }
+    const {error, stdout, stderr} = await exec(command);
+
+    if (error) {
+        console.log(error);
+        process.exit(1);
+    }
+    if (stderr && !silent) {
+        console.error(stderr);
+    }
+
+    if (silent) {
+        return stdout.trim();
+    } else {
         console.log(stdout);
-    });
+    }
 }

@@ -1,6 +1,9 @@
 
 QUIET := @
 
+OS = $(shell uname -s)
+ARCH = $(shell uname -m)
+
 all: setup build yarn
 
 setup:
@@ -16,7 +19,7 @@ jsvm:
 qjsc:
 	echo "Building qjsc bytecode compiler"
 	$(QUIET)$(cd quickjs && ./build.sh && cd ..)
-	cp quickjs/qjsc res/qjsc
+	cp quickjs/qjsc res/$(OS)-$(ARCH)-qjsc
 
 yarn:
 	$(QUIET)yarn
