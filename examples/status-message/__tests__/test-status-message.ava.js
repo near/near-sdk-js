@@ -16,12 +16,12 @@ test.before(async t => {
     // Deploy the jsvm contract.
     const jsvm = await root.createAndDeploy(
         root.getSubAccount('jsvm').accountId,
-        'build/jsvm.wasm',
+        './node_modules/near-sdk-js/res/jsvm.wasm',
     );
 
     // Deploy status-message JS contract
     const statusMessage = await root.createSubAccount('status-message');
-    let contract_base64 = (await readFile('build/status-message.base64')).toString();
+    let contract_base64 = (await readFile('build/contract.base64')).toString();
     await statusMessage.call(jsvm, 'deploy_js_contract', Buffer.from(contract_base64, 'base64'), {attachedDeposit: '400000000000000000000000'});
     await statusMessage.call(jsvm, 'call_js_contract', encodeCall(statusMessage.accountId, 'init', []), {attachedDeposit: '400000000000000000000000'});
 
@@ -30,15 +30,14 @@ test.before(async t => {
     const bob = await root.createSubAccount('bob');
     const carl = await root.createSubAccount('carl');
 
-    // Save state for test runs, it is unique for each test
+    // Save state for test runs
     t.context.worker = worker;
     t.context.accounts = { root, jsvm, statusMessage, ali, bob, carl };
 });
 
 test.after(async t => {
-    // Stop Sandbox server
     await t.context.worker.tearDown().catch(error => {
-        console.log('Failed to stop the Sandbox:', error);
+        console.log('Failed to tear down the worker:', error);
     });
 });
 

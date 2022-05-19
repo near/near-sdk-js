@@ -1,7 +1,7 @@
 {
-  "name": "status-message",
+  "name": "fungible-token",
   "version": "1.0.0",
-  "description": "Status message example with near-sdk-js",
+  "description": "Fungible token example with near-sdk-js",
   "main": "index.js",
   "type": "module",
   "scripts": {

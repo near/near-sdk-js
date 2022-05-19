@@ -1,7 +1,7 @@
 {
-  "name": "status-message",
+  "name": "on-call",
   "version": "1.0.0",
-  "description": "Status message example with near-sdk-js",
+  "description": "Cross contract call example with near-sdk-js",
   "main": "index.js",
   "type": "module",
   "scripts": {
