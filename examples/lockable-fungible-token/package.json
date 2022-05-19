@@ -1,0 +1,16 @@
+{
+  "name": "lockable-fungible-token",
+  "version": "1.0.0",
+  "description": "Lockable fungible token example with near-sdk-js",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "build": "near-sdk build"
+  },
+  "author": "Near Inc <hello@nearprotocol.com>",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "near-sdk-js": "file:../../"
+  },
+  "devDependencies": {}
+}
