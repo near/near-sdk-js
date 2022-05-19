@@ -1,8 +1,13 @@
-import {NearContract, NearBindgen, call, view, near} from '../../../sdk'
-import {LookupMap} from '../../../sdk/collections/lookup-map'
+import {
+    NearContract,
+    NearBindgen,
+    call,
+    view,
+    near,
+    LookupMap
+} from 'near-sdk-js'
 
-function assert(b, str)
-{
+function assert(b, str) {
     if (b) {
         return
     } else {

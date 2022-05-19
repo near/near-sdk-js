@@ -1,0 +1,9 @@
+.obj
+qjsc
+qjs
+hello.js
+hello.wasm
+hello.c
+hello_module.c
+qjscalc.c
+repl.c

@@ -17,12 +17,12 @@ test.beforeEach(async t => {
     // Deploy the jsvm contract.
     const jsvm = await root.createAndDeploy(
         root.getSubAccount('jsvm').accountId,
-        'build/jsvm.wasm',
+        './node_modules/near-sdk-js/res/jsvm.wasm',
     );
 
     // Deploy fungible token contract
     const fungibleTokenContract = await root.createSubAccount('fungible-token');
-    let ftContractBase64 = (await readFile('build/fungible-token.base64')).toString();
+    let ftContractBase64 = (await readFile('build/contract.base64')).toString();
     await fungibleTokenContract.call(jsvm, 'deploy_js_contract', Buffer.from(ftContractBase64, 'base64'), {attachedDeposit: '400000000000000000000000'});
     await fungibleTokenContract.call(jsvm, 'call_js_contract', encodeCall(fungibleTokenContract.accountId, 'init', ['a', '1000']), {attachedDeposit: '400000000000000000000000'});
 
