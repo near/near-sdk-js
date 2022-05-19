@@ -6,7 +6,7 @@ This README is a work in porgress. The best way to start using `near-sdk-js` is 
 It is tested on Ubuntu 20.04 and Intel Mac. Other linux and M1 Macs should also work but they're not tested.
 
 1. Make sure you have `wget`, `make`, `cmake` and `nodejs`. On Linux, also make sure you have `gcc`.
-2. Run `./rebuild_recources.sh` to get platform specific `qjsc` and `jsvm` contract in `res` folder.
+2. Run `make` to get platform specific `qjsc` and `jsvm` contract in `res` folder.
 
 ## Usage
 1. `cd examples/<example>`
@@ -35,7 +35,7 @@ near call <jsvm-account> remove_js_contract --accountId <your-account>
 
 1. Build the jsvm contract
 ```
-./rebuild_recources.sh
+make
 ```
 
 2. Go to nearcore, Build and start a local node
