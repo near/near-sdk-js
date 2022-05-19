@@ -37,7 +37,7 @@
     "yargs": "^17.5.1"
   },
   "files": [
-    "contract-builder",
+    "cli",
     "res",
     "scripts",
     "src"
