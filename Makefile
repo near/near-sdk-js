@@ -1,4 +1,5 @@
 
+.ONESHELL: # Applies to every targets in the file!
 QUIET := @
 
 OS = $(shell uname -s)
@@ -7,18 +8,18 @@ ARCH = $(shell uname -m)
 all: setup build yarn
 
 setup:
-	 $(QUIET)$(cd jsvm && ./setup.sh && cd ..)
+	cd jsvm && ./setup.sh && cd ..
 
 build: jsvm qjsc
 
 jsvm:
 	echo "Building jsvm.wasm..."
-	$(QUIET)$(cd jsvm && ./build.sh && cd ..)
+	cd jsvm && ./build.sh && cd ..
 	cp jsvm/jsvm.wasm res/jsvm.wasm
 
 qjsc:
 	echo "Building qjsc bytecode compiler"
-	$(QUIET)$(cd quickjs && ./build.sh && cd ..)
+	cd quickjs && ./build.sh && cd ..
 	cp quickjs/qjsc res/$(OS)-$(ARCH)-qjsc
 
 yarn:
