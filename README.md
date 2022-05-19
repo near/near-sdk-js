@@ -1,14 +1,45 @@
 ## Disclaimer:
 This README is a work in porgress. The best way to start using `near-sdk-js` is to check `./examples`.
-# NEAR-SDK-JS (Enclave)
 
-## Local Installation
+# NEAR-SDK-JS
+
+NEAR-SDK-JS currently supports two ways of running javascript smart contracts: 
+- Compiling your contract to WebAssembly (see the [wasm version](#wasm-version) for instructions)
+- Deploying a base64 encoded version of your contract and deploying to an enclave (see the [enclave version](#enclave-version) for instructions).
+
+There are pros and cons of each method but allow the user to write smart contracts in javascript. If you're unsure as to which version is right for you, we've outlined the differences below.
+
+> **NOTE:** these differences are noted as of right now. Some of them will be changed in future. An example of this is the 30% gas burnt payed out to the contracts will be implemented in the enclave version.
+
+| Areas                     | WebAssembly Version                                    | Enclave Version                                                                                                                                                     |
+|---------------------------|--------------------------------------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Initial Deployment Cost   | **~5x** more than Rust or AssemblyScript               | - no difference                                                                                                                                                     |
+| Cross-contract calls      | - no difference                                        | - synchronous and can only interact with contracts **within the jsvm**.                                                                                             |
+| Integrates standards      | - no difference                                        | - does not **currently** support any standards such as NFTs, FTs, events, etc..                                                                                     |
+| Using near-api-js         | - no difference                                        | - you **must** encode your arguments and make calls to the `jsvm` account rather than the JS contract                                                               |
+| GAS                       | - no difference                                        | - 30% GAS burnt payed out to the contract not **yet** implemented.                                                                                                  |
+| External packages         | - supports external npm packages written in javascript | - supports external npm packages written in javascript                                                                                                              |
+| Clearing State            | - no difference                                        | - you **must** deploy a contract to your account and call methods to clear state. You cannot delete your account and recreate it.                                   |
+| Function Call Access Keys | - no difference                                        | - Any user with a function call access key can call any method from any contract. Logic must be implemented in contract to allow/disallow certain calls can proceed |
+
+
+## WASM Version
+
+To start using the WebAssembly version, checkout the `standalone` branch and follow the instructions in the README.
+
+```bash
+git checkout standalone
+```
+
+## Enclave Version
+
+### Local Installation
 It is tested on Ubuntu 20.04 and Intel Mac. Other linux and M1 Macs should also work but they're not tested.
 
 1. Make sure you have `wget`, `make`, `cmake` and `nodejs`. On Linux, also make sure you have `gcc`.
 2. Run `make` to get platform specific `qjsc` and `jsvm` contract in `res` folder.
 
-## Usage
+### Usage
 1. `cd examples/<example>`
 2. `yarn && yarn build` to get <contract>.base64 file (JS smart-contract).
 3. Use near-cli to deploy `jsvm.wasm` from the `res` folder to your account.
@@ -29,9 +60,9 @@ node encode_call.js js_contract_name method_name args
 near call <jsvm-account> remove_js_contract --accountId <your-account>
 ```
 
-## Demo
+### Demo
 
-### On a local node
+#### On a local node
 
 1. Build the jsvm contract
 ```
@@ -81,7 +112,7 @@ http://localhost:9001/transactions/GkitU1Cm5bdQJWe6bzkYganiS9tfetuY4buqGFypvQWL
 
 ```
 
-### On Testnet
+#### On Testnet
 Latest master version of near-sdk-js enclave has been deployed on `jsvm.testnet`. You can use it or deploy your own copy of jsvm, which is simiar to the steps for deploy on local node. The following is the step to deploy and call your contract on `jsvm.testnet`.
 
 1. Build the contract
@@ -143,12 +174,12 @@ https://explorer.testnet.near.org/transactions/AGRHcCCBCFex2hiXQh5BhFDoq7bN1eVoU
 
 Note that, The second call shows this method can be call by anyone (`jsvmtester2.testnet` in above example, make sure you login the account with `near login`), not just the one who deployed this JS contract (`jsvmtester.testnet`).
 
-## NEAR-SDK-JS Low Level API Reference
+### NEAR-SDK-JS Low Level API Reference
 
 Use `env.func_name(args)` to call low level APIs in JavaScript contracts. `env` is already imported before contract start. For example, `env.read_register(0)`.
 To use nightly host functions, such as `alt_bn128_g1_sum`, the enclave contract need to be built with `NEAR_NIGHTLY=1 ./build.sh` and deployed to a nearcore node that has nightly enabled.
 
-### About Type 
+#### About Type 
 
 - In arguments, `Uint64: Number | BigInt`. In return, `Uint64: BigInt`. Because JavaScript Number cannot hold all Uint64 without losing precision. But as arguments, interger number is also allowed for convinience. Same for `Uint128`.
 - `String` in both arguments and return is a byte buffer encoded as a JavaScript String. Which means:
@@ -162,10 +193,10 @@ It's intentional to represent string and bytes in this way because QuickJS doesn
 - The lowest level Rust API cannot return value bigger than 64 bit integer. So some of the API pass pointer as Uint64 and the Rust function write return data at the location specified by pointer. In JavaScript we don't have this limitation and value is returned as API function return.
 
 
-### About commented APIs
+#### About commented APIs
 Some of the APIs below starts with `//`. This means this API is provided by nearcore, however they are intentionally removed for the JavaScript Enclave. The reason and alternative are documented in each API section.
 
-### Registers API
+#### Registers API
 
 ```
 function read_register(register_id: Uint64): String;
@@ -173,7 +204,7 @@ function register_len(register_id: Uint64): Uint64;
 function write_register(register_id: Uint64, data: String);
 ```
 
-### Context API
+#### Context API
 
 ```
 // function current_account_id(register_id: Uint64);
@@ -193,7 +224,7 @@ The `input` puts the argument passed to call the contract in given register. In 
 
 The `storage_usage` return the storage bytes used by JavaScript VM contract. User doesn't care about the storage usage of the JSVM. Instead, users care about storage usage of a given JavaScript contract. This can be obtained by `storage_read` and count the sum of `register_len`.
 
-### Economics API
+#### Economics API
 ```
 // function account_balance(): Uint128;
 // function account_locked_balance(): Uint128;
@@ -204,7 +235,7 @@ function used_gas(): Uint64;
 
 The `account_balance` and `account_locked_balance` returns balance and locked_balance of JavaScript VM. Those are also not cared by users.
 
-### Math API
+#### Math API
 
 
 ```
@@ -216,7 +247,7 @@ function ripemd160(value: String, register_id: Uint64);
 function ecrecover(hash: String, sign: String, v: Uint64, malleability_flag: Uint64, register_id: Uint64): Uint64;
 ```
 
-### Miscellaneous API
+#### Miscellaneous API
 
 
 ```
@@ -233,7 +264,7 @@ function log_utf16(msg: String);
 
 The `value_return` is a NEAR primitive that puts the value to return in a receipt. However we would want to access it as a JavaScript return value in a cross contract call. So we have a new API `jsvm_value_return`, which does return the value in receipt and also as a JavaScript value returned by `jsvm_call`. The `jsvm_value_return` should be used whenever you need `value_return`.
 
-### Promises API
+#### Promises API
 
 ```
 function promise_create(account_id: String, method_name: String, arguments: String, amount: Uint128, gas: Uint64): Uint64;
@@ -243,7 +274,7 @@ function promise_batch_create(account_id: String): Uint64;
 function promise_batch_then(promise_index: Uint64, account_id: String): Uint64;
 ```
 
-### Promise API actions
+#### Promise API actions
 
 ```
 // function promise_batch_action_create_account(promise_index: Uint64); // not allow users to create *.jsvm account
@@ -259,7 +290,7 @@ function promise_batch_then(promise_index: Uint64, account_id: String): Uint64;
 
 All Promise batch actions act on the JSVM contract, creating a subaccount of it and acting on it. JSVM would be a common VM used by the community instead of a Rust  contract owned by the deployer. Terefore, creating subaccounts and subsequent actions towards subaccounts are not allowed.
 
-### Promise API results
+#### Promise API results
 
 ```
 function promise_results_count(void): Uint64;
@@ -267,7 +298,7 @@ function promise_result(result_idx: Uint64, register_id: Uint64): Uint64;
 function promise_return(promise_idx: Uint64);
 ```
 
-### Storage API
+#### Storage API
 
 ```
 // function storage_write(key: String, value: String, register_id: Uint64): Uint64; // user can only access contract's storage
@@ -278,14 +309,14 @@ function storage_has_key(key: String): Uint64;
 
 The `storage_write` and `storage_remove` have access to all JavaScript contract codes and states deployed on JSVM. User can only write to their account owned code and state, as a substate of the JSVM. Therefor these two APIs are disallowed. Use `jsvm_storage_write` and `jsvm_storage_remove` instead. Read to other people owned code and state is allowed, as they're public as part of the blockchain anyway.
 
-### Validator API
+#### Validator API
 
 ```
 function validator_stake(account_id: String): Uint128;
 function validator_total_stake(): Uint128;
 ```
 
-### Alt BN128
+#### Alt BN128
 
 ```
 function alt_bn128_g1_multiexp(value: String, register_id: Uint64);
@@ -293,10 +324,10 @@ function alt_bn128_g1_sum(value: String, register_id: Uint64);
 function alt_bn128_pairing_check(value: String): Uint64;
 ```
 
-## JSVM Specific APIs
+### JSVM Specific APIs
 Due to the design of JavaScript VM Contract, some additonal APIs are provided to obtain context, access storage and cross contract call. Since they're not documented at [NEAR nomicon](https://nomicon.io/). They're explained here.
 
-### Obtain Context
+#### Obtain Context
 ```
 function jsvm_account_id(register_id: Uint64);
 function jsvm_js_contract_name(register_id: Uint64);
@@ -312,7 +343,7 @@ The `jsvm_method_name` put the method name being called into given register.
 
 The `jsvm_args` return the arguments passed to the method, into given register.
 
-### Storage Access
+#### Storage Access
 ```
 function jsvm_storage_write(key: String, value: String, register_id: Uint64): Uint64;
 function jsvm_storage_read(key: String, register_id: Uint64): Uint64;
@@ -327,7 +358,7 @@ jsvm_storage_read(k, register_id)
 storage_read(jsvm_js_contract_name + '/state/' + k)
 ```
 
-### Cross Contract Call
+#### Cross Contract Call
 ```
 function jsvm_value_return(value: String);
 function jsvm_call(contract_name: String, method: String, args: String, register_id: Uint64);
@@ -337,9 +368,9 @@ The `jsvm_value_return` is the version of `value_return` that should be used in 
 
 The `jsvm_call` invoke a synchronous cross contract call, to the given JavaScript `contract_name`, `method` with `args`. And capture the value returned from the call and stored in `register_id`.
 
-## Error Handling in NEAR-SDK-JS
+### Error Handling in NEAR-SDK-JS
 
-### Error handling behavior
+#### Error handling behavior
 
 - when js throws an error, uncatched, then transaction fails with GuestPanic error, with the user js error message and stacktrace
 - when call host function with inappropriate type, means incorrect number of arguments or arg is not expected type:
@@ -348,15 +379,15 @@ The `jsvm_call` invoke a synchronous cross contract call, to the given JavaScrip
     - if argument is different than the required type, it'll be coerced to required type
     - if argument is different than the required type but cannot be coerced, will throw runtime type error, also with message and stacktrace
 
-### The error reporting capability of a wasm contract
+#### The error reporting capability of a wasm contract
 Smart contract can only use `panic` or `panic_utf8` to abort from execution. That is of error kind `GuestPanic {msg}`. It displays in RPC as `"Smart contract panicked: {msg}"`
 And only `panic_utf8` can set that message. 
 Other than this, if calls a host function, it can returns error provided by that host function. For example, any host function can return a `GasExceeded`. `log_utf8` can return `BadUTF8`. This behavior is part of protocol and we cannot control or trigger in JavaScript (without calling `env.*`). 
 
-### Use errors
+#### Use errors
 You can throw an error in JavaScript. Our quickjs runtime will detect and automatically invoke `panic_utf8` with `"{error.message}\n:{error.stack}"`. As a result, transaction will fail with `"Smart contract panicked: {error.message}\n{error.stack}"` error message.
 
-### Use verror
+#### Use verror
 User can use verror this way:
 1. catch an error, attach information to it
 2. return/rethrow the error, attach more information to it
@@ -364,7 +395,7 @@ User can use verror this way:
 
 Under the hood, our quickjs runtime would take the final throwed error, and invoke panic_utf8("{error.message}\n{error.stack}")
 
-## Debug and Test
+### Debug and Test
 To get more debug utilities, such as debug print (`debug.log`) and logging stacktrace, you can build JSVM with sandbox flag: `NEAR_SANDBOX=1 ./build.sh`. A `jsvm_sandbox.wasm` will be build in current directory. You can then deploy sandbox versioned jsvm to a local [near-sandbox](https://github.com/near/sandbox). near-sandbox can be launched either manually or via the official testing framework [near-workspaces](https://github.com/near/workspaces-js). We recommend to use near-workspaces to write tests for your smart contracts. An example of use near-workspaces in a JS contract project can be found in `examples/project/`. 
 
 Note that, `jsvm.wasm` can be used for sandbox/near-workspaces as well. But to debug print, you need to use `jsvm_sandbox.wasm` instead.
