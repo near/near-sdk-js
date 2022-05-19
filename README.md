@@ -25,7 +25,7 @@ There are pros and cons of each method but allow the user to write smart contrac
 
 ## WASM Version
 
-To start using the WebAssembly version, checkout the `standalone` branch and follow the instructions in the README.
+To start using the WebAssembly version, checkout the [standalone](https://github.com/near/near-sdk-js/tree/standalone) branch and follow the instructions in the README.
 
 ```bash
 git checkout standalone
