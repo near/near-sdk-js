@@ -1,23 +1,45 @@
 {
-  "name": "near-sdk-js-builder",
-  "version": "1.0.0",
-  "description": "Scripts to build contracts written with NEAR-SDK-JS",
-  "main": "encode_call.js",
+  "name": "near-sdk-js",
+  "version": "0.1.0",
+  "description": "High Level JavaScript SDK for building smart contracts on NEAR",
+  "main": "src/index.js",
   "type": "module",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/near/near-sdk-js.git"
   },
-  "author": "Near Inc <hello@nearprotocol.com>",
-  "license": "Apache-2.0",
-  "bugs": {
-    "url": "https://github.com/near/near-sdk-js/issues"
+  "homepage": "https://github.com/near/near-sdk-js",
+  "keywords": [
+    "JS",
+    "JavaScript",
+    "NEAR",
+    "SDK",
+    "contract",
+    "smart",
+    "smart-contract"
+  ],
+  "license": "(MIT AND Apache-2.0)",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "homepage": "https://github.com/near/near-sdk-js#readme",
+  "bin": {
+    "near-sdk": "cli/cli.js"
+  },
+  "author": "Near Inc <hello@nearprotocol.com>",
   "dependencies": {
-    "source-map-js": "^1.0.2"
-  }
+    "@babel/core": "^7.17.5",
+    "@babel/plugin-proposal-decorators": "^7.17.2",
+    "rollup": "^2.61.1",
+    "rollup-plugin-sourcemaps": "^0.6.3",
+    "@rollup/plugin-babel": "^5.3.1",
+    "@rollup/plugin-commonjs": "^21.0.1",
+    "@rollup/plugin-node-resolve": "^13.1.1",
+    "yargs": "^17.5.1"
+  },
+  "files": [
+    "contract-builder",
+    "res",
+    "scripts",
+    "src"
+  ]
 }

@@ -5,24 +5,16 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "build": "./build.sh",
+    "build": "near-sdk build",
     "test": "ava"
   },
   "author": "Near Inc <hello@nearprotocol.com>",
   "license": "Apache-2.0",
   "dependencies": {
-    "lodash": "^4.17.21",
-    "lodash-es": "^4.17.21"
+    "near-sdk-js": "file:../../"
   },
   "devDependencies": {
-    "@babel/core": "^7.17.5",
-    "@babel/plugin-proposal-decorators": "^7.17.2",
-    "@rollup/plugin-babel": "^5.3.1",
-    "@rollup/plugin-commonjs": "^21.0.1",
-    "@rollup/plugin-node-resolve": "^13.1.1",
     "ava": "^4.2.0",
-    "near-workspaces": "^2.0.0",
-    "rollup": "^2.61.1",
-    "rollup-plugin-sourcemaps": "^0.6.3"
+    "near-workspaces": "^2.0.0"
   }
 }
