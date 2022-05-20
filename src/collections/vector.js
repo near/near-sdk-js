@@ -101,8 +101,8 @@ export class Vector {
     toArray() {
         let ret = []
         let iterator = this.iter()
-        while (iterator.hasNext()) {
-            ret.push(this.iterator.next())
+        for (let v of iterator) {
+            ret.push(v)
         }
         return ret
     }
@@ -114,13 +114,12 @@ class VectorIterator {
         this.vector = vector
     }
 
-    hasNext() {
-        return this.current < this.vector.len()
-    }
-
     next() {
-        let value = this.vector.get(this.current)
-        this.current += 1
-        return value
+        if (this.current < this.vector.len()) {
+            let value = this.vector.get(this.current)
+            this.current += 1
+            return {value, done: false}
+        }
+        return {value: null, done: true}
     }
 }
