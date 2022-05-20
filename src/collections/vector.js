@@ -26,7 +26,7 @@ export class Vector {
         let data = new Uint32Array([index])
         let array = new Uint8Array(data.buffer)
         let key = u8ArrayToString(array)
-        return prefix + key
+        return this.prefix + key
     }
 
     get(index) {
