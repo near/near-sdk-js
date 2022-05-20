@@ -56,6 +56,6 @@ near js call <contract-id> <function-name> [--args '<parameter>'] --deposit 0.1 
 ```
 
 or with the raw CLI call command:
-```
+```sh
 near call jsvm.test.near call_js_contract --accountId <accountID> --base64 --args $(node encode_call.js <contract-account-id> <function-name> '[<parameter>]') --deposit 0.1
 ```
