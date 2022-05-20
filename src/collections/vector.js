@@ -94,14 +94,13 @@ export class Vector {
         }
     }
 
-    iter() {
+    [Symbol.iterator]() {
         return new VectorIterator(this)
     }
 
     toArray() {
         let ret = []
-        let iterator = this.iter()
-        for (let v of iterator) {
+        for (let v of this) {
             ret.push(v)
         }
         return ret
