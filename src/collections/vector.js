@@ -21,8 +21,6 @@ export class Vector {
     }
 
     indexToKey(index) {
-        // TODO: there's no efficient way to convert a Uint64 (BigInt) to Uint8Array
-        // we limit index to be Uint32 for now
         let data = new Uint32Array([index])
         let array = new Uint8Array(data.buffer)
         let key = u8ArrayToString(array)
