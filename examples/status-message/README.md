@@ -22,14 +22,21 @@ npm run test
 Suppose JSVM contract was deployed to `jsvm.test.near`. Developer want to deploy the status message contract to `status-message.test.near`. Create `status-message.test.near`, `alice.test.near` and `bob.test.near` locally. Then:
 
 ```sh
+export NEAR_ENV=local
 near js deploy --accountId status-message.test.near --base64File build/status-message.base64 --deposit 0.1 --jsvm jsvm.test.near
 ```
 
-or with the raw CLI call command:
-```sh
-export NEAR_ENV=local
-near call jsvm.test.near deploy_js_contract --accountId status-message.test.near --args $(cat build/status-message.base64) --base64 --deposit 0.1
-```
+<details>
+<summary><strong>Or with the raw CLI call command</strong></summary>
+<p>
+
+    export NEAR_ENV=local
+    near call jsvm.test.near deploy_js_contract --accountId status-message.test.near --args $(cat build/status-message.base64) --base64 --deposit 0.1
+
+</p>
+</details>
+
+
 
 ## Initialize the contract
 
@@ -40,10 +47,14 @@ Go back to the root dir of near-sdk-js, where we have a helper `encode-call.js`.
 near js call status-message.test.near init --deposit 0.1 --accountId status-message.test.near --jsvm jsvm.test.near
 ```
 
-or with the raw CLI call command:
-```sh
-near call jsvm.test.near call_js_contract --accountId status-message.test.near --base64 --args $(node encode_call.js status-message.test.near init '')
-```
+<details>
+<summary><strong>Or with the raw CLI call command</strong></summary>
+<p>
+
+    near call jsvm.test.near call_js_contract --accountId status-message.test.near --base64 --args $(node encode_call.js status-message.test.near init '')
+
+</p>
+</details>
 
 ## Call the contract
 Under the root dir of near-sdk-js, call the `set_status` and `get_status` methods with:
@@ -55,11 +66,13 @@ near js call status-message.test.near set_status --args '["hello"]' --deposit 0.
 near js view status-message.test.near get_status --args '["alice.test.near"]' --deposit 0.1 --accountId bob.test.near --jsvm jsvm.test.near
 ```
 
-or with the raw CLI call command:
-```sh
-near call jsvm.test.near call_js_contract --accountId alice.test.near --base64 --args $(node encode_call.js status-message.test.near set_status '["hello"]') --deposit 0.1
+<details>
+<summary><strong>Or with the raw CLI call command</strong></summary>
+<p>
 
-near call jsvm.test.near call_js_contract --accountId bob.test.near --base64 --args $(node encode_call.js status-message.test.near get_status '["alice.test.near"]')
-```
+    near call jsvm.test.near call_js_contract --accountId alice.test.near --base64 --args $(node encode_call.js status-message.test.near set_status '["hello"]') --deposit 0.1
 
-Note that although `get_status` can be called as a view method with near-api-js, currently it cannot be called with near-cli because near-cli does not support base64 encoded arguments in view call.
+    near call jsvm.test.near call_js_contract --accountId bob.test.near --base64 --args $(node encode_call.js status-message.test.near get_status '["alice.test.near"]')
+
+</p>
+</details>

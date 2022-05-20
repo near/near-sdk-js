@@ -27,11 +27,15 @@ export NEAR_ENV=local
 near js deploy --accountId <accountId> --base64File <contract-name>.base64 --deposit 0.1 --jsvm jsvm.test.near
 ```
 
-or with the raw CLI call command:
-```sh
-export NEAR_ENV=local
-near call jsvm.test.near deploy_js_contract --accountId <accoundId> --args $(cat <contract-name>.base64) --base64 --deposit 0.1
-```
+<details>
+<summary><strong>Or with the raw CLI call command</strong></summary>
+<p>
+
+    export NEAR_ENV=local
+    near call jsvm.test.near deploy_js_contract --accountId <accoundId> --args $(cat <contract-name>.base64) --base64 --deposit 0.1
+
+</p>
+</details>
 
 ## Initialize the contract
 
@@ -43,10 +47,15 @@ Go back to the root dir of near-sdk-js, where we have a helper `encode-call.js` 
 near js call <contract-id> init --deposit 0.1 --accountId <signer-id> --jsvm jsvm.test.near
 ```
 
-or with the raw CLI call command:
-```sh
-near call jsvm.test.near call_js_contract --base64 --args $(node encode_call.js <contract-id> init '') --accountId <signer-id>
-```
+<details>
+<summary><strong>Or with the raw CLI call command</strong></summary>
+<p>
+
+    near call jsvm.test.near call_js_contract --base64 --args $(node encode_call.js <contract-id> init '') --accountId <signer-id>
+
+</p>
+</details>
+
 
 ## Call the contract
 Under the root dir of near-sdk-js, call the `set_status` and `set_person_on_call` using this pattern:
@@ -55,7 +64,11 @@ Under the root dir of near-sdk-js, call the `set_status` and `set_person_on_call
 near js call <contract-id> <function-name> [--args '<parameter>'] --deposit 0.1 --accountId <signer-id> --jsvm jsvm.test.near
 ```
 
-or with the raw CLI call command:
-```sh
-near call jsvm.test.near call_js_contract --accountId <accountID> --base64 --args $(node encode_call.js <contract-account-id> <function-name> '[<parameter>]') --deposit 0.1
-```
+or with t<details>
+<summary><strong>Or with the raw CLI call command</strong></summary>
+<p>
+
+    near call jsvm.test.near call_js_contract --accountId <accountID> --base64 --args $(node encode_call.js <contract-account-id> <function-name> '[<parameter>]') --deposit 0.1
+
+</p>
+</details>
