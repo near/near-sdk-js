@@ -121,7 +121,27 @@ near-sdk-js (master) near js deploy --accountId test.near --base64 hello_near.ba
     To see the transaction in the transaction explorer, please open this url in your browser
     http://localhost:9001/transactions/Df7txPSFWwaBLTz61pSxoVrPPu6qY7fUTJ31xuQtXDBf
     ''
+
+</p>
+</details>
+
+```sh
+near-sdk-js (master) near js call test.near hello --accountId test.near --deposit 0.1 --jsvm test.near
+```
+
+<details>
+<summary><strong>Or use the raw CLI call instead</strong></summary>
+<p>
+
     near-sdk-js (master) near call test.near call_js_contract --accountId test.near --base64 --args $(node encode_call.js test.near hello '')
+
+</p>
+</details>
+
+<details>
+<summary><strong>Example output</strong></summary>
+<p>
+
     Scheduling a call: test.near.call_js_contract(anN2bXRlc3Rlci50ZXN0bmV0AGhlbGxvAA==)
     Loaded master account test.near key from /home/bo/.near/validator_key.json with public key = ed25519:XXqxAHP1ZRcwCwBTr1MbdF9NM7UVynuTnxhZfFeE5UJ
     Doing account.functionCall()
