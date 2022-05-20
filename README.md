@@ -97,8 +97,19 @@ near-sdk-js (master) near deploy test.near jsvm.wasm
 4. Build, deploy hello contract to jsvm contract, and call hello. Example session:
 ```sh
 near-sdk-js (master) ./builder.sh examples/low-level/hello_near.js
-near-sdk-js (master) near call test.near deploy_js_contract --accountId test.near --base64 --args $(cat hello_near.base64) --deposit 0.1
+near-sdk-js (master) near js deploy --accountId test.near --base64 hello_near.base64 --deposit 0.1 --jsvm test.near
 ```
+
+<details>
+<summary><strong>Or use the raw CLI call instead</strong></summary>
+<p>
+
+    near-sdk-js (master) near call test.near deploy_js_contract --accountId test.near --base64 --args $(cat hello_near.base64) --deposit 0.1
+
+</p>
+</details>
+
+
 <details>
 <summary><strong>Example output</strong></summary>
 <p>
@@ -158,8 +169,18 @@ near-sdk-js (master) near login
 3. Deploy the JS contract:
 ```sh
 near-sdk-js (master) export JSVM_ACCOUNT=jsvm.testnet
-near-sdk-js (master) near call $JSVM_ACCOUNT deploy_js_contract --accountId jsvmtester.testnet --base64 --args $(cat hello_near.base64) --deposit 0.1
+near-sdk-js (master) near js call deploy --accountId jsvmtester.testnet --base64File hello_near.base64 --deposit 0.1 --jsvm $JSVM_ACCOUNT
 ```
+
+<details>
+<summary><strong>Or use the raw CLI call instead</strong></summary>
+<p>
+
+    near-sdk-js (master) near call $JSVM_ACCOUNT deploy_js_contract --accountId jsvmtester.testnet --base64 --args $(cat hello_near.base64) --deposit 0.1
+
+</p>
+</details>
+
 
 <details>
 <summary><strong>Example output</strong></summary>
@@ -179,9 +200,16 @@ Note that, in order to deploy the contract, the deployer need to deposit suffici
 
 4. Call the JS contract:
 ```sh
-near-sdk-js (master) near call $JSVM_ACCOUNT call_js_contract --accountId jsvmtester.testnet --args $(node encode_call.js jsvmtester.near hello '') --base64
+near-sdk-js (master) near js call jsvmtester.testnet hello --accountId jsvmtester.testnet --deposit 0.1 --jsvm $JSVM_ACCOUNT
 ```
+<details>
+<summary><strong>Or use the raw CLI call instead</strong></summary>
+<p>
 
+    near-sdk-js (master) near call $JSVM_ACCOUNT call_js_contract --accountId jsvmtester.testnet --args $(node encode_call.js jsvmtester.near hello '') --base64
+
+</p>
+</details>
 
 <details>
 <summary><strong>Example output</strong></summary>
@@ -199,9 +227,18 @@ near-sdk-js (master) near call $JSVM_ACCOUNT call_js_contract --accountId jsvmte
 </p>
 </details>
 
+```sh
+near-sdk-js (master) near js call jsvmtester.testnet hello --accountId jsvmtester2.testnet --deposit 0.1 --jsvm $JSVM_ACCOUNT
 ```
-near-sdk-js (master) near call $JSVM_ACCOUNT call_js_contract --accountId jsvmtester2.testnet --args $(node encode_call.js jsvmtester.near hello '') --base64
-```
+
+<details>
+<summary><strong>Or use the raw CLI call instead</strong></summary>
+<p>
+
+    near-sdk-js (master) near call $JSVM_ACCOUNT call_js_contract --accountId jsvmtester2.testnet --args $(node encode_call.js jsvmtester.near hello '') --base64
+
+</p>
+</details>
 
 <details>
 <summary><strong>Example output</strong></summary>
