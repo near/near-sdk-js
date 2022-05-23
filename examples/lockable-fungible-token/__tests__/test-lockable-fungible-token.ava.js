@@ -19,8 +19,8 @@ test.beforeEach(async t => {
         './node_modules/near-sdk-js/res/jsvm.wasm',
     );
 
-    // Deploy status-message JS contract
-    const lockableFt = await root.createSubAccount('status-message');
+    // Deploy lockable FT JS contract
+    const lockableFt = await root.createSubAccount('lockable-ft');
     let contract_base64 = (await readFile('build/contract.base64')).toString();
     await lockableFt.call(jsvm, 'deploy_js_contract', Buffer.from(contract_base64, 'base64'), { attachedDeposit: '1000000000000000000000000' });
     await lockableFt.call(jsvm, 'call_js_contract', encodeCall(lockableFt.accountId, 'init', ['prefix', 10000]), { attachedDeposit: '1000000000000000000000000' });
