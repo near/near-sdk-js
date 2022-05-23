@@ -24,37 +24,35 @@ class Account {
 
     setAllowance(escrowAccountId, allowance) {
         if (allowance > 0) {
-            this.allowances.set(escrowAccountId, allowance)
+            this.allowances[escrowAccountId] = allowance
         } else if (allowance === 0) {
-            this.allowances.delete(escrowAccountId)
+            delete this.allowances[escrowAccountId]
         } else {
             throw Error("Allowance can't be negative")
         }
     }
 
     getAllowance(escrowAccountId) {
-        return this.allowances.get(escrowAccountId) || 0
+        return this.allowances[escrowAccountId] || 0
     }
 
     setLockedBalance(escrowAccountId, lockedBalance) {
         if (lockedBalance > 0) {
-            this.lockedBalances.set(escrowAccountId, lockedBalance)
+            this.lockedBalances[escrowAccountId] = lockedBalance
         } else if (lockedBalance === 0) {
-            this.lockedBalances.delete(escrowAccountId)
+            delete this.lockedBalances[escrowAccountId]
         } else {
             throw Error("Locked balance cannot be negative")
         }
     }
 
     getLockedBalance(escrowAccountId) {
-        return this.lockedBalances.get(escrowAccountId) || 0
+        return this.lockedBalances[escrowAccountId] || 0
     }
 
     totalBalance() {
-        var totalLockedBalance = 0
-        this.lockedBalances.forEach((v) => {
-            totalLockedBalance += v
-        })
+        let totalLockedBalance =
+            Object.values(this.lockedBalances).reduce((acc, val) => acc + val, 0)
         return this.balance + totalLockedBalance
     }
 }
@@ -79,10 +77,9 @@ class LockableFungibleToken extends NearContract {
     getAccount(ownerId) {
         let account = this.accounts.get(ownerId)
         if (account === null) {
-            return new Account(0, new Map(), new Map())
+            return new Account(0, {}, {})
         }
-        let { balance, allowances, lockedBalances } = JSON.parse(account)
-        return new Account(balance, new Map(Object.entries(allowances)), new Map(Object.entries(lockedBalances)))
+        return Object.assign(new Account, JSON.parse(account))
     }
 
     setAccount(accountId, account) {
@@ -107,8 +104,8 @@ class LockableFungibleToken extends NearContract {
 
     @call
     lock(ownerId, lockAmount) {
-        if (lockAmount === 0) {
-            throw Error("Can't lock 0 tokens")
+        if (lockAmount <= 0) {
+            throw Error("Can't lock 0 or less tokens")
         }
         let escrowAccountId = near.predecessorAccountId()
         let account = this.getAccount(ownerId)
