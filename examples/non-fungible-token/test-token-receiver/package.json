@@ -1,7 +1,7 @@
 {
-  "name": "non-fungible-token",
+  "name": "test-token-receiver",
   "version": "1.0.0",
-  "description": "Non-fungible token example with near-sdk-js",
+  "description": "",
   "main": "index.js",
   "type": "module",
   "scripts": {
@@ -11,10 +11,7 @@
   "author": "Near Inc <hello@nearprotocol.com>",
   "license": "Apache-2.0",
   "dependencies": {
-    "near-sdk-js": "file:../../"
+    "near-sdk-js": "file:../../.."
   },
-  "devDependencies": {
-    "ava": "^4.2.0",
-    "near-workspaces": "^2.0.0"
-  }
+  "devDependencies": {}
 }
