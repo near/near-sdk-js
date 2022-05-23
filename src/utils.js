@@ -5,3 +5,11 @@ export function u8ArrayToString(array) {
     }
     return ret
 }
+
+export function stringToU8Array(string) {
+    let ret = new Uint8Array(string.length)
+    for (let i in string) {
+        ret[i] = string.charCodeAt(i)
+    }
+    return ret
+}
