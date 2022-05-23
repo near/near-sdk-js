@@ -1,5 +1,5 @@
 ## Disclaimer:
-This README is a work in porgress. The best way to start using `near-sdk-js` is to check `./examples`.
+This README is a work in progress. The best way to start using `near-sdk-js` is to check `./examples`.
 # NEAR-SDK-JS (Enclave)
 
 ## Local Installation
