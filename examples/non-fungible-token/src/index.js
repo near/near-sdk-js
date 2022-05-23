@@ -47,12 +47,29 @@ class NftContract extends NearContract {
     }
 
     @call
-    nftTransferCall(receiver_id, token_id, approval_id, memo) {
+    nftTransferCall(receiver_id, token_id, approval_id, memo, msg) {
         let sender_id = near.predecessorAccountId()
         let old_owner_id = this.internalTransfer(sender_id, receiver_id, token_id, approval_id, memo)
 
-        let onTransferRet = near.jsvmCall(receiverId, 'nftOnTransfer', [sender_id, old_owner_id, token_id, msg])
-        return onTransferRet
+        let onTransferRet = near.jsvmCall(receiver_id, 'nftOnTransfer', [sender_id, old_owner_id, token_id, msg])
+
+        // NOTE: Arbitrary logic can be run here, as an example we return the token to the initial
+        // owner if receiver's `nftOnTransfer` returns `true`
+        if (onTransferRet) {
+            let currentOwner = this.owner_by_id.get(token_id)
+            if (currentOwner === null) {
+                // The token was burned and doesn't exist anymore.
+                return true
+            } else if (currentOwner !== receiver_id) {
+                // The token is not owned by the receiver anymore. Can't return it.
+                return true
+            } else {
+                this.internalTransfer(receiver_id, sender_id, token_id, null, null)
+                return false
+            }
+        } else {
+            return true
+        }
     }
 
     @call
