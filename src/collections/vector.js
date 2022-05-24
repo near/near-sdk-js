@@ -29,7 +29,7 @@ export class Vector {
 
     get(index) {
         if (index >= this.length) {
-            return None
+            return null
         }
         let storageKey = this.indexToKey(index)
         return near.jsvmStorageRead(storageKey)
@@ -98,6 +98,14 @@ export class Vector {
         return new VectorIterator(this)
     }
 
+    clear() {
+        for (let i = 0; i < this.length; i++) {
+            let key = this.indexToKey(this.length)
+            near.jsvmStorageRemove(key)
+        }
+        this.len = 0
+    }
+
     toArray() {
         let ret = []
         for (let v of this) {
@@ -107,7 +115,7 @@ export class Vector {
     }
 }
 
-class VectorIterator {
+export class VectorIterator {
     constructor(vector) {
         this.current = 0
         this.vector = vector
