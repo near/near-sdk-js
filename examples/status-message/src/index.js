@@ -17,7 +17,7 @@ class StatusMessage extends NearContract {
     @view
     get_status(account_id) {
         env.log(`get_status for account_id ${account_id}`)
-        return this.records[account_id]
+        return this.records[account_id] || null
     }
 }
 
