@@ -12,7 +12,8 @@ import * as near from './api'
 import { 
     LookupMap,
     Vector,
-    LookupSet
+    LookupSet,
+    UnorderedMap
 } from './collections'
 
 export {
@@ -23,5 +24,6 @@ export {
     near,
     LookupMap,
     Vector,
-    LookupSet
+    LookupSet,
+    UnorderedMap
 }
