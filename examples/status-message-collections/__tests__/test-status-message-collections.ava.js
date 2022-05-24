@@ -6,7 +6,7 @@ function encodeCall(contract, method, args) {
     return Buffer.concat([Buffer.from(contract), Buffer.from([0]), Buffer.from(method), Buffer.from([0]), Buffer.from(JSON.stringify(args))])
 }
 
-test.before(async t => {
+test.beforeEach(async t => {
     // Init the worker and start a Sandbox server
     const worker = await Worker.init();
 
@@ -35,7 +35,7 @@ test.before(async t => {
     t.context.accounts = { root, jsvm, statusMessage, ali, bob, carl };
 });
 
-test.after(async t => {
+test.afterEach(async t => {
     await t.context.worker.tearDown().catch(error => {
         console.log('Failed to tear down the worker:', error);
     });
@@ -66,4 +66,28 @@ test('Bob and Carl have different statuses', async t => {
     const carlStatus = await jsvm.view('view_js_contract', encodeCall(statusMessage.accountId, 'get_status', [carl.accountId]));
     t.is(bobStatus, 'hello');
     t.is(carlStatus, 'world');
-  });
+});
+
+test('Get statuses from the contract', async t => {
+    const {jsvm, statusMessage, bob, carl} = t.context.accounts;
+    await bob.call(jsvm, 'call_js_contract', encodeCall(statusMessage.accountId, 'set_status', ['hello']), {attachedDeposit: '100000000000000000000000'});
+    await carl.call(jsvm, 'call_js_contract', encodeCall(statusMessage.accountId, 'set_status', ['world']), {attachedDeposit: '100000000000000000000000'});
+
+    const statuses = await jsvm.view('view_js_contract', encodeCall(statusMessage.accountId, 'get_all_statuses', []));
+    t.deepEqual(statuses, [[bob.accountId, 'hello'], [carl.accountId, 'world']]);
+});
+
+test('message has stored by someone', async t => {
+    const { ali, jsvm, statusMessage } = t.context.accounts;
+    await ali.call(jsvm, 'call_js_contract', encodeCall(statusMessage.accountId, 'set_status', ['hello']), {attachedDeposit: '100000000000000000000000'});
+    
+    t.is(
+        await jsvm.view('view_js_contract', encodeCall(statusMessage.accountId, 'has_status', ['hello'])),
+        true
+    );
+
+    t.is(
+        await jsvm.view('view_js_contract', encodeCall(statusMessage.accountId, 'has_status', ['world'])),
+        false
+    );
+});

@@ -29,7 +29,7 @@ export class Vector {
 
     get(index) {
         if (index >= this.length) {
-            return None
+            return null
         }
         let storageKey = this.indexToKey(index)
         return near.jsvmStorageRead(storageKey)
