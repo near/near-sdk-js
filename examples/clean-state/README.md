@@ -1,6 +1,6 @@
 # Clean state contract in JavaScript
 
-This is an equivalent JavaScript implementation of the clean state example. Every user can send and receive a non-fungible token.
+This is an equivalent JavaScript implementation of the clean state example. 
 
 ## Build the contract
 
