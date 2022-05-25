@@ -1,0 +1,27 @@
+name: Tests
+on: push
+jobs:
+  examples:
+    strategy:
+      matrix:
+        platform: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: "16"
+      - name: cross-contract-call
+        run: cd examples/cross-contract-call && yarn && yarn build && yarn test && cd ../..
+      - name: fungible-token
+        run: cd examples/fungible-token && yarn && yarn build && yarn test && cd ../..
+      - name: lockable-fungible-token
+        run: cd examples/lockable-fungible-token && yarn && yarn build && yarn test && cd ../..
+      - name: build test-token-receiver
+        run: cd examples/non-fungible-token/test-token-receiver && yarn && yarn build && cd ../../..
+      - name: non-fungible-token
+        run: cd examples/non-fungible-token && yarn && yarn build && yarn test && cd ../..
+      - name: status-message
+        run: cd examples/status-message && yarn && yarn build && yarn test && cd ../..
+      - name: status-message-collections
+        run: cd examples/status-message-collections && yarn && yarn build && yarn test && cd ../..
