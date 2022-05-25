@@ -24,7 +24,7 @@ test.beforeEach(async t => {
     const cleanStateContract = await root.createSubAccount('clean-state');
     let cleanStateContractBase64 = (await readFile('build/contract.base64')).toString();
     await cleanStateContract.call(jsvm, 'deploy_js_contract', Buffer.from(cleanStateContractBase64, 'base64'), { attachedDeposit: '400000000000000000000000' });
-    await cleanStateContract.call(jsvm, 'call_js_contract', encodeCall(cleanStateContract.accountId, 'init', [[]]), { attachedDeposit: '400000000000000000000000' });
+    await cleanStateContract.call(jsvm, 'call_js_contract', encodeCall(cleanStateContract.accountId, 'init', []), { attachedDeposit: '400000000000000000000000' });
 
     // Save state for test runs, it is unique for each test
     t.context.worker = worker;
@@ -46,7 +46,7 @@ test('Clean state after storing', async t => {
     await cleanStateContract.call(jsvm, 'call_js_contract', encodeCall(cleanStateContract.accountId, 'put', ['1', 1]), { attachedDeposit: '400000000000000000000000' });
     const value1 = await jsvm.view('view_js_contract', encodeCall(cleanStateContract.accountId, 'get', ['1']));
     t.is(value1, '1');
-    await cleanStateContract.call(jsvm, 'call_js_contract', encodeCall(cleanStateContract.accountId, 'init', [['1']]), { attachedDeposit: '400000000000000000000000' });
+    await cleanStateContract.call(jsvm, 'call_js_contract', encodeCall(cleanStateContract.accountId, 'clean', [['1']]), { attachedDeposit: '400000000000000000000000' });
     const value2 = await jsvm.view('view_js_contract', encodeCall(cleanStateContract.accountId, 'get', ['1']));
     t.is(value2, null);
 });

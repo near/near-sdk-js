@@ -2,8 +2,8 @@ import { NearContract, NearBindgen, call, view, near, LookupMap } from 'near-sdk
 
 @NearBindgen
 class CleanState extends NearContract {
-    constructor(keys) {
-        super()
+    @call
+    clean(keys) {
         keys.forEach(key => near.jsvmStorageRemove(key))
     }
 
