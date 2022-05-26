@@ -25,3 +25,5 @@ jobs:
         run: cd examples/status-message && yarn && yarn build && yarn test && cd ../..
       - name: status-message-collections
         run: cd examples/status-message-collections && yarn && yarn build && yarn test && cd ../..
+      - name: clean-state
+        run: cd examples/clean-state && yarn && yarn build && yarn test && cd ../..
