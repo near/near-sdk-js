@@ -20,7 +20,7 @@
   ],
   "license": "(MIT AND Apache-2.0)",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 0"
+    "test": "cd tests && yarn && yarn build && yarn test && cd .."
   },
   "bin": {
     "near-sdk": "cli/cli.js"
