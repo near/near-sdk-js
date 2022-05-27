@@ -87,7 +87,7 @@ export class UnorderedMap {
             if (this.len() == 1) {
                 // If there is only one element then swap remove simply removes it without
                 // swapping with the last element.
-                return near.jsvmStorageRemove(indexLookup)
+                near.jsvmStorageRemove(indexLookup)
             } else {
                 // If there is more than one element then swap remove swaps it with the last
                 // element.                

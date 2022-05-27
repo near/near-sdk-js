@@ -100,10 +100,10 @@ export class Vector {
 
     clear() {
         for (let i = 0; i < this.length; i++) {
-            let key = this.indexToKey(this.length)
+            let key = this.indexToKey(i)
             near.jsvmStorageRemove(key)
         }
-        this.len = 0
+        this.length = 0
     }
 
     toArray() {

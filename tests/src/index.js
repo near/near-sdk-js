@@ -68,10 +68,10 @@ class UnorderedMapTestContract extends NearContract {
 
     @view
     toArray() {
-        this.unorderedMap.toArray();
+        return this.unorderedMap.toArray();
     }
 
-    @view
+    @call
     extend(kvs) {
         this.unorderedMap.extend(kvs);
     }
