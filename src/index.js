@@ -13,7 +13,8 @@ import {
     LookupMap,
     Vector,
     LookupSet,
-    UnorderedMap
+    UnorderedMap,
+    UnorderedSet
 } from './collections'
 
 export {
@@ -25,5 +26,6 @@ export {
     LookupMap,
     Vector,
     LookupSet,
-    UnorderedMap
+    UnorderedMap,
+    UnorderedSet
 }

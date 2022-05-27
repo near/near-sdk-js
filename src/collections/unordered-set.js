@@ -1,0 +1,108 @@
+import * as near from '../api'
+import {u8ArrayToString, stringToU8Array} from '../utils'
+import { Vector } from './vector'
+
+const ERR_INCONSISTENT_STATE = "The collection is an inconsistent state. Did previous smart contract execution terminate unexpectedly?"
+
+export class UnorderedSet {
+    constructor(prefix) {
+        this.length = 0
+        this.elementIndexPrefix = prefix + 'i'
+        let elementsPrefix = prefix + 'e'
+        this.elements = new Vector(elementsPrefix)
+    }
+
+    len() {
+        return this.elements.len()
+    }
+
+    isEmpty() {
+        return this.elements.isEmpty()
+    }
+
+    serializeIndex(index) {
+        let data = new Uint32Array([index])
+        let array = new Uint8Array(data.buffer)
+        return u8ArrayToString(array)
+    }
+
+    deserializeIndex(rawIndex) {
+        let array = stringToU8Array(rawIndex)
+        let data = new Uint32Array(array.buffer)
+        return data[0]
+    }
+
+    contains(element) {
+        let indexLookup = this.elementIndexPrefix + element
+        return near.jsvmStorageHasKey(indexLookup)
+    }
+
+    set(element) {
+        let indexLookup = this.elementIndexPrefix + key
+        if (near.jsvmStorageRead(indexLookup)) {
+            return false
+        } else {
+            let nextIndex = this.len()
+            let nextIndexRaw = this.serializeIndex(nextIndex)
+            near.jsvmStorageWrite(indexLookup, nextIndexRaw)
+            this.elements.push(element)
+            return true
+        }
+    }
+
+    remove(element) {
+        let indexLookup = this.elementIndexPrefix + element
+        let indexRaw = near.jsvmStorageRead(indexLookup)
+        if (indexRaw) {
+            if (this.len() == 1) {
+                // If there is only one element then swap remove simply removes it without
+                // swapping with the last element.
+                return near.jsvmStorageRemove(indexLookup)
+            } else {
+                // If there is more than one element then swap remove swaps it with the last
+                // element.                
+                let lastElementRaw = this.elements.get(this.len() - 1)
+                if (!lastElementRaw) {
+                    throw new Error(ERR_INCONSISTENT_STATE)
+                }
+                near.jsvmStorageRemove(indexLookup)
+                // If the removed element was the last element from keys, then we don't need to
+                // reinsert the lookup back.
+                if (lastElementRaw != element) {
+                    let lastLookupElement = this.elementIndexPrefix + lastKeyRaw
+                    near.jsvmStorageWrite(lastLookupElement, indexRaw)
+                }
+            }
+            let index = this.deserializeIndex(indexRaw)
+            this.elements.swapRemove(index)
+            return true
+        }
+        return false
+    }
+
+    clear() {
+        for (let element of this.elements) {
+            let indexLookup = this.elementIndexPrefix + element
+            near.jsvmStorageRemove(indexLookup)
+        }
+        this.elements.clear()
+    }
+
+    toArray() {
+        let ret = []
+        for (let v of this) {
+            ret.push(v)
+        }
+        return ret
+    }
+
+    [Symbol.iterator]() {
+        return this.elements[Symbol.iterator]()
+    }
+
+    extend(kvs) {
+        for (let [k, v] of kvs) {
+            this.set(k, v)
+        }
+    }
+}
