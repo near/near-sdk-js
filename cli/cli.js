@@ -42,7 +42,7 @@ async function build(argv) {
     const TARGET_DIR = path.dirname(argv.target);
     const TARGET_FILE_NAME = path.basename(argv.target, '.base64');
 
-    const ROLLUP_TARGET = `${TARGET_DIR}${TARGET_FILE_NAME}.js`;
+    const ROLLUP_TARGET = `${TARGET_DIR}/${TARGET_FILE_NAME}.js`;
     const QJS_TARGET = `${TARGET_DIR}/${TARGET_FILE_NAME}.h`;
     const CONTRACT_TARGET = `${TARGET_DIR}/${TARGET_FILE_NAME}.base64`;
 
