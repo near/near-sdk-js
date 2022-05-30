@@ -40,7 +40,7 @@ async function build(argv) {
 
     const SOURCE_FILE_WITH_PATH = argv.source;
     const TARGET_DIR = path.dirname(argv.target);
-    const TARGET_FILE_NAME = path.basename(argv.target, false);
+    const TARGET_FILE_NAME = path.basename(argv.target, '.base64');
 
     const ROLLUP_TARGET = `${TARGET_DIR}${TARGET_FILE_NAME}.js`;
     const QJS_TARGET = `${TARGET_DIR}/${TARGET_FILE_NAME}.h`;
