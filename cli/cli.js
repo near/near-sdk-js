@@ -10,6 +10,7 @@ import { babel } from '@rollup/plugin-babel';
 import { rollup } from 'rollup';
 
 import { exec as exec_ } from 'child_process';
+import { path } from 'node:path';
 import { promisify } from 'util';
 
 const exec = promisify(exec_);
@@ -38,11 +39,8 @@ async function build(argv) {
     const ARCH = await executeCommand('uname -m', true);
 
     const SOURCE_FILE_WITH_PATH = argv.source;
-    // TODO: parce path
-    // const TARGET_DIR = getBuildDir(argv.target);
-    // const TARGET_FILE_NAME = getTargetFileName(argv.target);
-    const TARGET_DIR = 'build';
-    const TARGET_FILE_NAME = 'contract';
+    const TARGET_DIR = path.dirname(argv.target);
+    const TARGET_FILE_NAME = path.basename(argv.target);
 
     const ROLLUP_TARGET = `${TARGET_DIR}${TARGET_FILE_NAME}.js`;
     const QJS_TARGET = `${TARGET_DIR}/${TARGET_FILE_NAME}.h`;
