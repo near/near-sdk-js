@@ -34,15 +34,31 @@ yargs(hideBin(process.argv))
     .argv
 
 async function build(argv) {
-    // TODO: use target
-    console.log(`Building ${argv.source} contract...`);
+    const OS = await executeCommand('uname -s', true);
+    const ARCH = await executeCommand('uname -m', true);
 
-    console.log('Creating build directory...');
-    await executeCommand('mkdir -p build');
+    const SOURCE_FILE_WITH_PATH = argv.source;
+    // TODO: parce path
+    // const TARGET_DIR = getBuildDir(argv.target);
+    // const TARGET_FILE_NAME = getTargetFileName(argv.target);
+    const TARGET_DIR = 'build';
+    const TARGET_FILE_NAME = 'contract';
 
-    console.log('Executing rollup...');
+    const ROLLUP_TARGET = `${TARGET_DIR}${TARGET_FILE_NAME}.js`;
+    const QJS_TARGET = `${TARGET_DIR}/${TARGET_FILE_NAME}.h`;
+    const CONTRACT_TARGET = `${TARGET_DIR}/${TARGET_FILE_NAME}.base64`;
+
+    const SAVE_BYTECODE_SCRIPT = './node_modules/near-sdk-js/cli/save_bytecode.js';
+    const QJSC = `./node_modules/near-sdk-js/res/${OS}-${ARCH}-qjsc`;
+
+    console.log(`Building ${SOURCE_FILE_WITH_PATH} contract...`);
+
+    console.log(`Creating ${TARGET_DIR} directory...`);
+    await executeCommand(`mkdir -p ${TARGET_DIR}`);
+
+    console.log(`Creating ${ROLLUP_TARGET} file with Rollup...`);
     const bundle = await rollup({
-        input: argv.source,
+        input: SOURCE_FILE_WITH_PATH,
         plugins: [
             nodeResolve(),
             sourcemaps(),
@@ -53,20 +69,15 @@ async function build(argv) {
 
     await bundle.write({
         sourcemap: true,
-        file: 'build/contract.js',
+        file: ROLLUP_TARGET,
         format: 'es'
     });
 
-    console.log('Creating <>.base64 file with the use of QJSC...');
-    const SAVE_BYTECODE = './node_modules/near-sdk-js/cli/save_bytecode.js';
-    const os = await executeCommand('uname -s', true);
-    const arch = await executeCommand('uname -m', true);
-    const QJSC = `./node_modules/near-sdk-js/res/${os}-${arch}-qjsc`;
-    const TEMP = 'build/contract.h';
-    const TARGET = 'build/contract.base64';
-    const CONTRACT_JS_FILE = 'build/contract.js';
-    await executeCommand(`${QJSC} -c -m -o ${TEMP} -N code ${CONTRACT_JS_FILE}`);
-    await executeCommand(`node ${SAVE_BYTECODE} ${TEMP} ${TARGET}`);
+    console.log(`Creating ${QJS_TARGET} file with QJSC...`);
+    await executeCommand(`${QJSC} -c -m -o ${QJS_TARGET} -N code ${ROLLUP_TARGET}`);
+
+    console.log(`Saving bytecode to ${CONTRACT_TARGET}`);
+    await executeCommand(`node ${SAVE_BYTECODE_SCRIPT} ${QJS_TARGET} ${CONTRACT_TARGET}`);
 }
 
 async function executeCommand(command, silent = false) {
