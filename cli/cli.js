@@ -14,23 +14,35 @@ import { promisify } from 'util';
 
 const exec = promisify(exec_);
 
-//TODO: build passed file instead of hardcoded one
 yargs(hideBin(process.argv))
     .scriptName('near-sdk')
     .usage('$0 <cmd> [args]')
-    .command('build', 'Build NEAR JS Smart-contract', (yargs) => {}, build)
+    .command('build [source] [target]', 'Build NEAR JS Smart-contract', (yargs) => {
+        yargs
+            .positional('source', {
+                type: 'string',
+                default: 'src/index.js',
+                describe: 'Contract to build'
+            })
+            .positional('target', {
+                type: 'string',
+                default: 'build/contract.base64',
+                describe: 'Target file path and name'
+            })
+    }, build)
     .help()
     .argv
 
 async function build(argv) {
-    console.log(`Building ${argv.contract} contract...`);
+    // TODO: use target
+    console.log(`Building ${argv.source} contract...`);
 
     console.log('Creating build directory...');
     await executeCommand('mkdir -p build');
 
     console.log('Executing rollup...');
     const bundle = await rollup({
-        input: 'src/index.js',
+        input: argv.source,
         plugins: [
             nodeResolve(),
             sourcemaps(),
@@ -57,9 +69,9 @@ async function build(argv) {
     await executeCommand(`node ${SAVE_BYTECODE} ${TEMP} ${TARGET}`);
 }
 
-async function executeCommand(command, silent=false) {
+async function executeCommand(command, silent = false) {
     console.log(command);
-    const {error, stdout, stderr} = await exec(command);
+    const { error, stdout, stderr } = await exec(command);
 
     if (error) {
         console.log(error);
