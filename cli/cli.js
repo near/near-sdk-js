@@ -10,7 +10,7 @@ import { babel } from '@rollup/plugin-babel';
 import { rollup } from 'rollup';
 
 import { exec as exec_ } from 'child_process';
-import { path } from 'node:path';
+import path from 'path';
 import { promisify } from 'util';
 
 const exec = promisify(exec_);
