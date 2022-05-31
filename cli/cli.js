@@ -10,27 +10,53 @@ import { babel } from '@rollup/plugin-babel';
 import { rollup } from 'rollup';
 
 import { exec as exec_ } from 'child_process';
+import path from 'path';
 import { promisify } from 'util';
 
 const exec = promisify(exec_);
 
-//TODO: build passed file instead of hardcoded one
 yargs(hideBin(process.argv))
     .scriptName('near-sdk')
     .usage('$0 <cmd> [args]')
-    .command('build', 'Build NEAR JS Smart-contract', (yargs) => {}, build)
+    .command('build [source] [target]', 'Build NEAR JS Smart-contract', (yargs) => {
+        yargs
+            .positional('source', {
+                type: 'string',
+                default: 'src/index.js',
+                describe: 'Contract to build'
+            })
+            .positional('target', {
+                type: 'string',
+                default: 'build/contract.base64',
+                describe: 'Target file path and name'
+            })
+    }, build)
     .help()
     .argv
 
 async function build(argv) {
-    console.log(`Building ${argv.contract} contract...`);
+    const OS = await executeCommand('uname -s', true);
+    const ARCH = await executeCommand('uname -m', true);
 
-    console.log('Creating build directory...');
-    await executeCommand('mkdir -p build');
+    const SOURCE_FILE_WITH_PATH = argv.source;
+    const TARGET_DIR = path.dirname(argv.target);
+    const TARGET_FILE_NAME = path.basename(argv.target, '.base64');
 
-    console.log('Executing rollup...');
+    const ROLLUP_TARGET = `${TARGET_DIR}/${TARGET_FILE_NAME}.js`;
+    const QJS_TARGET = `${TARGET_DIR}/${TARGET_FILE_NAME}.h`;
+    const CONTRACT_TARGET = `${TARGET_DIR}/${TARGET_FILE_NAME}.base64`;
+
+    const SAVE_BYTECODE_SCRIPT = './node_modules/near-sdk-js/cli/save_bytecode.js';
+    const QJSC = `./node_modules/near-sdk-js/res/${OS}-${ARCH}-qjsc`;
+
+    console.log(`Building ${SOURCE_FILE_WITH_PATH} contract...`);
+
+    console.log(`Creating ${TARGET_DIR} directory...`);
+    await executeCommand(`mkdir -p ${TARGET_DIR}`);
+
+    console.log(`Creating ${ROLLUP_TARGET} file with Rollup...`);
     const bundle = await rollup({
-        input: 'src/index.js',
+        input: SOURCE_FILE_WITH_PATH,
         plugins: [
             nodeResolve(),
             sourcemaps(),
@@ -41,25 +67,20 @@ async function build(argv) {
 
     await bundle.write({
         sourcemap: true,
-        file: 'build/contract.js',
+        file: ROLLUP_TARGET,
         format: 'es'
     });
 
-    console.log('Creating <>.base64 file with the use of QJSC...');
-    const SAVE_BYTECODE = './node_modules/near-sdk-js/cli/save_bytecode.js';
-    const os = await executeCommand('uname -s', true);
-    const arch = await executeCommand('uname -m', true);
-    const QJSC = `./node_modules/near-sdk-js/res/${os}-${arch}-qjsc`;
-    const TEMP = 'build/contract.h';
-    const TARGET = 'build/contract.base64';
-    const CONTRACT_JS_FILE = 'build/contract.js';
-    await executeCommand(`${QJSC} -c -m -o ${TEMP} -N code ${CONTRACT_JS_FILE}`);
-    await executeCommand(`node ${SAVE_BYTECODE} ${TEMP} ${TARGET}`);
+    console.log(`Creating ${QJS_TARGET} file with QJSC...`);
+    await executeCommand(`${QJSC} -c -m -o ${QJS_TARGET} -N code ${ROLLUP_TARGET}`);
+
+    console.log(`Saving bytecode to ${CONTRACT_TARGET}`);
+    await executeCommand(`node ${SAVE_BYTECODE_SCRIPT} ${QJS_TARGET} ${CONTRACT_TARGET}`);
 }
 
-async function executeCommand(command, silent=false) {
+async function executeCommand(command, silent = false) {
     console.log(command);
-    const {error, stdout, stderr} = await exec(command);
+    const { error, stdout, stderr } = await exec(command);
 
     if (error) {
         console.log(error);
