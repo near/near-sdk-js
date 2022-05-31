@@ -28,7 +28,7 @@ test.beforeEach(async t => {
 
     // Deploy token receiver contract
     const tokenReceiverContract = await root.createSubAccount('token-receiver');
-    let tokenReceiverContractBase64 = (await readFile('test-token-receiver/build/contract.base64')).toString();
+    let tokenReceiverContractBase64 = (await readFile('build/test-token-receiver.base64')).toString();
     await tokenReceiverContract.call(jsvm, 'deploy_js_contract', Buffer.from(tokenReceiverContractBase64, 'base64'), { attachedDeposit: '400000000000000000000000' });
     await tokenReceiverContract.call(jsvm, 'call_js_contract', encodeCall(tokenReceiverContract.accountId, 'init', [nftContract.accountId]), { attachedDeposit: '400000000000000000000000' });
 

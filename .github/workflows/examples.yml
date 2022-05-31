@@ -17,8 +17,6 @@ jobs:
         run: cd examples/fungible-token && yarn && yarn build && yarn test && rm -rf node_modules && rm -rf build && cd ../..
       - name: lockable-fungible-token
         run: cd examples/lockable-fungible-token && yarn && yarn build && yarn test && rm -rf node_modules && rm -rf build && cd ../..
-      - name: build test-token-receiver
-        run: cd examples/non-fungible-token/test-token-receiver && yarn && yarn build && rm -rf node_modules && cd ../../..
       - name: non-fungible-token
         run: cd examples/non-fungible-token && yarn && yarn build && yarn test && rm -rf node_modules && rm -rf build && cd ../..
       - name: status-message
