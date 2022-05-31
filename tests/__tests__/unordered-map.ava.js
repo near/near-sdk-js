@@ -21,7 +21,7 @@ test.beforeEach(async t => {
 
     // Deploy test JS contract
     const testContract = await root.createSubAccount('test-contract');
-    let contract_base64 = (await readFile('build/contract.base64')).toString();
+    let contract_base64 = (await readFile('build/unordered-map.base64')).toString();
     await testContract.call(jsvm, 'deploy_js_contract', Buffer.from(contract_base64, 'base64'), { attachedDeposit: '400000000000000000000000' });
     await testContract.call(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'init', []), { attachedDeposit: '400000000000000000000000' });
 
