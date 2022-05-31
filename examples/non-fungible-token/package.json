@@ -5,6 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
+    "build": "yarn build:reciever && yarn build:nft",
     "build:nft": "near-sdk build",
     "build:receiver": "near-sdk build src/test-token-receiver.js build/test-token-receiver.base64",
     "test": "ava"
