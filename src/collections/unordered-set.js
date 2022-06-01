@@ -38,7 +38,7 @@ export class UnorderedSet {
     }
 
     set(element) {
-        let indexLookup = this.elementIndexPrefix + key
+        let indexLookup = this.elementIndexPrefix + element
         if (near.jsvmStorageRead(indexLookup)) {
             return false
         } else {
@@ -57,7 +57,7 @@ export class UnorderedSet {
             if (this.len() == 1) {
                 // If there is only one element then swap remove simply removes it without
                 // swapping with the last element.
-                return near.jsvmStorageRemove(indexLookup)
+                near.jsvmStorageRemove(indexLookup)
             } else {
                 // If there is more than one element then swap remove swaps it with the last
                 // element.                
@@ -69,7 +69,7 @@ export class UnorderedSet {
                 // If the removed element was the last element from keys, then we don't need to
                 // reinsert the lookup back.
                 if (lastElementRaw != element) {
-                    let lastLookupElement = this.elementIndexPrefix + lastKeyRaw
+                    let lastLookupElement = this.elementIndexPrefix + lastElementRaw
                     near.jsvmStorageWrite(lastLookupElement, indexRaw)
                 }
             }
@@ -100,9 +100,9 @@ export class UnorderedSet {
         return this.elements[Symbol.iterator]()
     }
 
-    extend(kvs) {
-        for (let [k, v] of kvs) {
-            this.set(k, v)
+    extend(elements) {
+        for (let element of elements) {
+            this.set(element)
         }
     }
 }
