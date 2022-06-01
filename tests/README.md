@@ -8,3 +8,7 @@ yarn
 yarn build
 yarn test
 ```
+
+# Add a new test
+
+Create a test contract that covers the API you want to test in `src/`. Add a build command in `build.sh`. Write ava test in `__tests__`.
