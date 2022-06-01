@@ -1,0 +1,20 @@
+{
+    "name": "tests",
+    "version": "1.0.0",
+    "description": "near-sdk-js tests",
+    "main": "index.js",
+    "type": "module",
+    "scripts": {
+        "build": "./build.sh",
+        "test": "ava"
+    },
+    "author": "Near Inc <hello@nearprotocol.com>",
+    "license": "Apache-2.0",
+    "dependencies": {
+        "near-sdk-js": "file:../"
+    },
+    "devDependencies": {
+        "ava": "^4.2.0",
+        "near-workspaces": "^2.0.0"
+    }
+}

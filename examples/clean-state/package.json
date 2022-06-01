@@ -1,7 +1,7 @@
 {
-  "name": "test-token-receiver",
+  "name": "clean-state",
   "version": "1.0.0",
-  "description": "",
+  "description": "Clean state token example with near-sdk-js",
   "main": "index.js",
   "type": "module",
   "scripts": {
@@ -11,7 +11,10 @@
   "author": "Near Inc <hello@nearprotocol.com>",
   "license": "Apache-2.0",
   "dependencies": {
-    "near-sdk-js": "file:../../.."
+    "near-sdk-js": "file:../../"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "ava": "^4.2.0",
+    "near-workspaces": "^2.0.0"
+  }
 }

@@ -1,6 +1,6 @@
 {
   "name": "near-sdk-js",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "High Level JavaScript SDK for building smart contracts on NEAR",
   "main": "src/index.js",
   "type": "module",
@@ -20,7 +20,7 @@
   ],
   "license": "(MIT AND Apache-2.0)",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 0"
+    "test": "cd tests && yarn && yarn build && yarn test && cd .."
   },
   "bin": {
     "near-sdk": "cli/cli.js"

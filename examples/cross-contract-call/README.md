@@ -8,7 +8,7 @@ A good place to start is the integration test stored in `__tests__/` folder.
 
 First ensure JSVM contract is built and deployed locally, follow [Local Installation](https://github.com/near/near-sdk-js#local-installation). Then run:
 ```
-yarn 
+yarn
 yarn build
 ```
 
@@ -21,12 +21,21 @@ yarn test
 
 ## Deploy the contract
 
-Suppose JSVM contract was deployed to `jsvm.test.near`. Now you want to deploy the status-message contract to `status-message.test.near` and on-call contract to `on-call.test.near`. Create `status-message.test.near`, `on-call.test.near`, `alice.test.near` and `bob.test.near` locally. Then deploy the contracts following this pattern:
-
-```
+Suppose JSVM contract was deployed to `jsvm.test.near`. Now you want to deploy the status-message contract to `status-message.test.near` and on-call contract to `on-call.test.near`. Create `status-message.test.near`, `on-call.test.near`, `alice.test.near` and `bob.test.near` locally. Then deploy the contracts following this pattern using the latest `near-cli`:
+```sh
 export NEAR_ENV=local
-near call jsvm.test.near deploy_js_contract --accountId <accoundId> --args $(cat <contract-name>.base64) --base64 --deposit 0.1
+near js deploy --accountId <accountId> --base64File <contract-name>.base64 --deposit 0.1 --jsvm jsvm.test.near
 ```
+
+<details>
+<summary><strong>Or with the raw CLI call command</strong></summary>
+<p>
+
+    export NEAR_ENV=local
+    near call jsvm.test.near deploy_js_contract --accountId <accoundId> --args $(cat <contract-name>.base64) --base64 --deposit 0.1
+
+</p>
+</details>
 
 ## Initialize the contract
 
@@ -34,13 +43,32 @@ Now we need to initialize `status-message` and `on-call` contracts after deploym
 
 Go back to the root dir of near-sdk-js, where we have a helper `encode-call.js` and use this pattern to init contracts:
 
+```sh
+near js call <contract-id> init --deposit 0.1 --accountId <signer-id> --jsvm jsvm.test.near
 ```
-near call jsvm.test.near call_js_contract --accountId <accountId> --base64 --args $(node encode_call.js <accountId> init '')
-```
+
+<details>
+<summary><strong>Or with the raw CLI call command</strong></summary>
+<p>
+
+    near call jsvm.test.near call_js_contract --base64 --args $(node encode_call.js <contract-id> init '') --accountId <signer-id>
+
+</p>
+</details>
+
 
 ## Call the contract
 Under the root dir of near-sdk-js, call the `set_status` and `set_person_on_call` using this pattern:
 
+```sh
+near js call <contract-id> <function-name> [--args '<parameter>'] --deposit 0.1 --accountId <signer-id> --jsvm jsvm.test.near
 ```
-near call jsvm.test.near call_js_contract --accountId <accountID> --base64 --args $(node encode_call.js <contract-account-id> <function-name> '[<parameter>]') --deposit 0.1
-```
+
+or with t<details>
+<summary><strong>Or with the raw CLI call command</strong></summary>
+<p>
+
+    near call jsvm.test.near call_js_contract --accountId <accountID> --base64 --args $(node encode_call.js <contract-account-id> <function-name> '[<parameter>]') --deposit 0.1
+
+</p>
+</details>

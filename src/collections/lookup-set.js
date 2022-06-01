@@ -26,9 +26,9 @@ export class LookupSet {
         return null
     }
 
-    extend(kvs) {
-        for(let kv of kvs) {
-            this.set(kv[0])
+    extend(keys) {
+        for(let key of keys) {
+            this.set(key)
         }
     }
 }
