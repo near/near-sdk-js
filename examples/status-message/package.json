@@ -5,7 +5,9 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "build": "near-sdk build",
+    "build": "yarn build:simple && yarn build:collections",
+    "build:simple": "near-sdk build src/status-message.js build/status-message.base64",
+    "build:collections": "near-sdk build src/status-message-collections.js build/status-message-collections.base64",
     "test": "ava"
   },
   "author": "Near Inc <hello@nearprotocol.com>",

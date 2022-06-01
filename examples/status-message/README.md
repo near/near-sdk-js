@@ -1,18 +1,16 @@
 # Status message contract in JavaScript
 
-This is an equivalent JavaScript implementation of the status message example. Every user can store a message on chain. Every user can view everyone's message.
+This is an equivalent JavaScript implementation of the status message example. Every user can store a message on chain. Every user can view everyone's message. Logic is implemented two times with the use of collections and without them.
 
 ## Build the contract
-
-First ensure JSVM contract is build and deployed locally, follow [Local Installation](https://github.com/near/near-sdk-js#local-installation). Then run:
 ```
 npm i
 npm run build
 ```
 
-Result contract bytecode file will be in `build/status-message.base64`. Intermediate JavaScript file can be found in `build/status-message.js`. You'll only need the `base64` file to deploy contract to chain. The intermediate JavaScript file is for curious user and near-sdk-js developers to understand what code generation happened under the hood.
+Result contract bytecode files will be stored in `build/status-message.base64` and `build/status-message-collections.base64`. Intermediate JavaScript file can be found in `build/` folder. You'll only need the `base64` file to deploy contract to chain. The intermediate JavaScript file is for curious user and near-sdk-js developers to understand what code generation happened under the hood.
 
-## Test the contract with workspaces-js
+## Test the contracts with workspaces-js
 ```
 npm run test
 ```
