@@ -4,7 +4,7 @@ This tests the functionality of high level APIs of NEAR-SDK-JS. Currently, it di
 
 # Run tests
 ```
-npm i
-npm run build
-npm run test
+yarn
+yarn build
+yarn test
 ```
