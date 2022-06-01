@@ -11,7 +11,7 @@ class Counter extends NearContract {
     @call
     increase(n=1) {
         this.count += n
-        env.log(`Counter increased to ${this.count}`)
+        near.log(`Counter increased to ${this.count}`)
     }
 
     @call
@@ -23,7 +23,7 @@ class Counter extends NearContract {
         } else {
             this.count -= n
         }
-        env.log(`Counter decreased to ${this.count}`)
+        near.log(`Counter decreased to ${this.count}`)
     }
 
     @view
