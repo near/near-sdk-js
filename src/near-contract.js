@@ -1,20 +1,21 @@
+import * as near from './api'
+
 export class NearContract {
     deserialize() {
-        let hasRead = env.jsvm_storage_read('STATE', 0)
-        if (hasRead != 0) {
-            let state = env.read_register(0)
+        let state = near.jsvmStorageRead('STATE');
+        if (state) {
             Object.assign(this, JSON.parse(state))
-        } else
+        } else {
             throw new Error('Contract state is empty')
+        }
     }
 
     serialize() {
-        env.jsvm_storage_write('STATE', JSON.stringify(this), 0)
+        near.jsvmStorageWrite('STATE', JSON.stringify(this));
     }
 
     static deserializeArgs() {
-        env.jsvm_args(0)
-        let args = env.read_register(0)
+        let args = near.jsvmArgs();
         return JSON.parse(args || '[]')
     }
 
