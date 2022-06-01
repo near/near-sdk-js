@@ -1,4 +1,4 @@
-import {NearContract, NearBindgen, call, view} from 'near-sdk-js'
+import {NearContract, NearBindgen, near, call, view} from 'near-sdk-js'
 import {isUndefined} from 'lodash-es'
 
 @NearBindgen
