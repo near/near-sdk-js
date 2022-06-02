@@ -21,8 +21,6 @@ jobs:
         run: cd examples/non-fungible-token && yarn && yarn build && yarn test && rm -rf node_modules && rm -rf build && cd ../..
       - name: status-message
         run: cd examples/status-message && yarn && yarn build && yarn test && rm -rf node_modules && rm -rf build && cd ../..
-      - name: status-message-collections
-        run: cd examples/status-message-collections && yarn && yarn build && yarn test && rm -rf node_modules && rm -rf build && cd ../..
       - name: clean-state
         run: cd examples/clean-state && yarn && yarn build && yarn test && rm -rf node_modules && rm -rf build && cd ../..
       - name: template
