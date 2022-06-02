@@ -64,7 +64,7 @@ test('Person can be set on-call if AVAILABLE', async t => {
     const { ali, bob, jsvm, statusMessageContract, onCallContract } = t.context.accounts;
 
     // Ali set her status as AVAILABLE
-    await ali.call(jsvm, 'call_js_contract', encodeCall(statusMessageContract.accountId, 'set_status', { status: 'AVAILABLE' }), { attachedDeposit: '100000000000000000000000' });
+    await ali.call(jsvm, 'call_js_contract', encodeCall(statusMessageContract.accountId, 'set_status', { message: 'AVAILABLE' }), { attachedDeposit: '100000000000000000000000' });
     // Bob sets Ali on-call
     await bob.call(jsvm, 'call_js_contract', encodeCall(onCallContract.accountId, 'set_person_on_call', { accountId: ali.accountId }), { attachedDeposit: '100000000000000000000000' });
 
@@ -79,7 +79,7 @@ test('Person can NOT be set on-call if UNAVAILABLE', async t => {
     const { ali, bob, jsvm, statusMessageContract, onCallContract } = t.context.accounts;
 
     // Ali set her status as AVAILABLE
-    await ali.call(jsvm, 'call_js_contract', encodeCall(statusMessageContract.accountId, 'set_status', { status: 'UNAVAILABLE' }), { attachedDeposit: '100000000000000000000000' });
+    await ali.call(jsvm, 'call_js_contract', encodeCall(statusMessageContract.accountId, 'set_status', { message: 'UNAVAILABLE' }), { attachedDeposit: '100000000000000000000000' });
     // Bob tries to sets Ali on-call
     await bob.call(jsvm, 'call_js_contract', encodeCall(onCallContract.accountId, 'set_person_on_call', { accountId: ali.accountId }), { attachedDeposit: '100000000000000000000000' });
 
