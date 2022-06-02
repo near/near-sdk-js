@@ -274,7 +274,7 @@ Due to the architecture of the JSVM, some NEAR host functions, part of Standalon
 
 - The `account_balance` and `account_locked_balance` returns balance and locked_balance of JavaScript VM. Those are also not cared by users.
 
-- The `value_return` is a NEAR primitive that puts the value to return in a receipt. However we would want to access it as a JavaScript return value in a cross contract call. So we have a new API `jsvm_value_return`, which does return the value in receipt and also as a JavaScript value returned by `jsvm_call`. The `jsvm_value_return` should be used whenever you need `value_return`.
+- The `value_return` is a NEAR primitive that puts the value to return in a receipt. However we would want to access it as a JavaScript return value in a cross contract call. So we have a new API `jsvmValueReturn`, which does return the value in receipt and also as a JavaScript value returned by `jsvm_call`. The `jsvmValueReturn` should be used whenever you need `value_return`.
 
 - `abort` is intended to mark error location (line number). A full stacktrace with line numbers is provided by QuickJS, available when you throw a JS Error. So this API isn't needed.
 
