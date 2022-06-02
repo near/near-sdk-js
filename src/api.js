@@ -122,9 +122,17 @@ export function jsvmStorageHasKey(key) {
     return false
 }
 
-export function jsvmCall(contractName, method, args) {
+export function jsvmCallRaw(contractName, method, args) {
     env.jsvm_call(contractName, method, JSON.stringify(args), 0)
-    return JSON.parse(env.read_register(0) || 'null')
+    return env.read_register(0)
+}
+
+export function jsvmCall(contractName, method, args) {
+    let ret =  jsvmCallRaw(contractName, method, args)
+    if (ret === null) {
+        return ret
+    }
+    return JSON.parse(ret)
 }
 
 export function storageGetEvicted() {
