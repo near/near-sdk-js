@@ -19,7 +19,7 @@ class FunctionParamsTestContract extends NearContract {
     }
 
     @call
-    set_values(param1, param2, param3) {
+    set_values({ param1, param2, param3 }) {
         near.log(JSON.stringify({ param1, param2, param3 }));
         this.val1 = param1;
         this.val2 = param2;

@@ -52,14 +52,3 @@ test('Developer can pass parameters as dictionary', async t => {
         { val3: 'newVal3', val2: 'newVal2', val1: 'newVal1' }
     );
 });
-
-test('Developer can pass parameters as array', async t => {
-    const { ali, jsvm, testContract } = t.context.accounts;
-
-    await ali.call(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'set_values', ['newVal1', 'newVal2', 'newVal3']), { attachedDeposit: '100000000000000000000000' });
-
-    t.deepEqual(
-        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'get_values', [])),
-        { val3: 'newVal3', val2: 'newVal2', val1: 'newVal1' }
-    );
-});

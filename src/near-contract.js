@@ -16,7 +16,7 @@ export class NearContract {
 
     static deserializeArgs() {
         let args = near.jsvmArgs();
-        return JSON.parse(args || '[]')
+        return JSON.parse(args || '{}')
     }
 
     static serializeReturn(ret) {

@@ -34,9 +34,9 @@ export default function () {
                   // let args = _contract.constructor.deserializeArgs()
                   t.variableDeclaration('let', [t.variableDeclarator(t.identifier('args'), 
                     t.callExpression(t.memberExpression(t.memberExpression(t.identifier('_contract'), t.identifier('constructor')), t.identifier('deserializeArgs')), []))]),
-                  // let ret = _contract.method(...args)
+                  // let ret = _contract.method(args)
                   t.variableDeclaration('let', [t.variableDeclarator(t.identifier('ret'), 
-                    t.callExpression(t.memberExpression(t.identifier('_contract'), t.identifier(method)), [t.spreadElement(t.identifier('args'))]))]),
+                    t.callExpression(t.memberExpression(t.identifier('_contract'), t.identifier(method)), [t.identifier('args')]))]),
                   contractMethods[method] == 'call' ?
                     // _contract.serialize()
                     t.expressionStatement(
