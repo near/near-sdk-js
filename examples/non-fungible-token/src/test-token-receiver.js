@@ -1,4 +1,4 @@
-import { NearContract, NearBindgen, call, view, near, LookupMap } from 'near-sdk-js'
+import { NearContract, NearBindgen, call, near } from 'near-sdk-js'
 
 function assert(b, str) {
     if (b) {
@@ -16,7 +16,7 @@ class NftContract extends NearContract {
     }
 
     @call
-    nftOnTransfer(senderId, previousOwnerId, tokenId, msg) {
+    nftOnTransfer({ senderId, previousOwnerId, tokenId, msg }) {
         assert(
             near.predecessorAccountId() === this.nonFungibleTokenAccountId,
             "Only supports the one non-fungible token contract"

@@ -8,7 +8,7 @@ class OnCall extends NearContract {
     }
     
     @call
-    set_person_on_call(accountId) {
+    set_person_on_call({accountId}) {
         near.log(`Trying to set ${accountId} on-call`)
         const status = near.jsvmCall('status-message.test.near', 'get_status', [accountId])
         near.log(`${accountId} status is ${status}`)

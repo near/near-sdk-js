@@ -1,5 +1,5 @@
 import { Worker } from 'near-workspaces';
-import {readFile} from 'fs/promises'
+import { readFile } from 'fs/promises'
 import test from 'ava';
 
 // TODO: make this function part of the npm package when it is available
@@ -23,8 +23,8 @@ test.beforeEach(async t => {
     // Deploy fungible token contract
     const fungibleTokenContract = await root.createSubAccount('fungible-token');
     let ftContractBase64 = (await readFile('build/contract.base64')).toString();
-    await fungibleTokenContract.call(jsvm, 'deploy_js_contract', Buffer.from(ftContractBase64, 'base64'), {attachedDeposit: '400000000000000000000000'});
-    await fungibleTokenContract.call(jsvm, 'call_js_contract', encodeCall(fungibleTokenContract.accountId, 'init', ['a', '1000']), {attachedDeposit: '400000000000000000000000'});
+    await fungibleTokenContract.call(jsvm, 'deploy_js_contract', Buffer.from(ftContractBase64, 'base64'), { attachedDeposit: '400000000000000000000000' });
+    await fungibleTokenContract.call(jsvm, 'call_js_contract', encodeCall(fungibleTokenContract.accountId, 'init', ['a', '1000']), { attachedDeposit: '400000000000000000000000' });
 
     // Create test accounts
     const ali = await root.createSubAccount('ali');
@@ -49,24 +49,24 @@ test.afterEach(async t => {
 
 test('Owner has all balance in the beginning', async t => {
     const { jsvm, fungibleTokenContract } = t.context.accounts;
-    const result = await jsvm.view('view_js_contract', encodeCall(fungibleTokenContract.accountId, 'ftBalanceOf', [fungibleTokenContract.accountId]));
+    const result = await jsvm.view('view_js_contract', encodeCall(fungibleTokenContract.accountId, 'ftBalanceOf', { accountId: fungibleTokenContract.accountId }));
     t.is(result, '1000');
 });
 
 test('Can transfer if balance is sufficient', async t => {
     const { ali, jsvm, fungibleTokenContract } = t.context.accounts;
-    
-    await fungibleTokenContract.call(jsvm, 'call_js_contract', encodeCall(fungibleTokenContract.accountId, 'ftTransfer', [ali.accountId, '100']),  {attachedDeposit: '400000000000000000000000'});
-    const aliBalance = await jsvm.view('view_js_contract', encodeCall(fungibleTokenContract.accountId, 'ftBalanceOf', [ali.accountId]));
+
+    await fungibleTokenContract.call(jsvm, 'call_js_contract', encodeCall(fungibleTokenContract.accountId, 'ftTransfer', { receiverId: ali.accountId, amount: '100' }), { attachedDeposit: '400000000000000000000000' });
+    const aliBalance = await jsvm.view('view_js_contract', encodeCall(fungibleTokenContract.accountId, 'ftBalanceOf', { accountId: ali.accountId }));
     t.is(aliBalance, '100');
-    const ownerBalance = await jsvm.view('view_js_contract', encodeCall(fungibleTokenContract.accountId, 'ftBalanceOf', [fungibleTokenContract.accountId]));
+    const ownerBalance = await jsvm.view('view_js_contract', encodeCall(fungibleTokenContract.accountId, 'ftBalanceOf', { accountId: fungibleTokenContract.accountId }));
     t.is(ownerBalance, '900');
 });
 
 test('Cannot transfer if balance is not sufficient', async t => {
     const { ali, bob, jsvm, fungibleTokenContract } = t.context.accounts;
     try {
-        await ali.call(jsvm, 'call_js_contract', encodeCall(fungibleTokenContract.accountId, 'ftTransfer', [bob.accountId, '100']),  {attachedDeposit: '400000000000000000000000'});
+        await ali.call(jsvm, 'call_js_contract', encodeCall(fungibleTokenContract.accountId, 'ftTransfer', { receiverId: bob.accountId, amount: '100' }), { attachedDeposit: '400000000000000000000000' });
     } catch (e) {
         t.assert(e.toString().indexOf('Smart contract panicked: assertion failed: The account doesn\'t have enough balance') >= 0);
     }

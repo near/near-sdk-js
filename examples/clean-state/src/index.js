@@ -3,17 +3,17 @@ import { NearContract, NearBindgen, call, view, near, LookupMap } from 'near-sdk
 @NearBindgen
 class CleanState extends NearContract {
     @call
-    clean(keys) {
+    clean({keys}) {
         keys.forEach(key => near.jsvmStorageRemove(key))
     }
 
     @call
-    put(key, value) {
+    put({key, value}) {
         near.jsvmStorageWrite(key, value)
     }
 
     @view
-    get(key) {
+    get({key}) {
         return near.jsvmStorageRead(key)
     }
 }
