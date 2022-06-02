@@ -65,17 +65,10 @@ extern void panic(void);
 extern void panic_utf8(uint64_t len, uint64_t ptr);
 extern void log_utf8(uint64_t len, uint64_t ptr);
 extern void log_utf16(uint64_t len, uint64_t ptr);
-// Name confliction with WASI. Can be re-exported with a different name on NEAR side with a protocol upgrade
-// Or, this is actually not a primitive, can be implement with log and panic host functions in C side or JS side. 
-// extern void abort(uint32_t msg_ptr, uint32_t filename_ptr, uint32_t u32, uint32_t col);
 // ################
 // # Promises API #
 // ################
-extern uint64_t promise_create(uint64_t account_id_len, uint64_t account_id_ptr, uint64_t method_name_len, uint64_t method_name_ptr, uint64_t arguments_len, uint64_t arguments_ptr, uint64_t amount_ptr, uint64_t gas);
-extern uint64_t promise_then(uint64_t promise_index, uint64_t account_id_len, uint64_t account_id_ptr, uint64_t method_name_len, uint64_t method_name_ptr, uint64_t arguments_len, uint64_t arguments_ptr, uint64_t amount_ptr, uint64_t gas);
-extern uint64_t promise_and(uint64_t promise_idx_ptr, uint64_t promise_idx_count);
 extern uint64_t promise_batch_create(uint64_t account_id_len, uint64_t account_id_ptr);
-extern uint64_t promise_batch_then(uint64_t promise_index, uint64_t account_id_len, uint64_t account_id_ptr);
 // #######################
 // # Promise API actions #
 // #######################
@@ -83,8 +76,6 @@ extern void promise_batch_action_transfer(uint64_t promise_index, uint64_t amoun
 // #######################
 // # Promise API results #
 // #######################
-extern uint64_t promise_results_count(void);
-extern uint64_t promise_result(uint64_t result_idx, uint64_t register_id);
 extern void promise_return(uint64_t promise_idx);
 // ###############
 // # Storage API #
@@ -457,128 +448,6 @@ static JSValue near_log_utf16(JSContext *ctx, JSValueConst this_val, int argc, J
 
   data_ptr = JS_ToCStringLenRaw(ctx, &data_len, argv[0]);
   log_utf16(data_len, (uint64_t)data_ptr);
-  return JS_UNDEFINED;
-}
-
-static JSValue near_promise_create(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
-{
-  const char *account_id_ptr, *method_name_ptr, *arguments_ptr;
-  size_t account_id_len, method_name_len, arguments_len;
-  uint64_t amount_ptr[2]; // amount is u128
-  uint64_t gas, ret;
-
-  account_id_ptr = JS_ToCStringLen(ctx, &account_id_len, argv[0]);
-  method_name_ptr = JS_ToCStringLen(ctx, &method_name_len, argv[1]);
-  arguments_ptr = JS_ToCStringLenRaw(ctx, &arguments_len, argv[2]);
-  if (quickjs_to_u128(ctx, argv[3], amount_ptr) != 0) {
-    return JS_ThrowTypeError(ctx, "Expect Uint128 for amount");
-  }
-  if (JS_ToUint64Ext(ctx, &gas, argv[4]) < 0) {
-    return JS_ThrowTypeError(ctx, "Expect Uint64 for gas");
-  }
-
-  ret = promise_create(account_id_len, (uint64_t)account_id_ptr, method_name_len, (uint64_t)method_name_ptr, arguments_len, (uint64_t)arguments_ptr, (uint64_t)amount_ptr, gas);
-  
-  return JS_NewBigUint64(ctx, ret);
-}
-
-static JSValue near_promise_then(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
-{
-  uint64_t promise_index;
-  const char *account_id_ptr, *method_name_ptr, *arguments_ptr;
-  size_t account_id_len, method_name_len, arguments_len;
-  uint64_t amount_ptr[2]; // amount is u128
-  uint64_t gas, ret;
-
-  if (JS_ToUint64Ext(ctx, &promise_index, argv[0]) < 0) {
-    return JS_ThrowTypeError(ctx, "Expect Uint64 for promise_index");
-  }
-  account_id_ptr = JS_ToCStringLen(ctx, &account_id_len, argv[1]);
-  method_name_ptr = JS_ToCStringLen(ctx, &method_name_len, argv[2]);
-  arguments_ptr = JS_ToCStringLenRaw(ctx, &arguments_len, argv[3]);
-  if (quickjs_to_u128(ctx, argv[4], amount_ptr) != 0) {
-    return JS_ThrowTypeError(ctx, "Expect Uint128 for amount");
-  }
-  if (JS_ToUint64Ext(ctx, &gas, argv[5]) < 0) {
-    return JS_ThrowTypeError(ctx, "Expect Uint64 for gas");
-  }
-
-  ret = promise_then(promise_index, account_id_len, (uint64_t)account_id_ptr, method_name_len, (uint64_t)method_name_ptr, arguments_len, (uint64_t)arguments_ptr, (uint64_t)amount_ptr, gas);
-  
-  return JS_NewBigUint64(ctx, ret);
-}
-
-static JSValue near_promise_and(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
-{
-  uint64_t promise_idx_ptr[argc], ret;
-
-  for(int i = 0; i < argc; i++) {
-    if (JS_ToUint64Ext(ctx, &promise_idx_ptr[i], argv[i]) < 0) {
-      return JS_ThrowTypeError(ctx, "Expect Uint64 for promise_id");
-    }
-  }
-  ret = promise_and((uint64_t)promise_idx_ptr, argc);
-  return JS_NewBigUint64(ctx, ret);
-}
-
-static JSValue near_promise_batch_create(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
-{
-  const char *account_id_ptr;
-  size_t account_id_len;
-  uint64_t ret;
-
-  account_id_ptr = JS_ToCStringLen(ctx, &account_id_len, argv[0]);
-  ret = promise_batch_create(account_id_len, (uint64_t)account_id_ptr);
-  return JS_NewBigUint64(ctx, ret);
-}
-
-static JSValue near_promise_batch_then(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
-{
-  uint64_t promise_index;
-  const char *account_id_ptr;
-  size_t account_id_len;
-  uint64_t ret;
-
-  if (JS_ToUint64Ext(ctx, &promise_index, argv[0]) < 0) {
-    return JS_ThrowTypeError(ctx, "Expect Uint64 for promise_index");
-  }
-  account_id_ptr = JS_ToCStringLen(ctx, &account_id_len, argv[1]);
-  ret = promise_batch_then(promise_index, account_id_len, (uint64_t)account_id_ptr);
-  return JS_NewBigUint64(ctx, ret);
-}
-
-static JSValue near_promise_results_count(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
-{
-  uint64_t value;
-
-  value = promise_results_count();
-  return JS_NewBigUint64(ctx, value);
-}
-
-static JSValue near_promise_result(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
-{
-  uint64_t result_idx, register_id;
-  uint64_t ret;
-
-  if (JS_ToUint64Ext(ctx, &result_idx, argv[0]) < 0) {
-    return JS_ThrowTypeError(ctx, "Expect Uint64 for result_idx");
-  }
-  if (JS_ToUint64Ext(ctx, &register_id, argv[1]) < 0) {
-    return JS_ThrowTypeError(ctx, "Expect Uint64 for register_id");
-  }
-  ret = promise_result(result_idx, register_id);
-
-  return JS_NewBigUint64(ctx, ret);
-}
-
-static JSValue near_promise_return(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
-{
-  uint64_t promise_idx;
-  if (JS_ToUint64Ext(ctx, &promise_idx, argv[0]) < 0) {
-    return JS_ThrowTypeError(ctx, "Expect Uint64 for promise_idx");
-  }
-  promise_return(promise_idx);
-  
   return JS_UNDEFINED;
 }
 
@@ -1151,14 +1020,6 @@ static void js_add_near_host_functions(JSContext* ctx) {
   JS_SetPropertyStr(ctx, env, "log", JS_NewCFunction(ctx, near_log, "log", 1));
   JS_SetPropertyStr(ctx, env, "log_utf8", JS_NewCFunction(ctx, near_log_utf8, "log_utf8", 1));
   JS_SetPropertyStr(ctx, env, "log_utf16", JS_NewCFunction(ctx, near_log_utf16, "log_utf16", 1));
-  JS_SetPropertyStr(ctx, env, "promise_create", JS_NewCFunction(ctx, near_promise_create, "promise_create", 5));
-  JS_SetPropertyStr(ctx, env, "promise_then", JS_NewCFunction(ctx, near_promise_then, "promise_then", 6));
-  JS_SetPropertyStr(ctx, env, "promise_and", JS_NewCFunction(ctx, near_promise_and, "promise_and", 1));
-  JS_SetPropertyStr(ctx, env, "promise_batch_create", JS_NewCFunction(ctx, near_promise_batch_create, "promise_batch_create", 1));
-  JS_SetPropertyStr(ctx, env, "promise_batch_then", JS_NewCFunction(ctx, near_promise_batch_then, "promise_batch_then", 2));
-  JS_SetPropertyStr(ctx, env, "promise_results_count", JS_NewCFunction(ctx, near_promise_results_count, "promise_results_count", 0));
-  JS_SetPropertyStr(ctx, env, "promise_result", JS_NewCFunction(ctx, near_promise_result, "promise_result", 2));
-  JS_SetPropertyStr(ctx, env, "promise_return", JS_NewCFunction(ctx, near_promise_return, "promise_return", 1));
   JS_SetPropertyStr(ctx, env, "storage_read", JS_NewCFunction(ctx, near_storage_read, "storage_read", 2));
   JS_SetPropertyStr(ctx, env, "storage_has_key", JS_NewCFunction(ctx, near_storage_has_key, "storage_has_key", 1));
   JS_SetPropertyStr(ctx, env, "validator_stake", JS_NewCFunction(ctx, near_validator_stake, "validator_stake", 2));
