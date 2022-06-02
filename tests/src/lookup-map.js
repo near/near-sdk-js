@@ -19,28 +19,27 @@ class LookupMapTestContract extends NearContract {
     }
 
     @view
-    get(key) {
+    get({key}) {
         return this.lookupMap.get(key);
     }
 
     @view
-    containsKey(key) {
+    containsKey({key}) {
         return this.lookupMap.containsKey(key);
     }
 
     @call
-    set(key, value) {
+    set({key, value}) {
         this.lookupMap.set(key, value);
     }
 
     @call
-    remove(key) {
+    remove({key}) {
         this.lookupMap.remove(key);
     }
 
     @call
-    extend(kvs) {
+    extend({kvs}) {
         this.lookupMap.extend(kvs);
     }
 }
-

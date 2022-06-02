@@ -43,10 +43,10 @@ test.afterEach(async t => {
 
 test('UnorderedSet is empty by default', async t => {
     const { root, jsvm, testContract } = t.context.accounts;
-    const result = await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'len', [root.accountId]));
+    const result = await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'len', {}));
     t.is(result, 0);
     t.is(
-        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'isEmpty', [])),
+        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'isEmpty', {})),
         true
     );
 });
@@ -54,14 +54,14 @@ test('UnorderedSet is empty by default', async t => {
 test('UnorderedSet set() contains()', async t => {
     const { ali, jsvm, testContract } = t.context.accounts;
     t.is(
-        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'contains', ['hello'])),
+        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'contains', { element: 'hello' })),
         false
     );
 
-    await ali.call(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'set', ['hello']), { attachedDeposit: '100000000000000000000000' });
+    await ali.call(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'set', { element: 'hello' }), { attachedDeposit: '100000000000000000000000' });
 
     t.is(
-        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'contains', ['hello'])),
+        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'contains', { element: 'hello' })),
         true
     );
 });
@@ -71,34 +71,34 @@ test('UnorderedSet insert, len and iterate', async t => {
     const { ali, jsvm, testContract } = t.context.accounts;
 
     t.is(
-        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'len', [])),
+        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'len', {})),
         0
     );
     t.deepEqual(
-        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'toArray', [])),
+        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'toArray', {})),
         []
     );
 
-    await ali.call(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'set', ['hello']), { attachedDeposit: '100000000000000000000000' });
+    await ali.call(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'set', { element: 'hello' }), { attachedDeposit: '100000000000000000000000' });
     t.is(
-        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'len', [])),
+        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'len', {})),
         1
     );
-    await ali.call(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'set', ['hello1']), { attachedDeposit: '100000000000000000000000' });
+    await ali.call(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'set', { element: 'hello1' }), { attachedDeposit: '100000000000000000000000' });
     t.is(
-        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'len', [])),
+        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'len', {})),
         2
     );
 
     // insert the same value, len shouldn't change
-    await ali.call(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'set', ['hello1']), { attachedDeposit: '100000000000000000000000' });
+    await ali.call(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'set', { element: 'hello1' }), { attachedDeposit: '100000000000000000000000' });
     t.is(
-        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'len', [])),
+        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'len', {})),
         2
     );
 
     t.deepEqual(
-        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'toArray', [])),
+        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'toArray', {})),
         ['hello', 'hello1']
     );
 });
@@ -106,70 +106,70 @@ test('UnorderedSet insert, len and iterate', async t => {
 test('UnorderedSet extend, remove, clear', async t => {
     const { ali, jsvm, testContract } = t.context.accounts;
 
-    await ali.call(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'extend', [['hello', 'world', 'hello1']]), { attachedDeposit: '100000000000000000000000' });
+    await ali.call(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'extend', { elements: ['hello', 'world', 'hello1'] }), { attachedDeposit: '100000000000000000000000' });
 
     t.deepEqual(
-        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'toArray', [])),
+        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'toArray', {})),
         ['hello', 'world', 'hello1']
     );
 
     // remove non existing element should not error
-    await ali.call(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'remove', ['hello3']), { attachedDeposit: '100000000000000000000000' });
+    await ali.call(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'remove', { element: 'hello3' }), { attachedDeposit: '100000000000000000000000' });
     t.deepEqual(
-        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'toArray', [])),
+        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'toArray', {})),
         ['hello', 'world', 'hello1']
     );
 
     // remove not the last one should work
-    await ali.call(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'remove', ['hello']), { attachedDeposit: '100000000000000000000000' });
+    await ali.call(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'remove', { element: 'hello' }), { attachedDeposit: '100000000000000000000000' });
     t.deepEqual(
-        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'toArray', [])),
+        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'toArray', {})),
         ['hello1', 'world']
     );
 
     // remove the last one should work
-    await ali.call(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'remove', ['world']), { attachedDeposit: '100000000000000000000000' });
+    await ali.call(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'remove', { element: 'world' }), { attachedDeposit: '100000000000000000000000' });
     t.deepEqual(
-        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'toArray', [])),
+        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'toArray', {})),
         ['hello1']
     );
 
     // remove when length is 1 should work
     t.is(
-        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'len', [])),
+        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'len', {})),
         1
     );
     t.is(
-        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'isEmpty', [])),
+        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'isEmpty', {})),
         false
     );
-    await ali.call(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'remove', ['hello1']), { attachedDeposit: '100000000000000000000000' });
+    await ali.call(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'remove', { element: 'hello1' }), { attachedDeposit: '100000000000000000000000' });
     t.deepEqual(
-        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'toArray', [])),
+        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'toArray', {})),
         []
     );
     t.is(
-        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'isEmpty', [])),
+        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'isEmpty', {})),
         true
     );
 
-    await ali.call(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'extend', [['hello', 'world', 'hello1']]), { attachedDeposit: '100000000000000000000000' });
+    await ali.call(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'extend', { elements: ['hello', 'world', 'hello1'] }), { attachedDeposit: '100000000000000000000000' });
     t.deepEqual(
-        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'toArray', [])),
+        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'toArray', {})),
         ['hello', 'world', 'hello1']
     );
     t.is(
-        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'isEmpty', [])),
+        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'isEmpty', {})),
         false
     );
     // clear should work
-    await ali.call(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'clear', []), { attachedDeposit: '100000000000000000000000' });
+    await ali.call(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'clear', {}), { attachedDeposit: '100000000000000000000000' });
     t.deepEqual(
-        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'toArray', [])),
+        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'toArray', {})),
         []
     );
     t.is(
-        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'isEmpty', [])),
+        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'isEmpty', {})),
         true
     );
 })

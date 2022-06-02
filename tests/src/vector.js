@@ -29,12 +29,12 @@ class VectorTestContract extends NearContract {
     }
 
     @view
-    get(index) {
+    get({index}) {
         return this.vector.get(index);
     }
 
     @call
-    push(value) {
+    push({value}) {
         this.vector.push(value);
     }
 
@@ -54,17 +54,17 @@ class VectorTestContract extends NearContract {
     }
 
     @call
-    extend(kvs) {
+    extend({kvs}) {
         this.vector.extend(kvs);
     }
 
     @call
-    replace(index, value) {
+    replace({index, value}) {
         this.vector.replace(index, value);
     }
 
     @call
-    swapRemove(index) {
+    swapRemove({index}) {
         this.vector.swapRemove(index);
     }
 }

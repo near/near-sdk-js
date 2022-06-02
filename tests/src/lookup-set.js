@@ -19,22 +19,22 @@ class LookupSetTestContract extends NearContract {
     }
 
     @view
-    contains(key) {
+    contains({key}) {
         return this.lookupSet.contains(key);
     }
 
     @call
-    set(key) {
+    set({key}) {
         this.lookupSet.set(key);
     }
 
     @call
-    remove(key) {
+    remove({key}) {
         this.lookupSet.remove(key);
     }
 
     @call
-    extend(keys) {
+    extend({keys}) {
         this.lookupSet.extend(keys);
     }
 }
