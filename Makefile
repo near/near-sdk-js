@@ -17,6 +17,11 @@ jsvm:
 	cd jsvm && ./build.sh && cd ..
 	cp jsvm/jsvm.wasm res/jsvm.wasm
 
+jsvm-nightly:
+	echo "Building jsvm.wasm..."
+	cd jsvm && NEAR_NIGHTLY=1 ./build.sh && cd ..
+	cp jsvm/jsvm_nightly.wasm res/jsvm_nightly.wasm
+
 qjsc:
 	echo "Building qjsc bytecode compiler"
 	cd quickjs && ./build.sh && cd ..
