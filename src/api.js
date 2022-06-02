@@ -1,6 +1,10 @@
 const U64_MAX = 2n**64n - 1n
 const EVICTED_REGISTER = U64_MAX - 1n
 
+export function log(message) {
+    env.log(message)
+}
+
 export function signerAccountId() {
     env.signer_account_id(0)
     return env.read_register(0)

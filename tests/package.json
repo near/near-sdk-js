@@ -6,6 +6,7 @@
     "type": "module",
     "scripts": {
         "build": "./build.sh",
+        "rebuild": "rm -rf node_modules && rm -rf build && yarn && yarn build",
         "test": "ava"
     },
     "author": "Near Inc <hello@nearprotocol.com>",
