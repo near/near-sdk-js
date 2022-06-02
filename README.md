@@ -63,69 +63,6 @@ When call host function with inappropriate type, means incorrect number of argum
 ## Test
 We recommend to use near-workspaces to write tests for your smart contracts. See any of the examples for how tests are setup and written.
 
-## Advanced guides
-
-### Manual setup with npm package
-
-You can also layout your project by install the npm package manually:
-```
-yarn add near-sdk-js
-# or
-npm install near-sdk-js
-```
-
-### NEAR-SDK-JS contributor setup
-
-It is tested on Ubuntu 20.04, Intel Mac and M1 Mac. Other linux should also work but they're not tested.
-
-1. Make sure you have `wget`, `make`, `cmake` and `nodejs`. On Linux, also make sure you have `gcc`.
-2. Run `make` to get platform specific `qjsc` and `jsvm` contract in `res` folder.
-
-
-### Run NEAR-SDK-JS tests
-See https://github.com/near/near-sdk-js/tree/master/tests
-
-
-### Low level way to invoke NEAR-CLI
-
-`near js` subcommand in near-cli is a recent feature. Under the hood, it is encoding a special function call to jsvm contract. 
-
-#### Deploy a JS contract
-
-<details>
-<summary><strong>The equivalent raw command is:</strong></summary>
-<p>
-
-    near call <jsvm-account> deploy_js_contract --accountId <your-account> --args $(cat <contract-name>.base64) --base64 --deposit 0.1
-
-</p>
-</details>
-
-#### Call a JS contract
-
-<details>
-<summary><strong>The equivalent raw command is:</strong></summary>
-<p>
-
-    near call <jsvm-account> call_js_contract --accountId <your-account> --args <encoded-args> --base64
-
-    # where `<encoded-args>` can be obtained by:
-    node scripts/encode_call.js <your-account> <method-name> <args>
-
-</p>
-</details>
-
-#### Remove a JS contract
-
-<details>
-<summary><strong>The equivalent raw command is:</strong></summary>
-<p>
-
-    near call <jsvm-account> remove_js_contract --accountId <your-account>
-
-</p>
-</details>
-
 ## NEAR-SDK-JS API Reference
 
 All NEAR blockchain provided functionality (host functions) are defined in `src/api.js` and exported as `near`. You can use them by:
@@ -195,7 +132,6 @@ function storageRead(key: String): String | null;
 function storageHasKey(key: String): bool;
 ```
 
-
 ### Validator API
 
 ```
@@ -263,6 +199,243 @@ The `jsvmCall` invoke a synchronous cross contract call, to the given JavaScript
 
 The `jsvmCallRaw` is similar to `jsvmCall`, but return the raw, unparsed String.
 
+### Collections
+A few useful on-chain persistent collections are provided.
+
+#### Vector
+Vector is an iterable implementation of vector that stores its content on the trie. Usage:
+
+```js
+import {Vector} from 'near-sdk-js'
+
+// in contract class constructor:
+constructor() {
+    super()
+    this.v = new Vector('my_prefix_')
+}
+
+// Override the deserializer to load vector from chain
+deserialize() {
+    super.deserialize()
+    this.v = Object.assign(new Vector, this.v)
+}
+
+someMethod() {
+    // insert
+    this.v.push('abc')
+    this.v.push('def')
+    this.v.push('ghi')
+
+    // batch insert, extend:
+    this.v.extend(['xyz', '123'])
+
+    // get
+    let first = this.v.get(0)
+
+    // remove, move the last element to the given index
+    this.v.swapRemove(0) 
+
+    // replace
+    this.v.replace(1, 'jkl')
+
+    // remove the last
+    this.v.pop()
+
+    // len, isEmpty
+    let len = this.v.len()
+    let isEmpty = this.v.isEnpty()
+
+    // iterate
+    for (let element of this.v) {
+        near.log(element)
+    }
+
+    // toArray, convert to JavaScript Array
+    let a = this.v.toArray()
+
+    // clear
+    ths.v.clear()
+}
+```
+
+#### LookupMap
+LookupMap is an non-iterable implementation of a map that stores its content directly on the trie. It's like a big hash map, but on trie. Usage:
+```js
+import {LookupMap} from 'near-sdk-js'
+
+// in contract class constructor:
+constructor() {
+    super()
+    this.m = new LookupMap('prefix_a')
+}
+
+// Override the deserializer to load vector from chain
+deserialize() {
+    super.deserialize()
+    this.m = Object.assign(new LookupMap, this.m)
+}
+
+someMethod() {
+    // insert
+    this.m.set('abc', 'aaa')
+    this.m.set('def', 'bbb')
+    this.m.set('ghi', 'ccc')
+
+    // batch insert, extend:
+    this.m.extend([['xyz', '123'], ['key2', 'value2']])
+
+    // check exist
+    let exist = this.m.containsKey('abc')
+
+    // get
+    let value = this.m.get('abc')
+
+    // remove
+    this.m.remove('def') 
+
+    // replace
+    this.m.set('ghi', 'ddd')
+}
+```
+
+#### LookupSet
+LookupSet is an non-iterable implementation of a set that stores its content directly on the trie. It's like LookupMap, but it only stores whether the value presents. Usage:
+```js
+import {LookupSet} from 'near-sdk-js'
+
+// in contract class constructor:
+constructor() {
+    super()
+    this.s = new LookupSet('prefix_b')
+}
+
+// Override the deserializer to load vector from chain
+deserialize() {
+    super.deserialize()
+    this.s = Object.assign(new LookupSet, this.s)
+}
+
+someMethod() {
+    // insert
+    this.s.set('abc')
+    this.s.set('def')
+    this.s.set('ghi')
+
+    // batch insert, extend:
+    this.s.extend(['xyz', '123'])
+
+    // check exist
+    let exist = this.s.contains('abc')
+
+    // remove
+    this.s.remove('def')
+}
+```
+
+#### UnorderedMap
+UnorderedMap is an iterable implementation of a map that stores its content directly on the trie. Usage:
+```js
+import {UnorderedMap} from 'near-sdk-js'
+
+// in contract class constructor:
+constructor() {
+    super()
+    this.m = new UnorderedMap('prefix_c')
+}
+
+// Override the deserializer to load vector from chain
+deserialize() {
+    super.deserialize()
+    this.m.keys = Object.assign(new Vector, this.m.keys)
+    this.m.values = Object.assign(new Vector, this.m.values)
+    this.m = Object.assign(new UnorderedMap, this.m)
+}
+
+someMethod() {
+    // insert
+    this.m.set('abc', 'aaa')
+    this.m.set('def', 'bbb')
+    this.m.set('ghi', 'ccc')
+
+    // batch insert, extend:
+    this.m.extend([['xyz', '123'], ['key2', 'value2']])
+
+    // get
+    let value = this.m.get('abc')
+
+    // remove
+    this.m.remove('def') 
+
+    // replace
+    this.m.set('ghi', 'ddd')
+
+    // len, isEmpty
+    let len = this.m.len()
+    let isEmpty = this.m.isEnpty()
+
+    // iterate
+    for (let [k, v] of this.m) {
+        near.log(k+v)
+    }
+
+    // toArray, convert to JavaScript Array
+    let a = this.m.toArray()
+
+    // clear
+    this.m.clear()
+}
+```
+
+#### UnorderedSet
+UnorderedSet is an iterable implementation of a set that stores its content directly on the trie. It's like UnorderedMap but it only stores whether the value presents. Usage:
+```js
+import {UnorderedSet} from 'near-sdk-js'
+
+// in contract class constructor:
+constructor() {
+    super()
+    this.s = new UnorderedSet('prefix_d')
+}
+
+// Override the deserializer to load vector from chain
+deserialize() {
+    super.deserialize()
+    this.s.elements = Object.assign(new Vector, this.s.elements)
+    this.s = Object.assign(new UnorderedSet, this.s)
+}
+
+someMethod() {
+    // insert
+    this.s.set('abc')
+    this.s.set('def')
+    this.s.set('ghi')
+
+    // batch insert, extend:
+    this.s.extend(['xyz', '123'])
+
+    // check exist
+    let exist = this.s.contains('abc')
+
+    // remove
+    this.s.remove('def')
+
+    // len, isEmpty
+    let len = this.s.len()
+    let isEmpty = this.s.isEnpty()
+
+    // iterate
+    for (let e of this.s) {
+        near.log(e)
+    }
+
+    // toArray, convert to JavaScript Array
+    let a = this.s.toArray()
+
+    // clear
+    this.s.clear()
+}
+```
+
 ### APIs not available in JSVM
 Due to the architecture of the JSVM, some NEAR host functions, part of Standalone SDK or Rust SDK, are not revelant or being replaced by above JSVM specific APIs. Those unavailable APIs are explained here.
 
@@ -281,3 +454,67 @@ Due to the architecture of the JSVM, some NEAR host functions, part of Standalon
 - Promise APIs act on the JSVM contract and could create subaccount, use the balance from JSVM account.JSVM would be a common VM used by the community instead of a Rust contract owned by the deployer. Therefore, promise APIs are not allowed.
 
 - The `storage_write` and `storage_remove` have access to all JavaScript contract codes and states deployed on JSVM. User can only write to their account owned code and state, as a substate of the JSVM. Therefor these two APIs are disallowed. Use `jsvm_storage_write` and `jsvm_storage_remove` instead. Read to other people owned code and state is allowed, as they're public as part of the blockchain anyway.
+
+
+## Advanced guides
+
+### Manual setup with npm package
+
+You can also layout your project by install the npm package manually:
+```
+yarn add near-sdk-js
+# or
+npm install near-sdk-js
+```
+
+### NEAR-SDK-JS contributor setup
+
+It is tested on Ubuntu 20.04, Intel Mac and M1 Mac. Other linux should also work but they're not tested.
+
+1. Make sure you have `wget`, `make`, `cmake` and `nodejs`. On Linux, also make sure you have `gcc`.
+2. Run `make` to get platform specific `qjsc` and `jsvm` contract in `res` folder.
+
+
+### Run NEAR-SDK-JS tests
+See https://github.com/near/near-sdk-js/tree/master/tests
+
+
+### Low level way to invoke NEAR-CLI
+
+`near js` subcommand in near-cli is a recent feature. Under the hood, it is encoding a special function call to jsvm contract. 
+
+#### Deploy a JS contract
+
+<details>
+<summary><strong>The equivalent raw command is:</strong></summary>
+<p>
+
+    near call <jsvm-account> deploy_js_contract --accountId <your-account> --args $(cat <contract-name>.base64) --base64 --deposit 0.1
+
+</p>
+</details>
+
+#### Call a JS contract
+
+<details>
+<summary><strong>The equivalent raw command is:</strong></summary>
+<p>
+
+    near call <jsvm-account> call_js_contract --accountId <your-account> --args <encoded-args> --base64
+
+    # where `<encoded-args>` can be obtained by:
+    node scripts/encode_call.js <your-account> <method-name> <args>
+
+</p>
+</details>
+
+#### Remove a JS contract
+
+<details>
+<summary><strong>The equivalent raw command is:</strong></summary>
+<p>
+
+    near call <jsvm-account> remove_js_contract --accountId <your-account>
+
+</p>
+</details>
