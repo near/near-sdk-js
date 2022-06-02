@@ -34,7 +34,7 @@ test.beforeEach(async t => {
 
     // Mint an NFT
     let tokenId = 'my-cool-nft';
-    await nftContract.call(jsvm, 'call_js_contract', encodeCall(nftContract.accountId, 'nftMint', [tokenId, nftContract.accountId]), { attachedDeposit: '400000000000000000000000' });
+    await nftContract.call(jsvm, 'call_js_contract', encodeCall(nftContract.accountId, 'nftMint', { token_id: tokenId, token_owner_id: nftContract.accountId }), { attachedDeposit: '400000000000000000000000' });
 
 
     // Create test accounts
