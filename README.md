@@ -136,7 +136,7 @@ import {near} from 'near-sdk-js'
 let signer = near.signerAccountId()
 ```
 
-To use nightly host functions, such as `altBn128G1Sum`, the enclave contract need to be built with `NEAR_NIGHTLY=1 ./build.sh` and deployed to a nearcore node that has nightly enabled.
+To use nightly host functions, such as `altBn128G1Sum`, the enclave contract need to be built with `make jsvm-nightly` and deployed to a nearcore node that has nightly enabled.
 
 ### About Type
 
