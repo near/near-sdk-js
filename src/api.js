@@ -20,6 +20,30 @@ export function predecessorAccountId() {
     return env.read_register(0)
 }
 
+export function blockIndex() {
+    return env.block_index()
+}
+
+export function blockTimestamp() {
+    return env.block_timestamp()
+}
+
+export function epochHeight() {
+    return env.epoch_height()
+}
+
+export function attachedDeposit() {
+    return env.attached_deposit()
+}
+
+export function prepaidGas() {
+    return env.prepaid_gas()
+}
+
+export function usedGas() {
+    return env.used_gas()
+}
+
 export function randomSeed() {
     env.random_seed(0)
     return env.read_register(0)
@@ -53,7 +77,21 @@ export function ecrecover(hash, sign, v, malleabilityFlag) {
     return env.read_register(0)
 }
 
-// TODO: env.promise_result returns need additioonal handling
+export function panic(msg) {
+    env.panic(msg)
+}
+
+export function panicUtf8(msg) {
+    env.panic_utf8(msg)
+}
+
+export function logUtf8(msg) {
+    env.log_utf8(msg)
+}
+
+export function logUtf16(msg) {
+    env.log_utf16(msg)
+}
 
 export function storageRead(key) {
     let ret = env.storage_read(key, 0)
@@ -64,6 +102,23 @@ export function storageRead(key) {
     }
 }
 
+export function storageHasKey(key) {
+    let ret = env.storage_has_key(key)
+    if (ret === 1n) {
+        return true
+    } else {
+        return false
+    }
+}
+
+export function validatorStake(accountId) {
+    return env.validator_stake(accountId)
+}
+
+export function validatorTotalStake() {
+    return env.validator_total_stake()
+}
+
 export function altBn128G1Multiexp(value) {
     env.alt_bn128_g1_multiexp(value, 0)
     return env.read_register(0)
@@ -72,6 +127,15 @@ export function altBn128G1Multiexp(value) {
 export function altBn128G1Sum(value) {
     env.alt_bn128_g1_sum(value, 0)
     return env.read_register(0)
+}
+
+export function altBn128PairingCheck(value) {
+    let ret = env.alt_bn128_pairing_check(value)
+    if (ret === 1n) {
+        return true
+    } else {
+        return false
+    }
 }
 
 export function jsvmAccountId() {
@@ -126,11 +190,23 @@ export function jsvmStorageHasKey(key) {
     return false
 }
 
-export function jsvmCall(contractName, method, args) {
+export function jsvmCallRaw(contractName, method, args) {
     env.jsvm_call(contractName, method, JSON.stringify(args), 0)
-    return JSON.parse(env.read_register(0) || 'null')
+    return env.read_register(0)
+}
+
+export function jsvmCall(contractName, method, args) {
+    let ret =  jsvmCallRaw(contractName, method, args)
+    if (ret === null) {
+        return ret
+    }
+    return JSON.parse(ret)
 }
 
 export function storageGetEvicted() {
     return env.read_register(EVICTED_REGISTER)
+}
+
+export function jsvmValueReturn(value) {
+    env.jsvm_value_return(value)
 }
