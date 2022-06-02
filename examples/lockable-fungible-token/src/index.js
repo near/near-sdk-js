@@ -16,7 +16,7 @@ function assert(b, str) {
 }
 
 class Account {
-    constructor({ balance, allowances, lockedBalances }) {
+    constructor(balance, allowances, lockedBalances) {
         this.balance = balance // Current unlocked balance
         this.allowances = allowances // Allowed account to the allowance amount
         this.lockedBalances = lockedBalances // Allowed account to locked balance
@@ -77,7 +77,7 @@ class LockableFungibleToken extends NearContract {
     getAccount({ ownerId }) {
         let account = this.accounts.get(ownerId)
         if (account === null) {
-            return new Account({ balance: 0, allowances: {}, lockedBalances: {} })
+            return new Account(0, {}, {})
         }
         return Object.assign(new Account, JSON.parse(account))
     }
