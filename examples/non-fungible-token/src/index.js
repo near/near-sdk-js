@@ -43,15 +43,15 @@ class NftContract extends NearContract {
     @call
     nftTransfer({ receiver_id, token_id, approval_id, memo }) {
         let sender_id = near.predecessorAccountId()
-        this.internalTransfer(sender_id, receiver_id, token_id, approval_id, memo)
+        this.internalTransfer({ sender_id, receiver_id, token_id, approval_id, memo })
     }
 
     @call
     nftTransferCall({ receiver_id, token_id, approval_id, memo, msg }) {
         let sender_id = near.predecessorAccountId()
-        let old_owner_id = this.internalTransfer(sender_id, receiver_id, token_id, approval_id, memo)
+        let old_owner_id = this.internalTransfer({ sender_id, receiver_id, token_id, approval_id, memo })
 
-        let onTransferRet = near.jsvmCall(receiver_id, 'nftOnTransfer', [sender_id, old_owner_id, token_id, msg])
+        let onTransferRet = near.jsvmCall(receiver_id, 'nftOnTransfer', { senderId: sender_id, previousOwnerId: old_owner_id, tokenId: token_id, msg: msg })
 
         // NOTE: Arbitrary logic can be run here, as an example we return the token to the initial
         // owner if receiver's `nftOnTransfer` returns `true`
@@ -64,7 +64,7 @@ class NftContract extends NearContract {
                 // The token is not owned by the receiver anymore. Can't return it.
                 return true
             } else {
-                this.internalTransfer(receiver_id, sender_id, token_id, null, null)
+                this.internalTransfer({ sender_id: receiver_id, receiver_id: sender_id, token_id: token_id, approval_id: null, memo: null })
                 return false
             }
         } else {
