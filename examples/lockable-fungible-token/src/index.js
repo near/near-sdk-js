@@ -22,7 +22,7 @@ class Account {
         this.lockedBalances = lockedBalances // Allowed account to locked balance
     }
 
-    setAllowance({ escrowAccountId, allowance }) {
+    setAllowance(escrowAccountId, allowance) {
         if (allowance > 0) {
             this.allowances[escrowAccountId] = allowance
         } else if (allowance === 0) {
@@ -32,11 +32,11 @@ class Account {
         }
     }
 
-    getAllowance({ escrowAccountId }) {
+    getAllowance(escrowAccountId) {
         return this.allowances[escrowAccountId] || 0
     }
 
-    setLockedBalance({ escrowAccountId, lockedBalance }) {
+    setLockedBalance(escrowAccountId, lockedBalance) {
         if (lockedBalance > 0) {
             this.lockedBalances[escrowAccountId] = lockedBalance
         } else if (lockedBalance === 0) {
@@ -46,7 +46,7 @@ class Account {
         }
     }
 
-    getLockedBalance({ escrowAccountId }) {
+    getLockedBalance(escrowAccountId) {
         return this.lockedBalances[escrowAccountId] || 0
     }
 
@@ -79,7 +79,7 @@ class LockableFungibleToken extends NearContract {
         if (account === null) {
             return new Account(0, {}, {})
         }
-        return Object.assign(new Account, JSON.parse(account))
+        return Object.assign(new Account(), JSON.parse(account))
     }
 
     setAccount({ accountId, account }) {
@@ -93,12 +93,12 @@ class LockableFungibleToken extends NearContract {
             throw Error("Can't set allowance for yourself")
         }
         let account = this.getAccount({ ownerId })
-        let lockedBalance = account.getLockedBalance({ escrowAccountId })
+        let lockedBalance = account.getLockedBalance(escrowAccountId)
         if (lockedBalance > allowance) {
             throw Error("The new allowance can't be less than the amount of locked tokens")
         }
 
-        account.setAllowance({ escrowAccountId, allowance: (allowance - lockedBalance) })
+        account.setAllowance(escrowAccountId, allowance - lockedBalance)
         this.setAccount({ accountId: ownerId, account })
     }
 
@@ -118,16 +118,16 @@ class LockableFungibleToken extends NearContract {
 
         // If locking by escrow, need to check and update the allowance.
         if (escrowAccountId !== ownerId) {
-            let allowance = account.getAllowance({ escrowAccountId })
+            let allowance = account.getAllowance(escrowAccountId)
             if (allowance < lockAmount) {
                 throw Error("Not enough allowance")
             }
-            account.setAllowance({ escrowAccountId, allowance: (allowance - lockAmount) })
+            account.setAllowance(escrowAccountId, allowance - lockAmount)
         }
 
         // Updating total lock balance
-        let lockedBalance = account.getLockedBalance({ escrowAccountId })
-        account.setLockedBalance({ escrowAccountId, lockedBalance: (lockedBalance + lockAmount) })
+        let lockedBalance = account.getLockedBalance(escrowAccountId)
+        account.setLockedBalance(escrowAccountId, lockedBalance + lockAmount)
 
         this.setAccount({ accountId: ownerId, account })
     }
@@ -141,16 +141,16 @@ class LockableFungibleToken extends NearContract {
         let account = this.getAccount({ ownerId })
 
         // Checking and updating locked balance
-        let lockedBalance = account.getLockedBalance({ escrowAccountId })
+        let lockedBalance = account.getLockedBalance(escrowAccountId)
         if (lockedBalance < unlockAmount) {
             throw Error("Not enough locked tokens")
         }
-        account.setLockedBalance({ escrowAccountId, lockedBalance: (lockedBalance - unlockAmount) })
+        account.setLockedBalance(escrowAccountId, lockedBalance - unlockAmount)
 
         // If unlocking by escrow, need to update allowance.
         if (escrowAccountId !== ownerId) {
-            let allowance = account.getAllowance({ escrowAccountId })
-            account.setAllowance({ escrowAccountId, allowance: (allowance + unlockAmount) })
+            let allowance = account.getAllowance(escrowAccountId)
+            account.setAllowance(escrowAccountId, allowance + unlockAmount)
         }
 
         // Updating unlocked balance
@@ -168,13 +168,13 @@ class LockableFungibleToken extends NearContract {
         let account = this.getAccount({ ownerId })
 
         // Checking and updating locked balance
-        let lockedBalance = account.getLockedBalance({ escrowAccountId })
+        let lockedBalance = account.getLockedBalance(escrowAccountId)
         var remainingAmount
         if (lockedBalance >= amount) {
-            account.setLockedBalance({ escrowAccountId, lockedBalance: (lockedBalance - amount) })
+            account.setLockedBalance(escrowAccountId, lockedBalance - amount)
             remainingAmount = 0
         } else {
-            account.setLockedBalance({ escrowAccountId, lockedBalance: 0 })
+            account.setLockedBalance(escrowAccountId, 0)
             remainingAmount = amount - lockedBalance
         }
 
@@ -188,12 +188,12 @@ class LockableFungibleToken extends NearContract {
 
             // If transferring by escrow, need to check and update allowance.
             if (escrowAccountId !== ownerId) {
-                let allowance = account.getAllowance({ escrowAccountId })
+                let allowance = account.getAllowance(escrowAccountId)
                 // Checking and updating unlocked balance
                 if (allowance < remainingAmount) {
                     throw Error("Not enough allowance")
                 }
-                account.setAllowance({ escrowAccountId, allowance: (allowance - remainingAmount) })
+                account.setAllowance(escrowAccountId, allowance - remainingAmount)
             }
         }
 
@@ -227,11 +227,11 @@ class LockableFungibleToken extends NearContract {
 
     @view
     getAllowance({ ownerId, escrowAccountId }) {
-        return this.getAccount({ ownerId }).getAllowance({ escrowAccountId })
+        return this.getAccount({ ownerId }).getAllowance(escrowAccountId)
     }
 
     @view
     getLockedBalance({ ownerId, escrowAccountId }) {
-        return this.getAccount({ ownerId }).getLockedBalance({ escrowAccountId })
+        return this.getAccount({ ownerId }).getLockedBalance(escrowAccountId)
     }
 }
