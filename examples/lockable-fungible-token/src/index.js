@@ -64,9 +64,9 @@ class LockableFungibleToken extends NearContract {
         this.accounts = new LookupMap(prefix) // Account ID -> Account mapping
         this.totalSupply = totalSupply // Total supply of the all tokens
         let ownerId = near.signerAccountId()
-        let ownerAccount = this.getAccount({ ownerId })
+        let ownerAccount = this.getAccount(ownerId)
         ownerAccount.balance = totalSupply
-        this.setAccount({ accountId: ownerId, account: ownerAccount })
+        this.setAccount(ownerId, ownerAccount)
     }
 
     deserialize() {
@@ -74,7 +74,7 @@ class LockableFungibleToken extends NearContract {
         this.accounts = Object.assign(new LookupMap, this.accounts)
     }
 
-    getAccount({ ownerId }) {
+    getAccount(ownerId) {
         let account = this.accounts.get(ownerId)
         if (account === null) {
             return new Account(0, {}, {})
@@ -82,7 +82,7 @@ class LockableFungibleToken extends NearContract {
         return Object.assign(new Account(), JSON.parse(account))
     }
 
-    setAccount({ accountId, account }) {
+    setAccount(accountId, account) {
         this.accounts.set(accountId, JSON.stringify(account))
     }
 
@@ -92,14 +92,14 @@ class LockableFungibleToken extends NearContract {
         if (escrowAccountId === ownerId) {
             throw Error("Can't set allowance for yourself")
         }
-        let account = this.getAccount({ ownerId })
+        let account = this.getAccount(ownerId)
         let lockedBalance = account.getLockedBalance(escrowAccountId)
         if (lockedBalance > allowance) {
             throw Error("The new allowance can't be less than the amount of locked tokens")
         }
 
         account.setAllowance(escrowAccountId, allowance - lockedBalance)
-        this.setAccount({ accountId: ownerId, account })
+        this.setAccount(ownerId, account)
     }
 
     @call
@@ -108,7 +108,7 @@ class LockableFungibleToken extends NearContract {
             throw Error("Can't lock 0 or less tokens")
         }
         let escrowAccountId = near.predecessorAccountId()
-        let account = this.getAccount({ ownerId })
+        let account = this.getAccount(ownerId)
 
         // Checking and updating unlocked balance
         if (account.balance < lockAmount) {
@@ -129,7 +129,7 @@ class LockableFungibleToken extends NearContract {
         let lockedBalance = account.getLockedBalance(escrowAccountId)
         account.setLockedBalance(escrowAccountId, lockedBalance + lockAmount)
 
-        this.setAccount({ accountId: ownerId, account })
+        this.setAccount(ownerId, account)
     }
 
     @call
@@ -138,7 +138,7 @@ class LockableFungibleToken extends NearContract {
             throw Error("Can't unlock 0 or less tokens")
         }
         let escrowAccountId = near.predecessorAccountId()
-        let account = this.getAccount({ ownerId })
+        let account = this.getAccount(ownerId)
 
         // Checking and updating locked balance
         let lockedBalance = account.getLockedBalance(escrowAccountId)
@@ -156,7 +156,7 @@ class LockableFungibleToken extends NearContract {
         // Updating unlocked balance
         account.balance += unlockAmount
 
-        this.setAccount({ accountId: ownerId, account })
+        this.setAccount(ownerId, account)
     }
 
     @call
@@ -165,7 +165,7 @@ class LockableFungibleToken extends NearContract {
             throw Error("Can't transfer 0 or less tokens")
         }
         let escrowAccountId = near.predecessorAccountId()
-        let account = this.getAccount({ ownerId })
+        let account = this.getAccount(ownerId)
 
         // Checking and updating locked balance
         let lockedBalance = account.getLockedBalance(escrowAccountId)
@@ -197,12 +197,12 @@ class LockableFungibleToken extends NearContract {
             }
         }
 
-        this.setAccount({ accountId: ownerId, account })
+        this.setAccount(ownerId, account)
 
         // Deposit amount to the new owner
         let newAccount = this.getAccount(newOwnerId)
         newAccount.balance += amount
-        this.setAccount({ accountId: newOwnerId, newAccount })
+        this.setAccount(newOwnerId, newAccount)
     }
 
     @call
@@ -217,21 +217,21 @@ class LockableFungibleToken extends NearContract {
 
     @view
     getTotalBalance({ ownerId }) {
-        return this.getAccount({ ownerId }).totalBalance()
+        return this.getAccount(ownerId).totalBalance()
     }
 
     @view
     getUnlockedBalance({ ownerId }) {
-        return this.getAccount({ ownerId }).balance
+        return this.getAccount(ownerId).balance
     }
 
     @view
     getAllowance({ ownerId, escrowAccountId }) {
-        return this.getAccount({ ownerId }).getAllowance(escrowAccountId)
+        return this.getAccount(ownerId).getAllowance(escrowAccountId)
     }
 
     @view
     getLockedBalance({ ownerId, escrowAccountId }) {
-        return this.getAccount({ ownerId }).getLockedBalance(escrowAccountId)
+        return this.getAccount(ownerId).getLockedBalance(escrowAccountId)
     }
 }
