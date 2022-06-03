@@ -24,13 +24,13 @@ test.beforeEach(async t => {
     const statusMessageContract = await root.createSubAccount('status-message');
     let statusContractBase64 = (await readFile('res/status-message.base64')).toString();
     await statusMessageContract.call(jsvm, 'deploy_js_contract', Buffer.from(statusContractBase64, 'base64'), { attachedDeposit: '400000000000000000000000' });
-    await statusMessageContract.call(jsvm, 'call_js_contract', encodeCall(statusMessageContract.accountId, 'init', []), { attachedDeposit: '400000000000000000000000' });
+    await statusMessageContract.call(jsvm, 'call_js_contract', encodeCall(statusMessageContract.accountId, 'init', {}), { attachedDeposit: '400000000000000000000000' });
 
     // Deploy on-call contrat
     const onCallContract = await root.createSubAccount('on-call');
     let cross_cc_contract_base64 = (await readFile('build/contract.base64')).toString();
     await onCallContract.call(jsvm, 'deploy_js_contract', Buffer.from(cross_cc_contract_base64, 'base64'), { attachedDeposit: '400000000000000000000000' });
-    await onCallContract.call(jsvm, 'call_js_contract', encodeCall(onCallContract.accountId, 'init', []), { attachedDeposit: '400000000000000000000000' });
+    await onCallContract.call(jsvm, 'call_js_contract', encodeCall(onCallContract.accountId, 'init', {}), { attachedDeposit: '400000000000000000000000' });
 
     // Create test accounts
     const ali = await root.createSubAccount('ali');
