@@ -61,7 +61,7 @@ async function build(argv) {
             nodeResolve(),
             sourcemaps(),
             // commonjs(),
-            babel({ babelHelpers: 'bundled' })
+            babel({ babelHelpers: 'bundled' }),
         ],
     });
 
