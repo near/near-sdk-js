@@ -43,7 +43,7 @@ test.afterEach(async t => {
 
 test('Root gets null status', async t => {
     const { root, jsvm, statusMessage } = t.context.accounts;
-    const result = await jsvm.view('view_js_contract', encodeCall(statusMessage.accountId, 'get_status', { accound_id: root.accountId }));
+    const result = await jsvm.view('view_js_contract', encodeCall(statusMessage.accountId, 'get_status', { account_id: root.accountId }));
     t.is(result, null);
 });
 
@@ -52,7 +52,7 @@ test('Ali sets then gets status', async t => {
     await ali.call(jsvm, 'call_js_contract', encodeCall(statusMessage.accountId, 'set_status', { message: 'hello' }), { attachedDeposit: '100000000000000000000000' });
 
     t.is(
-        await jsvm.view('view_js_contract', encodeCall(statusMessage.accountId, 'get_status', { accound_id: ali.accountId })),
+        await jsvm.view('view_js_contract', encodeCall(statusMessage.accountId, 'get_status', { account_id: ali.accountId })),
         'hello'
     );
 });
@@ -62,8 +62,8 @@ test('Bob and Carl have different statuses', async t => {
     await bob.call(jsvm, 'call_js_contract', encodeCall(statusMessage.accountId, 'set_status', { message: 'hello' }), { attachedDeposit: '100000000000000000000000' });
     await carl.call(jsvm, 'call_js_contract', encodeCall(statusMessage.accountId, 'set_status', { message: 'world' }), { attachedDeposit: '100000000000000000000000' });
 
-    const bobStatus = await jsvm.view('view_js_contract', encodeCall(statusMessage.accountId, 'get_status', { accound_id: bob.accountId }));
-    const carlStatus = await jsvm.view('view_js_contract', encodeCall(statusMessage.accountId, 'get_status', { accound_id: carl.accountId }));
+    const bobStatus = await jsvm.view('view_js_contract', encodeCall(statusMessage.accountId, 'get_status', { account_id: bob.accountId }));
+    const carlStatus = await jsvm.view('view_js_contract', encodeCall(statusMessage.accountId, 'get_status', { account_id: carl.accountId }));
     t.is(bobStatus, 'hello');
     t.is(carlStatus, 'world');
 });

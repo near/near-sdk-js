@@ -32,7 +32,7 @@ near js deploy --accountId <accountId> --base64File <contract-name>.base64 --dep
 <p>
 
     export NEAR_ENV=local
-    near call jsvm.test.near deploy_js_contract --accountId <accoundId> --args $(cat <contract-name>.base64) --base64 --deposit 0.1
+    near call jsvm.test.near deploy_js_contract --accountId <accountId> --args $(cat <contract-name>.base64) --base64 --deposit 0.1
 
 </p>
 </details>
