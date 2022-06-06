@@ -1,3 +1,5 @@
+import { env } from "yargs"
+
 const U64_MAX = 2n**64n - 1n
 const EVICTED_REGISTER = U64_MAX - 1n
 
@@ -22,6 +24,10 @@ export function predecessorAccountId() {
 
 export function blockIndex() {
     return env.block_index()
+}
+
+export function blockHeight() {
+    return blockIndex()
 }
 
 export function blockTimestamp() {

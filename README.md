@@ -92,6 +92,7 @@ function signerAccountId(): String;
 function signerAccountPk(): String;
 function predecessorAccountId(): String;
 function blockIndex(): Uint64;
+function blockHeight(): Uint64;
 function blockTimestamp(): Uint64;
 function epochHeight(): Uint64;
 ```
