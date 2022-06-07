@@ -33,7 +33,7 @@ near js deploy --accountId <your-account> --base64File build/<contract-name>.bas
 5. Interact with your contract using NEAR CLI or `near-api-js`. Encode the parameters and call. If the call cause the state increasement, you also need to attach NEAR to cover the storage deposit for the delta.
 
 ```sh
-near js call <your-account> <method-name> --args <args> --deposit 0.1 --jsvm <jsvm-account>
+near js call <account-that-deployed-js-contract-to-jsvm> <method-name> --accountId <account-performing-call> --args <args> --deposit 0.1 --jsvm <jsvm-account>
 ```
 
 6. If you want to remove the js contract and withdraw the storage deposit, use:
@@ -78,12 +78,7 @@ To use nightly host functions, such as `altBn128G1Sum`, the enclave contract nee
 ### About Type
 
 - In arguments, `Uint64: Number | BigInt`. In return, `Uint64: BigInt`. Because JavaScript Number cannot hold all Uint64 without losing precision. But as arguments, interger number is also allowed for convinience. Same for `Uint128`.
-- `String` in both arguments and return is a byte buffer encoded as a JavaScript String. Which means:
-    - If the string have only 1 byte chars, the representation is same.
-    - If the string have 2/3/4 byte char, it is break down to 2/3/4 bytes and each byte as a separate char.
-    - Arbitrary binary data `0x00-0xff` is as the char '\x00-\xff'
-
-It's intentional to represent string and bytes in this way because QuickJS doesn't have ArrayBuffer in C API.
+- `Bytes` in both arguments and return represent a byte buffer, internally it's a JavaScript String Object. Any binary data `0x00-0xff` is stored as the char '\x00-\xff'. This is because QuickJS doesn't have ArrayBuffer in C API. If the bytes happens to have only 1-byte chars, it happens to be same as the the same content string.
 
 ### Context API
 
@@ -92,6 +87,7 @@ function signerAccountId(): String;
 function signerAccountPk(): String;
 function predecessorAccountId(): String;
 function blockIndex(): Uint64;
+function blockHeight(): Uint64;
 function blockTimestamp(): Uint64;
 function epochHeight(): Uint64;
 ```
@@ -107,29 +103,29 @@ function usedGas(): Uint64;
 ### Math API
 
 ```
-function randomSeed(): String;
-function sha256(value: String): String;
-function keccak256(value: String): String;
-function keccak512(value: String): String;
-function ripemd160(value: String): String;
-function ecrecover(hash: String, sign: String, v: Uint64, malleability_flag: Uint64): String | null;
+function randomSeed(): Bytes;
+function sha256(value: Bytes): Bytes;
+function keccak256(value: Bytes): Bytes;
+function keccak512(value: Bytes): Bytes;
+function ripemd160(value: Bytes): Bytes;
+function ecrecover(hash: Bytes, sign: Bytes, v: Uint64, malleability_flag: Uint64): Bytes | null;
 ```
 
 ### Miscellaneous API
 
 ```
 function panic(msg?: String);
-function panicUtf8(msg: String);
+function panicUtf8(msg: Bytes);
 function log(msg: String);
-function logUtf8(msg: String);
-function logUtf16(msg: String);
+function logUtf8(msg: Bytes);
+function logUtf16(msg: Bytes);
 ```
 
 ### Storage API
 
 ```
-function storageRead(key: String): String | null;
-function storageHasKey(key: String): bool;
+function storageRead(key: Bytes): Bytes | null;
+function storageHasKey(key: Bytes): bool;
 ```
 
 ### Validator API
@@ -142,9 +138,9 @@ function validatorTotalStake(): Uint128;
 ### Alt BN128
 
 ```
-function altBn128G1Multiexp(value: String): String;
-function altBn128G1Sum(value: String): String;
-function altBn128PairingCheck(value: String): bool;
+function altBn128G1Multiexp(value: Bytes): Bytes;
+function altBn128G1Sum(value: Bytes): Bytes;
+function altBn128PairingCheck(value: Bytes): bool;
 ```
 
 ### JSVM Specific APIs
@@ -155,7 +151,7 @@ Due to the design of JavaScript VM Contract, some additonal APIs are provided to
 function jsvmAccountId(): String;
 function jsvmJsContractName(): String;
 function jsvmMethodName(): String;
-function jsvmArgs(): String;
+function jsvmArgs(): Bytes;
 ```
 
 The `jsvmAccountId` returns the JavaScript VM's contract account ID.
@@ -168,11 +164,11 @@ The `jsvmArgs` return the arguments passed to the method.
 
 #### Storage Access
 ```
-function jsvmStorageWrite(key: String, value: String): bool;
-function jsvmStorageRead(key: String): String | null;
-function jsvmStorageRemove(key: String): bool;
-function jsvmStorageHasKey(key: String): bool;
-function storageGetEvicted(): String;
+function jsvmStorageWrite(key: Bytes, value: Bytes): bool;
+function jsvmStorageRead(key: Bytes): Bytes | null;
+function jsvmStorageRemove(key: Bytes): bool;
+function jsvmStorageHasKey(key: Bytes): bool;
+function storageGetEvicted(): Bytes;
 ```
 
 These are equivalent to `storage*` but access limit to the substate of current JS contract. The `jsvmStorageWrite` and `jsvmStorageRemove` require and refund deposit to cover the storage delta. `jsvmStorage*` access the substate of current JS contract by prefix the key of current JS contract name (deployer's account id). You can use `storageRead` and `storageHasKey` to get code and state of other JS contracts. More specifically: code of `contractA` is stored under the key `contractA/code`. state of `contractA` is stored under `contractA/state/` concat with developer specifid key. And:
@@ -188,19 +184,19 @@ When `jsvmStroageRemove` remove a key that exists, the old value would be saved 
 
 #### Cross Contract Call
 ```
-function jsvmValueReturn(value: String);
-function jsvmCall(contract_name: String, method: String, args: String): any;
-function jsvmCallRaw(contract_name: String, method: String, args: String): String;
+function jsvmValueReturn(value: Bytes);
+function jsvmCall(contract_name: String, method: String, args: Bytes): any;
+function jsvmCallRaw(contract_name: String, method: String, args: Bytes): Bytes;
 ```
 
 The `jsvmValueReturn` is the version of `valueReturn` that should be used in all JavaScript contracts. It play well with `jsvmCall`.
 
 The `jsvmCall` invoke a synchronous cross contract call, to the given JavaScript `contract_name`, `method` with `args`. And returned the return value parsed as JSON into a JS object.
 
-The `jsvmCallRaw` is similar to `jsvmCall`, but return the raw, unparsed String.
+The `jsvmCallRaw` is similar to `jsvmCall`, but return the raw, unparsed Bytes.
 
 ### Collections
-A few useful on-chain persistent collections are provided.
+A few useful on-chain persistent collections are provided. All keys, values and elements are of type `Bytes`.
 
 #### Vector
 Vector is an iterable implementation of vector that stores its content on the trie. Usage:

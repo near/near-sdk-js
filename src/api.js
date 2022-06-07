@@ -24,6 +24,10 @@ export function blockIndex() {
     return env.block_index()
 }
 
+export function blockHeight() {
+    return blockIndex()
+}
+
 export function blockTimestamp() {
     return env.block_timestamp()
 }
