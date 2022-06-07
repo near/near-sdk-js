@@ -1,5 +1,5 @@
 import * as near from '../api'
-import {u8ArrayToString, stringToU8Array} from '../utils'
+import {u8ArrayToBytes, bytesToU8Array} from '../utils'
 import { Vector, VectorIterator } from './vector'
 
 const ERR_INCONSISTENT_STATE = "The collection is an inconsistent state. Did previous smart contract execution terminate unexpectedly?"
@@ -35,11 +35,11 @@ export class UnorderedMap {
     serializeIndex(index) {
         let data = new Uint32Array([index])
         let array = new Uint8Array(data.buffer)
-        return u8ArrayToString(array)
+        return u8ArrayToBytes(array)
     }
 
     deserializeIndex(rawIndex) {
-        let array = stringToU8Array(rawIndex)
+        let array = bytesToU8Array(rawIndex)
         let data = new Uint32Array(array.buffer)
         return data[0]
     }

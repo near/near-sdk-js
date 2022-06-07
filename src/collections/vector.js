@@ -1,5 +1,5 @@
 import * as near from '../api'
-import {u8ArrayToString} from '../utils'
+import {u8ArrayToBytes} from '../utils'
 
 const ERR_INDEX_OUT_OF_BOUNDS = "Index out of bounds"
 const ERR_INCONSISTENT_STATE = "The collection is an inconsistent state. Did previous smart contract execution terminate unexpectedly?"
@@ -23,7 +23,7 @@ export class Vector {
     indexToKey(index) {
         let data = new Uint32Array([index])
         let array = new Uint8Array(data.buffer)
-        let key = u8ArrayToString(array)
+        let key = u8ArrayToBytes(array)
         return this.prefix + key
     }
 
