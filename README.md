@@ -33,7 +33,7 @@ near js deploy --accountId <your-account> --base64File build/<contract-name>.bas
 5. Interact with your contract using NEAR CLI or `near-api-js`. Encode the parameters and call. If the call cause the state increasement, you also need to attach NEAR to cover the storage deposit for the delta.
 
 ```sh
-near js call <your-account> <method-name> --args <args> --deposit 0.1 --jsvm <jsvm-account>
+near js call <account-that-deployed-js-contract-to-jsvm> <method-name> --accountId <account-performing-call> --args <args> --deposit 0.1 --jsvm <jsvm-account>
 ```
 
 6. If you want to remove the js contract and withdraw the storage deposit, use:
