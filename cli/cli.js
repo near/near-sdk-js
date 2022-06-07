@@ -6,6 +6,7 @@ import { hideBin } from 'yargs/helpers'
 import { nodeResolve } from '@rollup/plugin-node-resolve';
 import sourcemaps from 'rollup-plugin-sourcemaps';
 import { babel } from '@rollup/plugin-babel';
+import commonjs from '@rollup/plugin-commonjs';
 
 import { rollup } from 'rollup';
 
@@ -60,8 +61,8 @@ async function build(argv) {
         plugins: [
             nodeResolve(),
             sourcemaps(),
-            // commonjs(),
-            babel({ babelHelpers: 'bundled' })
+            babel({ babelHelpers: 'bundled' }),
+            commonjs()
         ],
     });
 

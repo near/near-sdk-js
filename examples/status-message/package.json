@@ -5,9 +5,10 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "build": "yarn build:simple && yarn build:collections",
+    "build": "yarn build:simple && yarn build:collections && yarn build:borsh",
     "build:simple": "near-sdk build src/status-message.js build/status-message.base64",
     "build:collections": "near-sdk build src/status-message-collections.js build/status-message-collections.base64",
+    "build:borsh": "near-sdk build src/status-message-borsh.js build/status-message-borsh.base64",
     "test": "ava"
   },
   "author": "Near Inc <hello@nearprotocol.com>",
