@@ -49,4 +49,6 @@ test('Clean state after storing', async t => {
     await cleanStateContract.call(jsvm, 'call_js_contract', encodeCall(cleanStateContract.accountId, 'clean', { keys: ['1'] }), { attachedDeposit: '400000000000000000000000' });
     const value2 = await jsvm.view('view_js_contract', encodeCall(cleanStateContract.accountId, 'get', { key: '1' }));
     t.is(value2, null);
+    const value3 = await jsvm.view('view_js_contract', encodeCall(cleanStateContract.accountId, 'ifExistReturn6', { key: '1' }));
+    t.is(value3, 7);
 });

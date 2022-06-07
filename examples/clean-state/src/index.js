@@ -16,4 +16,14 @@ class CleanState extends NearContract {
     get({key}) {
         return near.jsvmStorageRead(key)
     }
+
+    @view
+    ifExistReturn6({key}) {
+        const res = near.jsvmStorageRead(key)
+        if (res) {
+            return 6
+        } else {
+            return 7
+        }
+    }
 }
