@@ -1,4 +1,4 @@
-export function u8ArrayToString(array) {
+export function u8ArrayToBytes(array) {
     let ret = ''
     for (let e of array) {
         ret += String.fromCharCode(e)
@@ -6,10 +6,10 @@ export function u8ArrayToString(array) {
     return ret
 }
 
-export function stringToU8Array(string) {
-    let ret = new Uint8Array(string.length)
-    for (let i in string) {
-        ret[i] = string.charCodeAt(i)
+export function bytesToU8Array(bytes) {
+    let ret = new Uint8Array(bytes.length)
+    for (let i in bytes) {
+        ret[i] = bytes.charCodeAt(i)
     }
     return ret
 }
