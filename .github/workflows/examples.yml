@@ -29,5 +29,3 @@ jobs:
         run: cd examples && yarn build:status-message-collections && yarn test:status-message-collections
       - name: status-message
         run: cd examples && yarn build:status-message && yarn test:status-message
-      - name: test-token-receiver
-        run: cd examples && yarn build:test-token-receiver && yarn test:test-token-receiver
