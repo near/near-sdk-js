@@ -22,7 +22,7 @@ test.beforeEach(async t => {
 
     // Deploy fungible token contract
     const fungibleTokenContract = await root.createSubAccount('fungible-token');
-    let ftContractBase64 = (await readFile('build/contract.base64')).toString();
+    let ftContractBase64 = (await readFile('build/fungible-token.base64')).toString();
     await fungibleTokenContract.call(jsvm, 'deploy_js_contract', Buffer.from(ftContractBase64, 'base64'), { attachedDeposit: '400000000000000000000000' });
     await fungibleTokenContract.call(jsvm, 'call_js_contract', encodeCall(fungibleTokenContract.accountId, 'init', { prefix: 'a', totalSupply: '1000' }), { attachedDeposit: '400000000000000000000000' });
 

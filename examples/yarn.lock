@@ -1438,6 +1438,11 @@ locate-path@^7.1.0:
   dependencies:
     p-locate "^6.0.0"
 
+lodash-es@^4.17.21:
+  version "4.17.21"
+  resolved "https://registry.npmjs.org/lodash-es/-/lodash-es-4.17.21.tgz#43e626c46e6591b7750beb2b50117390c609e3ee"
+  integrity sha512-mKnC+QJ9pWVzv+C4/U3rRsHapFfHvQFoFB92e52xeyGMcX6/OlIl78je1u8vePzYZSkkogMPJ2yjxxsb89cxyw==
+
 lodash@^4.17.15:
   version "4.17.21"
   resolved "https://registry.npmjs.org/lodash/-/lodash-4.17.21.tgz"
@@ -1586,7 +1591,7 @@ near-sandbox@^0.0.8:
     got "^11.8.2"
     tar "^6.1.0"
 
-"near-sdk-js@file:../..":
+"near-sdk-js@file:..":
   version "0.2.0"
   dependencies:
     "@babel/core" "^7.17.5"
