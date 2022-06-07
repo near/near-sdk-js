@@ -59,7 +59,7 @@ class Account {
 
 @NearBindgen
 class LockableFungibleToken extends NearContract {
-    constructor(prefix, totalSupply) {
+    constructor({ prefix, totalSupply }) {
         super()
         this.accounts = new LookupMap(prefix) // Account ID -> Account mapping
         this.totalSupply = totalSupply // Total supply of the all tokens

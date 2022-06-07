@@ -2,7 +2,7 @@ import { NearContract, NearBindgen, call, view, near } from 'near-sdk-js'
 
 @NearBindgen
 class OnCall extends NearContract {
-    constructor() {
+    constructor({ }) {
         super()
         this.personOnCall = "undefined"
     }
