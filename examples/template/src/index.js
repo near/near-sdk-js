@@ -3,7 +3,7 @@ import { isUndefined } from 'lodash-es'
 
 @NearBindgen
 class Counter extends NearContract {
-    constructor(initial = 0) {
+    constructor({ initial = 0 }) {
         super()
         this.count = initial
     }

@@ -10,7 +10,7 @@ function assert(b, str) {
 
 @NearBindgen
 class NftContract extends NearContract {
-    constructor(nonFungibleTokenAccountId) {
+    constructor({ nonFungibleTokenAccountId }) {
         super()
         this.nonFungibleTokenAccountId = nonFungibleTokenAccountId
     }

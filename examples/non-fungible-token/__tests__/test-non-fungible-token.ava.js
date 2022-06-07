@@ -24,13 +24,13 @@ test.beforeEach(async t => {
     const nftContract = await root.createSubAccount('fungible-token');
     let nftContractBase64 = (await readFile('build/contract.base64')).toString();
     await nftContract.call(jsvm, 'deploy_js_contract', Buffer.from(nftContractBase64, 'base64'), { attachedDeposit: '400000000000000000000000' });
-    await nftContract.call(jsvm, 'call_js_contract', encodeCall(nftContract.accountId, 'init', [nftContract.accountId, 'prefix']), { attachedDeposit: '400000000000000000000000' });
+    await nftContract.call(jsvm, 'call_js_contract', encodeCall(nftContract.accountId, 'init', { owner_id: nftContract.accountId, owner_by_id_prefix: 'prefix' }), { attachedDeposit: '400000000000000000000000' });
 
     // Deploy token receiver contract
     const tokenReceiverContract = await root.createSubAccount('token-receiver');
     let tokenReceiverContractBase64 = (await readFile('build/test-token-receiver.base64')).toString();
     await tokenReceiverContract.call(jsvm, 'deploy_js_contract', Buffer.from(tokenReceiverContractBase64, 'base64'), { attachedDeposit: '400000000000000000000000' });
-    await tokenReceiverContract.call(jsvm, 'call_js_contract', encodeCall(tokenReceiverContract.accountId, 'init', [nftContract.accountId]), { attachedDeposit: '400000000000000000000000' });
+    await tokenReceiverContract.call(jsvm, 'call_js_contract', encodeCall(tokenReceiverContract.accountId, 'init', { nonFungibleTokenAccountId: nftContract.accountId }), { attachedDeposit: '400000000000000000000000' });
 
     // Mint an NFT
     let tokenId = 'my-cool-nft';

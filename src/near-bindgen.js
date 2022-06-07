@@ -10,7 +10,7 @@ export function NearBindgen (Class) {
     let OriginalClass = Class
     let NewClass = function() {
         let args = OriginalClass.deserializeArgs()
-        let ret = new OriginalClass(...args)
+        let ret = new OriginalClass(args)
         ret.serialize()
         return ret
     }

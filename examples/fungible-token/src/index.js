@@ -17,7 +17,7 @@ function assert(b, str) {
 
 @NearBindgen
 class FungibleToken extends NearContract {
-    constructor(prefix, totalSupply) {
+    constructor({ prefix, totalSupply }) {
         super()
         this.accounts = new LookupMap(prefix)
         this.totalSupply = totalSupply
