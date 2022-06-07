@@ -43,10 +43,10 @@ test.afterEach(async t => {
 
 test('Clean state after storing', async t => {
     const { jsvm, cleanStateContract } = t.context.accounts;
-    await cleanStateContract.call(jsvm, 'call_js_contract', encodeCall(cleanStateContract.accountId, 'put', ['1', 1]), { attachedDeposit: '400000000000000000000000' });
-    const value1 = await jsvm.view('view_js_contract', encodeCall(cleanStateContract.accountId, 'get', ['1']));
+    await cleanStateContract.call(jsvm, 'call_js_contract', encodeCall(cleanStateContract.accountId, 'put', { key: '1', value: 1 }), { attachedDeposit: '400000000000000000000000' });
+    const value1 = await jsvm.view('view_js_contract', encodeCall(cleanStateContract.accountId, 'get', { key: '1' }));
     t.is(value1, '1');
-    await cleanStateContract.call(jsvm, 'call_js_contract', encodeCall(cleanStateContract.accountId, 'clean', [['1']]), { attachedDeposit: '400000000000000000000000' });
-    const value2 = await jsvm.view('view_js_contract', encodeCall(cleanStateContract.accountId, 'get', ['1']));
+    await cleanStateContract.call(jsvm, 'call_js_contract', encodeCall(cleanStateContract.accountId, 'clean', { keys: ['1'] }), { attachedDeposit: '400000000000000000000000' });
+    const value2 = await jsvm.view('view_js_contract', encodeCall(cleanStateContract.accountId, 'get', { key: '1' }));
     t.is(value2, null);
 });

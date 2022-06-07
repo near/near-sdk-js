@@ -1,5 +1,5 @@
 import { Worker } from 'near-workspaces';
-import {readFile} from 'fs/promises'
+import { readFile } from 'fs/promises'
 import test from 'ava';
 
 function encodeCall(contract, method, args) {
@@ -22,8 +22,8 @@ test.beforeEach(async t => {
     // Deploy status-message JS contract
     const statusMessage = await root.createSubAccount('status-message');
     let contract_base64 = (await readFile('build/status-message-collections.base64')).toString();
-    await statusMessage.call(jsvm, 'deploy_js_contract', Buffer.from(contract_base64, 'base64'), {attachedDeposit: '400000000000000000000000'});
-    await statusMessage.call(jsvm, 'call_js_contract', encodeCall(statusMessage.accountId, 'init', []), {attachedDeposit: '400000000000000000000000'});
+    await statusMessage.call(jsvm, 'deploy_js_contract', Buffer.from(contract_base64, 'base64'), { attachedDeposit: '400000000000000000000000' });
+    await statusMessage.call(jsvm, 'call_js_contract', encodeCall(statusMessage.accountId, 'init', []), { attachedDeposit: '400000000000000000000000' });
 
     // Test users
     const ali = await root.createSubAccount('ali');
@@ -43,51 +43,51 @@ test.afterEach(async t => {
 
 test('Root gets null status', async t => {
     const { root, jsvm, statusMessage } = t.context.accounts;
-    const result = await jsvm.view('view_js_contract', encodeCall(statusMessage.accountId, 'get_status', [root.accountId]));
+    const result = await jsvm.view('view_js_contract', encodeCall(statusMessage.accountId, 'get_status', { account_id: root.accountId }));
     t.is(result, null);
 });
 
 test('Ali sets then gets status', async t => {
     const { ali, jsvm, statusMessage } = t.context.accounts;
-    await ali.call(jsvm, 'call_js_contract', encodeCall(statusMessage.accountId, 'set_status', ['hello']), {attachedDeposit: '100000000000000000000000'});
-    
+    await ali.call(jsvm, 'call_js_contract', encodeCall(statusMessage.accountId, 'set_status', { message: 'hello' }), { attachedDeposit: '100000000000000000000000' });
+
     t.is(
-        await jsvm.view('view_js_contract', encodeCall(statusMessage.accountId, 'get_status', [ali.accountId])),
+        await jsvm.view('view_js_contract', encodeCall(statusMessage.accountId, 'get_status', { account_id: ali.accountId })),
         'hello'
     );
 });
 
 test('Bob and Carl have different statuses', async t => {
-    const {jsvm, statusMessage, bob, carl} = t.context.accounts;
-    await bob.call(jsvm, 'call_js_contract', encodeCall(statusMessage.accountId, 'set_status', ['hello']), {attachedDeposit: '100000000000000000000000'});
-    await carl.call(jsvm, 'call_js_contract', encodeCall(statusMessage.accountId, 'set_status', ['world']), {attachedDeposit: '100000000000000000000000'});
+    const { jsvm, statusMessage, bob, carl } = t.context.accounts;
+    await bob.call(jsvm, 'call_js_contract', encodeCall(statusMessage.accountId, 'set_status', { message: 'hello' }), { attachedDeposit: '100000000000000000000000' });
+    await carl.call(jsvm, 'call_js_contract', encodeCall(statusMessage.accountId, 'set_status', { message: 'world' }), { attachedDeposit: '100000000000000000000000' });
 
-    const bobStatus = await jsvm.view('view_js_contract', encodeCall(statusMessage.accountId, 'get_status', [bob.accountId]));
-    const carlStatus = await jsvm.view('view_js_contract', encodeCall(statusMessage.accountId, 'get_status', [carl.accountId]));
+    const bobStatus = await jsvm.view('view_js_contract', encodeCall(statusMessage.accountId, 'get_status', { account_id: bob.accountId }));
+    const carlStatus = await jsvm.view('view_js_contract', encodeCall(statusMessage.accountId, 'get_status', { account_id: carl.accountId }));
     t.is(bobStatus, 'hello');
     t.is(carlStatus, 'world');
 });
 
 test('Get statuses from the contract', async t => {
-    const {jsvm, statusMessage, bob, carl} = t.context.accounts;
-    await bob.call(jsvm, 'call_js_contract', encodeCall(statusMessage.accountId, 'set_status', ['hello']), {attachedDeposit: '100000000000000000000000'});
-    await carl.call(jsvm, 'call_js_contract', encodeCall(statusMessage.accountId, 'set_status', ['world']), {attachedDeposit: '100000000000000000000000'});
+    const { jsvm, statusMessage, bob, carl } = t.context.accounts;
+    await bob.call(jsvm, 'call_js_contract', encodeCall(statusMessage.accountId, 'set_status', { message: 'hello' }), { attachedDeposit: '100000000000000000000000' });
+    await carl.call(jsvm, 'call_js_contract', encodeCall(statusMessage.accountId, 'set_status', { message: 'world' }), { attachedDeposit: '100000000000000000000000' });
 
-    const statuses = await jsvm.view('view_js_contract', encodeCall(statusMessage.accountId, 'get_all_statuses', []));
+    const statuses = await jsvm.view('view_js_contract', encodeCall(statusMessage.accountId, 'get_all_statuses', {}));
     t.deepEqual(statuses, [[bob.accountId, 'hello'], [carl.accountId, 'world']]);
 });
 
 test('message has stored by someone', async t => {
     const { ali, jsvm, statusMessage } = t.context.accounts;
-    await ali.call(jsvm, 'call_js_contract', encodeCall(statusMessage.accountId, 'set_status', ['hello']), {attachedDeposit: '100000000000000000000000'});
-    
+    await ali.call(jsvm, 'call_js_contract', encodeCall(statusMessage.accountId, 'set_status', { message: 'hello' }), { attachedDeposit: '100000000000000000000000' });
+
     t.is(
-        await jsvm.view('view_js_contract', encodeCall(statusMessage.accountId, 'has_status', ['hello'])),
+        await jsvm.view('view_js_contract', encodeCall(statusMessage.accountId, 'has_status', { message: 'hello' })),
         true
     );
 
     t.is(
-        await jsvm.view('view_js_contract', encodeCall(statusMessage.accountId, 'has_status', ['world'])),
+        await jsvm.view('view_js_contract', encodeCall(statusMessage.accountId, 'has_status', { message: 'world' })),
         false
     );
 });

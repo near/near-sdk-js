@@ -42,20 +42,20 @@ test.afterEach(async t => {
 
 test('Owner initial details', async t => {
     const { jsvm, lockableFt } = t.context.accounts;
-    const totalSupply = await jsvm.view('view_js_contract', encodeCall(lockableFt.accountId, 'getTotalSupply', []));
+    const totalSupply = await jsvm.view('view_js_contract', encodeCall(lockableFt.accountId, 'getTotalSupply', {}));
     t.is(totalSupply, 10000);
-    const totalBalance = await jsvm.view('view_js_contract', encodeCall(lockableFt.accountId, 'getTotalBalance', [lockableFt.accountId]));
+    const totalBalance = await jsvm.view('view_js_contract', encodeCall(lockableFt.accountId, 'getTotalBalance', { ownerId: lockableFt.accountId }));
     t.is(totalBalance, 10000);
-    const unlockedBalance = await jsvm.view('view_js_contract', encodeCall(lockableFt.accountId, 'getUnlockedBalance', [lockableFt.accountId]));
+    const unlockedBalance = await jsvm.view('view_js_contract', encodeCall(lockableFt.accountId, 'getUnlockedBalance', { ownerId: lockableFt.accountId }));
     t.is(unlockedBalance, 10000);
     const allowance = await jsvm.view(
         'view_js_contract',
-        encodeCall(lockableFt.accountId, 'getAllowance', [lockableFt.accountId, lockableFt.accountId])
+        encodeCall(lockableFt.accountId, 'getAllowance', { ownerId: lockableFt.accountId, escrowAccountId: lockableFt.accountId })
     );
     t.is(allowance, 0);
     const lockedBalance = await jsvm.view(
         'view_js_contract',
-        encodeCall(lockableFt.accountId, 'getLockedBalance', [lockableFt.accountId, lockableFt.accountId])
+        encodeCall(lockableFt.accountId, 'getLockedBalance', { ownerId: lockableFt.accountId, escrowAccountId: lockableFt.accountId })
     );
     t.is(lockedBalance, 0);
 });
@@ -65,17 +65,17 @@ test('Set allowance', async t => {
     await lockableFt.call(
         jsvm,
         'call_js_contract',
-        encodeCall(lockableFt.accountId, 'setAllowance', [ali.accountId, 100]),
+        encodeCall(lockableFt.accountId, 'setAllowance', { escrowAccountId: ali.accountId, allowance: 100 }),
         { attachedDeposit: '100000000000000000000000' }
     );
     const aliAllowance = await jsvm.view(
         'view_js_contract',
-        encodeCall(lockableFt.accountId, 'getAllowance', [lockableFt.accountId, ali.accountId])
+        encodeCall(lockableFt.accountId, 'getAllowance', { ownerId: lockableFt.accountId, escrowAccountId: ali.accountId })
     );
     t.is(aliAllowance, 100);
     const contractAllowance = await jsvm.view(
         'view_js_contract',
-        encodeCall(lockableFt.accountId, 'getAllowance', [lockableFt.accountId, lockableFt.accountId])
+        encodeCall(lockableFt.accountId, 'getAllowance', { ownerId: lockableFt.accountId, escrowAccountId: lockableFt.accountId })
     );
     t.is(contractAllowance, 0);
 });
@@ -85,7 +85,7 @@ test('Fail to set allowance for oneself', async t => {
     const error = await t.throwsAsync(() => lockableFt.call(
         jsvm,
         'call_js_contract',
-        encodeCall(lockableFt.accountId, 'setAllowance', [lockableFt.accountId, 100]),
+        encodeCall(lockableFt.accountId, 'setAllowance', { escrowAccountId: lockableFt.accountId, allowance: 100 }),
         { attachedDeposit: '100000000000000000000000' }
     ));
     t.assert(error.message.includes(`Can't set allowance for yourself`));
@@ -96,22 +96,22 @@ test('Lock owner', async t => {
     await lockableFt.call(
         jsvm,
         'call_js_contract',
-        encodeCall(lockableFt.accountId, 'lock', [lockableFt.accountId, 100]),
+        encodeCall(lockableFt.accountId, 'lock', { ownerId: lockableFt.accountId, lockAmount: 100 }),
         { attachedDeposit: '100000000000000000000000' }
     );
     const unlockedBalance = await jsvm.view(
         'view_js_contract',
-        encodeCall(lockableFt.accountId, 'getUnlockedBalance', [lockableFt.accountId])
+        encodeCall(lockableFt.accountId, 'getUnlockedBalance', { ownerId: lockableFt.accountId })
     );
     t.is(unlockedBalance, 9900);
     const allowance = await jsvm.view(
         'view_js_contract',
-        encodeCall(lockableFt.accountId, 'getAllowance', [lockableFt.accountId, lockableFt.accountId])
+        encodeCall(lockableFt.accountId, 'getAllowance', { ownerId: lockableFt.accountId, escrowAccountId: lockableFt.accountId })
     );
     t.is(allowance, 0);
     const lockedBalance = await jsvm.view(
         'view_js_contract',
-        encodeCall(lockableFt.accountId, 'getLockedBalance', [lockableFt.accountId, lockableFt.accountId])
+        encodeCall(lockableFt.accountId, 'getLockedBalance', { ownerId: lockableFt.accountId, escrowAccountId: lockableFt.accountId })
     );
     t.is(lockedBalance, 100);
 });
@@ -121,7 +121,7 @@ test('Lock failures', async t => {
     const error1 = await t.throwsAsync(() => lockableFt.call(
         jsvm,
         'call_js_contract',
-        encodeCall(lockableFt.accountId, 'lock', [lockableFt.accountId, 0]),
+        encodeCall(lockableFt.accountId, 'lock', { ownerId: lockableFt.accountId, lockAmount: 0 }),
         { attachedDeposit: '100000000000000000000000' }
     ));
     t.assert(error1.message.includes(`Can't lock 0 or less tokens`));
@@ -129,7 +129,7 @@ test('Lock failures', async t => {
     const error2 = await t.throwsAsync(() => lockableFt.call(
         jsvm,
         'call_js_contract',
-        encodeCall(lockableFt.accountId, 'lock', [lockableFt.accountId, 10001]),
+        encodeCall(lockableFt.accountId, 'lock', { ownerId: lockableFt.accountId, lockAmount: 10001 }),
         { attachedDeposit: '100000000000000000000000' }
     ));
     t.assert(error2.message.includes(`Not enough unlocked balance`));
@@ -137,7 +137,7 @@ test('Lock failures', async t => {
     const error3 = await t.throwsAsync(() => ali.call(
         jsvm,
         'call_js_contract',
-        encodeCall(lockableFt.accountId, 'lock', [lockableFt.accountId, 10]),
+        encodeCall(lockableFt.accountId, 'lock', { ownerId: lockableFt.accountId, lockAmount: 10 }),
         { attachedDeposit: '100000000000000000000000' }
     ));
     t.assert(error3.message.includes(`Not enough allowance`));
@@ -148,28 +148,28 @@ test('Unlock owner', async t => {
     await lockableFt.call(
         jsvm,
         'call_js_contract',
-        encodeCall(lockableFt.accountId, 'lock', [lockableFt.accountId, 100]),
+        encodeCall(lockableFt.accountId, 'lock', { ownerId: lockableFt.accountId, lockAmount: 100 }),
         { attachedDeposit: '100000000000000000000000' }
     );
     await lockableFt.call(
         jsvm,
         'call_js_contract',
-        encodeCall(lockableFt.accountId, 'unlock', [lockableFt.accountId, 100]),
+        encodeCall(lockableFt.accountId, 'unlock', { ownerId: lockableFt.accountId, unlockAmount: 100 }),
         { attachedDeposit: '100000000000000000000000' }
     );
     const unlockedBalance = await jsvm.view(
         'view_js_contract',
-        encodeCall(lockableFt.accountId, 'getUnlockedBalance', [lockableFt.accountId])
+        encodeCall(lockableFt.accountId, 'getUnlockedBalance', { ownerId: lockableFt.accountId })
     );
     t.is(unlockedBalance, 10000);
     const allowance = await jsvm.view(
         'view_js_contract',
-        encodeCall(lockableFt.accountId, 'getAllowance', [lockableFt.accountId, lockableFt.accountId])
+        encodeCall(lockableFt.accountId, 'getAllowance', { ownerId: lockableFt.accountId, escrowAccountId: lockableFt.accountId })
     );
     t.is(allowance, 0);
     const lockedBalance = await jsvm.view(
         'view_js_contract',
-        encodeCall(lockableFt.accountId, 'getLockedBalance', [lockableFt.accountId, lockableFt.accountId])
+        encodeCall(lockableFt.accountId, 'getLockedBalance', { ownerId: lockableFt.accountId, escrowAccountId: lockableFt.accountId })
     );
     t.is(lockedBalance, 0);
 });
@@ -179,7 +179,7 @@ test('Unlock failures', async t => {
     const error1 = await t.throwsAsync(() => lockableFt.call(
         jsvm,
         'call_js_contract',
-        encodeCall(lockableFt.accountId, 'unlock', [lockableFt.accountId, 0]),
+        encodeCall(lockableFt.accountId, 'unlock', { ownerId: lockableFt.accountId, unlockAmount: 0 }),
         { attachedDeposit: '100000000000000000000000' }
     ));
     t.assert(error1.message.includes(`Can't unlock 0 or less tokens`));
@@ -187,7 +187,7 @@ test('Unlock failures', async t => {
     const error2 = await t.throwsAsync(() => lockableFt.call(
         jsvm,
         'call_js_contract',
-        encodeCall(lockableFt.accountId, 'unlock', [lockableFt.accountId, 1]),
+        encodeCall(lockableFt.accountId, 'unlock', { ownerId: lockableFt.accountId, unlockAmount: 1 }),
         { attachedDeposit: '100000000000000000000000' }
     ));
     t.assert(error2.message.includes(`Not enough locked tokens`));
@@ -198,17 +198,17 @@ test('Simple transfer', async t => {
     await lockableFt.call(
         jsvm,
         'call_js_contract',
-        encodeCall(lockableFt.accountId, 'transfer', [ali.accountId, 100]),
+        encodeCall(lockableFt.accountId, 'transfer', { newOwnerId: ali.accountId, amount: 100 }),
         { attachedDeposit: '100000000000000000000000' }
     );
     const ownerUnlockedBalance = await jsvm.view(
         'view_js_contract',
-        encodeCall(lockableFt.accountId, 'getUnlockedBalance', [lockableFt.accountId])
+        encodeCall(lockableFt.accountId, 'getUnlockedBalance', { ownerId: lockableFt.accountId })
     );
     t.is(ownerUnlockedBalance, 9900);
     const aliUnlockedBalance = await jsvm.view(
         'view_js_contract',
-        encodeCall(lockableFt.accountId, 'getUnlockedBalance', [ali.accountId])
+        encodeCall(lockableFt.accountId, 'getUnlockedBalance', { ownerId: ali.accountId })
     );
     t.is(aliUnlockedBalance, 100);
 });
@@ -218,7 +218,7 @@ test('Transfer failures', async t => {
     const error1 = await t.throwsAsync(() => lockableFt.call(
         jsvm,
         'call_js_contract',
-        encodeCall(lockableFt.accountId, 'transfer', [ali.accountId, 0]),
+        encodeCall(lockableFt.accountId, 'transfer', { newOwnerId: ali.accountId, amount: 0 }),
         { attachedDeposit: '100000000000000000000000' }
     ));
     t.assert(error1.message.includes(`Can't transfer 0 or less tokens`));
@@ -226,7 +226,7 @@ test('Transfer failures', async t => {
     const error2 = await t.throwsAsync(() => lockableFt.call(
         jsvm,
         'call_js_contract',
-        encodeCall(lockableFt.accountId, 'transfer', [ali.accountId, 10001]),
+        encodeCall(lockableFt.accountId, 'transfer', { newOwnerId: ali.accountId, amount: 10001 }),
         { attachedDeposit: '100000000000000000000000' }
     ));
     t.assert(error2.message.includes(`Not enough unlocked balance`));

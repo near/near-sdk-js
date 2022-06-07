@@ -32,32 +32,32 @@ class UnorderedMapTestContract extends NearContract {
     }
 
     @view
-    serializeIndex(index) {
+    serializeIndex({index}) {
         return this.unorderedMap.serializeIndex(index);
     }
 
     @view
-    deserializeIndex(rawIndex) {
+    deserializeIndex({rawIndex}) {
         return this.unorderedMap.deserializeIndex(rawIndex);
     }
 
     @view
-    getIndexRaw(key) {
+    getIndexRaw({key}) {
         return this.unorderedMap.getIndexRaw(key);
     }
 
     @view
-    get(key) {
+    get({key}) {
         return this.unorderedMap.get(key);
     }
 
     @call
-    set(key, value) {
+    set({key, value}) {
         this.unorderedMap.set(key, value);
     }
 
     @call
-    remove(key) {
+    remove({key}) {
         this.unorderedMap.remove(key);
     }
 
@@ -72,7 +72,7 @@ class UnorderedMapTestContract extends NearContract {
     }
 
     @call
-    extend(kvs) {
+    extend({kvs}) {
         this.unorderedMap.extend(kvs);
     }
 }

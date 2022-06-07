@@ -30,14 +30,14 @@ class FungibleToken extends NearContract {
         this.accounts = Object.assign(new LookupMap, this.accounts)
     }
 
-    internalDeposit(accountId, amount) {
+    internalDeposit({ accountId, amount }) {
         let balance = this.accounts.get(accountId) || '0'
         let newBalance = BigInt(balance) + BigInt(amount)
         this.accounts.set(accountId, newBalance.toString())
         this.totalSupply = (BigInt(this.totalSupply) + BigInt(amount)).toString()
     }
 
-    internalWithdraw(accountId, amount) {
+    internalWithdraw({ accountId, amount }) {
         let balance = this.accounts.get(accountId) || '0'
         let newBalance = BigInt(balance) - BigInt(amount)
         assert(newBalance >= 0n, "The account doesn't have enough balance")
@@ -47,25 +47,25 @@ class FungibleToken extends NearContract {
         this.totalSupply = newSupply.toString()
     }
 
-    internalTransfer(senderId, recieverId, amount, memo) {
-        assert(senderId != recieverId, "Sender and receiver should be different")
+    internalTransfer({ senderId, receiverId, amount, memo }) {
+        assert(senderId != receiverId, "Sender and receiver should be different")
         let amountInt = BigInt(amount)
         assert(amountInt > 0n, "The amount should be a positive number")
-        this.internalWithdraw(senderId, amount)
-        this.internalDeposit(recieverId, amount)
+        this.internalWithdraw({ accountId: senderId, amount })
+        this.internalDeposit({ accountId: receiverId, amount })
     }
 
     @call
-    ftTransfer(receiverId, amount, memo) {
+    ftTransfer({ receiverId, amount, memo }) {
         let senderId = near.predecessorAccountId()
-        this.internalTransfer(senderId, receiverId, amount, memo)
+        this.internalTransfer({ senderId, receiverId, amount, memo })
     }
 
     @call
-    ftTransferCall(receiverId, amount, memo, msg) {
+    ftTransferCall({ receiverId, amount, memo, msg }) {
         let senderId = near.predecessorAccountId()
-        this.internalTransfer(senderId, receiverId, amount, memo)
-        let onTransferRet = near.jsvmCall(receiverId, 'ftOnTransfer', [senderId, amount, msg, receiverId])
+        this.internalTransfer({ senderId, receiverId, amount, memo })
+        let onTransferRet = near.jsvmCall(receiverId, 'ftOnTransfer', { senderId, amount, msg, receiverId })
         // In JS, do not need a callback, ftResolveTransfer after ftOnTransfer Returns
         // If any logic after ftOnTransfer Returns is required, just do it on onTransferRet.
         return onTransferRet
@@ -77,7 +77,7 @@ class FungibleToken extends NearContract {
     }
 
     @view
-    ftBalanceOf(accountId) {
+    ftBalanceOf({ accountId }) {
         return this.accounts.get(accountId) || '0'
     }
 }

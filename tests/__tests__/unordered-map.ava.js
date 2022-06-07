@@ -43,21 +43,21 @@ test.afterEach(async t => {
 
 test('UnorderedMap is empty by default', async t => {
     const { root, jsvm, testContract } = t.context.accounts;
-    const result = await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'len', [root.accountId]));
+    const result = await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'len', {}));
     t.is(result, 0);
 });
 
 test('UnorderedMap set() get()', async t => {
     const { ali, jsvm, testContract } = t.context.accounts;
     t.is(
-        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'get', ['hello'])),
+        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'get', { key: 'hello' })),
         null
     );
 
-    await ali.call(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'set', ['hello', 'world']), { attachedDeposit: '100000000000000000000000' });
+    await ali.call(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'set', { key: 'hello', value: 'world' }), { attachedDeposit: '100000000000000000000000' });
 
     t.is(
-        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'get', ['hello'])),
+        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'get', { key: 'hello' })),
         'world'
     );
 });
@@ -67,48 +67,48 @@ test('UnorderedMap insert, update, len and iterate', async t => {
     const { ali, jsvm, testContract } = t.context.accounts;
 
     t.is(
-        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'len', [])),
+        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'len', {})),
         0
     );
     t.deepEqual(
-        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'toArray', [])),
+        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'toArray', {})),
         []
     );
 
-    await ali.call(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'set', ['hello', 'world']), { attachedDeposit: '100000000000000000000000' });
-    await ali.call(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'set', ['hello1', 'world0']), { attachedDeposit: '100000000000000000000000' });
+    await ali.call(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'set', { key: 'hello', value: 'world' }), { attachedDeposit: '100000000000000000000000' });
+    await ali.call(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'set', { key: 'hello1', value: 'world0' }), { attachedDeposit: '100000000000000000000000' });
     t.is(
-        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'len', [])),
+        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'len', {})),
         2
     );
 
     // update a value, len shouldn't change
-    await ali.call(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'set', ['hello1', 'world1']), { attachedDeposit: '100000000000000000000000' });
+    await ali.call(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'set', { key: 'hello1', value: 'world1' }), { attachedDeposit: '100000000000000000000000' });
     t.is(
-        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'len', [])),
+        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'len', {})),
         2
     );
     // update should have effect
     t.is(
-        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'get', ['hello1'])),
+        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'get', { key: 'hello1' })),
         'world1'
     );
 
-    await ali.call(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'set', ['hello2', 'world2']), { attachedDeposit: '100000000000000000000000' });
+    await ali.call(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'set', { key: 'hello2', value: 'world2' }), { attachedDeposit: '100000000000000000000000' });
     t.is(
-        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'len', [])),
+        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'len', {})),
         3
     );
 
     // Try to set a key with same value, len shouldn't change
-    await ali.call(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'set', ['hello2', 'world2']), { attachedDeposit: '100000000000000000000000' });
+    await ali.call(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'set', { key: 'hello2', value: 'world2' }), { attachedDeposit: '100000000000000000000000' });
     t.is(
-        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'len', [])),
+        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'len', {})),
         3
     );
 
     t.deepEqual(
-        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'toArray', [])),
+        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'toArray', {})),
         [['hello', 'world'], ['hello1', 'world1'], ['hello2', 'world2']]
     );
 });
@@ -116,66 +116,66 @@ test('UnorderedMap insert, update, len and iterate', async t => {
 test('UnorderedMap extend, remove, clear', async t => {
     const { ali, jsvm, testContract } = t.context.accounts;
 
-    await ali.call(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'extend', [[['hello', 'world'], ['hello1', 'world1'], ['hello2', 'world2']]]), { attachedDeposit: '100000000000000000000000' });
+    await ali.call(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'extend', { kvs: [['hello', 'world'], ['hello1', 'world1'], ['hello2', 'world2']] }), { attachedDeposit: '100000000000000000000000' });
 
     t.deepEqual(
-        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'toArray', [])),
+        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'toArray', {})),
         [['hello', 'world'], ['hello1', 'world1'], ['hello2', 'world2']]
     );
 
     // remove non existing element should not error
-    await ali.call(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'remove', ['hello3']), { attachedDeposit: '100000000000000000000000' });
+    await ali.call(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'remove', { key: 'hello3' }), { attachedDeposit: '100000000000000000000000' });
     t.deepEqual(
-        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'toArray', [])),
+        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'toArray', {})),
         [['hello', 'world'], ['hello1', 'world1'], ['hello2', 'world2']]
     );
 
     // remove not the last one should work
-    await ali.call(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'remove', ['hello']), { attachedDeposit: '100000000000000000000000' });
+    await ali.call(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'remove', { key: 'hello' }), { attachedDeposit: '100000000000000000000000' });
     t.deepEqual(
-        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'toArray', [])),
+        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'toArray', {})),
         [['hello2', 'world2'], ['hello1', 'world1']]
     );
 
     // remove the last one should work
-    await ali.call(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'remove', ['hello1']), { attachedDeposit: '100000000000000000000000' });
+    await ali.call(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'remove', { key: 'hello1' }), { attachedDeposit: '100000000000000000000000' });
     t.deepEqual(
-        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'toArray', [])),
+        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'toArray', {})),
         [['hello2', 'world2']]
     );
 
     // remove when length is 1 should work
     t.is(
-        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'len', [])),
+        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'len', {})),
         1
     );
     t.is(
-        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'isEmpty', [])),
+        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'isEmpty', {})),
         false
     );
-    await ali.call(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'remove', ['hello2']), { attachedDeposit: '100000000000000000000000' });
+    await ali.call(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'remove', { key: 'hello2' }), { attachedDeposit: '100000000000000000000000' });
     t.deepEqual(
-        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'toArray', [])),
+        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'toArray', {})),
         []
     );
     t.is(
-        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'isEmpty', [])),
+        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'isEmpty', {})),
         true
     );
 
-    await ali.call(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'extend', [[['hello', 'world'], ['hello1', 'world1'], ['hello2', 'world2']]]), { attachedDeposit: '100000000000000000000000' });
+    await ali.call(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'extend', { kvs: [['hello', 'world'], ['hello1', 'world1'], ['hello2', 'world2']] }), { attachedDeposit: '100000000000000000000000' });
     t.is(
-        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'isEmpty', [])),
+        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'isEmpty', {})),
         false
     );
-    await ali.call(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'clear', []), { attachedDeposit: '100000000000000000000000' });
+    await ali.call(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'clear', {}), { attachedDeposit: '100000000000000000000000' });
 
     t.deepEqual(
-        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'toArray', [])),
+        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'toArray', {})),
         []
     );
     t.is(
-        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'isEmpty', [])),
+        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'isEmpty', {})),
         true
     );
 })

@@ -44,22 +44,22 @@ test.afterEach(async t => {
 test('LookupMap set() get()', async t => {
     const { ali, jsvm, testContract } = t.context.accounts;
     t.is(
-        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'get', ['hello'])),
+        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'get', { key: 'hello' })),
         null
     );
     t.is(
-        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'containsKey', ['hello'])),
+        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'containsKey', { key: 'hello' })),
         false
     );
 
-    await ali.call(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'set', ['hello', 'world']), { attachedDeposit: '100000000000000000000000' });
+    await ali.call(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'set', { key: 'hello', value: 'world' }), { attachedDeposit: '100000000000000000000000' });
 
     t.is(
-        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'get', ['hello'])),
+        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'get', { key: 'hello' })),
         'world'
     );
     t.is(
-        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'containsKey', ['hello'])),
+        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'containsKey', { key: 'hello' })),
         true
     );
 });
@@ -68,32 +68,32 @@ test('LookupMap set() get()', async t => {
 test('LookupMap update, remove', async t => {
     const { ali, jsvm, testContract } = t.context.accounts;
 
-    await ali.call(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'set', ['hello', 'world']), { attachedDeposit: '100000000000000000000000' });
-    await ali.call(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'set', ['hello1', 'world0']), { attachedDeposit: '100000000000000000000000' });
+    await ali.call(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'set', { key: 'hello', value: 'world' }), { attachedDeposit: '100000000000000000000000' });
+    await ali.call(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'set', { key: 'hello1', value: 'world0' }), { attachedDeposit: '100000000000000000000000' });
 
     // update a value, len shouldn't change
-    await ali.call(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'set', ['hello1', 'world1']), { attachedDeposit: '100000000000000000000000' });
+    await ali.call(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'set', { key: 'hello1', value: 'world1' }), { attachedDeposit: '100000000000000000000000' });
     // update should have effect
     t.is(
-        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'get', ['hello1'])),
+        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'get', { key: 'hello1' })),
         'world1'
     );
     // not update key should not changed
     t.is(
-        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'get', ['hello'])),
+        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'get', { key: 'hello' })),
         'world'
     );
     // remove non existing element should not error
-    await ali.call(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'remove', ['hello3']), { attachedDeposit: '100000000000000000000000' });
+    await ali.call(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'remove', { key: 'hello3' }), { attachedDeposit: '100000000000000000000000' });
     // remove existing key should work
-    await ali.call(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'remove', ['hello1']));
+    await ali.call(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'remove', { key: 'hello1' }));
     t.is(
-        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'containsKey', ['hello1'])),
+        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'containsKey', { key: 'hello1' })),
         false
     );
     // not removed key should not affected
     t.is(
-        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'get', ['hello'])),
+        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'get', { key: 'hello' })),
         'world'
     );
 });
@@ -101,17 +101,17 @@ test('LookupMap update, remove', async t => {
 test('LookupMap extend', async t => {
     const { ali, jsvm, testContract } = t.context.accounts;
 
-    await ali.call(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'extend', [[['hello', 'world'], ['hello1', 'world1'], ['hello2', 'world2']]]), { attachedDeposit: '100000000000000000000000' });
+    await ali.call(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'extend', { kvs: [['hello', 'world'], ['hello1', 'world1'], ['hello2', 'world2']] }), { attachedDeposit: '100000000000000000000000' });
     t.is(
-        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'get', ['hello'])),
+        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'get', { key: 'hello' })),
         'world'
     );
     t.is(
-        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'get', ['hello1'])),
+        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'get', { key: 'hello1' })),
         'world1'
     );
     t.is(
-        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'get', ['hello2'])),
+        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'get', { key: 'hello2' })),
         'world2'
     );
 })

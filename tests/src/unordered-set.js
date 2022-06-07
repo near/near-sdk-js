@@ -31,17 +31,17 @@ class UnorderedSetTestContract extends NearContract {
     }
 
     @view
-    contains(element) {
+    contains({element}) {
         return this.unorderedSet.contains(element);
     }
 
     @call
-    set(element) {
+    set({element}) {
         this.unorderedSet.set(element);
     }
 
     @call
-    remove(element) {
+    remove({element}) {
         this.unorderedSet.remove(element);
     }
 
@@ -56,7 +56,7 @@ class UnorderedSetTestContract extends NearContract {
     }
 
     @call
-    extend(elements) {
+    extend({elements}) {
         this.unorderedSet.extend(elements);
     }
 }

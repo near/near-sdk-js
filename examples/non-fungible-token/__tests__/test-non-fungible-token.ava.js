@@ -34,7 +34,7 @@ test.beforeEach(async t => {
 
     // Mint an NFT
     let tokenId = 'my-cool-nft';
-    await nftContract.call(jsvm, 'call_js_contract', encodeCall(nftContract.accountId, 'nftMint', [tokenId, nftContract.accountId]), { attachedDeposit: '400000000000000000000000' });
+    await nftContract.call(jsvm, 'call_js_contract', encodeCall(nftContract.accountId, 'nftMint', { token_id: tokenId, token_owner_id: nftContract.accountId }), { attachedDeposit: '400000000000000000000000' });
 
 
     // Create test accounts
@@ -62,14 +62,14 @@ test.afterEach(async t => {
 
 test('Owner has the NFT in the beginning', async t => {
     const { jsvm, nftContract, tokenId } = t.context.accounts;
-    const result = await jsvm.view('view_js_contract', encodeCall(nftContract.accountId, 'nftToken', [tokenId]));
+    const result = await jsvm.view('view_js_contract', encodeCall(nftContract.accountId, 'nftToken', { token_id: tokenId }));
     t.deepEqual(result, { owner_id: nftContract.accountId, token_id: tokenId });
 });
 
 test('Simple transfer', async t => {
     const { jsvm, nftContract, tokenId, ali } = t.context.accounts;
-    await nftContract.call(jsvm, 'call_js_contract', encodeCall(nftContract.accountId, 'nftTransfer', [ali.accountId, tokenId]), { attachedDeposit: '400000000000000000000000' });
-    const result = await jsvm.view('view_js_contract', encodeCall(nftContract.accountId, 'nftToken', [tokenId]));
+    await nftContract.call(jsvm, 'call_js_contract', encodeCall(nftContract.accountId, 'nftTransfer', { receiver_id: ali.accountId, token_id: tokenId }), { attachedDeposit: '400000000000000000000000' });
+    const result = await jsvm.view('view_js_contract', encodeCall(nftContract.accountId, 'nftToken', { token_id: tokenId }));
     t.deepEqual(result, { owner_id: ali.accountId, token_id: tokenId });
 });
 
@@ -78,7 +78,7 @@ test('Transfer failures', async t => {
     const error1 = await t.throwsAsync(() => ali.call(
         jsvm,
         'call_js_contract',
-        encodeCall(nftContract.accountId, 'nftTransfer', [nftContract.accountId, 'non-existent-id']),
+        encodeCall(nftContract.accountId, 'nftTransfer', { receiver_id: nftContract.accountId, token_id: 'non-existent-id' }),
         { attachedDeposit: '400000000000000000000000' }
     ));
     t.assert(error1.message.includes(`Token not found`));
@@ -86,7 +86,7 @@ test('Transfer failures', async t => {
     const error2 = await t.throwsAsync(() => ali.call(
         jsvm,
         'call_js_contract',
-        encodeCall(nftContract.accountId, 'nftTransfer', [nftContract.accountId, tokenId]),
+        encodeCall(nftContract.accountId, 'nftTransfer', { receiver_id: nftContract.accountId, token_id: tokenId }),
         { attachedDeposit: '400000000000000000000000' }
     ));
     t.assert(error2.message.includes(`Sender must be the current owner`));
@@ -94,7 +94,7 @@ test('Transfer failures', async t => {
     const error3 = await t.throwsAsync(() => nftContract.call(
         jsvm,
         'call_js_contract',
-        encodeCall(nftContract.accountId, 'nftTransfer', [nftContract.accountId, tokenId]),
+        encodeCall(nftContract.accountId, 'nftTransfer', { receiver_id: nftContract.accountId, token_id: tokenId }),
         { attachedDeposit: '400000000000000000000000' }
     ));
     t.assert(error3.message.includes(`Current and next owner must differ`));
@@ -105,10 +105,10 @@ test('Transfer call where receiver returns the token', async t => {
     await nftContract.call(
         jsvm,
         'call_js_contract',
-        encodeCall(nftContract.accountId, 'nftTransferCall', [tokenReceiverContract.accountId, tokenId, null, null, 'return-it-now']),
+        encodeCall(nftContract.accountId, 'nftTransferCall', { receiver_id: tokenReceiverContract.accountId, token_id: tokenId, approval_id: null, memo: null, msg: 'return-it-now' }),
         { attachedDeposit: '400000000000000000000000' }
     );
-    const result = await jsvm.view('view_js_contract', encodeCall(nftContract.accountId, 'nftToken', [tokenId]));
+    const result = await jsvm.view('view_js_contract', encodeCall(nftContract.accountId, 'nftToken', { token_id: tokenId }));
     t.deepEqual(result, { owner_id: nftContract.accountId, token_id: tokenId });
 });
 
@@ -117,9 +117,9 @@ test('Transfer call where receiver keeps the token', async t => {
     await nftContract.call(
         jsvm,
         'call_js_contract',
-        encodeCall(nftContract.accountId, 'nftTransferCall', [tokenReceiverContract.accountId, tokenId, null, null, 'keep-it-now']),
+        encodeCall(nftContract.accountId, 'nftTransferCall', { receiver_id: tokenReceiverContract.accountId, token_id: tokenId, approval_id: null, memo: null, msg: 'keep-it-now' }),
         { attachedDeposit: '400000000000000000000000' }
     );
-    const result = await jsvm.view('view_js_contract', encodeCall(nftContract.accountId, 'nftToken', [tokenId]));
+    const result = await jsvm.view('view_js_contract', encodeCall(nftContract.accountId, 'nftToken', { token_id: tokenId }));
     t.deepEqual(result, { owner_id: tokenReceiverContract.accountId, token_id: tokenId });
 });
