@@ -17,6 +17,10 @@ import {
     UnorderedSet
 } from './collections'
 
+import {
+    bytes
+} from './utils'
+
 export {
     call,
     view,
@@ -27,5 +31,6 @@ export {
     Vector,
     LookupSet,
     UnorderedMap,
-    UnorderedSet
+    UnorderedSet,
+    bytes
 }
