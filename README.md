@@ -21,7 +21,7 @@ The general steps to run these contracts are same. You can also follow their cor
 1. Use near-cli to deploy `jsvm.wasm` from the `res` folder to one of account you controlled. For example, `jsvm.<your-account>`:
 ```sh
 export NEAR_ENV=local
-near deploy res/jsvm.wasm <jsvm-account>
+near deploy <jsvm-account> res/jsvm.wasm
 ```
 2. `cd examples/<example>`
 3. `yarn && yarn build` to get <contract>.base64 file (JS smart-contract).
