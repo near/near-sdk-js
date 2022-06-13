@@ -1,4 +1,4 @@
-import { Worker } from 'near-workspaces';
+import { Worker, BN } from 'near-workspaces';
 import {readFile} from 'fs/promises'
 import test from 'ava';
 
@@ -21,9 +21,9 @@ test.before(async t => {
 
     // Deploy status-message JS contract
     const statusMessage = await root.createSubAccount('status-message');
-    let contract_base64 = (await readFile('build/contract.base64')).toString();
-    await statusMessage.call(jsvm, 'deploy_js_contract', Buffer.from(contract_base64, 'base64'), {attachedDeposit: '400000000000000000000000'});
-    await statusMessage.call(jsvm, 'call_js_contract', encodeCall(statusMessage.accountId, 'init', []), {attachedDeposit: '400000000000000000000000'});
+    let contract_base64 = (await readFile('build/status-message-borsh.base64')).toString();
+    await statusMessage.call(jsvm, 'deploy_js_contract', Buffer.from(contract_base64, 'base64'), {attachedDeposit: '4000000000000000000000000', gas: '50 TGas'});
+    await statusMessage.call(jsvm, 'call_js_contract', encodeCall(statusMessage.accountId, 'init', []), {attachedDeposit: '400000000000000000000000', gas: '150 TGas'});
 
     // Test users
     const ali = await root.createSubAccount('ali');

@@ -59,7 +59,7 @@ async function build(argv) {
     const bundle = await rollup({
         input: SOURCE_FILE_WITH_PATH,
         plugins: [
-            nodeResolve(),
+            nodeResolve({preferBuiltins: false}),
             sourcemaps(),
             babel({ babelHelpers: 'bundled' }),
             commonjs()
