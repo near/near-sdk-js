@@ -82,7 +82,11 @@ export function ecrecover(hash, sign, v, malleabilityFlag) {
 }
 
 export function panic(msg) {
-    env.panic(msg)
+    if (msg !== undefined) {
+        env.panic(msg)
+    } else {
+        env.panic()
+    }
 }
 
 export function panicUtf8(msg) {

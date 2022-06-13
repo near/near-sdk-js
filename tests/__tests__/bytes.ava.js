@@ -170,3 +170,42 @@ test('Storage read bytes tests', async t => {
         [0x00, 'a'.charCodeAt(0), 'b'.charCodeAt(0)]
     );
 });
+
+test('panic tests', async t => {
+    const { jsvm, ali, testContract } = t.context.accounts;
+    let r = await ali.callRaw(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'panic_test', ''));
+    t.deepEqual(
+        r.result.receipts_outcome[0].outcome.status.Failure.ActionError.kind.FunctionCallError.ExecutionError,
+        'Smart contract panicked: explicit guest panic'
+    );
+
+    r = await ali.callRaw(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'panic_ascii_test', ''));
+    t.deepEqual(
+        r.result.receipts_outcome[0].outcome.status.Failure.ActionError.kind.FunctionCallError.ExecutionError,
+        'Smart contract panicked: abc'
+    );
+
+    r = await ali.callRaw(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'panic_js_number', ''));
+    t.deepEqual(
+        r.result.receipts_outcome[0].outcome.status.Failure.ActionError.kind.FunctionCallError.ExecutionError,
+        'Smart contract panicked: 356'
+    );
+
+    r = await ali.callRaw(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'panic_utf8_test', ''));
+    t.deepEqual(
+        r.result.receipts_outcome[0].outcome.status.Failure.ActionError.kind.FunctionCallError.ExecutionError,
+        'Smart contract panicked: 水'
+    );
+
+    r = await ali.callRaw(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'panicUtf8_valid_utf8_sequence', ''));
+    t.deepEqual(
+        r.result.receipts_outcome[0].outcome.status.Failure.ActionError.kind.FunctionCallError.ExecutionError,
+        'Smart contract panicked: 水'
+    );
+
+    r = await ali.callRaw(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'panicUtf8_invalid_utf8_sequence', ''));
+    t.deepEqual(
+        r.result.receipts_outcome[0].outcome.status.Failure.ActionError.kind.FunctionCallError.ExecutionError,
+        'String encoding is bad UTF-8 sequence.'
+    );
+})

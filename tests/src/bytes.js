@@ -56,3 +56,26 @@ export function storage_read_utf8_sequence_bytes_key_arbitrary_bytes_value() {
     near.jsvmValueReturn(near.jsvmStorageRead(bytes('\xe6\xb0\xb4')))
 }
 
+export function panic_test() {
+    near.panic()
+}
+
+export function panic_ascii_test() {
+    near.panic('abc')
+}
+
+export function panic_js_number() {
+    near.panic(356)
+}
+
+export function panic_utf8_test() {
+    near.panic('水')
+}
+
+export function panicUtf8_valid_utf8_sequence() {
+    near.panicUtf8(bytes('\xe6\xb0\xb4'))
+}
+
+export function panicUtf8_invalid_utf8_sequence() {
+    near.panicUtf8(bytes('\x00\x01\xff'))
+}
