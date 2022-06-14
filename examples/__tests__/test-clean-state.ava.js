@@ -22,7 +22,7 @@ test.beforeEach(async t => {
 
     // Deploy clean state contract
     const cleanStateContract = await root.createSubAccount('clean-state');
-    let cleanStateContractBase64 = (await readFile('build/contract.base64')).toString();
+    let cleanStateContractBase64 = (await readFile('build/clean-state.base64')).toString();
     await cleanStateContract.call(jsvm, 'deploy_js_contract', Buffer.from(cleanStateContractBase64, 'base64'), { attachedDeposit: '400000000000000000000000' });
     await cleanStateContract.call(jsvm, 'call_js_contract', encodeCall(cleanStateContract.accountId, 'init', {}), { attachedDeposit: '400000000000000000000000' });
 

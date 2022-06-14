@@ -1,0 +1,37 @@
+{
+  "name": "status-message",
+  "version": "1.0.0",
+  "description": "Status message example with near-sdk-js",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "build": "yarn build:clean-state && yarn build:counter && yarn build:cross-contract-call && yarn build:fungible-token-lockable && yarn build:fungible-token && yarn build:non-fungible-token && yarn build:status-message-collections && yarn build:status-message && yarn build:test-token-receiver",
+    "build:clean-state": "near-sdk build src/clean-state.js build/clean-state.base64",
+    "build:counter": "near-sdk build src/counter.js build/counter.base64",
+    "build:cross-contract-call": "near-sdk build src/status-message.js build/status-message.base64 && near-sdk build src/cross-contract-call.js build/cross-contract-call.base64",
+    "build:fungible-token-lockable": "near-sdk build src/fungible-token-lockable.js build/fungible-token-lockable.base64",
+    "build:fungible-token": "near-sdk build src/fungible-token.js build/fungible-token.base64",
+    "build:non-fungible-token": "near-sdk build src/test-token-receiver.js build/test-token-receiver.base64 && near-sdk build src/non-fungible-token.js build/non-fungible-token.base64",
+    "build:status-message-collections": "near-sdk build src/status-message-collections.js build/status-message-collections.base64",
+    "build:status-message": "near-sdk build src/status-message.js build/status-message.base64",
+    "test": "ava",
+    "test:clean-state": "ava __tests__/test-clean-state.ava.js",
+    "test:counter": "ava __tests__/test-counter.ava.js",
+    "test:cross-contract-call": "ava __tests__/test-cross-contract-call.ava.js",
+    "test:fungible-token-lockable": "ava __tests__/test-fungible-token-lockable.ava.js",
+    "test:fungible-token": "ava __tests__/test-fungible-token.ava.js",
+    "test:non-fungible-token": "ava __tests__/test-non-fungible-token.ava.js",
+    "test:status-message-collections": "ava __tests__/test-status-message-collections.ava.js",
+    "test:status-message": "ava __tests__/test-status-message.ava.js"
+  },
+  "author": "Near Inc <hello@nearprotocol.com>",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "near-sdk-js": "file:../",
+    "lodash-es": "^4.17.21"
+  },
+  "devDependencies": {
+    "ava": "^4.2.0",
+    "near-workspaces": "^2.0.0"
+  }
+}

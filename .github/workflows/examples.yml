@@ -11,17 +11,21 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: "16"
-      - name: cross-contract-call
-        run: cd examples/cross-contract-call && yarn && yarn build && yarn test && rm -rf node_modules && rm -rf build && cd ../..
-      - name: fungible-token
-        run: cd examples/fungible-token && yarn && yarn build && yarn test && rm -rf node_modules && rm -rf build && cd ../..
-      - name: lockable-fungible-token
-        run: cd examples/lockable-fungible-token && yarn && yarn build && yarn test && rm -rf node_modules && rm -rf build && cd ../..
-      - name: non-fungible-token
-        run: cd examples/non-fungible-token && yarn && yarn build && yarn test && rm -rf node_modules && rm -rf build && cd ../..
-      - name: status-message
-        run: cd examples/status-message && yarn && yarn build && yarn test && rm -rf node_modules && rm -rf build && cd ../..
+      - name: Install dependencies
+        run: cd examples && yarn
       - name: clean-state
-        run: cd examples/clean-state && yarn && yarn build && yarn test && rm -rf node_modules && rm -rf build && cd ../..
-      - name: template
-        run: cd examples/template && yarn && yarn build && yarn test && rm -rf node_modules && rm -rf build && cd ../..
+        run: cd examples && yarn build:clean-state && yarn test:clean-state
+      - name: counter
+        run: cd examples && yarn build:counter && yarn test:counter
+      - name: cross-contract-call
+        run: cd examples && yarn build:cross-contract-call && yarn test:cross-contract-call
+      - name: fungible-token-lockable
+        run: cd examples && yarn build:fungible-token-lockable && yarn test:fungible-token-lockable
+      - name: fungible-token
+        run: cd examples && yarn build:fungible-token && yarn test:fungible-token
+      - name: non-fungible-token
+        run: cd examples && yarn build:non-fungible-token && yarn test:non-fungible-token
+      - name: status-message-collections
+        run: cd examples && yarn build:status-message-collections && yarn test:status-message-collections
+      - name: status-message
+        run: cd examples && yarn build:status-message && yarn test:status-message
