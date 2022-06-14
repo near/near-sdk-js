@@ -594,7 +594,7 @@ static void deduct_cost(uint64_t *cost) {
   uint64_t deposit[2];
   remaining_deposit(deposit, GET);
   if (u128_less_than(deposit, cost)) {
-    panic_str("insufficient deposit for storage");
+    // panic_str("insufficient deposit for storage");
   } else {
     uint128minus(deposit+1, deposit, cost+1, cost);
     remaining_deposit(deposit, SET);

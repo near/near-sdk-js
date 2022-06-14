@@ -1,0 +1,19 @@
+{
+  "name": "tic-tac-toe",
+  "version": "1.0.0",
+  "description": "Tic-Tac-Toe on NEAR Blockchain with near-sdk-js",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "build": "near-sdk build src/tic-tac-toe.js build/tic-tac-toe.base64",
+    "test": "ava"
+  },
+  "author": "Vadim Ilin <vadim@near.org>",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "near-sdk-js": "file:../../"
+  },
+  "devDependencies": {
+
+  }
+}

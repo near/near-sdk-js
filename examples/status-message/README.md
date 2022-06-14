@@ -34,7 +34,12 @@ near js deploy --accountId status-message.test.near --base64File build/status-me
 </p>
 </details>
 
-
+## Set constants
+```sh
+export ACCOUNT_ID=alice..test.near
+export CONTRACT_ID=status-message.test.near
+export JSVM_ID=jsvm.test.near
+```
 
 ## Initialize the contract
 
@@ -42,14 +47,14 @@ Now we need to initialize the contract after deployment is ready, call the `init
 Go back to the root dir of near-sdk-js, where we have a helper `encode-call.js`. Call it with:
 
 ```sh
-near js call status-message.test.near init --deposit 0.1 --accountId status-message.test.near --jsvm jsvm.test.near
+near js call $CONTRACT_ID init --deposit 0.1 --accountId $CONTRACT_ID --jsvm $JSVM_ID
 ```
 
 <details>
 <summary><strong>Or with the raw CLI call command</strong></summary>
 <p>
 
-    near call jsvm.test.near call_js_contract --accountId status-message.test.near --base64 --args $(node encode_call.js status-message.test.near init '')
+    near call $JSVM_ID call_js_contract --accountId $CONTRACT_ID --base64 --args $(node ../../scripts/encode_call.js $CONTRACT_ID init '')
 
 </p>
 </details>
@@ -59,18 +64,19 @@ Under the root dir of near-sdk-js, call the `set_status` and `get_status` method
 
 
 ```sh
-near js call status-message.test.near set_status --args '["hello"]' --deposit 0.1 --accountId alice.test.near--jsvm jsvm.test.near
+near js call $CONTRACT_ID set_status --args '{"message": "hello"}' --deposit 0.1 --accountId $ACCOUNT_ID --jsvm $JSVM_ID
 
-near js view status-message.test.near get_status --args '["alice.test.near"]' --deposit 0.1 --accountId bob.test.near --jsvm jsvm.test.near
+near js view $CONTRACT_ID get_status --args '{"account_id": "'$ACCOUNT_ID'"}' --jsvm $JSVM_ID
 ```
 
 <details>
 <summary><strong>Or with the raw CLI call command</strong></summary>
 <p>
 
-    near call jsvm.test.near call_js_contract --accountId alice.test.near --base64 --args $(node encode_call.js status-message.test.near set_status '["hello"]') --deposit 0.1
+    near call $JSVM_ID call_js_contract --accountId $ACCOUNT_ID --base64 --args $(node ../../scripts/encode_call.js $CONTRACT_ID set_status '{"message":"hello"}') --deposit 0.1
 
-    near call jsvm.test.near call_js_contract --accountId bob.test.near --base64 --args $(node encode_call.js status-message.test.near get_status '["alice.test.near"]')
+    near call $JSVM_ID call_js_contract --accountId $ACCOUNT_ID --base64 --args $(node ../../scripts/encode_call.js $CONTRACT_ID get_status '{"account_id":"'$ACCOUNT_ID'"}')
+
 
 </p>
 </details>
