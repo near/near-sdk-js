@@ -24,8 +24,8 @@ test.beforeEach(async t => {
     // Deploy and init the counter JS contract
     const counter = await root.createSubAccount('counter');
     let contract_base64 = (await readFile('build/contract.base64')).toString();
-    await counter.call(jsvm, 'deploy_js_contract', Buffer.from(contract_base64, 'base64'), {attachedDeposit: '400000000000000000000000'});
-    await counter.call(jsvm, 'call_js_contract', encodeCall(counter.accountId, 'init', []), {attachedDeposit: '400000000000000000000000'});
+    await counter.call(jsvm, 'deploy_js_contract', Buffer.from(contract_base64, 'base64'), {attachedDeposit: '800000000000000000000000'});
+    await counter.call(jsvm, 'call_js_contract', encodeCall(counter.accountId, 'init', []), {attachedDeposit: '800000000000000000000000'});
 
     // Test users
     const ali = await root.createSubAccount('ali');
