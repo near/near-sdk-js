@@ -268,8 +268,9 @@
     "bs58" "^4.0.0"
     "text-encoding-utf-8" "^1.0.2"
 
-"borsh@near/borsh-js#import-buffer":
-  "resolved" "git+ssh://git@github.com/near/borsh-js.git#de9af485ec631eaeca52f721b97e528f6df00cb5"
+"borsh@https://github.com/near/borsh-js/tarball/import-buffer":
+  "integrity" "sha512-55eiXYFcztHjF3gqP8ploCy9fGrMsC5qCMSO8yOp5aZFQzuyyTQ+Wd+8ePDeXVQlLHyc1yuy2yhsoh4C1KN9HA=="
+  "resolved" "https://github.com/near/borsh-js/tarball/import-buffer"
   "version" "0.7.0"
   dependencies:
     "bn.js" "^5.2.0"
@@ -1603,6 +1604,11 @@
     "string-width" "^4.2.3"
     "y18n" "^5.0.5"
     "yargs-parser" "^21.0.0"
+
+"yarn@^1.22.19":
+  "integrity" "sha512-/0V5q0WbslqnwP91tirOvldvYISzaqhClxzyUKXYxs07yUILIs5jx/k6CFe8bvKSkds5w+eiOqta39Wk3WxdcQ=="
+  "resolved" "https://registry.npmjs.org/yarn/-/yarn-1.22.19.tgz"
+  "version" "1.22.19"
 
 "yocto-queue@^1.0.0":
   "integrity" "sha512-9bnSc/HEW2uRy67wc+T8UwauLuPJVn28jb+GtJY16iiKWyvmYJRXVT4UamsAEGQfPohgr2q4Tq0sQbQlxTfi1g=="
