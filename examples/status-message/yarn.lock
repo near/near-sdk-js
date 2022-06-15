@@ -268,6 +268,15 @@
     "bs58" "^4.0.0"
     "text-encoding-utf-8" "^1.0.2"
 
+"borsh@near/borsh-js#import-buffer":
+  "resolved" "git+ssh://git@github.com/near/borsh-js.git#de9af485ec631eaeca52f721b97e528f6df00cb5"
+  "version" "0.7.0"
+  dependencies:
+    "bn.js" "^5.2.0"
+    "bs58" "^4.0.0"
+    "buffer" "^6.0.3"
+    "text-encoding-utf-8" "^1.0.2"
+
 "brace-expansion@^1.1.7":
   "integrity" "sha512-iCuPHDFgrHX7H2vEI/5xpz07zSHB00TpugqhmYtVmMO6518mCuRMoOYFldEBl0g187ufozdaHgWKcYFb61qGiA=="
   "resolved" "https://registry.npmjs.org/brace-expansion/-/brace-expansion-1.1.11.tgz"

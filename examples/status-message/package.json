@@ -14,7 +14,7 @@
   "author": "Near Inc <hello@nearprotocol.com>",
   "license": "Apache-2.0",
   "dependencies": {
-    "buffer": "^6.0.3",
+    "borsh": "near/borsh-js#import-buffer",
     "near-sdk-js": "file:../../"
   },
   "devDependencies": {
