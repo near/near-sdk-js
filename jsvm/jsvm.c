@@ -717,7 +717,7 @@ static JSValue near_jsvm_storage_write(JSContext *ctx, JSValueConst this_val, in
   key_with_account_prefix = malloc(key_with_prefix_len);
   strncpy(key_with_account_prefix, contract_name, contract_name_len);
   strncpy(key_with_account_prefix+contract_name_len, "/state/", 7);
-  strncpy(key_with_account_prefix+contract_name_len+7, key_ptr, key_len);
+  memcpy(key_with_account_prefix+contract_name_len+7, key_ptr, key_len);
 
   ret = storage_write_enclave(key_with_prefix_len, (uint64_t)key_with_account_prefix, value_len, (uint64_t)value_ptr, register_id);
   return JS_NewBigUint64(ctx, ret);
@@ -739,7 +739,7 @@ static JSValue near_jsvm_storage_read(JSContext *ctx, JSValueConst this_val, int
   key_with_account_prefix = malloc(key_with_prefix_len);
   strncpy(key_with_account_prefix, contract_name, contract_name_len);
   strncpy(key_with_account_prefix+contract_name_len, "/state/", 7);
-  strncpy(key_with_account_prefix+contract_name_len+7, key_ptr, key_len);
+  memcpy(key_with_account_prefix+contract_name_len+7, key_ptr, key_len);
 
   ret = storage_read(key_with_prefix_len, (uint64_t)key_with_account_prefix, register_id);
   return JS_NewBigUint64(ctx, ret);
@@ -775,7 +775,7 @@ static JSValue near_jsvm_storage_remove(JSContext *ctx, JSValueConst this_val, i
   key_with_account_prefix = malloc(key_with_prefix_len);
   strncpy(key_with_account_prefix, contract_name, contract_name_len);
   strncpy(key_with_account_prefix+contract_name_len, "/state/", 7);
-  strncpy(key_with_account_prefix+contract_name_len+7, key_ptr, key_len);
+  memcpy(key_with_account_prefix+contract_name_len+7, key_ptr, key_len);
 
   ret = storage_remove_enclave(key_with_prefix_len, (uint64_t)key_with_account_prefix, register_id);
   return JS_NewBigUint64(ctx, ret);
@@ -794,7 +794,7 @@ static JSValue near_jsvm_storage_has_key(JSContext *ctx, JSValueConst this_val, 
   key_with_account_prefix = malloc(key_with_prefix_len);
   strncpy(key_with_account_prefix, contract_name, contract_name_len);
   strncpy(key_with_account_prefix+contract_name_len, "/state/", 7);
-  strncpy(key_with_account_prefix+contract_name_len+7, key_ptr, key_len);
+  memcpy(key_with_account_prefix+contract_name_len+7, key_ptr, key_len);
 
   ret = storage_has_key(key_with_prefix_len, (uint64_t)key_with_account_prefix);
   return JS_NewBigUint64(ctx, ret);
@@ -865,7 +865,7 @@ static void jsvm_call(uint64_t contract_len, char *contract, uint64_t method_len
     error_message_c = JS_ToCStringLen(ctx, &msg_len, error_message);
     error_stack_c = JS_ToCStringLen(ctx, &stack_len, error_stack);
     error_c = malloc(msg_len+1+stack_len);
-    strncpy(error_c, error_message_c, msg_len);
+    memcpy(error_c, error_message_c, msg_len);
     error_c[msg_len] = '\n';
     strncpy(error_c+msg_len+1, error_stack_c, stack_len);
     panic_utf8(msg_len+1+stack_len, (uint64_t)error_c);
