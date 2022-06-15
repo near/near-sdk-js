@@ -49,7 +49,7 @@ test('Root gets null status', async t => {
 
 test('Ali sets then gets status', async t => {
     const { ali, jsvm, statusMessage } = t.context.accounts;
-    await ali.call(jsvm, 'call_js_contract', encodeCall(statusMessage.accountId, 'set_status', ['hello']), {attachedDeposit: '100000000000000000000000'});
+    await ali.call(jsvm, 'call_js_contract', encodeCall(statusMessage.accountId, 'set_status', ['hello']), {attachedDeposit: '100000000000000000000000', gas: '150 TGas'});
     
     t.is(
         await jsvm.view('view_js_contract', encodeCall(statusMessage.accountId, 'get_status', [ali.accountId])),
@@ -59,8 +59,8 @@ test('Ali sets then gets status', async t => {
 
 test('Bob and Carl have different statuses', async t => {
     const {jsvm, statusMessage, bob, carl} = t.context.accounts;
-    await bob.call(jsvm, 'call_js_contract', encodeCall(statusMessage.accountId, 'set_status', ['hello']), {attachedDeposit: '100000000000000000000000'});
-    await carl.call(jsvm, 'call_js_contract', encodeCall(statusMessage.accountId, 'set_status', ['world']), {attachedDeposit: '100000000000000000000000'});
+    await bob.call(jsvm, 'call_js_contract', encodeCall(statusMessage.accountId, 'set_status', ['hello']), {attachedDeposit: '100000000000000000000000', gas: '150 TGas'});
+    await carl.call(jsvm, 'call_js_contract', encodeCall(statusMessage.accountId, 'set_status', ['world']), {attachedDeposit: '100000000000000000000000', gas: '150 TGas'});
 
     const bobStatus = await jsvm.view('view_js_contract', encodeCall(statusMessage.accountId, 'get_status', [bob.accountId]));
     const carlStatus = await jsvm.view('view_js_contract', encodeCall(statusMessage.accountId, 'get_status', [carl.accountId]));

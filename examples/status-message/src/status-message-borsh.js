@@ -1,6 +1,7 @@
 import { NearContract, NearBindgen, call, view, near } from 'near-sdk-js'
 import { serialize, deserialize } from 'borsh';
 import { panic } from '../../../src/api';
+import { Buffer } from 'buffer/'
 
 @NearBindgen
 class StatusMessage extends NearContract {
@@ -39,7 +40,15 @@ class StatusMessage extends NearContract {
 //     ]
 // }]]);
 
-class StatusMessageBorsh {}
+class Assignable {
+    constructor(properties) {
+        Object.keys(properties).map((key) => {
+            this[key] = properties[key];
+        });
+    }
+}
+
+class StatusMessageBorsh extends Assignable {}
 
 const schema = new Map([[StatusMessageBorsh, {
     'kind': 'struct',
@@ -49,8 +58,7 @@ const schema = new Map([[StatusMessageBorsh, {
 }]]);
 
 function borshSerializeStatusMessage(statusMessage) {
-    let temp = new StatusMessageBorsh()
-    temp.records = statusMessage.records
+    let temp = new StatusMessageBorsh({records: statusMessage.records})
     near.jsvmStorageWrite('STATE', serialize(schema, temp));
 }
 
@@ -58,7 +66,8 @@ function borshDeserializeStatusMessage(to) {
     let state = near.jsvmStorageRead('STATE');
 
     if (state) {
-        Object.assign(to, deserialize(schema, state));
+        let temp = deserialize(schema, StatusMessageBorsh, Buffer.from(state))
+        Object.assign(to, temp);
     } else {
         throw new Error('Contract state is empty')
     }
