@@ -61,6 +61,8 @@ test('Log unexpected types not logging', async t => {
     const { jsvm, ali, testContract } = t.context.accounts;
 
     let r = await ali.callRaw(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'log_unexpected_input_tests', ''), { attachedDeposit: '100000000000000000000000' });
+    // logUtf8 and logUtf16 only works with bytes, trying to log it with string is unexpected and behavior is undefined
+    // in this specific case, it logs nothing
     t.deepEqual(
         r.result.receipts_outcome[0].outcome.logs,
         [
@@ -189,6 +191,18 @@ test('panic tests', async t => {
     t.deepEqual(
         r.result.receipts_outcome[0].outcome.status.Failure.ActionError.kind.FunctionCallError.ExecutionError,
         'Smart contract panicked: 356'
+    );
+
+    r = await ali.callRaw(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'panic_js_undefined', ''));
+    t.deepEqual(
+        r.result.receipts_outcome[0].outcome.status.Failure.ActionError.kind.FunctionCallError.ExecutionError,
+        'Smart contract panicked: explicit guest panic'
+    );
+
+    r = await ali.callRaw(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'panic_js_null', ''));
+    t.deepEqual(
+        r.result.receipts_outcome[0].outcome.status.Failure.ActionError.kind.FunctionCallError.ExecutionError,
+        'Smart contract panicked: null'
     );
 
     r = await ali.callRaw(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'panic_utf8_test', ''));

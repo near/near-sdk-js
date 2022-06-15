@@ -68,6 +68,14 @@ export function panic_js_number() {
     near.panic(356)
 }
 
+export function panic_js_undefined() {
+    near.panic(undefined)
+}
+
+export function panic_js_null() {
+    near.panic(null)
+}
+
 export function panic_utf8_test() {
     near.panic('水')
 }
