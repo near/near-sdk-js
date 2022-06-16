@@ -1,4 +1,3 @@
-vendor
 jsvm.wasm
 jsvm_nightly.wasm
 jsvm_nightly_sandbox.wasm
