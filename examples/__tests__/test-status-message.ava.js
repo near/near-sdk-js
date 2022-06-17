@@ -16,7 +16,7 @@ test.before(async t => {
     // Deploy the jsvm contract.
     const jsvm = await root.createAndDeploy(
         root.getSubAccount('jsvm').accountId,
-        './node_modules/near-sdk-js/res/jsvm.wasm',
+        './node_modules/near-sdk-js/jsvm/build/jsvm.wasm',
     );
 
     // Deploy status-message JS contract

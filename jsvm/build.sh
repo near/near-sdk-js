@@ -40,3 +40,6 @@ $CC --target=wasm32-wasi \
     -o ${TARGET_NAME}
 
 ${WASI_STUB} ${TARGET_NAME} >/dev/null
+
+mkdir -p build
+mv ${TARGET_NAME} build

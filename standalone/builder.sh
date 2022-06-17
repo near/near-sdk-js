@@ -5,10 +5,9 @@ SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
 WASI_SDK_PATH=${SCRIPT_DIR}/../vendor/wasi-sdk-11.0
 CC="${WASI_SDK_PATH}/bin/clang --sysroot=${WASI_SDK_PATH}/share/wasi-sysroot"
 QUICKJS_SRC_DIR=${SCRIPT_DIR}/../quickjs
-RES_DIR=${SCRIPT_DIR}/../res
 OS=$(uname -s)
 ARCH=$(uname -m)
-QJSC=${RES_DIR}/${OS}-${ARCH}-qjsc
+QJSC=${SCRIPT_DIR}/../cli/qjsc/${OS}-${ARCH}-qjsc
 WASI_STUB=${SCRIPT_DIR}/../vendor/binaryen/wasi-stub/run.sh
 TARGET=$(basename ${1%.*}).wasm
 

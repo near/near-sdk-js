@@ -18,10 +18,10 @@ There are a couple of contract examples in the project:
 The general steps to run these contracts are same. You can also follow their corresponding READMEs to build, test and run the contracts.
 
 ### General steps to run examples locally
-1. Use near-cli to deploy `jsvm.wasm` from the `res` folder to one of account you controlled. For example, `jsvm.<your-account>`:
+1. Use near-cli to deploy `jsvm.wasm` from the `jsvm/build` folder to one of account you controlled. For example, `jsvm.<your-account>`:
 ```sh
 export NEAR_ENV=local
-near deploy <jsvm-account> res/jsvm.wasm
+near deploy <jsvm-account> jsvm/build/jsvm.wasm
 ```
 2. `cd examples/<example>`
 3. `yarn && yarn build` to get <contract>.base64 file (JS smart-contract).
@@ -468,7 +468,7 @@ npm install near-sdk-js
 It is tested on Ubuntu 20.04, Intel Mac and M1 Mac. Other linux should also work but they're not tested.
 
 1. Make sure you have `wget`, `make`, `cmake` and `nodejs`. On Linux, also make sure you have `gcc`.
-2. Run `make` to get platform specific `qjsc` and `jsvm` contract in `res` folder.
+2. Run `make` to get platform specific `qjsc` and `jsvm` contract in `jsvm/build` folder.
 
 
 ### Run NEAR-SDK-JS tests

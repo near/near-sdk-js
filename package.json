@@ -38,7 +38,7 @@
   },
   "files": [
     "cli",
-    "res",
+    "jsvm/build/jsvm.wasm",
     "scripts",
     "src"
   ]

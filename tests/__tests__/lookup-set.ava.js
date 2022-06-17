@@ -16,7 +16,7 @@ test.beforeEach(async t => {
     // Deploy the jsvm contract.
     const jsvm = await root.createAndDeploy(
         root.getSubAccount('jsvm').accountId,
-        '../res/jsvm.wasm',
+        '../jsvm/build/jsvm.wasm',
     );
 
     // Deploy test JS contract

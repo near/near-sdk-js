@@ -47,7 +47,7 @@ async function build(argv) {
     const CONTRACT_TARGET = `${TARGET_DIR}/${TARGET_FILE_NAME}.base64`;
 
     const SAVE_BYTECODE_SCRIPT = './node_modules/near-sdk-js/cli/save_bytecode.js';
-    const QJSC = `./node_modules/near-sdk-js/res/${OS}-${ARCH}-qjsc`;
+    const QJSC = `./node_modules/near-sdk-js/cli/qjsc/${OS}-${ARCH}-qjsc`;
 
     console.log(`Building ${SOURCE_FILE_WITH_PATH} contract...`);
 
