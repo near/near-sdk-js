@@ -1,516 +1,260 @@
-# NEAR-SDK-JS (Enclave)
+# NEAR-SDK-JS (Standalone)
 
-## Getting started with template project
+## Installation
+It is tested on Ubuntu 20.04 and Intel Mac. Other linux and M1 Mac with rosetta should also work but they're not tested.
 
-The fastest and recommended way to develop with near-sdk-js is to create a project with our github template: https://github.com/near/near-sdk-js-template-project.
+1. Make sure you have make, cmake and nodejs. On Linux, also make sure you have gcc.
+2. `make setup`
 
-## Running examples
+## Usage
 
-There are a couple of contract examples in the project:
+1. Write smart contracts with JavaScript. You can use most npm packages that uses portable ES2020 features. Export callable contract methods with export. See `examples/` for examples.
+2. Build the contract with `path/to/near-sdk-js/builder.sh path/to/your/<contract-name>.js`.
+3. If no errors happens, a `<contract-name>.wasm` will be generate at current directory. You can test it with local neard or testnet.
 
-- [Clean contract state](https://github.com/near/near-sdk-js/tree/master/examples/clean-state)
-- [Doing cross contract call](https://github.com/near/near-sdk-js/tree/master/examples/cross-contract-call)
-- [Fungible token](https://github.com/near/near-sdk-js/tree/master/examples/fungible-token)
-- [Lockable fungible token](https://github.com/near/near-sdk-js/tree/master/examples/lockable-fungible-token)
-- [Non fungible token](https://github.com/near/near-sdk-js/tree/master/examples/non-fungible-token)
-- [Status message board](https://github.com/near/near-sdk-js/tree/master/examples/status-message)
+## Demo
 
-The general steps to run these contracts are same. You can also follow their corresponding READMEs to build, test and run the contracts.
+### On a local node
 
-### General steps to run examples locally
-1. Use near-cli to deploy `jsvm.wasm` from the `res` folder to one of account you controlled. For example, `jsvm.<your-account>`:
-```sh
-export NEAR_ENV=local
-near deploy <jsvm-account> res/jsvm.wasm
+1. Build the contract
 ```
-2. `cd examples/<example>`
-3. `yarn && yarn build` to get <contract>.base64 file (JS smart-contract).
-4. Deploy <contract>.base64 file to `JSVM` account from the previous step.
-```sh
-near js deploy --accountId <your-account> --base64File build/<contract-name>.base64 --deposit 0.1 --jsvm <jsvm-account>
+mkdir -p build
+cd build
+../standalone/builder.sh ../standalone/examples/counter.js
 ```
 
-5. Interact with your contract using NEAR CLI or `near-api-js`. Encode the parameters and call. If the call cause the state increasement, you also need to attach NEAR to cover the storage deposit for the delta.
-
-```sh
-near js call <account-that-deployed-js-contract-to-jsvm> <method-name> --accountId <account-performing-call> --args <args> --deposit 0.1 --jsvm <jsvm-account>
+2. Go to nearcore, Build and start a local node
+```
+cargo build -p neard
+target/debug/neard init
+target/debug/neard run
 ```
 
-6. If you want to remove the js contract and withdraw the storage deposit, use:
+3. Have `near-cli` installed. Deploy and call method in the contract. Example session:
+```
+nearcore (near-sdk-js) export NEAR_ENV=local
+nearcore (near-sdk-js) near deploy test.near counter.wasm 
+Starting deployment. Account id: test.near, node: http://localhost:3030, helper: http://localhost:3000, file: counter.wasm
+Loaded master account test.near key from /home/bo/.near/validator_key.json with public key = ed25519:4tfuwpXjdHh22wuDigTTESxARtv2kdS78w3RnanKDQLb
+Transaction Id WJ5vz8NZbi2oxg9wKhkcLZcF8WatXYVY8PMu96FXPPF
+To see the transaction in the transaction explorer, please open this url in your browser
+http://localhost:9001/transactions/WJ5vz8NZbi2oxg9wKhkcLZcF8WatXYVY8PMu96FXPPF
+Done deploying to test.near
 
-```sh
-near js remove --accountId <your-account> --jsvm <jsvm-account>
+nearcore (near-sdk-js) near call test.near increment --accountId test.near --args ''
+Scheduling a call: test.near.increment()
+Loaded master account test.near key from /home/bo/.near/validator_key.json with public key = ed25519:4tfuwpXjdHh22wuDigTTESxARtv2kdS78w3RnanKDQLb
+Doing account.functionCall()
+Receipt: m2oWjsWUdr1AdP2AVB8snnK3PRGNgu9sQJVMuYcbmar
+        Log [test.near]: Increased number to 1
+Transaction Id 6Lhq2cXuaiwAtdcwyoXhpXYkd3MRZNCjGKL3oRrVeXM3
+To see the transaction in the transaction explorer, please open this url in your browser
+http://localhost:9001/transactions/6Lhq2cXuaiwAtdcwyoXhpXYkd3MRZNCjGKL3oRrVeXM3
+''
+
+nearcore (near-sdk-js) near call test.near increment --accountId test.near --args ''
+Scheduling a call: test.near.increment()
+Loaded master account test.near key from /home/bo/.near/validator_key.json with public key = ed25519:4tfuwpXjdHh22wuDigTTESxARtv2kdS78w3RnanKDQLb
+Doing account.functionCall()
+Receipt: Ez8yqQgNiX7sNg3hRYdu6pAGsuvPqd2z5JFacKmnTErg
+        Log [test.near]: Increased number to 2
+Transaction Id 5ERxe2AnfxoqrqHq1qDZtzWqM6j1uAbLscAchJ39yMDZ
+To see the transaction in the transaction explorer, please open this url in your browser
+http://localhost:9001/transactions/5ERxe2AnfxoqrqHq1qDZtzWqM6j1uAbLscAchJ39yMDZ
+''
+
+nearcore (near-sdk-js) near view test.near get_num --accountId test.near --args ''
+View call: test.near.get_num()
+Loaded master account test.near key from /home/bo/.near/validator_key.json with public key = ed25519:4tfuwpXjdHh22wuDigTTESxARtv2kdS78w3RnanKDQLb
+2
+
 ```
 
-### General steps to run examples on testnet
-1. `export NEAR_ENV=testnet`
-2. `cd examples/<example>`
-3. `yarn && yarn build` to get <contract>.base64 file (JS smart-contract).
-4. Deploy, call and remove JS contract is same as above, except <jsvm-account> is `jsvm.testnet`. This is also the default value, so you omit `--jsvm`.
+### On testnet
+The following shows a session to build, deploy and call a contract on testnet:
 
-## Error Handling in NEAR-SDK-JS
+```
+near-sdk-js (master) export NEAR_ENV=testnet
 
-If you want to indicate an error happened and fail the transaction, just throw an error object in JavaScript. Our JSVM runtime will detect and automatically invoke `panic_utf8` with `"{error.message}\n:{error.stack}"`. As a result, transaction will fail with `"Smart contract panicked: {error.message}\n{error.stack}"` error message. You can also use an error utilities library to organize your errors, such as verror.
+near-sdk-js (master) ./builder.sh examples/nft.js 
 
-When your JS code or library throws an error, uncaught, the transaction will also fail with GuestPanic error, with the error message and stacktrace.
+near-sdk-js (master) near dev-deploy nft.wasm 
+Starting deployment. Account id: dev-1641453759104-17291726737196, node: https://rpc.testnet.near.org, helper: https://helper.testnet.near.org, file: nft.wasm
+Transaction Id 7vxUnEg7XNjtBVxjgo1YvHnx9f6bzeTwWktDoQgaQzho
+To see the transaction in the transaction explorer, please open this url in your browser
+https://explorer.testnet.near.org/transactions/7vxUnEg7XNjtBVxjgo1YvHnx9f6bzeTwWktDoQgaQzho
+Done deploying to dev-1641453759104-17291726737196
 
-When call host function with inappropriate type, means incorrect number of arguments or arg is not expected type:
-    - if arguments less than params, remaining argument are set as 'undefined'
-    - if arguments more than params, remaining argument are ignored
-    - if argument is different than the required type, it'll be coerced to required type
-    - if argument is different than the required type but cannot be coerced, will throw runtime type error, also with message and stacktrace
-
-## Test
-We recommend to use near-workspaces to write tests for your smart contracts. See any of the examples for how tests are setup and written.
-
-## NEAR-SDK-JS API Reference
-
-All NEAR blockchain provided functionality (host functions) are defined in `src/api.js` and exported as `near`. You can use them by:
-```js
-import {near} from 'near-sdk-js'
-
-// near.<api doucmented below>. e.g.:
-let signer = near.signerAccountId()
+near-sdk-js (master) near call dev-1641453759104-17291726737196 mint_to --accountId dev-1641453759104-17291726737196 --args '{"owner":"abcdef.testnet"}'
+Scheduling a call: dev-1641453759104-17291726737196.mint_to({"owner":"abcdef.testnet"})
+Doing account.functionCall()
+Receipt: 7ouVxQnzFDqM9rasLVnDGfMFYPR42ZJ3Vh1z81Eb3d4C
+        Log [dev-1641453759104-17291726737196]: Minted NFT 1 to abcdef.testnet
+Transaction Id 3Fa6k2kGabBt9CafGkukgovJRaq29pAN4Vc6YafhjuiY
+To see the transaction in the transaction explorer, please open this url in your browser
+https://explorer.testnet.near.org/transactions/3Fa6k2kGabBt9CafGkukgovJRaq29pAN4Vc6YafhjuiY
+1
 ```
 
-To use nightly host functions, such as `altBn128G1Sum`, the enclave contract need to be built with `make jsvm-nightly` and deployed to a nearcore node that has nightly enabled.
+## NEAR-SDK-JS Low Level API Reference
 
-### About Type
+Use `env.func_name(args)` to call low level APIs in JavaScript contracts. `env` is already imported before contract start. For example, `env.read_register(0)`.
+To use nightly host functions, such as `alt_bn128_g1_sum`, build the contract with `NEAR_NIGHTLY=1 path/to/near-sdk-js/builder.sh path/to/contract.js`.
+
+### About Type 
 
 - In arguments, `Uint64: Number | BigInt`. In return, `Uint64: BigInt`. Because JavaScript Number cannot hold all Uint64 without losing precision. But as arguments, interger number is also allowed for convinience. Same for `Uint128`.
-- `Bytes` in both arguments and return represent a byte buffer, internally it's a JavaScript String Object. Any binary data `0x00-0xff` is stored as the char '\x00-\xff'. This is because QuickJS doesn't have ArrayBuffer in C API. If the bytes happens to have only 1-byte chars, it happens to be same as the the same content string.
+- `String` in both arguments and return is a byte buffer encoded as a JavaScript String. Which means:
+    - If the string have only 1 byte chars, the representation is same.
+    - If the string have 2/3/4 byte char, it is break down to 2/3/4 bytes and each byte as a separate char.
+    - Arbitrary binary data `0x00-0xff` is as the char '\x00-\xff'
+
+It's intentional to represent string and bytes in this way because QuickJS doesn't have ArrayBuffer in C API.
+
+- The signature may differs from Rust APIs. This is because JavaScript doesn't have pointers and not possible to pass pointer as arguments. So, Instead of `data_len: u64, data_ptr: u64`, JavaScript API pass the data directly: `data: String`.
+- The lowest level Rust API cannot return value bigger than 64 bit integer. So some of the API pass pointer as Uint64 and the Rust function write return data at the location specified by pointer. In JavaScript we don't have this limitation and value is returned as API function return.
+
+### Registers API
+
+```
+function read_register(register_id: Uint64): String;
+function register_len(register_id: Uint64): Uint64;
+function write_register(register_id: Uint64, data: String);
+```
 
 ### Context API
 
 ```
-function signerAccountId(): String;
-function signerAccountPk(): String;
-function predecessorAccountId(): String;
-function blockIndex(): Uint64;
-function blockHeight(): Uint64;
-function blockTimestamp(): Uint64;
-function epochHeight(): Uint64;
+function current_account_id(register_id: Uint64);
+function signer_account_id(register_id: Uint64);
+function signer_account_pk(register_id: Uint64);
+function predecessor_account_id(register_id: Uint64);
+function input(register_id: Uint64);
+function block_index(): Uint64;
+function block_timestamp(): Uint64;
+function epoch_height(): Uint64;
+function storage_usage(): Uint64;
 ```
-
 
 ### Economics API
 ```
-function attachedDeposit(): Uint128;
-function prepaidGas(): Uint64;
-function usedGas(): Uint64;
+function account_balance(): Uint128;
+function account_locked_balance(): Uint128;
+function attached_deposit(): Uint128;
+function prepaid_gas(): Uint64;
+function used_gas(): Uint64;
 ```
 
 ### Math API
 
+
 ```
-function randomSeed(): Bytes;
-function sha256(value: Bytes): Bytes;
-function keccak256(value: Bytes): Bytes;
-function keccak512(value: Bytes): Bytes;
-function ripemd160(value: Bytes): Bytes;
-function ecrecover(hash: Bytes, sign: Bytes, v: Uint64, malleability_flag: Uint64): Bytes | null;
+function random_seed(register_id: Uint64);
+function sha256(value: String, register_id: Uint64);
+function keccak256(value: String, register_id: Uint64);
+function keccak512(value: String, register_id: Uint64);
+function ripemd160(value: String, register_id: Uint64);
+function ecrecover(hash: String, sign: String, v: Uint64, malleability_flag: Uint64, register_id: Uint64): Uint64;
 ```
 
 ### Miscellaneous API
 
+
 ```
+function value_return(value: String);
 function panic(msg?: String);
-function panicUtf8(msg: Bytes);
+function panic_utf8(msg: String);
 function log(msg: String);
-function logUtf8(msg: Bytes);
-function logUtf16(msg: Bytes);
+function log_utf8(msg: String);
+function log_utf16(msg: String);
+// Name confliction with WASI. Can be re-exported with a different name on NEAR side with a protocol upgrade
+// Or, this is actually not a primitive, can be implement with log and panic host functions in C side or JS side. 
+// function abort(msg_ptr: Uint32, filename_ptr: Uint32, u32: Uint32, col: Uint32);
+```
+
+### Promises API
+
+```
+function promise_create(account_id: String, method_name: String, arguments: String, amount: Uint128, gas: Uint64): Uint64;
+function promise_then(promise_index: Uint64, account_id: String, method_name: String, arguments: String, amount: Uint128, gas: Uint64): Uint64;
+function promise_and(...promise_idx: Uint64): Uint64;
+function promise_batch_create(account_id: String): Uint64;
+function promise_batch_then(promise_index: Uint64, account_id: String): Uint64;
+```
+
+### Promise API actions
+
+```
+function promise_batch_action_create_account(promise_index: Uint64);
+function promise_batch_action_deploy_contract(promise_index: Uint64, code: String);
+function promise_batch_action_function_call(promise_index: Uint64, method_name: String, arguments: String, amount: Uint128, gas: Uint64);
+function promise_batch_action_transfer(promise_index: Uint64, amount: Uint128);
+function promise_batch_action_stake(promise_index: Uint64, amount: Uint128, public_key: String);
+function promise_batch_action_add_key_with_full_access(promise_index: Uint64, public_key: String, nonce: Uint64);
+function promise_batch_action_add_key_with_function_call(promise_index: Uint64, public_key: String, nonce: Uint64, allowance: Uint128, receiver_id: String, method_names: String);
+function promise_batch_action_delete_key(promise_index: Uint64, public_key: String);
+function promise_batch_action_delete_account(promise_index: Uint64, beneficiary_id: String);
+```
+
+### Promise API results
+
+```
+function promise_results_count(void): Uint64;
+function promise_result(result_idx: Uint64, register_id: Uint64): Uint64;
+function promise_return(promise_idx: Uint64);
 ```
 
 ### Storage API
 
 ```
-function storageRead(key: Bytes): Bytes | null;
-function storageHasKey(key: Bytes): bool;
+function storage_write(key: String, value: String, register_id: Uint64): Uint64;
+function storage_read(key: String, register_id: Uint64): Uint64;
+function storage_remove(key: String, register_id: Uint64): Uint64;
+function storage_has_key(key: String): Uint64;
 ```
 
 ### Validator API
 
 ```
-function validatorStake(account_id: String): Uint128;
-function validatorTotalStake(): Uint128;
+function validator_stake(account_id: String): Uint128;
+function validator_total_stake(): Uint128;
 ```
 
 ### Alt BN128
 
 ```
-function altBn128G1Multiexp(value: Bytes): Bytes;
-function altBn128G1Sum(value: Bytes): Bytes;
-function altBn128PairingCheck(value: Bytes): bool;
+function alt_bn128_g1_multiexp(value: String, register_id: Uint64);
+function alt_bn128_g1_sum(value: String, register_id: Uint64);
+function alt_bn128_pairing_check(value: String): Uint64;
 ```
 
-### JSVM Specific APIs
-Due to the design of JavaScript VM Contract, some additonal APIs are provided to obtain context, access storage and cross contract call. Since they're not documented at [NEAR nomicon](https://nomicon.io/). They're explained here.
-
-#### Obtain Context
-```
-function jsvmAccountId(): String;
-function jsvmJsContractName(): String;
-function jsvmMethodName(): String;
-function jsvmArgs(): Bytes;
-```
-
-The `jsvmAccountId` returns the JavaScript VM's contract account ID.
-
-The `jsvmJsContractName`, when called, returns the JavaScript contract name that are called at the moment.
-
-The `jsvmJsContractName` returns the method name being called.
-
-The `jsvmArgs` return the arguments passed to the method.
-
-#### Storage Access
-```
-function jsvmStorageWrite(key: Bytes, value: Bytes): bool;
-function jsvmStorageRead(key: Bytes): Bytes | null;
-function jsvmStorageRemove(key: Bytes): bool;
-function jsvmStorageHasKey(key: Bytes): bool;
-function storageGetEvicted(): Bytes;
-```
-
-These are equivalent to `storage*` but access limit to the substate of current JS contract. The `jsvmStorageWrite` and `jsvmStorageRemove` require and refund deposit to cover the storage delta. `jsvmStorage*` access the substate of current JS contract by prefix the key of current JS contract name (deployer's account id). You can use `storageRead` and `storageHasKey` to get code and state of other JS contracts. More specifically: code of `contractA` is stored under the key `contractA/code`. state of `contractA` is stored under `contractA/state/` concat with developer specifid key. And:
-```
-jsvmStorageRead(k)
-// equvalent to
-storageRead(jsvmJsContractName() + '/state/' + k)
-```
-
-When `jsvmStorageWrite` write to a key that already exists, the old value would be saved and can be obtained by `storageGetEvicted()`. In this case, jsvmStorageWrite returns `true`. If key doesn't exist before, returns `false`.
-
-When `jsvmStroageRemove` remove a key that exists, the old value would be saved and can be obtained by `storageGetEvicted()`. In this case, jsvmStroageRemove returns `true`. If key doesn't exist before, nothing is removed and returns `false`.
-
-#### Cross Contract Call
-```
-function jsvmValueReturn(value: Bytes);
-function jsvmCall(contract_name: String, method: String, args: Bytes): any;
-function jsvmCallRaw(contract_name: String, method: String, args: Bytes): Bytes;
-```
-
-The `jsvmValueReturn` is the version of `valueReturn` that should be used in all JavaScript contracts. It play well with `jsvmCall`.
-
-The `jsvmCall` invoke a synchronous cross contract call, to the given JavaScript `contract_name`, `method` with `args`. And returned the return value parsed as JSON into a JS object.
-
-The `jsvmCallRaw` is similar to `jsvmCall`, but return the raw, unparsed Bytes.
-
-### Collections
-A few useful on-chain persistent collections are provided. All keys, values and elements are of type `Bytes`.
-
-#### Vector
-Vector is an iterable implementation of vector that stores its content on the trie. Usage:
-
-```js
-import {Vector} from 'near-sdk-js'
-
-// in contract class constructor:
-constructor() {
-    super()
-    this.v = new Vector('my_prefix_')
-}
-
-// Override the deserializer to load vector from chain
-deserialize() {
-    super.deserialize()
-    this.v = Object.assign(new Vector, this.v)
-}
-
-someMethod() {
-    // insert
-    this.v.push('abc')
-    this.v.push('def')
-    this.v.push('ghi')
-
-    // batch insert, extend:
-    this.v.extend(['xyz', '123'])
-
-    // get
-    let first = this.v.get(0)
-
-    // remove, move the last element to the given index
-    this.v.swapRemove(0) 
-
-    // replace
-    this.v.replace(1, 'jkl')
-
-    // remove the last
-    this.v.pop()
-
-    // len, isEmpty
-    let len = this.v.len()
-    let isEmpty = this.v.isEnpty()
-
-    // iterate
-    for (let element of this.v) {
-        near.log(element)
-    }
-
-    // toArray, convert to JavaScript Array
-    let a = this.v.toArray()
-
-    // clear
-    ths.v.clear()
-}
-```
-
-#### LookupMap
-LookupMap is an non-iterable implementation of a map that stores its content directly on the trie. It's like a big hash map, but on trie. Usage:
-```js
-import {LookupMap} from 'near-sdk-js'
-
-// in contract class constructor:
-constructor() {
-    super()
-    this.m = new LookupMap('prefix_a')
-}
-
-// Override the deserializer to load vector from chain
-deserialize() {
-    super.deserialize()
-    this.m = Object.assign(new LookupMap, this.m)
-}
-
-someMethod() {
-    // insert
-    this.m.set('abc', 'aaa')
-    this.m.set('def', 'bbb')
-    this.m.set('ghi', 'ccc')
-
-    // batch insert, extend:
-    this.m.extend([['xyz', '123'], ['key2', 'value2']])
-
-    // check exist
-    let exist = this.m.containsKey('abc')
-
-    // get
-    let value = this.m.get('abc')
-
-    // remove
-    this.m.remove('def') 
-
-    // replace
-    this.m.set('ghi', 'ddd')
-}
-```
-
-#### LookupSet
-LookupSet is an non-iterable implementation of a set that stores its content directly on the trie. It's like LookupMap, but it only stores whether the value presents. Usage:
-```js
-import {LookupSet} from 'near-sdk-js'
-
-// in contract class constructor:
-constructor() {
-    super()
-    this.s = new LookupSet('prefix_b')
-}
-
-// Override the deserializer to load vector from chain
-deserialize() {
-    super.deserialize()
-    this.s = Object.assign(new LookupSet, this.s)
-}
-
-someMethod() {
-    // insert
-    this.s.set('abc')
-    this.s.set('def')
-    this.s.set('ghi')
-
-    // batch insert, extend:
-    this.s.extend(['xyz', '123'])
-
-    // check exist
-    let exist = this.s.contains('abc')
-
-    // remove
-    this.s.remove('def')
-}
-```
-
-#### UnorderedMap
-UnorderedMap is an iterable implementation of a map that stores its content directly on the trie. Usage:
-```js
-import {UnorderedMap} from 'near-sdk-js'
-
-// in contract class constructor:
-constructor() {
-    super()
-    this.m = new UnorderedMap('prefix_c')
-}
-
-// Override the deserializer to load vector from chain
-deserialize() {
-    super.deserialize()
-    this.m.keys = Object.assign(new Vector, this.m.keys)
-    this.m.values = Object.assign(new Vector, this.m.values)
-    this.m = Object.assign(new UnorderedMap, this.m)
-}
-
-someMethod() {
-    // insert
-    this.m.set('abc', 'aaa')
-    this.m.set('def', 'bbb')
-    this.m.set('ghi', 'ccc')
-
-    // batch insert, extend:
-    this.m.extend([['xyz', '123'], ['key2', 'value2']])
-
-    // get
-    let value = this.m.get('abc')
-
-    // remove
-    this.m.remove('def') 
-
-    // replace
-    this.m.set('ghi', 'ddd')
-
-    // len, isEmpty
-    let len = this.m.len()
-    let isEmpty = this.m.isEnpty()
-
-    // iterate
-    for (let [k, v] of this.m) {
-        near.log(k+v)
-    }
-
-    // toArray, convert to JavaScript Array
-    let a = this.m.toArray()
-
-    // clear
-    this.m.clear()
-}
-```
-
-#### UnorderedSet
-UnorderedSet is an iterable implementation of a set that stores its content directly on the trie. It's like UnorderedMap but it only stores whether the value presents. Usage:
-```js
-import {UnorderedSet} from 'near-sdk-js'
-
-// in contract class constructor:
-constructor() {
-    super()
-    this.s = new UnorderedSet('prefix_d')
-}
-
-// Override the deserializer to load vector from chain
-deserialize() {
-    super.deserialize()
-    this.s.elements = Object.assign(new Vector, this.s.elements)
-    this.s = Object.assign(new UnorderedSet, this.s)
-}
-
-someMethod() {
-    // insert
-    this.s.set('abc')
-    this.s.set('def')
-    this.s.set('ghi')
-
-    // batch insert, extend:
-    this.s.extend(['xyz', '123'])
-
-    // check exist
-    let exist = this.s.contains('abc')
-
-    // remove
-    this.s.remove('def')
-
-    // len, isEmpty
-    let len = this.s.len()
-    let isEmpty = this.s.isEnpty()
-
-    // iterate
-    for (let e of this.s) {
-        near.log(e)
-    }
-
-    // toArray, convert to JavaScript Array
-    let a = this.s.toArray()
-
-    // clear
-    this.s.clear()
-}
-```
-
-### APIs not available in JSVM
-Due to the architecture of the JSVM, some NEAR host functions, part of Standalone SDK or Rust SDK, are not revelant or being replaced by above JSVM specific APIs. Those unavailable APIs are explained here.
-
-- The `current_account_id` would always puts the account id of the JavaScript VM contract account in given register. The naming `current_account_id` is therefore confusing and not as helpful as a Rust contract. In some case, developer may want to get JavaScript VM contract account name, for example, determines whether it's running on testnet or mainnet, and behaves differently. So we expose this functionality under `jsvm_account_id()`.
-
-- The `input` puts the argument passed to call the contract in given register. In JavaScript VM, this is encoded as `"js_contract_name\0method_name\0args...`. This format isn't very convinient to developer, therefore, separate API `jsvm_js_contract_name`, `jsvm_method_name` and `jsvm_args` are provided.
-
-- The `storage_usage` return the storage bytes used by JavaScript VM contract. User doesn't care about the storage usage of the JSVM. Instead, users care about storage usage of a given JavaScript contract. This can be obtained by `storage_read` and count the sum of `register_len`.
-
-- The `account_balance` and `account_locked_balance` returns balance and locked_balance of JavaScript VM. Those are also not cared by users.
-
-- The `value_return` is a NEAR primitive that puts the value to return in a receipt. However we would want to access it as a JavaScript return value in a cross contract call. So we have a new API `jsvmValueReturn`, which does return the value in receipt and also as a JavaScript value returned by `jsvm_call`. The `jsvmValueReturn` should be used whenever you need `value_return`.
-
-- `abort` is intended to mark error location (line number). A full stacktrace with line numbers is provided by QuickJS, available when you throw a JS Error. So this API isn't needed.
-
-- Promise APIs act on the JSVM contract and could create subaccount, use the balance from JSVM account.JSVM would be a common VM used by the community instead of a Rust contract owned by the deployer. Therefore, promise APIs are not allowed.
-
-- The `storage_write` and `storage_remove` have access to all JavaScript contract codes and states deployed on JSVM. User can only write to their account owned code and state, as a substate of the JSVM. Therefor these two APIs are disallowed. Use `jsvm_storage_write` and `jsvm_storage_remove` instead. Read to other people owned code and state is allowed, as they're public as part of the blockchain anyway.
-
-
-## Advanced guides
-
-### Manual setup with npm package
-
-You can also layout your project by install the npm package manually:
-```
-yarn add near-sdk-js
-# or
-npm install near-sdk-js
-```
-
-### NEAR-SDK-JS contributor setup
-
-It is tested on Ubuntu 20.04, Intel Mac and M1 Mac. Other linux should also work but they're not tested.
-
-1. Make sure you have `wget`, `make`, `cmake` and `nodejs`. On Linux, also make sure you have `gcc`.
-2. Run `make` to get platform specific `qjsc` and `jsvm` contract in `res` folder.
-
-
-### Run NEAR-SDK-JS tests
-See https://github.com/near/near-sdk-js/tree/master/tests
-
-
-### Low level way to invoke NEAR-CLI
-
-`near js` subcommand in near-cli is a recent feature. Under the hood, it is encoding a special function call to jsvm contract. 
-
-#### Deploy a JS contract
-
-<details>
-<summary><strong>The equivalent raw command is:</strong></summary>
-<p>
-
-    near call <jsvm-account> deploy_js_contract --accountId <your-account> --args $(cat <contract-name>.base64) --base64 --deposit 0.1
-
-</p>
-</details>
-
-#### Call a JS contract
-
-<details>
-<summary><strong>The equivalent raw command is:</strong></summary>
-<p>
-
-    near call <jsvm-account> call_js_contract --accountId <your-account> --args <encoded-args> --base64
-
-    # where `<encoded-args>` can be obtained by:
-    node scripts/encode_call.js <your-account> <method-name> <args>
-
-</p>
-</details>
-
-#### Remove a JS contract
-
-<details>
-<summary><strong>The equivalent raw command is:</strong></summary>
-<p>
-
-    near call <jsvm-account> remove_js_contract --accountId <your-account>
-
-</p>
-</details>
+## Error Handling in NEAR-SDK-JS
+
+### Error handling behavior
+
+- when js throws an error, uncatched, then transaction fails with GuestPanic error, with the user js error message and stacktrace
+- when call host function with inappropriate type, means incorrect number of arguments or arg is not expected type:
+    - if arguments less than params, remaining argument are set as 'undefined'
+    - if arguments more than params, remaining argument are ignored
+    - if argument is different than the required type, it'll be coerced to required type
+    - if argument is different than the required type but cannot be coerced, will throw runtime type error, also with message and stacktrace
+
+### The error reporting capability of a wasm contract
+Smart contract can only use `panic` or `panic_utf8` to abort from execution. That is of error kind `GuestPanic {msg}`. It displays in RPC as `"Smart contract panicked: {msg}"`
+And only `panic_utf8` can set that message. 
+Other than this, if calls a host function, it can returns error provided by that host function. For example, any host function can return a `GasExceeded`. `log_utf8` can return `BadUTF8`. This behavior is part of protocol and we cannot control or trigger in JavaScript (without calling `env.*`). 
+
+### Use errors
+You can throw an error in JavaScript. Our quickjs runtime will detect and automatically invoke `panic_utf8` with `"{error.message}\n:{error.stack}"`. As a result, transaction will fail with `"Smart contract panicked: {error.message}\n{error.stack}"` error message.
+
+### Use verror
+User can use verror this way:
+1. catch an error, attach information to it
+2. return/rethrow the error, attach more information to it
+3. throw the final verror, `throw e`, same as in nodejs.
+
+Under the hood, our quickjs runtime would take the final throwed error, and invoke panic_utf8("{error.message}\n{error.stack}")
+
+## TODO
+- Other c functions are exposed and can be name confliction with bindgen functions. Need binaryen pass to rename c functions
+- Source maps for rollup build to correctly display locations in the backtrace

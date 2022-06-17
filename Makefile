@@ -8,7 +8,7 @@ ARCH = $(shell uname -m)
 all: setup build yarn
 
 setup:
-	cd jsvm && ./setup.sh && cd ..
+	./setup.sh
 
 build: jsvm qjsc
 
@@ -33,7 +33,7 @@ yarn:
 clean: clean-vendor clean-node
 
 clean-vendor:
-	$(QUIET)rm -rf jsvm/vendor
+	$(QUIET)rm -rf vendor
 
 clean-node:
 	$(QUIET)rm -rf node_modules
