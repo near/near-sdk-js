@@ -24,7 +24,7 @@ if [[ -n "${NEAR_NIGHTLY}" ]]; then
 fi
 set -u
 
-INCLUDES="-I${SCRIPT_DIR}/stubs -I${QUICKJS_SRC_DIR} -I."
+INCLUDES="-I${QUICKJS_SRC_DIR} -I."
 LIBS='-lm'
 QUICKJS_SOURCES=(quickjs.c libregexp.c libunicode.c cutils.c quickjs-libc-min.c libbf.c)
 SOURCES="${SCRIPT_DIR}/builder.c"
