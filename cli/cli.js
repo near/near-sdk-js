@@ -41,6 +41,7 @@ async function build(argv) {
 
     const ROLLUP_TARGET = `${TARGET_DIR}/${TARGET_FILE_NAME}.js`;
     const QJSC_TARGET = `${TARGET_DIR}/${TARGET_FILE_NAME}.h`;
+    const STANDALONE_CONTRACT_TARGET = `${TARGET_DIR}/${TARGET_FILE_NAME}.wasm`;
     const ENCLAVED_CONTRACT_TARGET = `${TARGET_DIR}/${TARGET_FILE_NAME}.base64`;
 
     console.log(`Building ${SOURCE_FILE_WITH_PATH} contract...`);
@@ -52,7 +53,12 @@ async function build(argv) {
 
     await qjsc(ROLLUP_TARGET, QJSC_TARGET);
 
-    await createEnclavedContract(QJSC_TARGET, ENCLAVED_CONTRACT_TARGET);
+    const ENCLAVED = true; // TODO: pass as a parameter
+    if (ENCLAVED) {
+        await createEnclavedContract(QJSC_TARGET, ENCLAVED_CONTRACT_TARGET);
+    } else {
+        await createStandaloneContract(QJSC_TARGET, STANDALONE_CONTRACT_TARGET);
+    }
 }
 
 async function rollup(sourceFileWithPath, rollupTarget) {
@@ -87,6 +93,11 @@ async function createEnclavedContract(qjscTarget, enclavedContractTarget) {
     console.log(`Saving enclaved bytecode to ${enclavedContractTarget}`);
     await executeCommand(`node ${SAVE_BYTECODE_SCRIPT} ${qjscTarget} ${enclavedContractTarget}`);
 }
+
+async function createStandaloneContract(qjsscTarget, standaloneContractTarget) {
+    // TODO: move second half of the builder/builder.sh here
+}
+
 
 async function executeCommand(command, silent = false) {
     console.log(command);
