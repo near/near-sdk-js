@@ -49,9 +49,9 @@ async function build(argv) {
     console.log(`Creating ${TARGET_DIR} directory...`);
     await executeCommand(`mkdir -p ${TARGET_DIR}`);
 
-    await rollup(SOURCE_FILE_WITH_PATH, ROLLUP_TARGET);
+    await createJsFileWithRullup(SOURCE_FILE_WITH_PATH, ROLLUP_TARGET);
 
-    await qjsc(ROLLUP_TARGET, QJSC_TARGET);
+    await cratreHeaderFileWithQjsc(ROLLUP_TARGET, QJSC_TARGET);
 
     const ENCLAVED = true; // TODO: pass as a parameter
     if (ENCLAVED) {
@@ -61,7 +61,7 @@ async function build(argv) {
     }
 }
 
-async function rollup(sourceFileWithPath, rollupTarget) {
+async function createJsFileWithRullup(sourceFileWithPath, rollupTarget) {
     console.log(`Creating ${rollupTarget} file with Rollup...`);
     const bundle = await rollup({
         input: sourceFileWithPath,
@@ -80,7 +80,7 @@ async function rollup(sourceFileWithPath, rollupTarget) {
     });
 }
 
-async function qjsc(rollupTarget, qjscTarget) {
+async function cratreHeaderFileWithQjsc(rollupTarget, qjscTarget) {
     const OS = await executeCommand('uname -s', true);
     const ARCH = await executeCommand('uname -m', true);
     const QJSC = `./node_modules/near-sdk-js/cli/qjsc/${OS}-${ARCH}-qjsc`;
