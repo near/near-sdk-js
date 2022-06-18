@@ -35,28 +35,30 @@ yargs(hideBin(process.argv))
     .argv
 
 async function build(argv) {
-    const OS = await executeCommand('uname -s', true);
-    const ARCH = await executeCommand('uname -m', true);
-
     const SOURCE_FILE_WITH_PATH = argv.source;
     const TARGET_DIR = path.dirname(argv.target);
     const TARGET_FILE_NAME = path.basename(argv.target, '.base64');
 
     const ROLLUP_TARGET = `${TARGET_DIR}/${TARGET_FILE_NAME}.js`;
-    const QJS_TARGET = `${TARGET_DIR}/${TARGET_FILE_NAME}.h`;
-    const CONTRACT_TARGET = `${TARGET_DIR}/${TARGET_FILE_NAME}.base64`;
-
-    const SAVE_BYTECODE_SCRIPT = './node_modules/near-sdk-js/cli/save_bytecode.js';
-    const QJSC = `./node_modules/near-sdk-js/cli/qjsc/${OS}-${ARCH}-qjsc`;
+    const QJSC_TARGET = `${TARGET_DIR}/${TARGET_FILE_NAME}.h`;
+    const ENCLAVED_CONTRACT_TARGET = `${TARGET_DIR}/${TARGET_FILE_NAME}.base64`;
 
     console.log(`Building ${SOURCE_FILE_WITH_PATH} contract...`);
 
     console.log(`Creating ${TARGET_DIR} directory...`);
     await executeCommand(`mkdir -p ${TARGET_DIR}`);
 
-    console.log(`Creating ${ROLLUP_TARGET} file with Rollup...`);
+    await rollup(SOURCE_FILE_WITH_PATH, ROLLUP_TARGET);
+
+    await qjsc(ROLLUP_TARGET, QJSC_TARGET);
+
+    await createEnclavedContract(QJSC_TARGET, ENCLAVED_CONTRACT_TARGET);
+}
+
+async function rollup(sourceFileWithPath, rollupTarget) {
+    console.log(`Creating ${rollupTarget} file with Rollup...`);
     const bundle = await rollup({
-        input: SOURCE_FILE_WITH_PATH,
+        input: sourceFileWithPath,
         plugins: [
             nodeResolve(),
             sourcemaps(),
@@ -67,15 +69,23 @@ async function build(argv) {
 
     await bundle.write({
         sourcemap: true,
-        file: ROLLUP_TARGET,
+        file: rollupTarget,
         format: 'es'
     });
+}
 
-    console.log(`Creating ${QJS_TARGET} file with QJSC...`);
-    await executeCommand(`${QJSC} -c -m -o ${QJS_TARGET} -N code ${ROLLUP_TARGET}`);
+async function qjsc(rollupTarget, qjscTarget) {
+    const OS = await executeCommand('uname -s', true);
+    const ARCH = await executeCommand('uname -m', true);
+    const QJSC = `./node_modules/near-sdk-js/cli/qjsc/${OS}-${ARCH}-qjsc`;
+    console.log(`Creating ${qjscTarget} file with QJSC...`);
+    await executeCommand(`${QJSC} -c -m -o ${qjscTarget} -N code ${rollupTarget}`);
+}
 
-    console.log(`Saving bytecode to ${CONTRACT_TARGET}`);
-    await executeCommand(`node ${SAVE_BYTECODE_SCRIPT} ${QJS_TARGET} ${CONTRACT_TARGET}`);
+async function createEnclavedContract(qjscTarget, enclavedContractTarget) {
+    const SAVE_BYTECODE_SCRIPT = './node_modules/near-sdk-js/cli/save_bytecode.js';
+    console.log(`Saving enclaved bytecode to ${enclavedContractTarget}`);
+    await executeCommand(`node ${SAVE_BYTECODE_SCRIPT} ${qjscTarget} ${enclavedContractTarget}`);
 }
 
 async function executeCommand(command, silent = false) {
