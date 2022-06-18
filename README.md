@@ -8,12 +8,12 @@ The fastest and recommended way to develop with near-sdk-js is to create a proje
 
 There are a couple of contract examples in the project:
 
-- [Clean contract state](/examples/README-clean-state)
-- [Doing cross contract call](/examples/README-cross-contract-call)
-- [Fungible token](/examples/README-FT)
-- [Lockable fungible token](/examples/README-lockable-FT)
-- [Non fungible token](/examples/README-NFT)
-- [Status message board](/examples/README-status-message)
+- [Clean contract state](https://github.com/near/near-sdk-js/blob/master/examples/README-CLEAN-STATE.md)
+- [Doing cross contract call](https://github.com/near/near-sdk-js/blob/master/examples/README-CROSS-CONTRACT-CALL.md)
+- [Fungible token](https://github.com/near/near-sdk-js/blob/master/examples/README-FT.md)
+- [Lockable fungible token](https://github.com/near/near-sdk-js/blob/master/examples/README-LOCKABLE-FT.md)
+- [Non fungible token](https://github.com/near/near-sdk-js/blob/master/examples/README-NFT.md)
+- [Status message board](https://github.com/near/near-sdk-js/blob/master/examples/README-STATUS-MESSAGE.md)
 
 The general steps to run these contracts are same. You can also follow their corresponding READMEs to build, test and run the contracts.
 
