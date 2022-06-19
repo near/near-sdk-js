@@ -1,18 +1,18 @@
-export class UnorderedSet {
+import { Vector } from "./vector";
+export declare class UnorderedSet {
+    readonly length: number;
+    readonly elementIndexPrefix: string;
+    readonly elements: Vector;
     constructor(prefix: any);
-    length: number;
-    elementIndexPrefix: string;
-    elements: Vector;
     len(): number;
     isEmpty(): boolean;
-    serializeIndex(index: any): string;
-    deserializeIndex(rawIndex: any): number;
-    contains(element: any): boolean;
-    set(element: any): boolean;
-    remove(element: any): boolean;
+    serializeIndex(index: number): string;
+    deserializeIndex(rawIndex: string): number;
+    contains(element: string): boolean;
+    set(element: string): boolean;
+    remove(element: string): boolean;
     clear(): void;
     toArray(): string[];
-    extend(elements: any): void;
     [Symbol.iterator](): import("./vector").VectorIterator;
+    extend(elements: string[]): void;
 }
-import { Vector } from "./vector";

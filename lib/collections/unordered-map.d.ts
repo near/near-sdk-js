@@ -1,31 +1,30 @@
-export class UnorderedMap {
-    constructor(prefix: any);
-    length: number;
-    keyIndexPrefix: string;
-    keys: Vector;
-    values: Vector;
+import { Vector } from "./vector";
+export declare class UnorderedMap {
+    readonly length: number;
+    readonly keyIndexPrefix: string;
+    readonly keys: Vector;
+    readonly values: Vector;
+    constructor(prefix: string);
     len(): number;
     isEmpty(): boolean;
-    serializeIndex(index: any): string;
-    deserializeIndex(rawIndex: any): number;
-    getIndexRaw(key: any): any;
-    get(key: any): string;
-    set(key: any, value: any): string;
-    remove(key: any): string;
+    serializeIndex(index: number): string;
+    deserializeIndex(rawIndex: string): number;
+    getIndexRaw(key: string): string;
+    get(key: string): string | null;
+    set(key: string, value: string): string | null;
+    remove(key: string): string | null;
     clear(): void;
-    toArray(): string[][];
-    extend(kvs: any): void;
+    toArray(): [string, string][];
     [Symbol.iterator](): UnorderedMapIterator;
+    extend(kvs: [string, string][]): void;
 }
-import { Vector } from "./vector";
 declare class UnorderedMapIterator {
-    constructor(unorderedMap: any);
-    keys: VectorIterator;
-    values: VectorIterator;
+    private keys;
+    private values;
+    constructor(unorderedMap: UnorderedMap);
     next(): {
-        value: string[];
+        value: [string | null, string | null];
         done: boolean;
     };
 }
-import { VectorIterator } from "./vector";
 export {};
