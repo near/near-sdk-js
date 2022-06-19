@@ -1,26 +1,25 @@
-export class Vector {
-    constructor(prefix: any);
+export declare class Vector {
     length: number;
-    prefix: any;
+    readonly prefix: string;
+    constructor(prefix: string);
     len(): number;
     isEmpty(): boolean;
-    indexToKey(index: any): string;
-    get(index: any): any;
-    swapRemove(index: any): any;
-    push(element: any): void;
-    pop(): any;
-    replace(index: any, element: any): any;
-    extend(elements: any): void;
-    clear(): void;
-    toArray(): any[];
+    get(index: number): string | null;
+    swapRemove(index: number): string | null;
+    push(element: string): void;
+    pop(): string | null;
+    replace(index: number, element: string): string;
+    extend(elements: string[]): void;
     [Symbol.iterator](): VectorIterator;
+    clear(): void;
+    toArray(): string[];
 }
-export class VectorIterator {
-    constructor(vector: any);
-    current: number;
-    vector: any;
+export declare class VectorIterator {
+    private current;
+    private vector;
+    constructor(vector: Vector);
     next(): {
-        value: any;
+        value: string | null;
         done: boolean;
     };
 }

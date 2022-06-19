@@ -11,7 +11,7 @@ export class UnorderedSet {
     set(element: any): boolean;
     remove(element: any): boolean;
     clear(): void;
-    toArray(): any[];
+    toArray(): string[];
     extend(elements: any): void;
     [Symbol.iterator](): import("./vector").VectorIterator;
 }

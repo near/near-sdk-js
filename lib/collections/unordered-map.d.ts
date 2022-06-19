@@ -9,11 +9,11 @@ export class UnorderedMap {
     serializeIndex(index: any): string;
     deserializeIndex(rawIndex: any): number;
     getIndexRaw(key: any): any;
-    get(key: any): any;
-    set(key: any, value: any): any;
-    remove(key: any): any;
+    get(key: any): string;
+    set(key: any, value: any): string;
+    remove(key: any): string;
     clear(): void;
-    toArray(): any[][];
+    toArray(): string[][];
     extend(kvs: any): void;
     [Symbol.iterator](): UnorderedMapIterator;
 }
@@ -23,7 +23,7 @@ declare class UnorderedMapIterator {
     keys: VectorIterator;
     values: VectorIterator;
     next(): {
-        value: any[];
+        value: string[];
         done: boolean;
     };
 }
