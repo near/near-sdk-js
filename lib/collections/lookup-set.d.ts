@@ -1,8 +1,8 @@
-export class LookupSet {
-    constructor(keyPrefix: any);
-    keyPrefix: any;
-    contains(key: any): boolean;
-    remove(key: any): any;
-    set(key: any): any;
-    extend(keys: any): void;
+export declare class LookupSet {
+    readonly keyPrefix: string;
+    constructor(keyPrefix: string);
+    contains(key: string): boolean;
+    remove(key: string): any;
+    set(key: string): any;
+    extend(keys: string[]): void;
 }

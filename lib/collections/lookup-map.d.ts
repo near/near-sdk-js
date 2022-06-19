@@ -1,9 +1,9 @@
-export class LookupMap {
-    constructor(keyPrefix: any);
-    keyPrefix: any;
-    containsKey(key: any): boolean;
-    get(key: any): any;
-    remove(key: any): any;
-    set(key: any, value: any): any;
-    extend(kvs: any): void;
+export declare class LookupMap {
+    readonly keyPrefix: string;
+    constructor(keyPrefix: string);
+    containsKey(key: string): boolean;
+    get(key: string): string | null;
+    remove(key: string): string | null;
+    set(key: string, value: string): string | null;
+    extend(kvs: [string, string][]): void;
 }
