@@ -1,223 +1,241 @@
-const U64_MAX = 2n**64n - 1n
-const EVICTED_REGISTER = U64_MAX - 1n
+const U64_MAX = 2n ** 64n - 1n;
+const EVICTED_REGISTER = U64_MAX - 1n;
 
+interface Env {
+  panic: (msg?: string) => never;
+  panic_utf8: (msg: string) => never;
+  [x: string]: any;
+}
 // env object is injected by JSVM
-declare let env: any;
+declare let env: Env;
 
-export function log(message) {
-    env.log(message)
+export function log(message: string) {
+  env.log(message);
 }
 
-export function signerAccountId() {
-    env.signer_account_id(0)
-    return env.read_register(0)
+export function signerAccountId(): string {
+  env.signer_account_id(0);
+  return env.read_register(0);
 }
 
-export function signerAccountPk() {
-    env.signer_account_pk(0)
-    return env.read_register(0)
+export function signerAccountPk(): string {
+  env.signer_account_pk(0);
+  return env.read_register(0);
 }
 
-export function predecessorAccountId() {
-    env.predecessor_account_id(0)
-    return env.read_register(0)
+export function predecessorAccountId(): string {
+  env.predecessor_account_id(0);
+  return env.read_register(0);
 }
 
-export function blockIndex() {
-    return env.block_index()
+export function blockIndex(): BigInt {
+  return env.block_index();
 }
 
-export function blockHeight() {
-    return blockIndex()
+export function blockHeight(): BigInt {
+  return blockIndex();
 }
 
-export function blockTimestamp() {
-    return env.block_timestamp()
+export function blockTimestamp(): BigInt {
+  return env.block_timestamp();
 }
 
-export function epochHeight() {
-    return env.epoch_height()
+export function epochHeight(): BigInt {
+  return env.epoch_height();
 }
 
-export function attachedDeposit() {
-    return env.attached_deposit()
+export function attachedDeposit(): BigInt {
+  return env.attached_deposit();
 }
 
-export function prepaidGas() {
-    return env.prepaid_gas()
+export function prepaidGas(): BigInt {
+  return env.prepaid_gas();
 }
 
-export function usedGas() {
-    return env.used_gas()
+export function usedGas(): BigInt {
+  return env.used_gas();
 }
 
-export function randomSeed() {
-    env.random_seed(0)
-    return env.read_register(0)
+export function randomSeed(): string {
+  env.random_seed(0);
+  return env.read_register(0);
 }
 
-export function sha256(value) {
-    env.sha256(value, 0)
-    return env.read_register(0)
+export function sha256(value: string): string {
+  env.sha256(value, 0);
+  return env.read_register(0);
 }
 
-export function keccak256(value) {
-    env.keccak256(value, 0)
-    return env.read_register(0)
+export function keccak256(value: string): string {
+  env.keccak256(value, 0);
+  return env.read_register(0);
 }
 
-export function keccak512(value) {
-    env.keccak512(value, 0)
-    return env.read_register(0)
+export function keccak512(value: string): string {
+  env.keccak512(value, 0);
+  return env.read_register(0);
 }
 
-export function ripemd160(value) {
-    env.ripemd160(value, 0)
-    return env.read_register(0)
+export function ripemd160(value: string): string {
+  env.ripemd160(value, 0);
+  return env.read_register(0);
 }
 
-export function ecrecover(hash, sign, v, malleabilityFlag) {
-    let ret = env.ecrecover(hash, sign, v, malleabilityFlag, 0)
-    if (ret === 0n) {
-        return null
-    }
-    return env.read_register(0)
+export function ecrecover(
+  hash: string,
+  sig: string,
+  v: number,
+  malleabilityFlag: number
+): string | null {
+  let ret = env.ecrecover(hash, sig, v, malleabilityFlag, 0);
+  if (ret === 0n) {
+    return null;
+  }
+  return env.read_register(0);
 }
 
-export function panic(msg) {
-    if (msg !== undefined) {
-        env.panic(msg)
-    } else {
-        env.panic()
-    }
+export function panic(msg?: string): never {
+  if (msg !== undefined) {
+    env.panic(msg);
+  } else {
+    env.panic();
+  }
 }
 
-export function panicUtf8(msg) {
-    env.panic_utf8(msg)
+export function panicUtf8(msg: string): never {
+  env.panic_utf8(msg);
 }
 
-export function logUtf8(msg) {
-    env.log_utf8(msg)
+export function logUtf8(msg: string) {
+  env.log_utf8(msg);
 }
 
-export function logUtf16(msg) {
-    env.log_utf16(msg)
+export function logUtf16(msg: string) {
+  env.log_utf16(msg);
 }
 
-export function storageRead(key) {
-    let ret = env.storage_read(key, 0)
-    if (ret === 1n) {
-        return env.read_register(0)
-    } else {
-        return null
-    }
+export function storageRead(key: any): string | null {
+  let ret = env.storage_read(key, 0);
+  if (ret === 1n) {
+    return env.read_register(0);
+  } else {
+    return null;
+  }
 }
 
-export function storageHasKey(key) {
-    let ret = env.storage_has_key(key)
-    if (ret === 1n) {
-        return true
-    } else {
-        return false
-    }
+export function storageHasKey(key: string): boolean {
+  let ret = env.storage_has_key(key);
+  if (ret === 1n) {
+    return true;
+  } else {
+    return false;
+  }
 }
 
-export function validatorStake(accountId) {
-    return env.validator_stake(accountId)
+export function validatorStake(accountId: string) {
+  return env.validator_stake(accountId);
 }
 
-export function validatorTotalStake() {
-    return env.validator_total_stake()
+export function validatorTotalStake(): BigInt {
+  return env.validator_total_stake();
 }
 
-export function altBn128G1Multiexp(value) {
-    env.alt_bn128_g1_multiexp(value, 0)
-    return env.read_register(0)
+export function altBn128G1Multiexp(value: string): string {
+  env.alt_bn128_g1_multiexp(value, 0);
+  return env.read_register(0);
 }
 
-export function altBn128G1Sum(value) {
-    env.alt_bn128_g1_sum(value, 0)
-    return env.read_register(0)
+export function altBn128G1Sum(value: string): string {
+  env.alt_bn128_g1_sum(value, 0);
+  return env.read_register(0);
 }
 
-export function altBn128PairingCheck(value) {
-    let ret = env.alt_bn128_pairing_check(value)
-    if (ret === 1n) {
-        return true
-    } else {
-        return false
-    }
+export function altBn128PairingCheck(value: string): boolean {
+  let ret = env.alt_bn128_pairing_check(value);
+  if (ret === 1n) {
+    return true;
+  } else {
+    return false;
+  }
 }
 
-export function jsvmAccountId() {
-    env.jsvm_account_id(0)
-    return env.read_register(0)
+export function jsvmAccountId(): string {
+  env.jsvm_account_id(0);
+  return env.read_register(0);
 }
 
-export function jsvmJsContractName() {
-    env.jsvm_js_contract_name(0)
-    return env.read_register(0)
+export function jsvmJsContractName(): string {
+  env.jsvm_js_contract_name(0);
+  return env.read_register(0);
 }
 
-export function jsvmMethodName() {
-    env.jsvm_method_name(0)
-    return env.read_register(0)
+export function jsvmMethodName(): string {
+  env.jsvm_method_name(0);
+  return env.read_register(0);
 }
 
-export function jsvmArgs() {
-    env.jsvm_args(0)
-    return env.read_register(0)
+export function jsvmArgs(): string {
+  env.jsvm_args(0);
+  return env.read_register(0);
 }
 
-export function jsvmStorageWrite(key, value) {
-    let exist = env.jsvm_storage_write(key, value, EVICTED_REGISTER)
-    if (exist === 1n) {
-        return true
-    }
-    return false
+export function jsvmStorageWrite(key: string, value: string): boolean {
+  let exist = env.jsvm_storage_write(key, value, EVICTED_REGISTER);
+  if (exist === 1n) {
+    return true;
+  }
+  return false;
 }
 
-export function jsvmStorageRead(key) {
-    let exist = env.jsvm_storage_read(key, 0)
-    if (exist === 1n) {
-        return env.read_register(0)
-    }
-    return null
+export function jsvmStorageRead(key: string): string | null {
+  let exist = env.jsvm_storage_read(key, 0);
+  if (exist === 1n) {
+    return env.read_register(0);
+  }
+  return null;
 }
 
-export function jsvmStorageRemove(key) {
-    let exist = env.jsvm_storage_remove(key, EVICTED_REGISTER)
-    if (exist === 1n) {
-        return true
-    }
-    return false
+export function jsvmStorageRemove(key: string): boolean {
+  let exist = env.jsvm_storage_remove(key, EVICTED_REGISTER);
+  if (exist === 1n) {
+    return true;
+  }
+  return false;
 }
 
-export function jsvmStorageHasKey(key) {
-    let exist = env.jsvm_storage_has_key(key)
-    if (exist === 1n) {
-        return true
-    }
-    return false
+export function jsvmStorageHasKey(key: string): boolean {
+  let exist = env.jsvm_storage_has_key(key);
+  if (exist === 1n) {
+    return true;
+  }
+  return false;
 }
 
-export function jsvmCallRaw(contractName, method, args) {
-    env.jsvm_call(contractName, method, JSON.stringify(args), 0)
-    return env.read_register(0)
+export function jsvmCallRaw(
+  contractName: string,
+  method: string,
+  args: any
+): string | null {
+  env.jsvm_call(contractName, method, JSON.stringify(args), 0);
+  return env.read_register(0);
 }
 
-export function jsvmCall(contractName, method, args) {
-    let ret =  jsvmCallRaw(contractName, method, args)
-    if (ret === null) {
-        return ret
-    }
-    return JSON.parse(ret)
+export function jsvmCall(
+  contractName: string,
+  method: string,
+  args: any
+): string | null {
+  let ret = jsvmCallRaw(contractName, method, args);
+  if (ret === null) {
+    return ret;
+  }
+  return JSON.parse(ret);
 }
 
-export function storageGetEvicted() {
-    return env.read_register(EVICTED_REGISTER)
+export function storageGetEvicted(): string {
+  return env.read_register(EVICTED_REGISTER);
 }
 
-export function jsvmValueReturn(value) {
-    env.jsvm_value_return(value)
+export function jsvmValueReturn(value: string) {
+  env.jsvm_value_return(value);
 }
