@@ -69,7 +69,7 @@ async function build(argv) {
         await wasiStubStandaloneContract();
     } else if (TARGET_TYPE === 'ENCLAVED') {
         await createEnclavedContract(QJSC_TARGET, ENCLAVED_CONTRACT_TARGET);
-        await cleanupEnclavedBuildArtifacts();
+        await cleanupEnclavedBuildArtifacts(QJSC_TARGET);
     } else {
         throw new Error('Unsupported target, make sure target ends with .wasm or .base64');
     }
@@ -102,33 +102,36 @@ async function cratreHeaderFileWithQjsc(rollupTarget, qjscTarget) {
 
 // Enclaved build functions
 async function createEnclavedContract(qjscTarget, enclavedContractTarget) {
-    const SAVE_BYTECODE_SCRIPT = './node_modules/near-sdk-js/cli/save_bytecode.js';
     console.log(`Saving enclaved bytecode to ${enclavedContractTarget}`);
+    const SAVE_BYTECODE_SCRIPT = './node_modules/near-sdk-js/cli/save_bytecode.js';
     await executeCommand(`node ${SAVE_BYTECODE_SCRIPT} ${qjscTarget} ${enclavedContractTarget}`);
 }
 
 async function cleanupEnclavedBuildArtifacts(qjscTraget) {
+    console.log(`Removing ${qjscTraget} ...`);
     await executeCommand(`rm ${qjscTraget}`);
 }
 
 // Standalone build functions
 async function wasiStubStandaloneContract() {
+    console.log(`Excecuting wasi-stup...`);
     const WASI_STUB = `${VENDOR_FOLDER}/binaryen/wasi-stub/run.sh`;
     await executeCommand(`${WASI_STUB} ${standaloneContractTarget} >/dev/null`);
 }
 
 async function cleanupStandaloneBuildArtifacts() {
+    console.log(`Cleanup standalone build artifacts...`);
     await executeCommand(`rm code.h methods.h`);
 }
 
 async function createStandaloneMethodsHeaderFile(rollupTarget) {
-    const CODEGEN_SCRIPT = './node_modules/near-sdk-js/cli/builder/codegen.js';
     console.log(`Genereting methods.h file`);
+    const CODEGEN_SCRIPT = './node_modules/near-sdk-js/cli/builder/codegen.js';
     await executeCommand(`node ${CODEGEN_SCRIPT} ${rollupTarget}`);
 }
 
 async function createStandaloneWasmContract(standaloneContractTarget) {
-    // TODO: Looks like qjscTarget mast be "code.h" now
+    console.log(`Creating ${standaloneContractTarget} contract...`);
     const VENDOR_FOLDER = 'node_modules/near-sdk-js/vendor';
     const WASI_SDK_PATH = `${VENDOR_FOLDER}/wasi-sdk-11.0`;
 
