@@ -65,14 +65,11 @@ async function build(argv) {
     await cratreHeaderFileWithQjsc(ROLLUP_TARGET, QJSC_TARGET);
 
     if (TARGET_TYPE === 'STANDALONE') {
-        // TODO: QJSC_TARGET is not used and hardcoded in C
         await createStandaloneMethodsHeaderFile(ROLLUP_TARGET);
-        await createStandaloneWasmContract(STANDALONE_CONTRACT_TARGET);
-        await cleanupStandaloneBuildArtifacts();
+        await createStandaloneWasmContract(QJSC_TARGET, STANDALONE_CONTRACT_TARGET);
         await wasiStubStandaloneContract(STANDALONE_CONTRACT_TARGET);
     } else if (TARGET_TYPE === 'ENCLAVED') {
         await createEnclavedContract(QJSC_TARGET, ENCLAVED_CONTRACT_TARGET);
-        await cleanupEnclavedBuildArtifacts(QJSC_TARGET);
     } else {
         throw new Error('Unsupported target, make sure target ends with .wasm or .base64');
     }
@@ -99,7 +96,6 @@ async function createJsFileWithRullup(sourceFileWithPath, rollupTarget) {
 }
 
 async function cratreHeaderFileWithQjsc(rollupTarget, qjscTarget) {
-    qjscTarget = `build/code.h`; // TODO: delete this dirty hack!
     console.log(`Creating ${qjscTarget} file with QJSC...`);
     await executeCommand(`${QJSC} -c -m -o ${qjscTarget} -N code ${rollupTarget}`);
 }
@@ -111,21 +107,11 @@ async function createEnclavedContract(qjscTarget, enclavedContractTarget) {
     await executeCommand(`node ${SAVE_BYTECODE_SCRIPT} ${qjscTarget} ${enclavedContractTarget}`);
 }
 
-async function cleanupEnclavedBuildArtifacts(qjscTraget) {
-    console.log(`Removing ${qjscTraget} ...`);
-    await executeCommand(`rm ${qjscTraget}`);
-}
-
 // Standalone build functions
 async function wasiStubStandaloneContract(standaloneContractTarget) {
     console.log(`Excecuting wasi-stup...`);
     const WASI_STUB = `${VENDOR}/binaryen/wasi-stub/run.sh`;
     await executeCommand(`${WASI_STUB} ${standaloneContractTarget} >/dev/null`);
-}
-
-async function cleanupStandaloneBuildArtifacts() {
-    // console.log(`Cleanup standalone build artifacts...`); //TODO: cleanup files when names will be available
-    // await executeCommand(`rm build/code.h build/methods.h build/builder.c`);
 }
 
 async function createStandaloneMethodsHeaderFile(rollupTarget) {
@@ -138,10 +124,10 @@ async function createStandaloneMethodsHeaderFile(rollupTarget) {
     for (let name of exportNames) {
         methods += `DEFINE_NEAR_METHOD(${name})\n`;
     }
-    await fs.writeFile(`${buildPath}/methods.h`, methods); // TODO: should we usd unique file name here?
+    await fs.writeFile(`${buildPath}/methods.h`, methods);
 }
 
-async function createStandaloneWasmContract(standaloneContractTarget) {
+async function createStandaloneWasmContract(qjscTarget, standaloneContractTarget) {
     console.log(`Creating ${standaloneContractTarget} contract...`);
     const WASI_SDK_PATH = `${VENDOR}/wasi-sdk-11.0`;
 
@@ -156,8 +142,9 @@ async function createStandaloneWasmContract(standaloneContractTarget) {
     const SOURCES = `${NEW_BUILDER_PATH} ${QJSC_DIR}/quickjs.c ${QJSC_DIR}/libregexp.c ${QJSC_DIR}/libunicode.c ${QJSC_DIR}/cutils.c ${QJSC_DIR}/quickjs-libc-min.c ${QJSC_DIR}/libbf.c`;
     const LIBS = `-lm`
 
-    // copying builder.c file to the build folder (TODO: is there a better way to do this?)
+    // copying builder.c file to the build folder
     await executeCommand(`cp ${ORIGINAL_BUILDER_PATH} ${NEW_BUILDER_PATH}`);
+    await executeCommand(`mv ${qjscTarget} build/code.h`);
 
     await executeCommand(`${CC} --target=wasm32-wasi -nostartfiles -Oz -flto ${DEFS} ${INCLUDES} ${SOURCES} ${LIBS} -Wl,--no-entry -Wl,--allow-undefined -Wl,-z,stack-size=${256 * 1024} -Wl,--lto-O3 -o ${standaloneContractTarget}`);
 }
