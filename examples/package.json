@@ -33,6 +33,7 @@
     "lodash-es": "^4.17.21"
   },
   "devDependencies": {
-    "ava": "^4.2.0"
+    "ava": "^4.2.0",
+    "near-workspaces": "^2.0.0"
   }
 }
