@@ -33,7 +33,7 @@ yargs(hideBin(process.argv))
             })
             .positional('target', {
                 type: 'string',
-                default: 'build/contract.base64',
+                default: 'build/contract.wasm',
                 describe: 'Target file path and name'
             })
     }, build)
@@ -43,7 +43,9 @@ yargs(hideBin(process.argv))
 async function build(argv) {
     const SOURCE_FILE_WITH_PATH = argv.source;
     const TARGET_DIR = path.dirname(argv.target);
-    const TARGET_FILE_NAME = path.basename(argv.target, '.base64');
+    const TARGET_EXT = argv.target.split('.').pop();
+    const TARGET_FILE_NAME = path.basename(argv.target, `.${TARGET_EXT}`);
+    const TARGET_TYPE = TARGET_EXT === 'wasm' ? 'STANDALONE' : TARGET_EXT === 'base64' ? 'ENCLAVED' : undefined;
 
     const ROLLUP_TARGET = `${TARGET_DIR}/${TARGET_FILE_NAME}.js`;
     const QJSC_TARGET = `${TARGET_DIR}/${TARGET_FILE_NAME}.h`;
@@ -59,11 +61,21 @@ async function build(argv) {
 
     await cratreHeaderFileWithQjsc(ROLLUP_TARGET, QJSC_TARGET);
 
-    await createEnclavedContract(QJSC_TARGET, ENCLAVED_CONTRACT_TARGET);
-
-    await createStandaloneContract(ROLLUP_TARGET, QJSC_TARGET, STANDALONE_CONTRACT_TARGET);
+    if (TARGET_TYPE === 'STANDALONE') {
+        // TODO: QJSC_TARGET is not used and hardcoded in C
+        await createStandaloneMethodsHeaderFile(ROLLUP_TARGET);
+        await createStandaloneWasmContract(STANDALONE_CONTRACT_TARGET);
+        await cleanupStandaloneBuildArtifacts();
+        await wasiStubStandaloneContract();
+    } else if (TARGET_TYPE === 'ENCLAVED') {
+        await createEnclavedContract(QJSC_TARGET, ENCLAVED_CONTRACT_TARGET);
+        await cleanupEnclavedBuildArtifacts();
+    } else {
+        throw new Error('Unsupported target, make sure target ends with .wasm or .base64');
+    }
 }
 
+// Common build function
 async function createJsFileWithRullup(sourceFileWithPath, rollupTarget) {
     console.log(`Creating ${rollupTarget} file with Rollup...`);
     const bundle = await rollup({
@@ -88,36 +100,48 @@ async function cratreHeaderFileWithQjsc(rollupTarget, qjscTarget) {
     await executeCommand(`${QJSC} -c -m -o ${qjscTarget} -N code ${rollupTarget}`);
 }
 
+// Enclaved build functions
 async function createEnclavedContract(qjscTarget, enclavedContractTarget) {
     const SAVE_BYTECODE_SCRIPT = './node_modules/near-sdk-js/cli/save_bytecode.js';
     console.log(`Saving enclaved bytecode to ${enclavedContractTarget}`);
     await executeCommand(`node ${SAVE_BYTECODE_SCRIPT} ${qjscTarget} ${enclavedContractTarget}`);
 }
 
-async function createStandaloneContract(rollupTarget, qjscTarget, standaloneContractTarget) {
-    // TODO: Looks like qjscTarget mast be "code.h" now
-    const VENDOR_FOLDER = 'node_modules/near-sdk-js/vendor';
-    const WASI_SDK_PATH = `${VENDOR_FOLDER}/wasi-sdk-11.0`;
-    const CC = `${WASI_SDK_PATH}/bin/clang --sysroot=${WASI_SDK_PATH}/share/wasi-sysroot`
-    const WASI_STUB = `${VENDOR_FOLDER}/binaryen/wasi-stub/run.sh`;
+async function cleanupEnclavedBuildArtifacts(qjscTraget) {
+    await executeCommand(`rm ${qjscTraget}`);
+}
 
+// Standalone build functions
+async function wasiStubStandaloneContract() {
+    const WASI_STUB = `${VENDOR_FOLDER}/binaryen/wasi-stub/run.sh`;
+    await executeCommand(`${WASI_STUB} ${standaloneContractTarget} >/dev/null`);
+}
+
+async function cleanupStandaloneBuildArtifacts() {
+    await executeCommand(`rm code.h methods.h`);
+}
+
+async function createStandaloneMethodsHeaderFile(rollupTarget) {
     const CODEGEN_SCRIPT = './node_modules/near-sdk-js/cli/builder/codegen.js';
     console.log(`Genereting methods.h file`);
     await executeCommand(`node ${CODEGEN_SCRIPT} ${rollupTarget}`);
+}
 
+async function createStandaloneWasmContract(standaloneContractTarget) {
+    // TODO: Looks like qjscTarget mast be "code.h" now
+    const VENDOR_FOLDER = 'node_modules/near-sdk-js/vendor';
+    const WASI_SDK_PATH = `${VENDOR_FOLDER}/wasi-sdk-11.0`;
+
+    const CC = `${WASI_SDK_PATH}/bin/clang --sysroot=${WASI_SDK_PATH}/share/wasi-sysroot`
     const DEFS = `-D_GNU_SOURCE -DCONFIG_VERSION="2021-03-27" -DCONFIG_BIGNUM ${process.env.NEAR_NIGHTLY ? '-DNIGHTLY' : ''}`
     const INCLUDES = `-I${QJSC_DIR} -I.`
     const SOURCES = `./node_modules/near-sdk-js/cli/builder/builder.c ${QJSC_DIR}/quickjs.c ${QJSC_DIR}/libregexp.c ${QJSC_DIR}/libunicode.c ${QJSC_DIR}/cutils.c ${QJSC_DIR}/quickjs-libc-min.c ${QJSC_DIR}/libbf.c`;
     const LIBS = `-lm`
 
     await executeCommand(`${CC} --target=wasm32-wasi -nostartfiles -Oz -flto ${DEFS} ${INCLUDES} ${SOURCES} ${LIBS} -Wl,--no-entry -Wl,--allow-undefined -Wl,-z,stack-size=$((256 * 1024)) -Wl,--lto-O3 -o ${standaloneContractTarget}`);
-
-    await executeCommand(`rm code.h methods.h`);
-
-    await executeCommand(`${WASI_STUB} ${standaloneContractTarget} >/dev/null`);
 }
 
-
+// Utils
 async function executeCommand(command, silent = false) {
     console.log(command);
     const { error, stdout, stderr } = await exec(command);
