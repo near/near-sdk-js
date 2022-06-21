@@ -17,8 +17,9 @@ const exec = promisify(exec_);
 
 const OS = await executeCommand('uname -s', true);
 const ARCH = await executeCommand('uname -m', true);
-const QJSC_DIR = `./node_modules/near-sdk-js/cli/qjsc`;
-const QJSC = `${QJSC_DIR}/${OS}-${ARCH}-qjsc`;
+const QJSC_DIR = `./node_modules/near-sdk-js/quickjs`;
+const QJSC_BUILDS_DIR = `./node_modules/near-sdk-js/cli/qjsc`;
+const QJSC = `${QJSC_BUILDS_DIR}/${OS}-${ARCH}-qjsc`;
 
 yargs(hideBin(process.argv))
     .scriptName('near-sdk')
@@ -95,9 +96,10 @@ async function createEnclavedContract(qjscTarget, enclavedContractTarget) {
 
 async function createStandaloneContract(rollupTarget, qjscTarget, standaloneContractTarget) {
     // TODO: Looks like qjscTarget mast be "code.h" now
-    const WASI_SDK_PATH = '../vendor/wasi-sdk-11.0';
+    const VENDOR_FOLDER = 'node_modules/near-sdk-js/vendor';
+    const WASI_SDK_PATH = `${VENDOR_FOLDER}/wasi-sdk-11.0`;
     const CC = `${WASI_SDK_PATH}/bin/clang --sysroot=${WASI_SDK_PATH}/share/wasi-sysroot`
-    const WASI_STUB = `../vendor/binaryen/wasi-stub/run.sh`;
+    const WASI_STUB = `${VENDOR_FOLDER}/binaryen/wasi-stub/run.sh`;
 
     const CODEGEN_SCRIPT = './node_modules/near-sdk-js/cli/builder/codegen.js';
     console.log(`Genereting methods.h file`);
@@ -105,26 +107,10 @@ async function createStandaloneContract(rollupTarget, qjscTarget, standaloneCont
 
     const DEFS = `-D_GNU_SOURCE -DCONFIG_VERSION="2021-03-27" -DCONFIG_BIGNUM ${process.env.NEAR_NIGHTLY ? '-DNIGHTLY' : ''}`
     const INCLUDES = `-I${QJSC_DIR} -I.`
-    const SOURCES = [
-        `builder/builder.c`,
-        `${QJSC_DIR}/quickjs.c`,
-        `${QJSC_DIR}/libregexp.c`,
-        `${QJSC_DIR}/libunicode.c`,
-        `${QJSC_DIR}/cutils.c`,
-        `${QJSC_DIR}/quickjs-libc-min.c`,
-        `${QJSC_DIR}/libbf.c`
-    ];
+    const SOURCES = `./node_modules/near-sdk-js/cli/builder/builder.c ${QJSC_DIR}/quickjs.c ${QJSC_DIR}/libregexp.c ${QJSC_DIR}/libunicode.c ${QJSC_DIR}/cutils.c ${QJSC_DIR}/quickjs-libc-min.c ${QJSC_DIR}/libbf.c`;
     const LIBS = `-lm`
 
-    await executeCommand(`${CC} --target=wasm32-wasi \
-        -nostartfiles -Oz -flto \
-        ${DEFS} ${INCLUDES} ${SOURCES} ${LIBS} \
-        -Wl,--no-entry \
-        -Wl,--allow-undefined \
-        -Wl,-z,stack-size=$((256 * 1024)) \
-        -Wl,--lto-O3 \
-        -o ${standaloneContractTarget}`
-    );
+    await executeCommand(`${CC} --target=wasm32-wasi -nostartfiles -Oz -flto ${DEFS} ${INCLUDES} ${SOURCES} ${LIBS} -Wl,--no-entry -Wl,--allow-undefined -Wl,-z,stack-size=$((256 * 1024)) -Wl,--lto-O3 -o ${standaloneContractTarget}`);
 
     await executeCommand(`rm code.h methods.h`);
 
