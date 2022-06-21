@@ -12,20 +12,20 @@ jobs:
         with:
           node-version: "16"
       - name: Install dependencies
-        run: cd examples && yarn
+        run: cd jsvm/examples && yarn
       - name: clean-state
-        run: cd examples && yarn build:clean-state && yarn test:clean-state
+        run: cd jsvm/examples && yarn build:clean-state && yarn test:clean-state
       - name: counter
-        run: cd examples && yarn build:counter && yarn test:counter
+        run: cd jsvm/examples && yarn build:counter && yarn test:counter
       - name: cross-contract-call
-        run: cd examples && yarn build:cross-contract-call && yarn test:cross-contract-call
+        run: cd jsvm/examples && yarn build:cross-contract-call && yarn test:cross-contract-call
       - name: fungible-token-lockable
-        run: cd examples && yarn build:fungible-token-lockable && yarn test:fungible-token-lockable
+        run: cd jsvm/examples && yarn build:fungible-token-lockable && yarn test:fungible-token-lockable
       - name: fungible-token
-        run: cd examples && yarn build:fungible-token && yarn test:fungible-token
+        run: cd jsvm/examples && yarn build:fungible-token && yarn test:fungible-token
       - name: non-fungible-token
-        run: cd examples && yarn build:non-fungible-token && yarn test:non-fungible-token
+        run: cd jsvm/examples && yarn build:non-fungible-token && yarn test:non-fungible-token
       - name: status-message-collections
-        run: cd examples && yarn build:status-message-collections && yarn test:status-message-collections
+        run: cd jsvm/examples && yarn build:status-message-collections && yarn test:status-message-collections
       - name: status-message
-        run: cd examples && yarn build:status-message && yarn test:status-message
+        run: cd jsvm/examples && yarn build:status-message && yarn test:status-message

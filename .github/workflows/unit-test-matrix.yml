@@ -13,7 +13,5 @@ jobs:
           node-version: "16"
       - name: Install modules
         run: yarn
-      - name: Install for tests
-        run: cd tests && yarn
       - name: Run tests
         run: yarn test
