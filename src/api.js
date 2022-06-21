@@ -1,6 +1,9 @@
+import { env } from "yargs"
+
 const U64_MAX = 2n**64n - 1n
 const EVICTED_REGISTER = U64_MAX - 1n
 
+// Common APIs
 export function log(message) {
     env.log(message)
 }
@@ -146,6 +149,11 @@ export function altBn128PairingCheck(value) {
     }
 }
 
+export function storageGetEvicted() {
+    return env.read_register(EVICTED_REGISTER)
+}
+
+// JSVM only APIs
 export function jsvmAccountId() {
     env.jsvm_account_id(0)
     return env.read_register(0)
@@ -211,10 +219,129 @@ export function jsvmCall(contractName, method, args) {
     return JSON.parse(ret)
 }
 
-export function storageGetEvicted() {
-    return env.read_register(EVICTED_REGISTER)
-}
-
 export function jsvmValueReturn(value) {
     env.jsvm_value_return(value)
+}
+
+// Standalone only APIs
+export function currentAccountId() {
+    env.current_account_id(0)
+    return env.read_register(0)
+}
+
+export function input() {
+    env.input(0)
+    return env.read_register(0)
+}
+
+export function storageUsage() {
+    env.storageUsage(0)
+    return env.storage_usage(0)
+}
+
+export function accountBalance() {
+    return env.account_balance()
+}
+
+export function accountLockedBalance() {
+    return env.account_locked_balance()
+}
+
+export function valueReturn(value) {
+    env.value_return(value)
+}
+
+export function promiseCreate(accountId, methodName, arguments, amount, gas) {
+    return env.promise_create(accountId, methodName, arguments, amount, gas)
+}
+
+export function promiseThen(promiseIndex, accountId, methodName, arguments, amount, gas) {
+    return env.promise_then(promiseIndex, accountId, methodName, arguments, amount, gas)
+}
+
+export function promiseAnd(...promiseIndex) {
+    return env.promise(...promiseIndex)
+}
+
+export function promiseBatchCreate(accountId) {
+    return env.promise_batch_create(accountId)
+}
+
+export function promiseBatchThen(promiseIndex, accountId) {
+    return env.promise_batch_then(promiseIndex, accountId)
+}
+
+export function promiseBatchActionCreateAccount(promiseIndex) {
+    env.promise_batch_action_create_account(promiseIndex)
+}
+
+export function promiseBatchActionDeployContract(promiseIndex, code) {
+    env.promise_batch_action_deploy_contract(promiseIndex, code)
+}
+
+export function promiseBatchActionFunctionCall(promiseIndex, methodName, arguments, amount, gas) {
+    env.promise_batch_action_function_call(promiseIndex, methodName, arguments, amount, gas)   
+}
+
+export function promiseBatchActionTransfer(promiseIndex, amount) {
+    env.promise_batch_action_transfer(promiseIndex, amount)
+}
+
+export function promiseBatchActionStake(promiseIndex, amount, publicKey) {
+    env.promise_batch_action_stake(promiseIndex, amount, publicKey)
+}
+
+export function promiseBatchActionAddKeyWithFullAccess(promiseIndex, publicKey, nonce) {
+    env.promise_batch_action_add_key_with_full_access(promiseIndex, publicKey, nonce)
+}
+
+export function promiseBatchActionAddKeyWithFunctionCall(promiseIndex, publicKey, nonce, allowance, receiverId, methodNames) {
+    env.promise_batch_action_add_key_with_function_call(promiseIndex, publicKey, nonce, allowance, receiverId, methodNames)
+}
+
+export function promiseBatchActionDeleteKey(promiseIndex, publicKey) {
+    env.promise_batch_action_delete_key(promiseIndex, publicKey)
+}
+
+export function promiseBatchActionDeleteAccount(promiseIndex, beneficiaryId) {
+    env.promise_batch_action_delete_account(promiseIndex, beneficiaryId)
+}
+
+export function promiseResultsCount() {
+    return env.promise_results_count()
+}
+
+export const PROMISE_RESULT_NOT_READY = 0n
+export const PROMISE_RESULT_SUCCESSFUL = 1n
+export const PROMISE_RESULT_FAILED = 2n
+
+export function promiseResult(resultIdx) {
+    let status = env.promise_result(resultIdx, 0)
+    if (status === PROMISE_RESULT_NOT_READY || status === PROMISE_RESULT_FAILED) {
+        return {status}
+    } else if (status === PROMISE_RESULT_SUCCESSFUL) {
+        return {status, data: env.read_register(0)}
+    } else {
+        panic("Unexpected return code.")
+    }
+}
+
+export function promiseReturn(promiseIdx) {
+    env.promise_return(promiseIdx)
+}
+
+export function storageWrite(key, value) {
+    let exist = env.storage_write(key, value, EVICTED_REGISTER)
+    if (exist === 1n) {
+        return true
+    }
+    return false
+}
+
+export function storageRemove(key) {
+    let exist = env.storage_remove(key, EVICTED_REGISTER)
+    if (exist === 1n) {
+        return true
+    }
+    return false
 }
