@@ -249,12 +249,12 @@ export function valueReturn(value) {
     env.value_return(value)
 }
 
-export function promiseCreate(accountId, methodName, arguments, amount, gas) {
-    return env.promise_create(accountId, methodName, arguments, amount, gas)
+export function promiseCreate(accountId, methodName, args, amount, gas) {
+    return env.promise_create(accountId, methodName, args, amount, gas)
 }
 
-export function promiseThen(promiseIndex, accountId, methodName, arguments, amount, gas) {
-    return env.promise_then(promiseIndex, accountId, methodName, arguments, amount, gas)
+export function promiseThen(promiseIndex, accountId, methodName, args, amount, gas) {
+    return env.promise_then(promiseIndex, accountId, methodName, args, amount, gas)
 }
 
 export function promiseAnd(...promiseIndex) {
@@ -277,8 +277,8 @@ export function promiseBatchActionDeployContract(promiseIndex, code) {
     env.promise_batch_action_deploy_contract(promiseIndex, code)
 }
 
-export function promiseBatchActionFunctionCall(promiseIndex, methodName, arguments, amount, gas) {
-    env.promise_batch_action_function_call(promiseIndex, methodName, arguments, amount, gas)   
+export function promiseBatchActionFunctionCall(promiseIndex, methodName, args, amount, gas) {
+    env.promise_batch_action_function_call(promiseIndex, methodName, args, amount, gas)   
 }
 
 export function promiseBatchActionTransfer(promiseIndex, amount) {
