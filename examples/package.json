@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "build": "yarn build:clean-state && yarn build:counter && yarn build:cross-contract-call && yarn build:fungible-token-lockable && yarn build:fungible-token && yarn build:non-fungible-token && yarn build:status-message-collections && yarn build:status-message",
+    "build": "yarn build:clean-state && yarn build:counter && yarn build:cross-contract-call && yarn build:fungible-token-lockable && yarn build:fungible-token && yarn build:non-fungible-token && yarn build:status-message-collections && yarn build:status-message && yarn build:donation",
     "build:clean-state": "near-sdk build src/clean-state.js build/clean-state.base64",
     "build:counter": "near-sdk build src/counter.js build/counter.base64",
     "build:donation": "near-sdk build src/donation.js build/donation.base64",
