@@ -13,6 +13,8 @@ import { exec as exec_ } from 'child_process';
 import path from 'path';
 import { promisify } from 'util';
 
+const VENDOR_FOLDER = 'node_modules/near-sdk-js/vendor';
+
 const exec = promisify(exec_);
 
 const OS = await executeCommand('uname -s', true);
@@ -66,7 +68,7 @@ async function build(argv) {
         await createStandaloneMethodsHeaderFile(ROLLUP_TARGET);
         await createStandaloneWasmContract(STANDALONE_CONTRACT_TARGET);
         await cleanupStandaloneBuildArtifacts();
-        await wasiStubStandaloneContract();
+        await wasiStubStandaloneContract(STANDALONE_CONTRACT_TARGET);
     } else if (TARGET_TYPE === 'ENCLAVED') {
         await createEnclavedContract(QJSC_TARGET, ENCLAVED_CONTRACT_TARGET);
         await cleanupEnclavedBuildArtifacts(QJSC_TARGET);
@@ -114,7 +116,7 @@ async function cleanupEnclavedBuildArtifacts(qjscTraget) {
 }
 
 // Standalone build functions
-async function wasiStubStandaloneContract() {
+async function wasiStubStandaloneContract(standaloneContractTarget) {
     console.log(`Excecuting wasi-stup...`);
     const WASI_STUB = `${VENDOR_FOLDER}/binaryen/wasi-stub/run.sh`;
     await executeCommand(`${WASI_STUB} ${standaloneContractTarget} >/dev/null`);
@@ -122,7 +124,7 @@ async function wasiStubStandaloneContract() {
 
 async function cleanupStandaloneBuildArtifacts() {
     console.log(`Cleanup standalone build artifacts...`);
-    await executeCommand(`rm code.h methods.h`);
+    await executeCommand(`rm build/code.h build/methods.h build/builder.c`);
 }
 
 async function createStandaloneMethodsHeaderFile(rollupTarget) {
@@ -133,11 +135,13 @@ async function createStandaloneMethodsHeaderFile(rollupTarget) {
 
 async function createStandaloneWasmContract(standaloneContractTarget) {
     console.log(`Creating ${standaloneContractTarget} contract...`);
-    const VENDOR_FOLDER = 'node_modules/near-sdk-js/vendor';
     const WASI_SDK_PATH = `${VENDOR_FOLDER}/wasi-sdk-11.0`;
 
     const CC = `${WASI_SDK_PATH}/bin/clang --sysroot=${WASI_SDK_PATH}/share/wasi-sysroot`
-    const DEFS = `-D_GNU_SOURCE -DCONFIG_VERSION="2021-03-27" -DCONFIG_BIGNUM ${process.env.NEAR_NIGHTLY ? '-DNIGHTLY' : ''}`
+    let DEFS = `-D_GNU_SOURCE '-DCONFIG_VERSION="2021-03-27"' -DCONFIG_BIGNUM`
+    if (process.env.NEAR_NIGHTLY) {
+        DEFS = DEFS + ' -DNIGHTLY'
+    }
     const INCLUDES = `-I${QJSC_DIR} -I.`
     const ORIGINAL_BUILDER_PATH = './node_modules/near-sdk-js/cli/builder/builder.c';
     const NEW_BUILDER_PATH = `${path.dirname(standaloneContractTarget)}/builder.c`
@@ -147,7 +151,7 @@ async function createStandaloneWasmContract(standaloneContractTarget) {
     // copying builder.c file to the build folder (TODO: is there a better way to do this?)
     await executeCommand(`cp ${ORIGINAL_BUILDER_PATH} ${NEW_BUILDER_PATH}`);
 
-    await executeCommand(`${CC} --target=wasm32-wasi -nostartfiles -Oz -flto ${DEFS} ${INCLUDES} ${SOURCES} ${LIBS} -Wl,--no-entry -Wl,--allow-undefined -Wl,-z,stack-size=$((256 * 1024)) -Wl,--lto-O3 -o ${standaloneContractTarget}`);
+    await executeCommand(`${CC} --target=wasm32-wasi -nostartfiles -Oz -flto ${DEFS} ${INCLUDES} ${SOURCES} ${LIBS} -Wl,--no-entry -Wl,--allow-undefined -Wl,-z,stack-size=${256 * 1024} -Wl,--lto-O3 -o ${standaloneContractTarget}`);
 }
 
 // Utils
