@@ -96,6 +96,7 @@ async function createJsFileWithRullup(sourceFileWithPath, rollupTarget) {
 }
 
 async function cratreHeaderFileWithQjsc(rollupTarget, qjscTarget) {
+    qjscTarget = `build/code.h`; // TODO: delete this dirty hack!
     console.log(`Creating ${qjscTarget} file with QJSC...`);
     await executeCommand(`${QJSC} -c -m -o ${qjscTarget} -N code ${rollupTarget}`);
 }
@@ -138,8 +139,13 @@ async function createStandaloneWasmContract(standaloneContractTarget) {
     const CC = `${WASI_SDK_PATH}/bin/clang --sysroot=${WASI_SDK_PATH}/share/wasi-sysroot`
     const DEFS = `-D_GNU_SOURCE -DCONFIG_VERSION="2021-03-27" -DCONFIG_BIGNUM ${process.env.NEAR_NIGHTLY ? '-DNIGHTLY' : ''}`
     const INCLUDES = `-I${QJSC_DIR} -I.`
-    const SOURCES = `./node_modules/near-sdk-js/cli/builder/builder.c ${QJSC_DIR}/quickjs.c ${QJSC_DIR}/libregexp.c ${QJSC_DIR}/libunicode.c ${QJSC_DIR}/cutils.c ${QJSC_DIR}/quickjs-libc-min.c ${QJSC_DIR}/libbf.c`;
+    const ORIGINAL_BUILDER_PATH = './node_modules/near-sdk-js/cli/builder/builder.c';
+    const NEW_BUILDER_PATH = `${path.dirname(standaloneContractTarget)}/builder.c`
+    const SOURCES = `${NEW_BUILDER_PATH} ${QJSC_DIR}/quickjs.c ${QJSC_DIR}/libregexp.c ${QJSC_DIR}/libunicode.c ${QJSC_DIR}/cutils.c ${QJSC_DIR}/quickjs-libc-min.c ${QJSC_DIR}/libbf.c`;
     const LIBS = `-lm`
+
+    // copying builder.c file to the build folder (TODO: is there a better way to do this?)
+    await executeCommand(`cp ${ORIGINAL_BUILDER_PATH} ${NEW_BUILDER_PATH}`);
 
     await executeCommand(`${CC} --target=wasm32-wasi -nostartfiles -Oz -flto ${DEFS} ${INCLUDES} ${SOURCES} ${LIBS} -Wl,--no-entry -Wl,--allow-undefined -Wl,-z,stack-size=$((256 * 1024)) -Wl,--lto-O3 -o ${standaloneContractTarget}`);
 }
