@@ -18,7 +18,7 @@ class Donation extends NearContract {
     this.amounts = Object.assign(new Vector, this.amounts)
   }
 
-  transferMoney(donor, amount) {
+  transfer_money(donor, amount) {
     // TODO: implement real transfer once SDK supports it
   }
 
@@ -36,7 +36,7 @@ class Donation extends NearContract {
     const donation_number = this.donors.len()
     near.log(`Thank you ${donor}! donation number: ${donation_number}`)
 
-    this.transferMoney(donor, amount - STORAGE_COST)
+    this.transfer_money(donor, amount - STORAGE_COST)
 
     return donation_number
   }
