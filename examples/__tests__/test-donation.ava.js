@@ -80,11 +80,11 @@ test('Each donation is registered in contract state', async t => {
 
   // get_donation_list => [{donor1, 1yN}]
   result = await jsvm.view('view_js_contract', encodeCall(donationContract.accountId, 'get_donation_list', {}));
-  t.deepEqual(result, [{ donor: 'donor1.test.near', amount: toYocto(0.1) }]);
+  t.snapshot(result)
 
   // get_donation_by_number(0) => 0.1yN
   result = await jsvm.view('view_js_contract', encodeCall(donationContract.accountId, 'get_donation_by_number', {donation_number: 0}));
-  t.deepEqual(result, { donor: 'donor1.test.near', amount: toYocto(0.1) });
+  t.snapshot(result)
 
   // donor2 donates 0.2N
   await donor2.call(jsvm, 'call_js_contract', encodeCall(donationContract.accountId, 'donate', {}), { attachedDeposit: toYocto(0.2) });
@@ -95,13 +95,10 @@ test('Each donation is registered in contract state', async t => {
 
   // donations list => donor1,donor2
   result = await jsvm.view('view_js_contract', encodeCall(donationContract.accountId, 'get_donation_list', {}));
-  t.deepEqual(result, [
-    { donor: 'donor1.test.near', amount: '100000000000000000000000' },
-    { donor: 'donor2.test.near', amount: '200000000000000000000000' },
-  ]);
+  t.snapshot(result)
   // donation2 => of donor2
   result = await jsvm.view('view_js_contract', encodeCall(donationContract.accountId, 'get_donation_by_number', {donation_number: 1}));
-  t.deepEqual(result, { donor: 'donor2.test.near', amount: '200000000000000000000000' });
+  t.snapshot(result)
 
   // donor1 donates 0.3N
   await donor1.call(jsvm, 'call_js_contract', encodeCall(donationContract.accountId, 'donate', {}), { attachedDeposit: toYocto(0.3) });
@@ -114,10 +111,5 @@ test('Each donation is registered in contract state', async t => {
 
   // donations list => [donor1,donor2,donor1,donor1]
   result = await jsvm.view('view_js_contract', encodeCall(donationContract.accountId, 'get_donation_list', {}));
-  t.deepEqual(result, [
-    { donor: 'donor1.test.near', amount: '100000000000000000000000' },
-    { donor: 'donor2.test.near', amount: '200000000000000000000000' },
-    { donor: 'donor1.test.near', amount: '300000000000000000000000' },
-    { donor: 'donor1.test.near', amount: '1100000000000000000000000' },
-  ]);
+  t.snapshot(result)
 });
