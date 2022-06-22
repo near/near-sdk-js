@@ -62,7 +62,7 @@ async function build(argv) {
 
     await createJsFileWithRullup(SOURCE_FILE_WITH_PATH, ROLLUP_TARGET);
 
-    await cratreHeaderFileWithQjsc(ROLLUP_TARGET, QJSC_TARGET);
+    await createHeaderFileWithQjsc(ROLLUP_TARGET, QJSC_TARGET);
 
     if (TARGET_TYPE === 'STANDALONE') {
         await createStandaloneMethodsHeaderFile(ROLLUP_TARGET);
@@ -95,7 +95,7 @@ async function createJsFileWithRullup(sourceFileWithPath, rollupTarget) {
     });
 }
 
-async function cratreHeaderFileWithQjsc(rollupTarget, qjscTarget) {
+async function createHeaderFileWithQjsc(rollupTarget, qjscTarget) {
     console.log(`Creating ${qjscTarget} file with QJSC...`);
     await executeCommand(`${QJSC} -c -m -o ${qjscTarget} -N code ${rollupTarget}`);
 }
