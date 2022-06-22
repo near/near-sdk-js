@@ -1,4 +1,4 @@
-name: Unit tests
+name: Unit standalone
 on: push
 jobs:
   unit-tests:
@@ -11,9 +11,9 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: "16"
+      - name: Setup
+        run: ./setup.sh
       - name: Install modules
         run: yarn
-      - name: Install test modules
-        run: cd jsvm/tests && yarn
-      - name: Run tests
-        run: yarn test
+      - name: Run standalone unit tests
+        run: yarn test:standalone

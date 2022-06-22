@@ -20,7 +20,9 @@
   ],
   "license": "(MIT AND Apache-2.0)",
   "scripts": {
-    "test": "cd jsvm/tests && yarn rebuild && yarn test && cd .."
+    "test:standalone": "cd tests && yarn rebuild && yarn test && cd ..",
+    "test:enclaved": "cd jsvm/tests && yarn rebuild && yarn test && cd ../..",
+    "test": "yarn test:standalone && yarn test:enclaved"
   },
   "bin": {
     "near-sdk": "cli/cli.js"

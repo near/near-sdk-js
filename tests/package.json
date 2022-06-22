@@ -1,0 +1,23 @@
+{
+  "name": "tests",
+  "version": "1.0.0",
+  "description": "near-sdk-js tests",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+      "build": "yarn build:context-api",
+      "build:context-api": "near-sdk build src/context_api.js build/context_api.wasm",
+      "rebuild": "rm -rf node_modules && rm -rf build && yarn && yarn build",
+      "test": "ava",
+      "test:context-api": "ava __tests__/test_context_api.ava.js"
+  },
+  "author": "Near Inc <hello@nearprotocol.com>",
+  "license": "Apache-2.0",
+  "dependencies": {
+      "near-sdk-js": "file:../"
+  },
+  "devDependencies": {
+      "ava": "^4.2.0",
+      "near-workspaces": "^2.0.0"
+  }
+}
