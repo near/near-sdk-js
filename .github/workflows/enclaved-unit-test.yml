@@ -1,4 +1,4 @@
-name: Unit enclaved
+name: Enclaved unit
 on: push
 jobs:
   unit-tests:
@@ -14,4 +14,4 @@ jobs:
       - name: Install modules
         run: yarn
       - name: Run enclaved unit tests
-        run: yarn test:enclaved
+        run: yarn test:enclaved:unit

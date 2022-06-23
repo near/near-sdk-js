@@ -21,11 +21,15 @@
   ],
   "license": "(MIT AND Apache-2.0)",
   "scripts": {
-    "pretest": "yarn build",
     "build": "tsc -p ./tsconfig.json",
-    "test:standalone": "cd tests && yarn rebuild && yarn test && cd ..",
-    "test:enclaved": "cd jsvm/tests && yarn rebuild && yarn test && cd ../..",
-    "test": "yarn test:standalone && yarn test:enclaved"
+    "pretest": "yarn build",
+    "test": "yarn test:standalone && yarn test:enclaved",
+    "test:standalone": "test:standalone:unit && test:standalone:examples",
+    "test:standalone:unit": "cd tests && yarn rebuild && yarn test && cd ..",
+    "test:standalone:examples": "cd examples && yarn && yarn rebuild && yarn test && cd ..",
+    "test:enclaved": "test:enclaved:unit && test:enclaved:examples",
+    "test:enclaved:unit": "cd jsvm/tests && yarn rebuild && yarn test && cd ../..",
+    "test:enclaved:examples": "cd jsvm/examples && yarn && yarn rebuild && yarn test && cd ../.."
   },
   "bin": {
     "near-sdk": "cli/cli.js"
