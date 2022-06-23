@@ -14,6 +14,7 @@
     "build:non-fungible-token": "near-sdk build src/test-token-receiver.js build/test-token-receiver.base64 && near-sdk build src/non-fungible-token.js build/non-fungible-token.base64",
     "build:status-message-collections": "near-sdk build src/status-message-collections.js build/status-message-collections.base64",
     "build:status-message": "near-sdk build src/status-message.js build/status-message.base64",
+    "build:test-token-receiver": "near-sdk build src/test-token-receiver.js build/test-token-receiver.base64",
     "test": "ava",
     "test:clean-state": "ava __tests__/test-clean-state.ava.js",
     "test:counter": "ava __tests__/test-counter.ava.js",
