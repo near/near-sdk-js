@@ -106,7 +106,10 @@ test('Transfer call where receiver returns the token', async t => {
         jsvm,
         'call_js_contract',
         encodeCall(nftContract.accountId, 'nftTransferCall', { receiver_id: tokenReceiverContract.accountId, token_id: tokenId, approval_id: null, memo: null, msg: 'return-it-now' }),
-        { attachedDeposit: '400000000000000000000000' }
+        {
+            attachedDeposit: '400000000000000000000000',
+            gas: '40000000000000',
+        }
     );
     const result = await jsvm.view('view_js_contract', encodeCall(nftContract.accountId, 'nftToken', { token_id: tokenId }));
     t.deepEqual(result, { owner_id: nftContract.accountId, token_id: tokenId });
