@@ -244,131 +244,203 @@ export function jsvmValueReturn(value: Bytes) {
 
 // Standalone only APIs
 export function currentAccountId(): string {
-  env.current_account_id(0)
-  return env.read_register(0)
+  env.current_account_id(0);
+  return env.read_register(0);
 }
 
 export function input(): Bytes {
-  env.input(0)
-  return env.read_register(0)
+  env.input(0);
+  return env.read_register(0);
 }
 
 export function storageUsage(): BigInt {
-  env.storageUsage(0)
-  return env.storage_usage(0)
+  env.storageUsage(0);
+  return env.storage_usage(0);
 }
 
 export function accountBalance(): BigInt {
-  return env.account_balance()
+  return env.account_balance();
 }
 
 export function accountLockedBalance(): BigInt {
-  return env.account_locked_balance()
+  return env.account_locked_balance();
 }
 
 export function valueReturn(value: Bytes) {
-  env.value_return(value)
+  env.value_return(value);
 }
 
-export function promiseCreate(accountId: string, methodName: string, args: Bytes, amount: number | BigInt, gas: number | BigInt): BigInt {
-  return env.promise_create(accountId, methodName, args, amount, gas)
+export function promiseCreate(
+  accountId: string,
+  methodName: string,
+  args: Bytes,
+  amount: number | BigInt,
+  gas: number | BigInt
+): BigInt {
+  return env.promise_create(accountId, methodName, args, amount, gas);
 }
 
-export function promiseThen(promiseIndex: number | BigInt, accountId: string, methodName: string, args: Bytes, amount: number | BigInt, gas: number | BigInt) {
-  return env.promise_then(promiseIndex, accountId, methodName, args, amount, gas)
+export function promiseThen(
+  promiseIndex: number | BigInt,
+  accountId: string,
+  methodName: string,
+  args: Bytes,
+  amount: number | BigInt,
+  gas: number | BigInt
+) {
+  return env.promise_then(
+    promiseIndex,
+    accountId,
+    methodName,
+    args,
+    amount,
+    gas
+  );
 }
 
 export function promiseAnd(...promiseIndex: number[] | BigInt[]) {
-  return env.promise(...promiseIndex)
+  return env.promise(...promiseIndex);
 }
 
 export function promiseBatchCreate(accountId: string): BigInt {
-  return env.promise_batch_create(accountId)
+  return env.promise_batch_create(accountId);
 }
 
-export function promiseBatchThen(promiseIndex: number | BigInt, accountId: string): BigInt {
-  return env.promise_batch_then(promiseIndex, accountId)
+export function promiseBatchThen(
+  promiseIndex: number | BigInt,
+  accountId: string
+): BigInt {
+  return env.promise_batch_then(promiseIndex, accountId);
 }
 
 export function promiseBatchActionCreateAccount(promiseIndex: number | BigInt) {
-  env.promise_batch_action_create_account(promiseIndex)
+  env.promise_batch_action_create_account(promiseIndex);
 }
 
-export function promiseBatchActionDeployContract(promiseIndex: number | BigInt, code: Bytes) {
-  env.promise_batch_action_deploy_contract(promiseIndex, code)
+export function promiseBatchActionDeployContract(
+  promiseIndex: number | BigInt,
+  code: Bytes
+) {
+  env.promise_batch_action_deploy_contract(promiseIndex, code);
 }
 
-export function promiseBatchActionFunctionCall(promiseIndex: number | BigInt, methodName: string, args: Bytes, amount: number | BigInt, gas: number | BigInt) {
-  env.promise_batch_action_function_call(promiseIndex, methodName, args, amount, gas)   
+export function promiseBatchActionFunctionCall(
+  promiseIndex: number | BigInt,
+  methodName: string,
+  args: Bytes,
+  amount: number | BigInt,
+  gas: number | BigInt
+) {
+  env.promise_batch_action_function_call(
+    promiseIndex,
+    methodName,
+    args,
+    amount,
+    gas
+  );
 }
 
-export function promiseBatchActionTransfer(promiseIndex: number | BigInt, amount: number | BigInt) {
-  env.promise_batch_action_transfer(promiseIndex, amount)
+export function promiseBatchActionTransfer(
+  promiseIndex: number | BigInt,
+  amount: number | BigInt
+) {
+  env.promise_batch_action_transfer(promiseIndex, amount);
 }
 
-export function promiseBatchActionStake(promiseIndex: number | BigInt, amount: number | BigInt, publicKey: Bytes) {
-  env.promise_batch_action_stake(promiseIndex, amount, publicKey)
+export function promiseBatchActionStake(
+  promiseIndex: number | BigInt,
+  amount: number | BigInt,
+  publicKey: Bytes
+) {
+  env.promise_batch_action_stake(promiseIndex, amount, publicKey);
 }
 
-export function promiseBatchActionAddKeyWithFullAccess(promiseIndex: number | BigInt, publicKey: Bytes, nonce: number | BigInt) {
-  env.promise_batch_action_add_key_with_full_access(promiseIndex, publicKey, nonce)
+export function promiseBatchActionAddKeyWithFullAccess(
+  promiseIndex: number | BigInt,
+  publicKey: Bytes,
+  nonce: number | BigInt
+) {
+  env.promise_batch_action_add_key_with_full_access(
+    promiseIndex,
+    publicKey,
+    nonce
+  );
 }
 
-export function promiseBatchActionAddKeyWithFunctionCall(promiseIndex: number | BigInt, publicKey: Bytes, nonce: number | BigInt, allowance: number | BigInt, receiverId: string, methodNames: string) {
-  env.promise_batch_action_add_key_with_function_call(promiseIndex, publicKey, nonce, allowance, receiverId, methodNames)
+export function promiseBatchActionAddKeyWithFunctionCall(
+  promiseIndex: number | BigInt,
+  publicKey: Bytes,
+  nonce: number | BigInt,
+  allowance: number | BigInt,
+  receiverId: string,
+  methodNames: string
+) {
+  env.promise_batch_action_add_key_with_function_call(
+    promiseIndex,
+    publicKey,
+    nonce,
+    allowance,
+    receiverId,
+    methodNames
+  );
 }
 
-export function promiseBatchActionDeleteKey(promiseIndex: number | BigInt, publicKey: Bytes) {
-  env.promise_batch_action_delete_key(promiseIndex, publicKey)
+export function promiseBatchActionDeleteKey(
+  promiseIndex: number | BigInt,
+  publicKey: Bytes
+) {
+  env.promise_batch_action_delete_key(promiseIndex, publicKey);
 }
 
-export function promiseBatchActionDeleteAccount(promiseIndex: number | BigInt, beneficiaryId: string) {
-  env.promise_batch_action_delete_account(promiseIndex, beneficiaryId)
+export function promiseBatchActionDeleteAccount(
+  promiseIndex: number | BigInt,
+  beneficiaryId: string
+) {
+  env.promise_batch_action_delete_account(promiseIndex, beneficiaryId);
 }
 
 export function promiseResultsCount(): BigInt {
-  return env.promise_results_count()
+  return env.promise_results_count();
 }
 
-const PROMISE_RESULT_NOT_READY = 0n
-const PROMISE_RESULT_SUCCESSFUL = 1n
-const PROMISE_RESULT_FAILED = 2n
-
-export enum PromiseFailure {
+export enum PromiseResult {
   NotReady = 0,
+  Successful = 1,
   Failed = 2,
 }
 
-export function promiseResult(resultIdx: number | BigInt): Bytes | PromiseFailure {
-  let status = env.promise_result(resultIdx, 0)
-  if (status === PROMISE_RESULT_NOT_READY) {
-      return PromiseFailure.NotReady
-  } else if (status === PROMISE_RESULT_FAILED) {
-      return PromiseFailure.Failed
-  } else if (status === PROMISE_RESULT_SUCCESSFUL) {
-      return env.read_register(0)
+export function promiseResult(
+  resultIdx: number | BigInt
+): Bytes | PromiseResult.NotReady | PromiseResult.Failed {
+  let status: PromiseResult = env.promise_result(resultIdx, 0);
+  if (status === PromiseResult.Successful) {
+    return env.read_register(0);
+  } else if (
+    status === PromiseResult.Failed ||
+    status === PromiseResult.NotReady
+  ) {
+    return status;
   } else {
-      panic("Unexpected return code.")
+    panic("Unexpected return code.");
   }
 }
 
 export function promiseReturn(promiseIdx: number | BigInt) {
-  env.promise_return(promiseIdx)
+  env.promise_return(promiseIdx);
 }
 
 export function storageWrite(key: Bytes, value: Bytes): boolean {
-  let exist = env.storage_write(key, value, EVICTED_REGISTER)
+  let exist = env.storage_write(key, value, EVICTED_REGISTER);
   if (exist === 1n) {
-      return true
+    return true;
   }
-  return false
+  return false;
 }
 
 export function storageRemove(key: Bytes): boolean {
-  let exist = env.storage_remove(key, EVICTED_REGISTER)
+  let exist = env.storage_remove(key, EVICTED_REGISTER);
   if (exist === 1n) {
-      return true
+    return true;
   }
-  return false
+  return false;
 }
-
