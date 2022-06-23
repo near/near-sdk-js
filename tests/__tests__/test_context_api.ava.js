@@ -34,29 +34,73 @@ test('get current account id correct', async t => {
     const { ali, contextApiContract } = t.context.accounts;
     let r = await ali.call(contextApiContract, 'get_current_account_id', '');
     t.is(r, contextApiContract.accountId);
-})
+});
 
 test('get signer account id correct', async t => {
     const { ali, contextApiContract } = t.context.accounts;
     let r = await ali.call(contextApiContract, 'get_signer_account_id', '');
     t.is(r, ali.accountId);
-})
+});
 
 test('get predecessor account id correct', async t => {
     const { ali, contextApiContract } = t.context.accounts;
     let r = await ali.call(contextApiContract, 'get_predecessor_account_id', '');
     t.is(r, ali.accountId);
-})
+});
 
 test('get signer account pk correct', async t => {
     const { ali, contextApiContract } = t.context.accounts;
     let r = await ali.callRaw(contextApiContract, 'get_signer_account_pk', '');
     // the prefixing byte 0 indicates it's a ED25519 PublicKey, see how PublicKey is serialized in nearcore
     t.deepEqual(Buffer.from(r.result.status.SuccessValue, 'base64'), Buffer.concat([Buffer.from([0]), Buffer.from((await ali.getKey(ali.accountId)).getPublicKey().data)]));
-})
+});
 
 test('get input correct', async t => {
     const { ali, contextApiContract } = t.context.accounts;
     let r = await ali.callRaw(contextApiContract, 'get_input', new Uint8Array([0, 1, 255]));
     t.is(r.result.status.SuccessValue, Buffer.from(new Uint8Array([0, 1, 255])).toString('base64'));
-})
+});
+
+test('get block height', async t => {
+    const { ali, contextApiContract } = t.context.accounts;
+    let r = await ali.call(contextApiContract, 'get_block_height', '');
+    t.is(r > 0, true);
+});
+
+test('get block timestamp', async t => {
+    let time = new Date().getTime() * 1e6;
+    const { ali, contextApiContract } = t.context.accounts;
+    let r = await ali.call(contextApiContract, 'get_block_timestamp', '');
+    t.is(r > time, true);
+});
+
+test('get epoch height', async t => {
+    const { ali, contextApiContract } = t.context.accounts;
+    let r = await ali.call(contextApiContract, 'get_epoch_height', '');
+    t.is(r, 1);
+});
+
+test('get attached deposit', async t => {
+    const { ali, contextApiContract } = t.context.accounts;
+    let r = await ali.call(contextApiContract, 'get_attached_deposit', '', {attachedDeposit: 3});
+    t.is(r, 3);
+});
+
+test('get prepaid gas', async t => {
+    const { ali, contextApiContract } = t.context.accounts;
+    let r = await ali.call(contextApiContract, 'get_prepaid_gas', '', {gas: '10 TGas'});
+    t.is(r, 10000000000000);
+});
+
+test('get used gas', async t => {
+    const { ali, contextApiContract } = t.context.accounts;
+    let r = await ali.call(contextApiContract, 'get_used_gas', '', {gas: '10 TGas'});
+    t.is(r>0, true);
+    t.is(r<10000000000000, true);
+});
+
+test('get random seed', async t => {
+    const { ali, contextApiContract } = t.context.accounts;
+    let r = await ali.callRaw(contextApiContract, 'get_random_seed', '');
+    t.is(Buffer.from(r.result.status.SuccessValue, 'base64').length, 32);
+});
