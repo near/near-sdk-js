@@ -1,21 +1,24 @@
 import * as near from '../api'
+import { Bytes } from '../utils';
 
 export class LookupMap {
-    constructor(keyPrefix) {
+    readonly keyPrefix: Bytes;
+
+    constructor(keyPrefix: Bytes) {
         this.keyPrefix = keyPrefix
     }
 
-    containsKey(key) {
+    containsKey(key: Bytes): boolean {
         let storageKey = this.keyPrefix + key
         return near.jsvmStorageHasKey(storageKey)
     }
 
-    get(key) {
+    get(key: Bytes): Bytes | null {
         let storageKey = this.keyPrefix + key
         return near.jsvmStorageRead(storageKey)
     }
 
-    remove(key) {
+    remove(key: Bytes): Bytes | null {
         let storageKey = this.keyPrefix + key
         if (near.jsvmStorageRemove(storageKey)) {
             return near.storageGetEvicted()
@@ -23,7 +26,7 @@ export class LookupMap {
         return null
     }
 
-    set(key, value) {
+    set(key: Bytes, value: Bytes): Bytes | null {
         let storageKey = this.keyPrefix + key
         if (near.jsvmStorageWrite(storageKey, value)) {
             return near.storageGetEvicted()
@@ -31,7 +34,7 @@ export class LookupMap {
         return null
     }
 
-    extend(kvs) {
+    extend(kvs: [Bytes, Bytes][]) {
         for(let kv of kvs) {
             this.set(kv[0], kv[1])
         }
