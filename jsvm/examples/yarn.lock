@@ -1591,8 +1591,8 @@ near-sandbox@^0.0.8:
     got "^11.8.2"
     tar "^6.1.0"
 
-"near-sdk-js@file:..":
-  version "0.2.0"
+"near-sdk-js@file:../..":
+  version "0.3.0"
   dependencies:
     "@babel/core" "^7.17.5"
     "@babel/plugin-proposal-decorators" "^7.17.2"
