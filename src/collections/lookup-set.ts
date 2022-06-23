@@ -1,16 +1,19 @@
 import * as near from '../api'
+import { Bytes } from '../utils';
 
 export class LookupSet {
-    constructor(keyPrefix) {
+    readonly keyPrefix: Bytes;
+
+    constructor(keyPrefix: Bytes) {
         this.keyPrefix = keyPrefix
     }
 
-    contains(key) {
+    contains(key: Bytes) {
         let storageKey = this.keyPrefix + key
         return near.jsvmStorageHasKey(storageKey)
     }
     
-    remove(key) {
+    remove(key: Bytes) {
         let storageKey = this.keyPrefix + key
         if (near.jsvmStorageRemove(storageKey)) {
             return near.storageGetEvicted()
@@ -18,7 +21,7 @@ export class LookupSet {
         return null
     }
 
-    set(key) {
+    set(key: Bytes) {
         let storageKey = this.keyPrefix + key
         if (near.jsvmStorageWrite(storageKey, '')) {
             return near.storageGetEvicted()
@@ -26,7 +29,7 @@ export class LookupSet {
         return null
     }
 
-    extend(keys) {
+    extend(keys: Bytes[]) {
         for(let key of keys) {
             this.set(key)
         }
