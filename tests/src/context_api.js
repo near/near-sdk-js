@@ -20,3 +20,31 @@ export function get_input() {
     near.valueReturn(near.input())
 }
 
+export function get_block_height() {
+    near.valueReturn(near.blockHeight())
+}
+
+export function get_block_timestamp() {
+    near.valueReturn(near.blockTimestamp())
+}
+
+export function get_epoch_height() {
+    near.valueReturn(near.epochHeight())
+}
+
+export function get_attached_deposit() {
+    near.valueReturn(near.attachedDeposit())
+}
+
+export function get_prepaid_gas() {
+    near.valueReturn(near.prepaidGas())
+}
+
+export function get_used_gas() {
+    near.valueReturn(near.usedGas())
+}
+
+export function get_random_seed() {
+    near.valueReturn(near.randomSeed())
+}
+
