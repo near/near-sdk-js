@@ -60,11 +60,12 @@ export declare function promiseBatchActionAddKeyWithFunctionCall(promiseIndex: n
 export declare function promiseBatchActionDeleteKey(promiseIndex: number | BigInt, publicKey: Bytes): void;
 export declare function promiseBatchActionDeleteAccount(promiseIndex: number | BigInt, beneficiaryId: string): void;
 export declare function promiseResultsCount(): BigInt;
-export declare enum PromiseFailure {
+export declare enum PromiseResult {
     NotReady = 0,
+    Successful = 1,
     Failed = 2
 }
-export declare function promiseResult(resultIdx: number | BigInt): Bytes | PromiseFailure;
+export declare function promiseResult(resultIdx: number | BigInt): Bytes | PromiseResult.NotReady | PromiseResult.Failed;
 export declare function promiseReturn(promiseIdx: number | BigInt): void;
 export declare function storageWrite(key: Bytes, value: Bytes): boolean;
 export declare function storageRemove(key: Bytes): boolean;
