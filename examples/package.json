@@ -7,7 +7,7 @@
   "scripts": {
     "build": "yarn build:status-message",
     "rebuild": "rm -rf node_modules && rm -rf build && yarn && yarn build",
-    "build:status-message": "yarn near-sdk build src/status-message.js build/status-message.base64",
+    "build:status-message": "yarn near-sdk build src/status-message.js build/status-message.wasm",
 
     "test": "ava",
     "test:status-message": "ava __tests__/test-status-message.ava.js"
