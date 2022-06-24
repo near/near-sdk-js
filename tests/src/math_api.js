@@ -36,5 +36,3 @@ export function test_ecrecover() {
     let ret = near.ecrecover(hash, sign, v, malleabilityFlag)
     near.valueReturn(ret)
 }
-
-export function test_
