@@ -10,17 +10,17 @@ export class LookupMap {
 
     containsKey(key: Bytes): boolean {
         let storageKey = this.keyPrefix + key
-        return near.jsvmStorageHasKey(storageKey)
+        return near.storageHasKey(storageKey)
     }
 
     get(key: Bytes): Bytes | null {
         let storageKey = this.keyPrefix + key
-        return near.jsvmStorageRead(storageKey)
+        return near.storageRead(storageKey)
     }
 
     remove(key: Bytes): Bytes | null {
         let storageKey = this.keyPrefix + key
-        if (near.jsvmStorageRemove(storageKey)) {
+        if (near.storageRemove(storageKey)) {
             return near.storageGetEvicted()
         }
         return null
@@ -28,7 +28,7 @@ export class LookupMap {
 
     set(key: Bytes, value: Bytes): Bytes | null {
         let storageKey = this.keyPrefix + key
-        if (near.jsvmStorageWrite(storageKey, value)) {
+        if (near.storageWrite(storageKey, value)) {
             return near.storageGetEvicted()
         }
         return null

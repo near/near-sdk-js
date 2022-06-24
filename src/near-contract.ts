@@ -2,7 +2,7 @@ import * as near from "./api";
 
 export class NearContract {
   deserialize() {
-    let state = near.jsvmStorageRead("STATE");
+    let state = near.storageRead("STATE");
     if (state) {
       Object.assign(this, JSON.parse(state));
     } else {
@@ -11,11 +11,11 @@ export class NearContract {
   }
 
   serialize() {
-    near.jsvmStorageWrite("STATE", JSON.stringify(this));
+    near.storageWrite("STATE", JSON.stringify(this));
   }
 
   static deserializeArgs(): any {
-    let args = near.jsvmArgs();
+    let args = near.input();
     return JSON.parse(args || "{}");
   }
 

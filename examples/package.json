@@ -1,0 +1,24 @@
+{
+  "name": "standalone-examples",
+  "version": "1.0.0",
+  "description": "Status message example with near-sdk-js",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "build": "yarn build:status-message",
+    "rebuild": "cd .. && yarn build && cd examples && rm -rf node_modules && rm -rf build && yarn && yarn build",
+    "build:status-message": "yarn near-sdk build src/status-message.js build/status-message.wasm",
+
+    "test": "ava",
+    "test:status-message": "ava __tests__/test-status-message.ava.js"
+  },
+  "author": "Near Inc <hello@nearprotocol.com>",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "near-sdk-js": "file:../"
+  },
+  "devDependencies": {
+    "ava": "^4.2.0",
+    "near-workspaces": "^2.0.0"
+  }
+}

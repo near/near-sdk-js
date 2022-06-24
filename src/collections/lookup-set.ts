@@ -10,12 +10,12 @@ export class LookupSet {
 
     contains(key: Bytes) {
         let storageKey = this.keyPrefix + key
-        return near.jsvmStorageHasKey(storageKey)
+        return near.storageHasKey(storageKey)
     }
     
     remove(key: Bytes) {
         let storageKey = this.keyPrefix + key
-        if (near.jsvmStorageRemove(storageKey)) {
+        if (near.storageRemove(storageKey)) {
             return near.storageGetEvicted()
         }
         return null
@@ -23,7 +23,7 @@ export class LookupSet {
 
     set(key: Bytes) {
         let storageKey = this.keyPrefix + key
-        if (near.jsvmStorageWrite(storageKey, '')) {
+        if (near.storageWrite(storageKey, '')) {
             return near.storageGetEvicted()
         }
         return null

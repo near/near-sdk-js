@@ -44,8 +44,8 @@ export default function () {
                     : t.emptyStatement(),
                   // if (ret !== undefined)
                   t.ifStatement(t.binaryExpression('!==', t.identifier('ret'), t.identifier('undefined')),
-                    // env.jsvm_value_return(_contract.constructor.serializeReturn(ret))
-                    t.expressionStatement(t.callExpression(t.memberExpression(t.identifier('env'), t.identifier('jsvm_value_return')), [
+                    // env.value_return(_contract.constructor.serializeReturn(ret))
+                    t.expressionStatement(t.callExpression(t.memberExpression(t.identifier('env'), t.identifier('value_return')), [
                       t.callExpression(t.memberExpression(t.memberExpression(t.identifier('_contract'), t.identifier('constructor')), t.identifier('serializeReturn')), [t.identifier('ret')])
                     ]))
                   )
