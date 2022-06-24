@@ -1,11 +1,5 @@
 import { Worker } from 'near-workspaces';
-import { readFile } from 'fs/promises'
 import test from 'ava';
-
-// TODO: make this function part of the npm package when it is available
-function encodeCall(contract, method, args) {
-    return Buffer.concat([Buffer.from(contract), Buffer.from([0]), Buffer.from(method), Buffer.from([0]), Buffer.from(JSON.stringify(args))])
-}
 
 test.beforeEach(async t => {
     // Init the worker and start a Sandbox server
@@ -14,17 +8,14 @@ test.beforeEach(async t => {
     // Prepare sandbox for tests, create accounts, deploy contracts, etx.
     const root = worker.rootAccount;
 
-    // Deploy the jsvm contract.
-    const jsvm = await root.createAndDeploy(
-        root.getSubAccount('jsvm').accountId,
-        './node_modules/near-sdk-js/jsvm/build/jsvm.wasm',
+    // Deploy the ft contract.
+    const ft = await root.createAndDeploy(
+        root.getSubAccount('ft').accountId,
+        './build/fungible-token.wasm',
     );
 
-    // Deploy fungible token contract
-    const fungibleTokenContract = await root.createSubAccount('fungible-token');
-    let ftContractBase64 = (await readFile('build/fungible-token.base64')).toString();
-    await fungibleTokenContract.call(jsvm, 'deploy_js_contract', Buffer.from(ftContractBase64, 'base64'), { attachedDeposit: '400000000000000000000000' });
-    await fungibleTokenContract.call(jsvm, 'call_js_contract', encodeCall(fungibleTokenContract.accountId, 'init', { prefix: 'a', totalSupply: '1000' }), { attachedDeposit: '400000000000000000000000' });
+    // Init the contract
+    await ft.call(ft, 'init', {});
 
     // Create test accounts
     const ali = await root.createSubAccount('ali');
@@ -32,13 +23,7 @@ test.beforeEach(async t => {
 
     // Save state for test runs, it is unique for each test
     t.context.worker = worker;
-    t.context.accounts = {
-        root,
-        jsvm,
-        fungibleTokenContract,
-        ali,
-        bob,
-    };
+    t.context.accounts = { root, ft, ali, bob };
 });
 
 test.afterEach(async t => {
@@ -48,25 +33,25 @@ test.afterEach(async t => {
 });
 
 test('Owner has all balance in the beginning', async t => {
-    const { jsvm, fungibleTokenContract } = t.context.accounts;
-    const result = await jsvm.view('view_js_contract', encodeCall(fungibleTokenContract.accountId, 'ftBalanceOf', { accountId: fungibleTokenContract.accountId }));
+    const { ft } = t.context.accounts;
+    const result = await ft.view('ftBalanceOf', { accountId: ft.accountId });
     t.is(result, '1000');
 });
 
 test('Can transfer if balance is sufficient', async t => {
-    const { ali, jsvm, fungibleTokenContract } = t.context.accounts;
+    const { ali, ft } = t.context.accounts;
 
-    await fungibleTokenContract.call(jsvm, 'call_js_contract', encodeCall(fungibleTokenContract.accountId, 'ftTransfer', { receiverId: ali.accountId, amount: '100' }), { attachedDeposit: '400000000000000000000000' });
-    const aliBalance = await jsvm.view('view_js_contract', encodeCall(fungibleTokenContract.accountId, 'ftBalanceOf', { accountId: ali.accountId }));
+    await ft.call(ft, 'ftTransfer', { receiverId: ali.accountId, amount: '100' });
+    const aliBalance = await ft.view('ftBalanceOf', { accountId: ali.accountId });
     t.is(aliBalance, '100');
-    const ownerBalance = await jsvm.view('view_js_contract', encodeCall(fungibleTokenContract.accountId, 'ftBalanceOf', { accountId: fungibleTokenContract.accountId }));
+    const ownerBalance = await ft.view('ftBalanceOf', { accountId: ft.accountId });
     t.is(ownerBalance, '900');
 });
 
 test('Cannot transfer if balance is not sufficient', async t => {
-    const { ali, bob, jsvm, fungibleTokenContract } = t.context.accounts;
+    const { ali, bob, ft } = t.context.accounts;
     try {
-        await ali.call(jsvm, 'call_js_contract', encodeCall(fungibleTokenContract.accountId, 'ftTransfer', { receiverId: bob.accountId, amount: '100' }), { attachedDeposit: '400000000000000000000000' });
+        await ali.call(ft, 'ftTransfer', { receiverId: bob.accountId, amount: '100' });
     } catch (e) {
         t.assert(e.toString().indexOf('Smart contract panicked: assertion failed: The account doesn\'t have enough balance') >= 0);
     }
