@@ -34,7 +34,7 @@ test.after(async t => {
 });
 
 test('Root gets null status', async t => {
-    const { statusMessage } = t.context.accounts;
+    const { statusMessage, root } = t.context.accounts;
     const result = await statusMessage.view('get_status', { account_id: root.accountId });
     t.is(result, null);
 });

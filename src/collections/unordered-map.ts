@@ -52,7 +52,7 @@ export class UnorderedMap {
 
   getIndexRaw(key: Bytes): Bytes {
     let indexLookup = this.keyIndexPrefix + key;
-    let indexRaw = near.jsvmStorageRead(indexLookup);
+    let indexRaw = near.storageRead(indexLookup);
     return indexRaw;
   }
 
@@ -72,14 +72,14 @@ export class UnorderedMap {
 
   set(key: Bytes, value: Bytes): Bytes | null {
     let indexLookup = this.keyIndexPrefix + key;
-    let indexRaw = near.jsvmStorageRead(indexLookup);
+    let indexRaw = near.storageRead(indexLookup);
     if (indexRaw) {
       let index = this.deserializeIndex(indexRaw);
       return this.values.replace(index, value);
     } else {
       let nextIndex = this.len();
       let nextIndexRaw = this.serializeIndex(nextIndex);
-      near.jsvmStorageWrite(indexLookup, nextIndexRaw);
+      near.storageWrite(indexLookup, nextIndexRaw);
       this.keys.push(key);
       this.values.push(value);
       return null;
@@ -88,12 +88,12 @@ export class UnorderedMap {
 
   remove(key: Bytes): Bytes | null {
     let indexLookup = this.keyIndexPrefix + key;
-    let indexRaw = near.jsvmStorageRead(indexLookup);
+    let indexRaw = near.storageRead(indexLookup);
     if (indexRaw) {
       if (this.len() == 1) {
         // If there is only one element then swap remove simply removes it without
         // swapping with the last element.
-        near.jsvmStorageRemove(indexLookup);
+        near.storageRemove(indexLookup);
       } else {
         // If there is more than one element then swap remove swaps it with the last
         // element.
@@ -101,12 +101,12 @@ export class UnorderedMap {
         if (!lastKeyRaw) {
           throw new Error(ERR_INCONSISTENT_STATE);
         }
-        near.jsvmStorageRemove(indexLookup);
+        near.storageRemove(indexLookup);
         // If the removed element was the last element from keys, then we don't need to
         // reinsert the lookup back.
         if (lastKeyRaw != key) {
           let lastLookupKey = this.keyIndexPrefix + lastKeyRaw;
-          near.jsvmStorageWrite(lastLookupKey, indexRaw);
+          near.storageWrite(lastLookupKey, indexRaw);
         }
       }
       let index = this.deserializeIndex(indexRaw);
@@ -119,7 +119,7 @@ export class UnorderedMap {
   clear() {
     for (let key of this.keys) {
       let indexLookup = this.keyIndexPrefix + key;
-      near.jsvmStorageRemove(indexLookup);
+      near.storageRemove(indexLookup);
     }
     this.keys.clear();
     this.values.clear();

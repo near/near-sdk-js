@@ -36,7 +36,7 @@ export class Vector {
       return null;
     }
     let storageKey = indexToKey(this.prefix, index);
-    return near.jsvmStorageRead(storageKey);
+    return near.storageRead(storageKey);
   }
 
   /// Removes an element from the vector and returns it in serialized form.
@@ -50,7 +50,7 @@ export class Vector {
     } else {
       let key = indexToKey(this.prefix, index);
       let last = this.pop();
-      if (near.jsvmStorageWrite(key, last)) {
+      if (near.storageWrite(key, last)) {
         return near.storageGetEvicted();
       } else {
         throw new Error(ERR_INCONSISTENT_STATE);
@@ -61,7 +61,7 @@ export class Vector {
   push(element: Bytes) {
     let key = indexToKey(this.prefix, this.length);
     this.length += 1;
-    near.jsvmStorageWrite(key, element);
+    near.storageWrite(key, element);
   }
 
   pop(): Bytes | null {
@@ -71,7 +71,7 @@ export class Vector {
       let lastIndex = this.length - 1;
       let lastKey = indexToKey(this.prefix, lastIndex);
       this.length -= 1;
-      if (near.jsvmStorageRemove(lastKey)) {
+      if (near.storageRemove(lastKey)) {
         return near.storageGetEvicted();
       } else {
         throw new Error(ERR_INCONSISTENT_STATE);
@@ -84,7 +84,7 @@ export class Vector {
       throw new Error(ERR_INDEX_OUT_OF_BOUNDS);
     } else {
       let key = indexToKey(this.prefix, index);
-      if (near.jsvmStorageWrite(key, element)) {
+      if (near.storageWrite(key, element)) {
         return near.storageGetEvicted();
       } else {
         throw new Error(ERR_INCONSISTENT_STATE);
@@ -105,7 +105,7 @@ export class Vector {
   clear() {
     for (let i = 0; i < this.length; i++) {
       let key = indexToKey(this.prefix, i);
-      near.jsvmStorageRemove(key);
+      near.storageRemove(key);
     }
     this.length = 0;
   }
