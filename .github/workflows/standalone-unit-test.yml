@@ -1,4 +1,4 @@
-name: Unit standalone
+name: Standalone unit
 on: push
 jobs:
   unit-tests:
@@ -16,4 +16,4 @@ jobs:
       - name: Install modules
         run: yarn
       - name: Run standalone unit tests
-        run: yarn test:standalone
+        run: yarn test:standalone:unit

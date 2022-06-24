@@ -8,7 +8,7 @@
         "build": "yarn build:context-api && yarn build:math-api",
         "build:context-api": "near-sdk build src/context_api.js build/context_api.wasm",
         "build:math-api": "near-sdk build src/math_api.js build/math_api.wasm",
-        "rebuild": "rm -rf node_modules && rm -rf build && yarn && yarn build",
+        "rebuild": "cd .. && yarn build && cd tests && rm -rf node_modules && rm -rf build && yarn && yarn build",
         "test": "ava",
         "test:context-api": "ava __tests__/test_context_api.ava.js",
         "test:math-api": "ava __tests__/test_math_api.ava.js"

@@ -39,17 +39,17 @@ export class UnorderedSet {
 
   contains(element: Bytes): boolean {
     let indexLookup = this.elementIndexPrefix + element;
-    return near.jsvmStorageHasKey(indexLookup);
+    return near.storageHasKey(indexLookup);
   }
 
   set(element: Bytes): boolean {
     let indexLookup = this.elementIndexPrefix + element;
-    if (near.jsvmStorageRead(indexLookup)) {
+    if (near.storageRead(indexLookup)) {
       return false;
     } else {
       let nextIndex = this.len();
       let nextIndexRaw = this.serializeIndex(nextIndex);
-      near.jsvmStorageWrite(indexLookup, nextIndexRaw);
+      near.storageWrite(indexLookup, nextIndexRaw);
       this.elements.push(element);
       return true;
     }
@@ -57,12 +57,12 @@ export class UnorderedSet {
 
   remove(element: Bytes): boolean {
     let indexLookup = this.elementIndexPrefix + element;
-    let indexRaw = near.jsvmStorageRead(indexLookup);
+    let indexRaw = near.storageRead(indexLookup);
     if (indexRaw) {
       if (this.len() == 1) {
         // If there is only one element then swap remove simply removes it without
         // swapping with the last element.
-        near.jsvmStorageRemove(indexLookup);
+        near.storageRemove(indexLookup);
       } else {
         // If there is more than one element then swap remove swaps it with the last
         // element.
@@ -70,12 +70,12 @@ export class UnorderedSet {
         if (!lastElementRaw) {
           throw new Error(ERR_INCONSISTENT_STATE);
         }
-        near.jsvmStorageRemove(indexLookup);
+        near.storageRemove(indexLookup);
         // If the removed element was the last element from keys, then we don't need to
         // reinsert the lookup back.
         if (lastElementRaw != element) {
           let lastLookupElement = this.elementIndexPrefix + lastElementRaw;
-          near.jsvmStorageWrite(lastLookupElement, indexRaw);
+          near.storageWrite(lastLookupElement, indexRaw);
         }
       }
       let index = this.deserializeIndex(indexRaw);
@@ -88,7 +88,7 @@ export class UnorderedSet {
   clear() {
     for (let element of this.elements) {
       let indexLookup = this.elementIndexPrefix + element;
-      near.jsvmStorageRemove(indexLookup);
+      near.storageRemove(indexLookup);
     }
     this.elements.clear();
   }

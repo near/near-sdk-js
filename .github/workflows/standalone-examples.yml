@@ -1,0 +1,19 @@
+name: Standalone examples
+on: push
+jobs:
+  examples:
+    strategy:
+      matrix:
+        platform: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: "16"
+      - name: Setup
+        run: ./setup.sh
+      - name: Install dependencies
+        run: cd examples && yarn
+      - name: status-message
+        run: cd examples && yarn build:status-message && yarn test:status-message
