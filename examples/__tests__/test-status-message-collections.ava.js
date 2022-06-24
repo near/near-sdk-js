@@ -10,7 +10,7 @@ test.beforeEach(async t => {
 
     // Deploy the statis-message contract.
     const statusMessage = await root.createAndDeploy(
-        root.getSubAccount('status-message').accountId,
+        root.getSubAccount('statusmessage').accountId,
         './build/status-message-collections.wasm',
     );
 

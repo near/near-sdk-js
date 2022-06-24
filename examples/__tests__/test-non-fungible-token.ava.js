@@ -19,8 +19,8 @@ test.beforeEach(async t => {
 
     // Deploy the tokenReciever contract.
     const tokenReciever = await root.createAndDeploy(
-        root.getSubAccount('token-reciever').accountId,
-        './build/tokenReciever.wasm',
+        root.getSubAccount('tokenreciever').accountId,
+        './build/test-token-receiver.wasm',
     );
 
     // Init the contract

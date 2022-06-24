@@ -8,20 +8,20 @@ test.beforeEach(async t => {
     // Prepare sandbox for tests, create accounts, deploy contracts, etx.
     const root = worker.rootAccount;
 
-    // Deploy the clearn-state contract.
-    const clearnState = await root.createAndDeploy(
-        root.getSubAccount('clearn-state').accountId,
-        './build/clearn-state.wasm',
+    // Deploy the clean-state contract.
+    const cleanState = await root.createAndDeploy(
+        root.getSubAccount('cleanstate').accountId,
+        './build/clean-state.wasm',
     );
 
     // Init the contract
-    await clearnState.call(clearnState, 'init', {});
+    await cleanState.call(cleanState, 'init', {});
 
     // Save state for test runs, it is unique for each test
     t.context.worker = worker;
     t.context.accounts = {
         root,
-        clearnState,
+        cleanState,
     };
 });
 
@@ -32,11 +32,11 @@ test.afterEach(async t => {
 });
 
 test('Clean state after storing', async t => {
-    const { root, clearnState } = t.context.accounts;
-    await root.call(clearnState, 'put', { key: '1', value: 1 });
-    const value1 = await clearnState.view('get', { key: '1' });
+    const { root, cleanState } = t.context.accounts;
+    await root.call(cleanState, 'put', { key: '1', value: 1 });
+    const value1 = await cleanState.view('get', { key: '1' });
     t.is(value1, '1');
-    await cleanStateContract.call(clearnState, 'clean', { keys: ['1'] });
-    const value2 = await clearnState.view('get', { key: '1' });
+    await cleanState.call(cleanState, 'clean', { keys: ['1'] });
+    const value2 = await cleanState.view('get', { key: '1' });
     t.is(value2, null);
 });

@@ -10,7 +10,7 @@ test.beforeEach(async t => {
 
     // Deploy the onCall contract.
     const onCall = await root.createAndDeploy(
-        root.getSubAccount('cross-contract-call').accountId,
+        root.getSubAccount('oncall').accountId,
         './build/cross-contract-call.wasm',
     );
 
@@ -19,7 +19,7 @@ test.beforeEach(async t => {
 
     // Deploy status-message the contract.
     const statusMessage = await root.createAndDeploy(
-        root.getSubAccount('status-message').accountId,
+        root.getSubAccount('statusmessage').accountId,
         './build/status-message.wasm',
     );
 
