@@ -104,3 +104,13 @@ test('get random seed', async t => {
     let r = await ali.callRaw(contextApiContract, 'get_random_seed', '');
     t.is(Buffer.from(r.result.status.SuccessValue, 'base64').length, 32);
 });
+
+test('get validator stake test', async t => {
+    const { ali, contextApiContract, root } = t.context.accounts;
+    let r = await ali.call(contextApiContract, 'get_validator_stake', '');
+    t.is(r, 0);
+    r = await root.callRaw(contextApiContract, 'get_validator_stake', '');
+    t.is(Buffer.from(r.result.status.SuccessValue, 'base64').toString('ascii'), '50000000000000000000000000000000');
+    r = await contextApiContract.viewRaw('get_total_stake', '');
+    t.is(Buffer.from(r.result).toString('ascii'), '50000000000000000000000000000000');
+});

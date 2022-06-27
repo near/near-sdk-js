@@ -48,3 +48,10 @@ export function get_random_seed() {
     near.valueReturn(near.randomSeed())
 }
 
+export function get_validator_stake() {
+    near.valueReturn(near.validatorStake(near.signerAccountId()))
+}
+
+export function get_total_stake() {
+    near.valueReturn(near.validatorTotalStake())
+}
