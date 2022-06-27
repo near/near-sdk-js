@@ -15,7 +15,7 @@ test.beforeEach(async t => {
     );
 
     // Init the contract
-    await ft.call(ft, 'init', {});
+    await ft.call(ft, 'init', { prefix: 'a', totalSupply: '1000' });
 
     // Create test accounts
     const ali = await root.createSubAccount('ali');
@@ -56,3 +56,5 @@ test('Cannot transfer if balance is not sufficient', async t => {
         t.assert(e.toString().indexOf('Smart contract panicked: assertion failed: The account doesn\'t have enough balance') >= 0);
     }
 });
+
+// TODO: add ftTransferCall test
