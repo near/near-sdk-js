@@ -15,16 +15,16 @@ test.beforeEach(async t => {
     );
 
     // Init the contract
-    await nft.call(nft, 'init', {});
+    await nft.call(nft, 'init', { owner_id: nft.accountId, owner_by_id_prefix: 'a' });
 
-    // Deploy the tokenReciever contract.
-    const tokenReciever = await root.createAndDeploy(
-        root.getSubAccount('tokenreciever').accountId,
+    // Deploy the tokenReceiver contract.
+    const tokenReceiver = await root.createAndDeploy(
+        root.getSubAccount('tokenreceiver').accountId,
         './build/test-token-receiver.wasm',
     );
 
     // Init the contract
-    await tokenReciever.call(tokenReciever, 'init', {});
+    await tokenReceiver.call(tokenReceiver, 'init', {});
 
     // Mint an NFT
     let tokenId = 'my-cool-nft';
@@ -37,7 +37,7 @@ test.beforeEach(async t => {
 
     // Save state for test runs, it is unique for each test
     t.context.worker = worker;
-    t.context.accounts = { root, nft, tokenReciever, tokenId, ali, bob };
+    t.context.accounts = { root, nft, tokenReceiver, tokenId, ali, bob };
 });
 
 test.afterEach(async t => {
@@ -72,10 +72,10 @@ test('Transfer failures', async t => {
 });
 
 test('Transfer call where receiver returns the token', async t => {
-    const { nft, tokenReceiverContract, tokenId } = t.context.accounts;
+    const { nft, tokenReceiver, tokenId } = t.context.accounts;
     await nft.call(
         nft,
-        'nftTransferCall', { receiver_id: tokenReceiverContract.accountId, token_id: tokenId, approval_id: null, memo: null, msg: 'return-it-now' },
+        'nftTransferCall', { receiver_id: tokenReceiver.accountId, token_id: tokenId, approval_id: null, memo: null, msg: 'return-it-now' },
         {
             gas: '40000000000000', //TODO: test if it works with standart gas
         }
@@ -85,8 +85,8 @@ test('Transfer call where receiver returns the token', async t => {
 });
 
 test('Transfer call where receiver keeps the token', async t => {
-    const { nft, tokenReceiverContract, tokenId } = t.context.accounts;
-    await nft.call(nft, 'nftTransferCall', { receiver_id: tokenReceiverContract.accountId, token_id: tokenId, approval_id: null, memo: null, msg: 'keep-it-now' });
+    const { nft, tokenReceiver, tokenId } = t.context.accounts;
+    await nft.call(nft, 'nftTransferCall', { receiver_id: tokenReceiver.accountId, token_id: tokenId, approval_id: null, memo: null, msg: 'keep-it-now' });
     const result = await nft.view('nftToken', { token_id: tokenId });
-    t.deepEqual(result, { owner_id: tokenReceiverContract.accountId, token_id: tokenId });
+    t.deepEqual(result, { owner_id: tokenReceiver.accountId, token_id: tokenId });
 });
