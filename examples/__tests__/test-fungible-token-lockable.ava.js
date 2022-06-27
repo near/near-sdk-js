@@ -15,7 +15,7 @@ test.beforeEach(async t => {
     );
 
     // Init the contract
-    await lockableFt.call(lockableFt, 'init', {});
+    await lockableFt.call(lockableFt, 'init', { prefix: 'prefix', totalSupply: 10000 });
 
     // Test users
     const ali = await root.createSubAccount('ali');
