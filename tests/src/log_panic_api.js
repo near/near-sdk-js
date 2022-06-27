@@ -33,29 +33,6 @@ export function log_invalid_utf16_sequence_test() {
     near.logUtf16(bytes('\x00\x01\xff'))
 }
 
-export function storage_write_bytes() {
-    near.jsvmStorageWrite(bytes('abc'), bytes('def'))
-    near.jsvmStorageWrite(bytes('\x00\x01\xff'), bytes('\xe6\xb0\xb4'))
-    near.jsvmStorageWrite(bytes('\xe6\xb0\xb4'), bytes('\x00ab'))
-}
-
-export function storage_write_unexpected_input() {
-    near.jsvmStorageWrite('水', '水')
-    near.jsvmStorageWrite(123, 456)
-}
-
-export function storage_read_ascii_bytes() {
-    near.jsvmValueReturn(near.jsvmStorageRead(bytes('abc')))
-}
-
-export function storage_read_arbitrary_bytes_key_utf8_sequence_bytes_value() {
-    near.jsvmValueReturn(near.jsvmStorageRead(bytes('\x00\x01\xff')))
-}
-
-export function storage_read_utf8_sequence_bytes_key_arbitrary_bytes_value() {
-    near.jsvmValueReturn(near.jsvmStorageRead(bytes('\xe6\xb0\xb4')))
-}
-
 export function panic_test() {
     near.panic()
 }
