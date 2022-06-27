@@ -814,11 +814,14 @@ static JSValue near_storage_write(JSContext *ctx, JSValueConst this_val, int arg
 {
   const char *key_ptr, *value_ptr;
   size_t key_len, value_len;
-  uint64_t ret;
+  uint64_t register_id, ret;
 
   key_ptr = JS_ToCStringLenRaw(ctx, &key_len, argv[0]);
   value_ptr = JS_ToCStringLenRaw(ctx, &value_len, argv[1]);
-  ret = storage_write(key_len, (uint64_t)key_ptr, value_len, (uint64_t)value_ptr, 0);
+  if (JS_ToUint64Ext(ctx, &register_id, argv[2]) < 0) {
+    return JS_ThrowTypeError(ctx, "Expect Uint64 for register_id");
+  }
+  ret = storage_write(key_len, (uint64_t)key_ptr, value_len, (uint64_t)value_ptr, register_id);
   return JS_NewBigUint64(ctx, ret);
 }
 
