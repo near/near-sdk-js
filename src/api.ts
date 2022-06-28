@@ -415,15 +415,15 @@ export function promiseResult(
   resultIdx: number | BigInt
 ): Bytes | PromiseResult.NotReady | PromiseResult.Failed {
   let status: PromiseResult = env.promise_result(resultIdx, 0);
-  if (status === PromiseResult.Successful) {
+  if (status == PromiseResult.Successful) {
     return env.read_register(0);
   } else if (
-    status === PromiseResult.Failed ||
-    status === PromiseResult.NotReady
+    status == PromiseResult.Failed ||
+    status == PromiseResult.NotReady
   ) {
     return status;
   } else {
-    panic("Unexpected return code.");
+    panic(`Unexpected return code: ${status}`);
   }
 }
 

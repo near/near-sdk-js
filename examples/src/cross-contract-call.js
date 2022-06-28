@@ -12,18 +12,16 @@ class OnCall extends NearContract {
         near.log(`Trying to set ${accountId} on-call`)
         const promise = near.promiseBatchCreate('statusmessage.test.near')
         near.promiseBatchActionFunctionCall(promise, 'get_status', bytes(JSON.stringify({ account_id: accountId })), 0, 30000000000000)
-        near.promiseThen(promise, near.currentAccountId(), '_set_person_on_call_private', bytes(JSON.stringify({})), 0, 30000000000000);
+        near.promiseThen(promise, near.currentAccountId(), '_set_person_on_call_private', bytes(JSON.stringify({ accountId: accountId })), 0, 30000000000000);
     }
 
     @call
-    _set_person_on_call_private({ }) {
+    _set_person_on_call_private({ accountId }) {
         near.log(`_set_person_on_call_private called`)
-        if (near.currentAccountId() ==! near.predecessorAccountId()) {
+        if (near.currentAccountId() == !near.predecessorAccountId()) {
             near.panic('Function can be used as a callback only')
         }
-        const res = near.promiseResult(0); // TODO: why we are hardcoding 0 here?
-        near.log(`res fin: ${res}`)
-        const status = 'AVAILABLE' // TODO: get from result
+        const status = near.promiseResult(0);
         near.log(`${accountId} status is ${status}`)
         if (status === 'AVAILABLE') {
             this.personOnCall = accountId
