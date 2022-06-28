@@ -1,4 +1,4 @@
-import { NearContract, NearBindgen, call, view, near } from 'near-sdk-js'
+import { NearContract, NearBindgen, call, view, near, bytes } from 'near-sdk-js'
 
 @NearBindgen
 class OnCall extends NearContract {
@@ -10,7 +10,12 @@ class OnCall extends NearContract {
     @call
     set_person_on_call({ accountId }) {
         near.log(`Trying to set ${accountId} on-call`)
-        const status = near.jsvmCall('status-message.test.near', 'get_status', { account_id: accountId })
+        // const status = near.jsvmCall('status-message.test.near', 'get_status', { account_id: accountId })
+        // TODO: rewrite api.js to named parameters
+        const promise = near.promiseBatchCreate('status-message.test.near')
+        const fcPromise = near.promiseBatchActionFunctionCall(promise, 'get_status', bytes(JSON.stringify({ account_id: accountId })), 0, 30000000000000)
+        const resBytes = near.promiseResult(fcPromise)
+        const status = 'AVAILABLE' // TODO: get from res
         near.log(`${accountId} status is ${status}`)
         if (status === 'AVAILABLE') {
             this.personOnCall = accountId
