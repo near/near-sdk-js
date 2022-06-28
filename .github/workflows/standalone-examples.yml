@@ -19,8 +19,8 @@ jobs:
         run: cd examples && yarn build:clean-state && yarn test:clean-state
       - name: counter
         run: cd examples && yarn build:counter && yarn test:counter
-      # - name: cross-contract-call
-      #   run: cd examples && yarn build:cross-contract-call && yarn test:cross-contract-call
+      - name: cross-contract-call
+        run: cd examples && yarn build:cross-contract-call && yarn test:cross-contract-call
       - name: fungible-token-lockable
         run: cd examples && yarn build:fungible-token-lockable && yarn test:fungible-token-lockable
       - name: fungible-token

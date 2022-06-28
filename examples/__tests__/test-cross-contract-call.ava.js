@@ -61,6 +61,7 @@ test('Person can be set on-call if AVAILABLE', async t => {
     // Bob sets Ali on-call
     await bob.call(onCall, 'set_person_on_call', { accountId: ali.accountId }, { gas: 120000000000000 });
 
+
     // Check that Ali is on-call
     t.is(
         await onCall.view('person_on_call', {}),
@@ -74,7 +75,7 @@ test('Person can NOT be set on-call if UNAVAILABLE', async t => {
     // Ali set her status as AVAILABLE
     await ali.call(statusMessage, 'set_status', { message: 'UNAVAILABLE' });
     // Bob tries to sets Ali on-call
-    await bob.call(onCall, 'set_person_on_call', { accountId: ali.accountId });
+    await bob.call(onCall, 'set_person_on_call', { accountId: ali.accountId }, { gas: 120000000000000 });
 
     // Check that Ali is NOT on-call
     t.not(
