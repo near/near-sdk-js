@@ -11,6 +11,8 @@ interface Env {
 // env object is injected by JSVM
 declare let env: Env;
 
+// TODO: rewrite api.js to named parameters?
+// TODO: should have the same interface as console.log
 export function log(message: string) {
   env.log(message);
 }
