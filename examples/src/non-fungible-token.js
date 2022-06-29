@@ -1,4 +1,4 @@
-import { NearContract, NearBindgen, call, view, near, LookupMap } from 'near-sdk-js'
+import { NearContract, NearBindgen, call, view, near, LookupMap, bytes } from 'near-sdk-js'
 
 function assert(b, str) {
     if (b) {
@@ -66,15 +66,15 @@ class NftContract extends NearContract {
         const isTokenTransfered = JSON.parse(near.promiseResult(0))
         near.log(`${token_id} ${isTokenTransfered ? 'was transfered' : 'was NOT transfered'}`)
 
-        if (isTokenTransfered) {
+        if (!isTokenTransfered) {
+            near.log(`Returning ${token_id} to ${receiver_id}`)
             const currentOwner = this.owner_by_id.get(token_id)
-            if (!currentOwner || currentOwner !== receiver_id) {
-                // The token was burned and doesn't exist anymore or it is not owned by the receiver anymore. Can't return it.
-                return
-            } else {
+            if (currentOwner === receiver_id) {
                 this.internalTransfer({ sender_id: receiver_id, receiver_id: sender_id, token_id: token_id, approval_id: null, memo: null })
+                near.log(`${token_id} returned to ${sender_id}`)
                 return
             }
+            near.log(`Failed to return ${token_id}. It was burned or not owned by ${receiver_id} now.`)
         }
     }
 
