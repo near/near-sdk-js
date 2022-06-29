@@ -11,9 +11,12 @@ interface Env {
 // env object is injected by JSVM
 declare let env: Env;
 
-// TODO: should have the same interface as console.log
-export function log(message: string) {
-  env.log(message);
+export function log(...params: any[]) {
+  env.log(`${params
+    .map(x => x === undefined ? 'undefined' : x)                // Stringify undefined
+    .map(x => typeof (x) === 'object' ? JSON.stringify(x) : x)  // Convert Objects to strings
+    .join(' ')}`                                                // Convert to string
+  )
 }
 
 export function signerAccountId(): string {
