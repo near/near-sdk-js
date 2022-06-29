@@ -21,7 +21,7 @@ class OnCall extends NearContract {
         if (near.currentAccountId() == !near.predecessorAccountId()) {
             near.panic('Function can be used as a callback only')
         }
-        const status = near.promiseResult(0).replaceAll('\"', ''); // TODO: Any ideas why we have "AVAILABLE" instead of AVALABLE?
+        const status = JSON.parse(near.promiseResult(0))
         near.log(`${accountId} status is ${status}`)
         if (status === 'AVAILABLE') {
             this.personOnCall = accountId
