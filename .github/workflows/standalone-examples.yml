@@ -25,8 +25,8 @@ jobs:
         run: cd examples && yarn build:fungible-token-lockable && yarn test:fungible-token-lockable
       - name: fungible-token
         run: cd examples && yarn build:fungible-token && yarn test:fungible-token
-      # - name: non-fungible-token
-      #   run: cd examples && yarn build:non-fungible-token && yarn test:non-fungible-token
+      - name: non-fungible-token
+        run: cd examples && yarn build:non-fungible-token && yarn test:non-fungible-token
       - name: status-message-collections
         run: cd examples && yarn build:status-message-collections && yarn test:status-message-collections
       - name: status-message

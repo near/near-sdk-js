@@ -20,7 +20,7 @@ test.beforeEach(async t => {
     // Deploy the tokenReceiver contract.
     const tokenReceiver = await root.createAndDeploy(
         root.getSubAccount('tokenreceiver').accountId,
-        './build/test-token-receiver.wasm',
+        './build/non-fungible-token-receiver.wasm',
     );
 
     // Init the contract
