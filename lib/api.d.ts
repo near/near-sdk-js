@@ -1,5 +1,5 @@
 import { Bytes } from "./utils";
-export declare function log(message: string): void;
+export declare function log(...params: any[]): void;
 export declare function signerAccountId(): string;
 export declare function signerAccountPk(): Bytes;
 export declare function predecessorAccountId(): string;
