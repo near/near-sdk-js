@@ -20,11 +20,11 @@ test.beforeEach(async t => {
     // Deploy the tokenReceiver contract.
     const tokenReceiver = await root.createAndDeploy(
         root.getSubAccount('tokenreceiver').accountId,
-        './build/test-token-receiver.wasm',
+        './build/non-fungible-token-receiver.wasm',
     );
 
     // Init the contract
-    await tokenReceiver.call(tokenReceiver, 'init', {});
+    await tokenReceiver.call(tokenReceiver, 'init', { nonFungibleTokenAccountId: nft.accountId });
 
     // Mint an NFT
     let tokenId = 'my-cool-nft';
@@ -75,18 +75,14 @@ test('Transfer call where receiver returns the token', async t => {
     const { nft, tokenReceiver, tokenId } = t.context.accounts;
     await nft.call(
         nft,
-        'nftTransferCall', { receiver_id: tokenReceiver.accountId, token_id: tokenId, approval_id: null, memo: null, msg: 'return-it-now' },
-        {
-            gas: '40000000000000', //TODO: test if it works with standart gas
-        }
-    );
+        'nftTransferCall', { receiver_id: tokenReceiver.accountId, token_id: tokenId, approval_id: null, memo: null, msg: 'return-it-now' }, { gas: '120000000000000' });
     const result = await nft.view('nftToken', { token_id: tokenId });
     t.deepEqual(result, { owner_id: nft.accountId, token_id: tokenId });
 });
 
 test('Transfer call where receiver keeps the token', async t => {
     const { nft, tokenReceiver, tokenId } = t.context.accounts;
-    await nft.call(nft, 'nftTransferCall', { receiver_id: tokenReceiver.accountId, token_id: tokenId, approval_id: null, memo: null, msg: 'keep-it-now' });
+    await nft.call(nft, 'nftTransferCall', { receiver_id: tokenReceiver.accountId, token_id: tokenId, approval_id: null, memo: null, msg: 'keep-it-now' }, { gas: '120000000000000' });
     const result = await nft.view('nftToken', { token_id: tokenId });
     t.deepEqual(result, { owner_id: tokenReceiver.accountId, token_id: tokenId });
 });
