@@ -1,4 +1,4 @@
-import {near, bytes, call} from 'near-sdk-js'
+import {near, bytes} from 'near-sdk-js'
 
 function arrayN(n) {
     return [...Array(Number(n)).keys()]

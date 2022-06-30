@@ -20,12 +20,18 @@ test.before(async t => {
         'build/promise_api.wasm',
     );
 
+    const caller2Contract = await root.createAndDeploy(
+        root.getSubAccount('caller2').accountId,
+        'build/promise_batch_api.wasm',
+    );
+
     // Test users
     const ali = await root.createSubAccount('ali');
+    const bob = await root.createSubAccount('bob');
 
     // Save state for test runs
     t.context.worker = worker;
-    t.context.accounts = { root, callerContract, calleeContract, ali };
+    t.context.accounts = { root, callerContract, calleeContract, ali, bob, caller2Contract };
 });
 
 test.after(async t => {
@@ -118,3 +124,27 @@ test('promise and', async t => {
         })]
     });
 });
+
+test('promise batch create account, transfer', async t => {
+    const { bob, caller2Contract } = t.context.accounts;
+
+    let r = await bob.callRaw(caller2Contract, 'test_promise_batch_create_transfer', '', {gas: '100 Tgas'});
+    t.is(r.result.receipts_outcome[1].outcome.executor_id, caller2Contract.getSubAccount('a').accountId);
+    t.is(r.result.receipts_outcome[1].outcome.status.SuccessValue, '');
+
+    let balance = await caller2Contract.getSubAccount('a').balance()
+    t.is(balance.total.toString(), '10000000000000000000000000')
+})
+
+test('promise batch deploy contract and call', async t => {
+    const { bob, caller2Contract } = t.context.accounts;
+
+    let r = await bob.callRaw(caller2Contract, 'test_promise_batch_deploy_call', '', {gas: '200 Tgas'});
+    let deployed = caller2Contract.getSubAccount('b');
+    t.deepEqual(JSON.parse(Buffer.from(r.result.status.SuccessValue, 'base64')), {
+        currentAccountId: deployed.accountId,
+        signerAccountId: bob.accountId,
+        predecessorAccountId: caller2Contract.accountId,
+        input: 'abc',
+    });
+})
