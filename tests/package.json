@@ -5,7 +5,7 @@
     "main": "index.js",
     "type": "module",
     "scripts": {
-        "build": "yarn build:context-api && yarn build:math-api && yarn build:storage-api && yarn build:log-panic-api && yarn build promise-api",
+        "build": "yarn build:context-api && yarn build:math-api && yarn build:storage-api && yarn build:log-panic-api && yarn build:promise-api",
         "build:context-api": "near-sdk build src/context_api.js build/context_api.wasm",
         "build:math-api": "near-sdk build src/math_api.js build/math_api.wasm",
         "build:storage-api": "near-sdk build src/storage_api.js build/storage_api.wasm",
