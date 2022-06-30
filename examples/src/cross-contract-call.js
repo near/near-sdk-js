@@ -18,7 +18,7 @@ class OnCall extends NearContract {
     @call
     _set_person_on_call_private({ accountId }) {
         near.log(`_set_person_on_call_private called, accountId ${accountId}`)
-        if (near.currentAccountId() == !near.predecessorAccountId()) {
+        if (near.currentAccountId() !== near.predecessorAccountId()) {
             near.panic('Function can be used as a callback only')
         }
         const status = JSON.parse(near.promiseResult(0))
