@@ -298,8 +298,8 @@ export function promiseThen(
   );
 }
 
-export function promiseAnd(...promiseIndex: number[] | BigInt[]) {
-  return env.promise(...promiseIndex);
+export function promiseAnd(...promiseIndex: number[] | BigInt[]): BigInt {
+  return env.promise_and(...promiseIndex);
 }
 
 export function promiseBatchCreate(accountId: string): BigInt {
@@ -413,11 +413,11 @@ export function promiseResult(
   resultIdx: number | BigInt
 ): Bytes | PromiseResult.NotReady | PromiseResult.Failed {
   let status: PromiseResult = env.promise_result(resultIdx, 0);
-  if (status === PromiseResult.Successful) {
+  if (status == PromiseResult.Successful) {
     return env.read_register(0);
   } else if (
-    status === PromiseResult.Failed ||
-    status === PromiseResult.NotReady
+    status == PromiseResult.Failed ||
+    status == PromiseResult.NotReady
   ) {
     return status;
   } else {
