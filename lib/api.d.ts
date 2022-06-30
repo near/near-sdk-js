@@ -47,7 +47,7 @@ export declare function accountLockedBalance(): BigInt;
 export declare function valueReturn(value: Bytes): void;
 export declare function promiseCreate(accountId: string, methodName: string, args: Bytes, amount: number | BigInt, gas: number | BigInt): BigInt;
 export declare function promiseThen(promiseIndex: number | BigInt, accountId: string, methodName: string, args: Bytes, amount: number | BigInt, gas: number | BigInt): any;
-export declare function promiseAnd(...promiseIndex: number[] | BigInt[]): any;
+export declare function promiseAnd(...promiseIndex: number[] | BigInt[]): BigInt;
 export declare function promiseBatchCreate(accountId: string): BigInt;
 export declare function promiseBatchThen(promiseIndex: number | BigInt, accountId: string): BigInt;
 export declare function promiseBatchActionCreateAccount(promiseIndex: number | BigInt): void;

@@ -302,8 +302,8 @@ export function promiseThen(
   );
 }
 
-export function promiseAnd(...promiseIndex: number[] | BigInt[]) {
-  return env.promise(...promiseIndex);
+export function promiseAnd(...promiseIndex: number[] | BigInt[]): BigInt {
+  return env.promise_and(...promiseIndex);
 }
 
 export function promiseBatchCreate(accountId: string): BigInt {

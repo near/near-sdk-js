@@ -5,17 +5,19 @@
     "main": "index.js",
     "type": "module",
     "scripts": {
-        "build": "yarn build:context-api && yarn build:math-api && yarn build:storage-api && yarn build:log-panic-api",
+        "build": "yarn build:context-api && yarn build:math-api && yarn build:storage-api && yarn build:log-panic-api && yarn build:promise-api",
         "build:context-api": "near-sdk build src/context_api.js build/context_api.wasm",
         "build:math-api": "near-sdk build src/math_api.js build/math_api.wasm",
         "build:storage-api": "near-sdk build src/storage_api.js build/storage_api.wasm",
         "build:log-panic-api": "near-sdk build src/log_panic_api.js build/log_panic_api.wasm",
+        "build:promise-api": "near-sdk build src/promise_api.js build/promise_api.wasm",
         "rebuild": "cd .. && yarn build && cd tests && rm -rf node_modules && rm -rf build && yarn && yarn build",
         "test": "ava",
         "test:context-api": "ava __tests__/test_context_api.ava.js",
         "test:math-api": "ava __tests__/test_math_api.ava.js",
         "test:storage-api": "ava __tests__/test_storage_api.ava.js",
-        "test:log-panic-api": "ava __tests__/test_log_panic_api.ava.js"
+        "test:log-panic-api": "ava __tests__/test_log_panic_api.ava.js",
+        "test:promise-api": "ava __tests__/test_promise_api.ava.js"
     },
     "author": "Near Inc <hello@nearprotocol.com>",
     "license": "Apache-2.0",
