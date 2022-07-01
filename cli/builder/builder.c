@@ -699,7 +699,7 @@ static JSValue near_promise_batch_action_stake(JSContext *ctx, JSValueConst this
   if (quickjs_to_u128(ctx, argv[1], amount_ptr) != 0) {
     return JS_ThrowTypeError(ctx, "Expect Uint128 for amount");
   }
-  public_key_ptr = JS_ToCStringLen(ctx, &public_key_len, argv[2]);
+  public_key_ptr = JS_ToCStringLenRaw(ctx, &public_key_len, argv[2]);
 
   promise_batch_action_stake(promise_index, (uint64_t)amount_ptr, public_key_len, (uint64_t)public_key_ptr);
   return JS_UNDEFINED;
@@ -715,7 +715,7 @@ static JSValue near_promise_batch_action_add_key_with_full_access(JSContext *ctx
   if (JS_ToUint64Ext(ctx, &promise_index, argv[0]) < 0) {
     return JS_ThrowTypeError(ctx, "Expect Uint64 for promise_index");
   }
-  public_key_ptr = JS_ToCStringLen(ctx, &public_key_len, argv[1]);
+  public_key_ptr = JS_ToCStringLenRaw(ctx, &public_key_len, argv[1]);
   if (JS_ToUint64Ext(ctx, &nonce, argv[2]) < 0) {
     return JS_ThrowTypeError(ctx, "Expect Uint64 for nonce");
   }
@@ -733,7 +733,7 @@ static JSValue near_promise_batch_action_add_key_with_function_call(JSContext *c
   if (JS_ToUint64Ext(ctx, &promise_index, argv[0]) < 0) {
     return JS_ThrowTypeError(ctx, "Expect Uint64 for promise_index");
   }
-  public_key_ptr = JS_ToCStringLen(ctx, &public_key_len, argv[1]);
+  public_key_ptr = JS_ToCStringLenRaw(ctx, &public_key_len, argv[1]);
   if (JS_ToUint64Ext(ctx, &nonce, argv[2]) < 0) {
     return JS_ThrowTypeError(ctx, "Expect Uint64 for nonce");
   }
@@ -756,7 +756,7 @@ static JSValue near_promise_batch_action_delete_key(JSContext *ctx, JSValueConst
   if (JS_ToUint64Ext(ctx, &promise_index, argv[0]) < 0) {
     return JS_ThrowTypeError(ctx, "Expect Uint64 for promise_index");
   }
-  public_key_ptr = JS_ToCStringLen(ctx, &public_key_len, argv[1]);
+  public_key_ptr = JS_ToCStringLenRaw(ctx, &public_key_len, argv[1]);
   promise_batch_action_delete_key(promise_index, public_key_len, (uint64_t)public_key_ptr);
   return JS_UNDEFINED;
 }
