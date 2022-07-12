@@ -15,13 +15,15 @@ import { rollup } from 'rollup';
 
 const exec = promisify(exec_);
 
-const PROJECT_DIR = `../../../`;
-const NEAR_SDK_JS = 'node_modules/near-sdk-js';
-const VENDOR = `${NEAR_SDK_JS}/vendor`;
 const OS = await executeCommand('uname -s', true);
 const ARCH = await executeCommand('uname -m', true);
+
+const PROJECT_DIR = `../../../`;
+const NEAR_SDK_JS = 'node_modules/near-sdk-js';
+const CLI_DEPENDENCIES = `${NEAR_SDK_JS}/cli/dependencies`;
+
 const QJSC_DIR = `${NEAR_SDK_JS}/quickjs`;
-const QJSC_BUILDS_DIR = `${NEAR_SDK_JS}/cli/dependencies/qjsc`;
+const QJSC_BUILDS_DIR = `${CLI_DEPENDENCIES}/qjsc`;
 const QJSC = `${QJSC_BUILDS_DIR}/${OS}-${ARCH}-qjsc`;
 
 yargs(hideBin(process.argv))
@@ -110,7 +112,7 @@ async function createEnclavedContract(qjscTarget, enclavedContractTarget) {
 // Standalone build functions
 async function wasiStubStandaloneContract(standaloneContractTarget) {
     console.log(`Excecuting wasi-stup...`);
-    const WASI_STUB = `${VENDOR}/binaryen/wasi-stub/run.sh`;
+    const WASI_STUB = `${CLI_DEPENDENCIES}/binaryen/run.sh`;
     await executeCommand(`${WASI_STUB} ${standaloneContractTarget} >/dev/null`);
 }
 

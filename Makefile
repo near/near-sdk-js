@@ -5,10 +5,7 @@ QUIET := @
 OS = $(shell uname -s)
 ARCH = $(shell uname -m)
 
-all: setup build yarn
-
-setup:
-	./setup.sh
+all: build yarn
 
 build: jsvm qjsc
 
@@ -37,6 +34,6 @@ clean-node:
 	$(QUIET)rm -rf node_modules
 
 
-.PHONY: all setup build yarn
+.PHONY: all build yarn
 .PHONY: jsvm qjsc
 .PHONY: clean clean-vendor clean-node
