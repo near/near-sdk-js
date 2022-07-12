@@ -11,6 +11,8 @@ test.beforeEach(async t => {
     // Deploy the counter contract.
     const counter = await root.createAndDeploy(
         root.getSubAccount('counter').accountId,
+        process.env['COUNTER_LOWLEVEL'] ? 
+        './build/counter-lowlevel.wasm' :
         './build/counter.wasm',
     );
 
