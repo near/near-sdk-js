@@ -129,7 +129,7 @@ async function createStandaloneMethodsHeaderFile(rollupTarget) {
 
 async function createStandaloneWasmContract(qjscTarget, standaloneContractTarget) {
     console.log(`Creating ${standaloneContractTarget} contract...`);
-    const WASI_SDK_PATH = `${NEAR_SDK_JS}/cli/dependencies/wasi-sdk-${ARCH}`;
+    const WASI_SDK_PATH = `${NEAR_SDK_JS}/cli/dependencies/wasi-sdk/${OS}`;
 
     const CC = `${WASI_SDK_PATH}/bin/clang --sysroot=${WASI_SDK_PATH}/share/wasi-sysroot`
     let DEFS = `-D_GNU_SOURCE '-DCONFIG_VERSION="2021-03-27"' -DCONFIG_BIGNUM`
