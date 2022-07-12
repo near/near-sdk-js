@@ -21,7 +21,7 @@ const VENDOR = `${NEAR_SDK_JS}/vendor`;
 const OS = await executeCommand('uname -s', true);
 const ARCH = await executeCommand('uname -m', true);
 const QJSC_DIR = `${NEAR_SDK_JS}/quickjs`;
-const QJSC_BUILDS_DIR = `${NEAR_SDK_JS}/cli/qjsc`;
+const QJSC_BUILDS_DIR = `${NEAR_SDK_JS}/cli/dependencies/qjsc`;
 const QJSC = `${QJSC_BUILDS_DIR}/${OS}-${ARCH}-qjsc`;
 
 yargs(hideBin(process.argv))
@@ -129,7 +129,7 @@ async function createStandaloneMethodsHeaderFile(rollupTarget) {
 
 async function createStandaloneWasmContract(qjscTarget, standaloneContractTarget) {
     console.log(`Creating ${standaloneContractTarget} contract...`);
-    const WASI_SDK_PATH = `${VENDOR}/wasi-sdk-11.0`;
+    const WASI_SDK_PATH = `${NEAR_SDK_JS}/cli/dependencies/wasi-sdk-${ARCH}`;
 
     const CC = `${WASI_SDK_PATH}/bin/clang --sysroot=${WASI_SDK_PATH}/share/wasi-sysroot`
     let DEFS = `-D_GNU_SOURCE '-DCONFIG_VERSION="2021-03-27"' -DCONFIG_BIGNUM`

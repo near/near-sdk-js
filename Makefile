@@ -23,7 +23,7 @@ jsvm-nightly:
 qjsc:
 	echo "Building qjsc bytecode compiler"
 	cd quickjs && ./build.sh && cd ..
-	cp quickjs/qjsc cli/qjsc/$(OS)-$(ARCH)-qjsc
+	cp quickjs/qjsc cli/dependencies/qjsc/$(OS)-$(ARCH)-qjsc
 
 yarn:
 	$(QUIET)yarn
