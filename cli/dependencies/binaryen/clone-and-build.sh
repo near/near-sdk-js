@@ -17,5 +17,5 @@ cd ../..
 
 # Copy build artifacts to bin directory.
 mkdir -p bin
-cp binaryen/wasi-stub/wasi-stub bin/
-cp binaryen/lib/libbinaryen.so bin/
+cp binaryen/wasi-stub/wasi-stub ../artifacts/binaryen
+cp binaryen/lib/libbinaryen.so ../artifacts/binaryen

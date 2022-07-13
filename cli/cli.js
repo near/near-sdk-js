@@ -21,9 +21,10 @@ const ARCH = await executeCommand('uname -m', true);
 const PROJECT_DIR = `../../../`;
 const NEAR_SDK_JS = 'node_modules/near-sdk-js';
 const CLI_DEPENDENCIES = `${NEAR_SDK_JS}/cli/dependencies`;
+const ARTIFACTS = `${CLI_DEPENDENCIES}/artifacts`;
 
-const QJSC_DIR = `${NEAR_SDK_JS}/quickjs`;
-const QJSC_BUILDS_DIR = `${CLI_DEPENDENCIES}/qjsc`;
+const QJSC_DIR = `${CLI_DEPENDENCIES}/quickjs`;
+const QJSC_BUILDS_DIR = `${ARTIFACTS}/qjsc`;
 const QJSC = `${QJSC_BUILDS_DIR}/${OS}-${ARCH}-qjsc`;
 
 yargs(hideBin(process.argv))
@@ -110,12 +111,6 @@ async function createEnclavedContract(qjscTarget, enclavedContractTarget) {
 }
 
 // Standalone build functions
-async function wasiStubStandaloneContract(standaloneContractTarget) {
-    console.log(`Excecuting wasi-stup...`);
-    const WASI_STUB = `${CLI_DEPENDENCIES}/binaryen/run.sh`;
-    await executeCommand(`${WASI_STUB} ${standaloneContractTarget} >/dev/null`);
-}
-
 async function createStandaloneMethodsHeaderFile(rollupTarget) {
     console.log(`Genereting methods.h file`);
     let source = rollupTarget;
@@ -131,7 +126,7 @@ async function createStandaloneMethodsHeaderFile(rollupTarget) {
 
 async function createStandaloneWasmContract(qjscTarget, standaloneContractTarget) {
     console.log(`Creating ${standaloneContractTarget} contract...`);
-    const WASI_SDK_PATH = `${NEAR_SDK_JS}/cli/dependencies/wasi-sdk/${OS}`;
+    const WASI_SDK_PATH = `${CLI_DEPENDENCIES}/wasi-sdk/${OS}`;
 
     const CC = `${WASI_SDK_PATH}/bin/clang --sysroot=${WASI_SDK_PATH}/share/wasi-sysroot`
     let DEFS = `-D_GNU_SOURCE '-DCONFIG_VERSION="2021-03-27"' -DCONFIG_BIGNUM`
@@ -149,6 +144,12 @@ async function createStandaloneWasmContract(qjscTarget, standaloneContractTarget
     await executeCommand(`mv ${qjscTarget} build/code.h`);
 
     await executeCommand(`${CC} --target=wasm32-wasi -nostartfiles -Oz -flto ${DEFS} ${INCLUDES} ${SOURCES} ${LIBS} -Wl,--no-entry -Wl,--allow-undefined -Wl,-z,stack-size=${256 * 1024} -Wl,--lto-O3 -o ${standaloneContractTarget}`);
+}
+
+async function wasiStubStandaloneContract(standaloneContractTarget) {
+    console.log(`Excecuting wasi-stup...`);
+    const WASI_STUB = `${ARTIFACTS}/binaryen/run.sh`;
+    await executeCommand(`${WASI_STUB} ${standaloneContractTarget} >/dev/null`);
 }
 
 // Utils

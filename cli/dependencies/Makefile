@@ -5,34 +5,35 @@ QUIET := @
 OS = $(shell uname -s)
 ARCH = $(shell uname -m)
 
-all: build
+build: binaryen qjsc wasi-sdk
 
-build: binarien qjsc wasi-sdk
-
-binarien:
-	echo "Building binarien..."
-	# TODO
+binaryen:
+	echo "Building binaryen..."
+	cd binaryen && ./clone-and-build.sh
 qjsc:
 	echo "Building qjsc bytecode compiler"
 	cd quickjs && ./build.sh && cd ..
 	cp quickjs/qjsc artifacts/qjsc/$(OS)-$(ARCH)-qjsc
 
 wasi-sdk:
-	echo "Building wasi-sdk..."
-	cd wasi-sdk && ./build.sh && cd ..
-	cp wasi-sdk/wasi-sdk artifacts/wasi-sdk/$(OS)-$(ARCH)-wasi-sdk #TODO
+	echo "Loading wasi-sdk..."
+	cd wasi-sdk && ./load-wasi-sdk.sh
 
 clean: clean-binaryen clean-qjsc clean-wasi-sdk
 
 clean-binaryen:
-	$(QUIET)rm -rf vendor # TODO
+	echo "Cleaning binaryen..."
+	$(QUIET)rm -rf binaryen/binaryen
+	$(QUIET)rm artifacts/binaryen/libbinaryen.so
+	$(QUIET)rm artifacts/binaryen/wasi-stub
 
 clean-qjsc:
-	$(QUIET)rm -rf vendor # TODO
+	echo "Cleaning qjsc..."
+	rm artifacts/qjsc/$(OS)-$(ARCH)-qjsc
 
 clean-wasi-sdk:
-	$(QUIET)rm -rf vendor # TODO
+	echo "Deleting wasi-sdk..."
+	rm -rf wasi-sdk/$(OS)
 
-.PHONY: all build yarn
-.PHONY: jsvm qjsc
-.PHONY: clean clean-vendor clean-node
+.PHONY: build binaryen qjsc wasi-sdk
+.PHONY: clean clean-binaryen clean-qjsc clean-wasi-sdk
