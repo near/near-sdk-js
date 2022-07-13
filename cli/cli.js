@@ -84,7 +84,7 @@ async function createJsFileWithRullup(sourceFileWithPath, rollupTarget) {
             nodeResolve(),
             sourcemaps(),
             // commonjs(),
-            babel({ babelHelpers: 'bundled' })
+            babel({ babelHelpers: 'bundled', extensions: ['.ts', '.js', '.jsx', '.es6', '.es', '.mjs'] })
         ],
     });
 
@@ -118,6 +118,7 @@ async function createStandaloneMethodsHeaderFile(rollupTarget) {
     console.log(`Genereting methods.h file`);
     let source = rollupTarget;
     const buildPath = path.dirname(source);
+    console.log(rollupTarget)
     let mod = await import(`${PROJECT_DIR}/${rollupTarget}`);
     let exportNames = Object.keys(mod);
     let methods = '';
