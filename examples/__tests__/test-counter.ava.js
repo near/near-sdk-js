@@ -13,7 +13,7 @@ test.beforeEach(async t => {
         root.getSubAccount('counter').accountId,
         process.env['COUNTER_LOWLEVEL'] ? 
         './build/counter-lowlevel.wasm' :
-        './build/counter.wasm',
+        (process.env['COUNTER_TS'] ? './build/counter-ts.wasm' : './build/counter.wasm')
     );
 
     // Init the contract

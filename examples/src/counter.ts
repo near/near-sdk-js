@@ -5,7 +5,7 @@ import { isUndefined } from 'lodash-es'
 class Counter extends NearContract {
     count: number;
 
-    constructor({ initial = 0 }) {
+    constructor({ initial = 0 }: {initial : number}) {
         super()
         this.count = initial
     }
@@ -29,7 +29,7 @@ class Counter extends NearContract {
     }
 
     @view
-    getCount() {
+    getCount(): number {
         return this.count
     }
 }
