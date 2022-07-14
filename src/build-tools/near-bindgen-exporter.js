@@ -56,7 +56,7 @@ export default function () {
           path.insertAfter(
             t.exportNamedDeclaration(
               t.functionDeclaration(t.identifier('init'), [], t.blockStatement([
-                t.expressionStatement(t.newExpression(classId, [])),
+                t.expressionStatement(t.callExpression(t.memberExpression(classId, t.identifier('_init')), [])),
               ])),
               [t.exportSpecifier(t.identifier('init'), t.identifier('init'))]))
 
