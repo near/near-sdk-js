@@ -51,6 +51,7 @@ export default function () {
                   )
                 ])),
                 [t.exportSpecifier(t.identifier(method), t.identifier(method))]))
+            path.scope.registerDeclaration(path.getSibling(path.key + 1))
           }
 
           path.insertAfter(
@@ -59,6 +60,7 @@ export default function () {
                 t.expressionStatement(t.callExpression(t.memberExpression(classId, t.identifier('_init')), [])),
               ])),
               [t.exportSpecifier(t.identifier('init'), t.identifier('init'))]))
+          path.scope.registerDeclaration(path.getSibling(path.key + 1))
 
           console.log('Near bindgen export done')
         }
