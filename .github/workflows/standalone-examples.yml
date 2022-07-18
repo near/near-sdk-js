@@ -17,6 +17,10 @@ jobs:
         run: cd examples && yarn build:clean-state && yarn test:clean-state
       - name: counter
         run: cd examples && yarn build:counter && yarn test:counter
+      - name: counter-lowlevel
+        run: cd examples && yarn build:counter-lowlevel && yarn test:counter-lowlevel
+      - name: counter-ts
+        run: cd examples && yarn build:counter-ts && yarn test:counter-ts
       - name: cross-contract-call
         run: cd examples && yarn build:cross-contract-call && yarn test:cross-contract-call
       - name: fungible-token-lockable
@@ -29,3 +33,5 @@ jobs:
         run: cd examples && yarn build:status-message-collections && yarn test:status-message-collections
       - name: status-message
         run: cd examples && yarn build:status-message && yarn test:status-message
+      - name: check typescript build
+        run: cd examples && yarn test:check-ts-build
