@@ -7,6 +7,9 @@
   "scripts": {
     "build": "yarn build:clean-state && yarn build:counter && yarn build:counter-lowlevel && yarn build:counter-ts && yarn build:cross-contract-call && yarn build:fungible-token-lockable && yarn build:fungible-token && yarn build:non-fungible-token && yarn build:status-message-collections && yarn build:status-message",
     "rebuild": "cd .. && yarn build && cd examples && rm -rf node_modules && rm -rf build && yarn && yarn build",
+    "build:hello-near": "yarn near-sdk build src/docs/hello-near.js build/hello-near.wasm",
+    "build:docs-counter": "yarn near-sdk build src/docs/counter.js build/docs-counter.wasm",
+    "build:guest-book": "yarn near-sdk build src/docs/guest-book.js build/guest-book.wasm",
     "build:status-message": "yarn near-sdk build src/status-message.js build/status-message.wasm",
     "build:clean-state": "near-sdk build src/clean-state.js build/clean-state.wasm",
     "build:counter": "near-sdk build src/counter.js build/counter.wasm",
@@ -37,8 +40,6 @@
     "near-sdk-js": "file:../"
   },
   "devDependencies": {
-    "ava": "^4.2.0",
-    "typescript": "^4.7.4",
-    "near-workspaces": "2.0.0"
+    "typescript": "^4.7.4"
   }
 }
