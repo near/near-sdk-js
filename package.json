@@ -24,7 +24,7 @@
     "build": "tsc -p ./tsconfig.json",
     "pretest": "yarn build",
     "test": "yarn test:standalone && yarn test:enclaved",
-    "test:standalone": "test:standalone:unit && test:standalone:examples",
+    "test:standalone": "yarn test:standalone:unit && yarn test:standalone:examples",
     "test:standalone:unit": "cd tests && yarn rebuild && yarn test && cd ..",
     "test:standalone:examples": "cd examples && yarn && yarn rebuild && yarn test && cd ..",
     "test:enclaved": "test:enclaved:unit && test:enclaved:examples",
@@ -32,7 +32,7 @@
     "test:enclaved:examples": "cd jsvm/examples && yarn && yarn rebuild && yarn test && cd ../.."
   },
   "bin": {
-    "near-sdk": "cli/cli.js"
+    "near-sdk-js": "cli/cli.js"
   },
   "author": "Near Inc <hello@nearprotocol.com>",
   "dependencies": {
