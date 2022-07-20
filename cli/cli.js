@@ -2,8 +2,6 @@
 
 import fs from 'fs/promises'
 import path from 'path';
-import { exec as exec_ } from 'child_process';
-import { promisify } from 'util';
 
 import yargs from 'yargs'
 import { hideBin } from 'yargs/helpers'
@@ -13,7 +11,7 @@ import sourcemaps from 'rollup-plugin-sourcemaps';
 import { babel } from '@rollup/plugin-babel';
 import { rollup } from 'rollup';
 
-const exec = promisify(exec_);
+import { executeCommand } from './utils';
 
 const OS = await executeCommand('uname -s', true);
 const ARCH = await executeCommand('uname -m', true);
@@ -151,24 +149,4 @@ async function wasiStubStandaloneContract(standaloneContractTarget) {
     console.log(`Excecuting wasi-stup...`);
     const WASI_STUB = `${ARTIFACTS}/binaryen/run.sh`;
     await executeCommand(`${WASI_STUB} ${standaloneContractTarget} >/dev/null`);
-}
-
-// Utils
-async function executeCommand(command, silent = false) {
-    console.log(command);
-    const { error, stdout, stderr } = await exec(command);
-
-    if (error) {
-        console.log(error);
-        process.exit(1);
-    }
-    if (stderr && !silent) {
-        console.error(stderr);
-    }
-
-    if (silent) {
-        return stdout.trim();
-    } else {
-        console.log(stdout);
-    }
 }
