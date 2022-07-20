@@ -31,6 +31,11 @@ class Contract extends NearContract {
         this.messages = new Vector('m');
     }
 
+    deserialize() {
+        super.deserialize()
+        this.messages = Object.assign(new Vector, this.messages)
+    }
+
     @call
     // Adds a new message under the name of the sender's account id.
     add_message({ text }) {
@@ -44,9 +49,13 @@ class Contract extends NearContract {
     get_messages() {
         const numMessages = Math.min(MESSAGE_LIMIT, this.messages.length);
         const startIndex = this.messages.length - numMessages;
+        near.log(numMessages);
+        near.log(startIndex);
+        near.log(this.messages.get(0));
         const result = [];
         for(let i = 0; i < numMessages; i++) {
-            result[i] = this.messages[i + startIndex];
+            near.log(this.messages.get(i + startIndex));
+            result[i] = this.messages.get(i + startIndex);
         }
         return result;
     }
