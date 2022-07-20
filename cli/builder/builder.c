@@ -1,6 +1,6 @@
 #include <string.h>
-#include "../../cli/dependencies/quickjs/quickjs-libc-min.h"
-#include "../../cli/dependencies/quickjs/libbf.h"
+#include "../../quickjs/quickjs-libc-min.h"
+#include "../../quickjs/libbf.h"
 #include "code.h"
 
 static JSContext *JS_NewCustomContext(JSRuntime *rt)

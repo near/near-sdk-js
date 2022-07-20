@@ -21,9 +21,8 @@ const NEAR_SDK_JS = 'node_modules/near-sdk-js';
 const CLI_DEPENDENCIES = `${NEAR_SDK_JS}/cli/dependencies`;
 const ARTIFACTS = `${CLI_DEPENDENCIES}/artifacts`;
 
-const QJSC_DIR = `${CLI_DEPENDENCIES}/quickjs`;
-const QJSC_BUILDS_DIR = `${ARTIFACTS}/qjsc`;
-const QJSC = `${QJSC_BUILDS_DIR}/${OS}-${ARCH}-qjsc`;
+const QJSC_DIR = `${NEAR_SDK_JS}/quickjs`;
+const QJSC = `${NEAR_SDK_JS}/qjsc`;
 
 yargs(hideBin(process.argv))
     .scriptName('near-sdk')
