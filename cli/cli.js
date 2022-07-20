@@ -11,7 +11,7 @@ import sourcemaps from 'rollup-plugin-sourcemaps';
 import { babel } from '@rollup/plugin-babel';
 import { rollup } from 'rollup';
 
-import { executeCommand } from './utils';
+import { executeCommand } from './utils.js';
 
 const OS = await executeCommand('uname -s', true);
 const ARCH = await executeCommand('uname -m', true);
@@ -125,7 +125,7 @@ async function createStandaloneMethodsHeaderFile(rollupTarget) {
 
 async function createStandaloneWasmContract(qjscTarget, standaloneContractTarget) {
     console.log(`Creating ${standaloneContractTarget} contract...`);
-    const WASI_SDK_PATH = `${CLI_DEPENDENCIES}/wasi-sdk/${OS}`;
+    const WASI_SDK_PATH = `${NEAR_SDK_JS}/wasi-sdk`;
 
     const CC = `${WASI_SDK_PATH}/bin/clang --sysroot=${WASI_SDK_PATH}/share/wasi-sysroot`
     let DEFS = `-D_GNU_SOURCE '-DCONFIG_VERSION="2021-03-27"' -DCONFIG_BIGNUM`

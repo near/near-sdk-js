@@ -5,7 +5,7 @@ QUIET := @
 OS = $(shell uname -s)
 ARCH = $(shell uname -m)
 
-build: binaryen qjsc wasi-sdk
+build: binaryen qjsc
 
 binaryen:
 	echo "Building binaryen..."
@@ -15,11 +15,7 @@ qjsc:
 	cd quickjs && ./build.sh && cd ..
 	cp quickjs/qjsc artifacts/qjsc/$(OS)-$(ARCH)-qjsc
 
-wasi-sdk:
-	echo "Loading wasi-sdk..."
-	cd wasi-sdk && ./load-wasi-sdk.sh
-
-clean: clean-binaryen clean-qjsc clean-wasi-sdk
+clean: clean-binaryen clean-qjsc
 
 clean-binaryen:
 	echo "Cleaning binaryen..."
@@ -31,9 +27,5 @@ clean-qjsc:
 	echo "Cleaning qjsc..."
 	rm artifacts/qjsc/$(OS)-$(ARCH)-qjsc
 
-clean-wasi-sdk:
-	echo "Deleting wasi-sdk..."
-	rm -rf wasi-sdk/$(OS)
-
-.PHONY: build binaryen qjsc wasi-sdk
-.PHONY: clean clean-binaryen clean-qjsc clean-wasi-sdk
+.PHONY: build binaryen qjsc
+.PHONY: clean clean-binaryen clean-qjsc
