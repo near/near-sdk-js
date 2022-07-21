@@ -136,6 +136,8 @@ async function createStandaloneWasmContract(qjscTarget, standaloneContractTarget
     await executeCommand(`cp ${ORIGINAL_BUILDER_PATH} ${NEW_BUILDER_PATH}`);
     await executeCommand(`mv ${qjscTarget} build/code.h`);
 
+    await executeCommand('pwd');
+    await executeCommand('ls');
     await executeCommand(`${CC} --target=wasm32-wasi -nostartfiles -Oz -flto ${DEFS} ${INCLUDES} ${SOURCES} ${LIBS} -Wl,--no-entry -Wl,--allow-undefined -Wl,-z,stack-size=${256 * 1024} -Wl,--lto-O3 -o ${standaloneContractTarget}`);
 }
 
