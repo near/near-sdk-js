@@ -35,5 +35,3 @@ jobs:
         run: cd examples && yarn build:status-message-collections && yarn test:status-message-collections
       - name: status-message
         run: cd examples && yarn build:status-message && yarn test:status-message
-      - name: check typescript build
-        run: cd examples && yarn test:check-ts-build
