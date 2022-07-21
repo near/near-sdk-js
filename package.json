@@ -30,7 +30,7 @@
     "test:enclaved": "test:enclaved:unit && test:enclaved:examples",
     "test:enclaved:unit": "cd jsvm/tests && yarn rebuild && yarn test && cd ../..",
     "test:enclaved:examples": "cd jsvm/examples && yarn && yarn rebuild && yarn test && cd ../..",
-    "postinstall": "node cli/post-install.js"
+    "postinstall": "cd cli && mkdir -p deps && cd deps && node ../post-install.js"
   },
   "bin": {
     "near-sdk": "cli/cli.js"

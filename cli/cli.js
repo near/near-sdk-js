@@ -16,8 +16,8 @@ import { executeCommand } from './utils.js';
 const PROJECT_DIR = `../../../`;
 const NEAR_SDK_JS = 'node_modules/near-sdk-js';
 
-const QJSC_DIR = `${NEAR_SDK_JS}/quickjs`;
-const QJSC = `${NEAR_SDK_JS}/qjsc`;
+const QJSC_DIR = `${NEAR_SDK_JS}/cli/deps/quickjs`;
+const QJSC = `${NEAR_SDK_JS}/cli/deps/qjsc`;
 
 yargs(hideBin(process.argv))
     .scriptName('near-sdk')
@@ -119,7 +119,7 @@ async function createStandaloneMethodsHeaderFile(rollupTarget) {
 
 async function createStandaloneWasmContract(qjscTarget, standaloneContractTarget) {
     console.log(`Creating ${standaloneContractTarget} contract...`);
-    const WASI_SDK_PATH = `${NEAR_SDK_JS}/wasi-sdk`;
+    const WASI_SDK_PATH = `${NEAR_SDK_JS}/cli/deps/wasi-sdk`;
 
     const CC = `${WASI_SDK_PATH}/bin/clang --sysroot=${WASI_SDK_PATH}/share/wasi-sysroot`
     let DEFS = `-D_GNU_SOURCE '-DCONFIG_VERSION="2021-03-27"' -DCONFIG_BIGNUM`
@@ -141,6 +141,6 @@ async function createStandaloneWasmContract(qjscTarget, standaloneContractTarget
 
 async function wasiStubStandaloneContract(standaloneContractTarget) {
     console.log(`Excecuting wasi-stub...`);
-    const WASI_STUB = `${NEAR_SDK_JS}/binaryen/wasi-stub/run.sh`;
+    const WASI_STUB = `${NEAR_SDK_JS}/cli/deps/binaryen/wasi-stub/run.sh`;
     await executeCommand(`${WASI_STUB} ${standaloneContractTarget} >/dev/null`);
 }
