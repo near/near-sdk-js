@@ -13,13 +13,8 @@ import { rollup } from 'rollup';
 
 import { executeCommand } from './utils.js';
 
-const OS = await executeCommand('uname -s', true);
-const ARCH = await executeCommand('uname -m', true);
-
 const PROJECT_DIR = `../../../`;
 const NEAR_SDK_JS = 'node_modules/near-sdk-js';
-const CLI_DEPENDENCIES = `${NEAR_SDK_JS}/cli/dependencies`;
-const ARTIFACTS = `${CLI_DEPENDENCIES}/artifacts`;
 
 const QJSC_DIR = `${NEAR_SDK_JS}/quickjs`;
 const QJSC = `${NEAR_SDK_JS}/qjsc`;
@@ -145,7 +140,7 @@ async function createStandaloneWasmContract(qjscTarget, standaloneContractTarget
 }
 
 async function wasiStubStandaloneContract(standaloneContractTarget) {
-    console.log(`Excecuting wasi-stup...`);
-    const WASI_STUB = `${ARTIFACTS}/binaryen/run.sh`;
+    console.log(`Excecuting wasi-stub...`);
+    const WASI_STUB = `${NEAR_SDK_JS}/binaryen/wasi-stub/run.sh`;
     await executeCommand(`${WASI_STUB} ${standaloneContractTarget} >/dev/null`);
 }

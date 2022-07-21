@@ -14,7 +14,25 @@ if (ARCH !== 'x86_64' && ARCH !== 'arm64') {
 }
 
 console.log('Installing wasi-stub...');
-//TODO
+const BINARYEN_VERSION = `0.1.6`; // TODO: update version
+const BINARYEN_VERSION_TAG = `v${BINARYEN_VERSION}`;
+const BINARYEN_SYSTEM_NAME = OS === 'Linux' ? 'Linux' : OS === 'Darwin' ? 'macOS' : 'other';
+const BINARYEN_ARCH_NAME = ARCH === 'x86_64' ? 'X64' : ARCH === 'arm64' ? 'arm64' : 'other';
+
+// Download binaryen src
+await executeCommand(`wget https://github.com/near/binaryen/archive/refs/tags/${BINARYEN_VERSION_TAG}.tar.gz`);
+await executeCommand(`tar xvf ${BINARYEN_VERSION_TAG}.tar.gz`);
+await executeCommand(`rm ${BINARYEN_VERSION_TAG}.tar.gz`);
+await executeCommand(`mv binaryen-${BINARYEN_VERSION} binaryen`);
+
+// Download binaryen build artifact
+await executeCommand(`wget https://github.com/near/binaryen/releases/download/${BINARYEN_VERSION_TAG}/binaryen-${BINARYEN_SYSTEM_NAME}-${BINARYEN_ARCH_NAME}`);
+await executeCommand(`mkdir binaryen/lib && mv binaryen-${BINARYEN_SYSTEM_NAME}-${BINARYEN_ARCH_NAME} binaryen/lib/libbinaryen.so`);
+
+// Download wasi-stub artifact
+await executeCommand(`wget https://github.com/near/binaryen/releases/download/${BINARYEN_VERSION_TAG}/wasi-stub-${BINARYEN_SYSTEM_NAME}-${BINARYEN_ARCH_NAME}`);
+await executeCommand(`mv wasi-stub-${BINARYEN_SYSTEM_NAME}-${BINARYEN_ARCH_NAME} binaryen/wasi-stub/wasi-stub`);
+await executeCommand(`chmod 777 binaryen/wasi-stub/wasi-stub`);
 
 console.log('Installing QuickJS...');
 const QUICK_JS_VERSION = `0.1.0`;
