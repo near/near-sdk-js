@@ -21,7 +21,7 @@ const BINARYEN_ARCH_NAME = ARCH === 'x86_64' ? 'X64' : ARCH === 'arm64' ? 'arm64
 const BINARYEN_TAR_NAME = `binaryen-${BINARYEN_SYSTEM_NAME}-${BINARYEN_ARCH_NAME}`;
 
 await executeCommand(`wget https://github.com/near/binaryen/releases/download/${BINARYEN_VERSION_TAG}/${BINARYEN_TAR_NAME}`);
-await executeCommand(`mkdir binaryen && tar xvf ${BINARYEN_TAR_NAME} --directory binaryen`);
+await executeCommand(`mkdir -p binaryen && tar xvf ${BINARYEN_TAR_NAME} --directory binaryen`);
 await executeCommand(`rm ${BINARYEN_TAR_NAME}`);
 
 console.log('Installing QuickJS...');
