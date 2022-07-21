@@ -49,8 +49,6 @@
   },
   "files": [
     "cli",
-    "jsvm/build/jsvm.wasm",
-    "scripts",
     "lib"
   ],
   "devDependencies": {
