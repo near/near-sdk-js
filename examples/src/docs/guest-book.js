@@ -41,7 +41,7 @@ class Contract extends NearContract {
     add_message({ text }) {
         const message = new PostedMessage(text);
         near.log(message);
-        this.messages.push(text);
+        this.messages.push(message);
     }
     
     @view
@@ -49,12 +49,8 @@ class Contract extends NearContract {
     get_messages() {
         const numMessages = Math.min(MESSAGE_LIMIT, this.messages.length);
         const startIndex = this.messages.length - numMessages;
-        near.log(numMessages);
-        near.log(startIndex);
-        near.log(this.messages.get(0));
         const result = [];
         for(let i = 0; i < numMessages; i++) {
-            near.log(this.messages.get(i + startIndex));
             result[i] = this.messages.get(i + startIndex);
         }
         return result;

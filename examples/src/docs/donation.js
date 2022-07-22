@@ -8,12 +8,19 @@ function assert(b, str) {
     }
 }
 
-const STORAGE_COST = BigInt('1_000_000_000_000_000_000_000');
+const STORAGE_COST = BigInt('1000000000000000000000');
 
+
+class Donation {
+    constructor(accountId, totalAmount) {
+        this.account_id = accountId,
+        this.total_amount = totalAmount
+    }
+  }
 @NearBindgen
-class Counter extends NearContract {
-    constructor() {
-        super({ beneficiary })
+export class Contract extends NearContract {
+    constructor({ beneficiary }) {
+        super()
         this.beneficiary = beneficiary;
         this.donations = new UnorderedMap('d');
     }
@@ -46,70 +53,11 @@ class Counter extends NearContract {
         // Return the total amount donated so far
         return donatedSoFar
     }
-}
 
-#[near_bindgen]
-impl Contract {
-  // Public - but only callable by env::current_account_id(). Sets the beneficiary
-  #[private]
-  pub fn change_beneficiary(&mut self, beneficiary: AccountId) {
-    self.beneficiary = beneficiary;
-  }
-}
-
-
-#[cfg(test)]
-mod tests {
-  use super::*;
-  use near_sdk::testing_env;
-  use near_sdk::test_utils::VMContextBuilder;
-
-  const BENEFICIARY: &str = "beneficiary";
-  const NEAR: u128 = 1000000000000000000000000;
-
-  #[test]
-  fn initializes() {
-      let contract = Contract::new(BENEFICIARY.parse().unwrap());
-      assert_eq!(contract.beneficiary, BENEFICIARY.parse().unwrap())
-  }
-
-  #[test]
-  fn donate() {
-      let mut contract = Contract::new(BENEFICIARY.parse().unwrap());
-
-      // Make a donation
-      set_context("donor_a", 1*NEAR);
-      contract.donate();
-      let first_donation = contract.get_donation_for_account("donor_a".parse().unwrap());
-
-      // Check the donation was recorded correctly
-      assert_eq!(first_donation.total_amount.0, 1*NEAR);
-
-      // Make another donation
-      set_context("donor_b", 2*NEAR);
-      contract.donate();
-      let second_donation = contract.get_donation_for_account("donor_b".parse().unwrap());
-
-      // Check the donation was recorded correctly
-      assert_eq!(second_donation.total_amount.0, 2*NEAR);
-
-      // User A makes another donation on top of their original
-      set_context("donor_a", 1*NEAR);
-      contract.donate();
-      let first_donation = contract.get_donation_for_account("donor_a".parse().unwrap());
-
-      // Check the donation was recorded correctly
-      assert_eq!(first_donation.total_amount.0, 1*NEAR * 2);
-
-      assert_eq!(contract.total_donations(), 2);
-  }
-
-  // Auxiliar fn: create a mock context
-  fn set_context(predecessor: &str, amount: Balance) {
-    let mut builder = VMContextBuilder::new();
-    builder.predecessor_account_id(predecessor.parse().unwrap());
-    builder.attached_deposit(amount);
-
-    testing_env!(builder.build());
-  }
+    @call
+    // Public - but only callable by near.current_account_id(). Sets the beneficiary
+    change_beneficiary({ beneficiary }) {
+        assert(near.predecessorAccountId() == near.currentAccountId(), "only owner can change beneficiary");
+        this.beneficiary = beneficiary;
+    }
 }

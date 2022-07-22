@@ -10,6 +10,7 @@
     "build:hello-near": "yarn near-sdk build src/docs/hello-near.js build/hello-near.wasm",
     "build:docs-counter": "yarn near-sdk build src/docs/counter.js build/docs-counter.wasm",
     "build:guest-book": "yarn near-sdk build src/docs/guest-book.js build/guest-book.wasm",
+    "build:donation": "yarn near-sdk build src/docs/donation.js build/donation.wasm",
     "build:status-message": "yarn near-sdk build src/status-message.js build/status-message.wasm",
     "build:clean-state": "near-sdk build src/clean-state.js build/clean-state.wasm",
     "build:counter": "near-sdk build src/counter.js build/counter.wasm",
