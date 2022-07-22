@@ -14,7 +14,7 @@ if (ARCH !== 'x86_64' && ARCH !== 'arm64') {
 }
 
 console.log('Installing wasi-stub...');
-const BINARYEN_VERSION = `0.1.0`;
+const BINARYEN_VERSION = `0.1.9`;
 const BINARYEN_VERSION_TAG = `v${BINARYEN_VERSION}`;
 const BINARYEN_SYSTEM_NAME = OS === 'Linux' ? 'Linux' : OS === 'Darwin' ? 'macOS' : 'other';
 const BINARYEN_ARCH_NAME = ARCH === 'x86_64' ? 'X64' : ARCH === 'arm64' ? 'arm64' : 'other';
