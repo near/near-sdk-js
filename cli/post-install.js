@@ -14,7 +14,7 @@ if (ARCH !== 'x86_64' && ARCH !== 'arm64') {
 }
 
 console.log('Installing wasi-stub...');
-const BINARYEN_VERSION = `0.1.9`;
+const BINARYEN_VERSION = `0.1.0`;
 const BINARYEN_VERSION_TAG = `v${BINARYEN_VERSION}`;
 const BINARYEN_SYSTEM_NAME = OS === 'Linux' ? 'Linux' : OS === 'Darwin' ? 'macOS' : 'other';
 const BINARYEN_ARCH_NAME = ARCH === 'x86_64' ? 'X64' : ARCH === 'arm64' ? 'arm64' : 'other';
@@ -51,18 +51,16 @@ await executeCommand(`chmod 777 ${QUICK_JS_TARGET_NAME}`);
 console.log('Installing wasi-sdk...');
 const WASI_SDK_MAJOR_VER = 11;
 const WASI_SDK_MINOR_VER = 0;
-const WASI_SDK_VERSION = `${WASI_SDK_MAJOR_VER}.${WASI_SDK_MINOR_VER}`;
+const WASI_SDK_DOWNLOADED_FOLDER_NAME = `wasi-sdk-${WASI_SDK_MAJOR_VER}.${WASI_SDK_MINOR_VER}`
 const WASI_SDK_SYSTEM_NAME = OS === 'Linux' ? 'linux' : OS === 'Darwin' ? 'macos' : 'other';
-const WASI_SDK_DOWNLOADED_FOLDER_NAME = `wasi-sdk-${WASI_SDK_VERSION}`
 const WASI_SDK_TAR_NAME = `${WASI_SDK_DOWNLOADED_FOLDER_NAME}-${WASI_SDK_SYSTEM_NAME}.tar.gz`
-const WASI_SDK_TARGET_FOLDER_NAME = 'wasi-sdk';
 
 // Download WASI SDK
-await executeCommand(`wget https://github.com/WebAssembly/wasi-sdk/releases/download/wasi-sdk-11/${WASI_SDK_TAR_NAME}`);
+await executeCommand(`wget https://github.com/WebAssembly/wasi-sdk/releases/download/wasi-sdk-${WASI_SDK_MAJOR_VER}/${WASI_SDK_TAR_NAME}`);
 // Extract WASI SDK
 await executeCommand(`tar xvf ${WASI_SDK_TAR_NAME}`);
 // Delete .tar file
 await executeCommand(`rm ${WASI_SDK_TAR_NAME}`);
 // Delete version from folder name
-await executeCommand(`mv ${WASI_SDK_DOWNLOADED_FOLDER_NAME} ${WASI_SDK_TARGET_FOLDER_NAME}`);
+await executeCommand(`mv ${WASI_SDK_DOWNLOADED_FOLDER_NAME} wasi-sdk`);
 
