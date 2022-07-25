@@ -1,11 +1,5 @@
 # NEAR-SDK-JS (Standalone)
 
-## Installation
-It is tested on Ubuntu 20.04, M1 Mac and Intel Mac. Other linux should also work but they're not tested.
-
-1. Make sure you have make, cmake and nodejs. On Linux, also make sure you have gcc.
-2. `make setup`
-
 ## Usage
 
 1. Copy project layout including configurations from `examples/` as a starting point
