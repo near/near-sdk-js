@@ -2,8 +2,6 @@
 
 import fs from 'fs/promises'
 import path from 'path';
-import { exec as exec_ } from 'child_process';
-import { promisify } from 'util';
 
 import yargs from 'yargs'
 import { hideBin } from 'yargs/helpers'
@@ -13,16 +11,13 @@ import sourcemaps from 'rollup-plugin-sourcemaps';
 import { babel } from '@rollup/plugin-babel';
 import { rollup } from 'rollup';
 
-const exec = promisify(exec_);
+import { executeCommand } from './utils.js';
 
 const PROJECT_DIR = `../../../`;
 const NEAR_SDK_JS = 'node_modules/near-sdk-js';
-const VENDOR = `${NEAR_SDK_JS}/vendor`;
-const OS = await executeCommand('uname -s', true);
-const ARCH = await executeCommand('uname -m', true);
-const QJSC_DIR = `${NEAR_SDK_JS}/quickjs`;
-const QJSC_BUILDS_DIR = `${NEAR_SDK_JS}/cli/qjsc`;
-const QJSC = `${QJSC_BUILDS_DIR}/${OS}-${ARCH}-qjsc`;
+
+const QJSC_DIR = `${NEAR_SDK_JS}/cli/deps/quickjs`;
+const QJSC = `${NEAR_SDK_JS}/cli/deps/qjsc`;
 
 yargs(hideBin(process.argv))
     .scriptName('near-sdk')
@@ -108,12 +103,6 @@ async function createEnclavedContract(qjscTarget, enclavedContractTarget) {
 }
 
 // Standalone build functions
-async function wasiStubStandaloneContract(standaloneContractTarget) {
-    console.log(`Excecuting wasi-stup...`);
-    const WASI_STUB = `${VENDOR}/binaryen/wasi-stub/run.sh`;
-    await executeCommand(`${WASI_STUB} ${standaloneContractTarget} >/dev/null`);
-}
-
 async function createStandaloneMethodsHeaderFile(rollupTarget) {
     console.log(`Genereting methods.h file`);
     let source = rollupTarget;
@@ -130,7 +119,7 @@ async function createStandaloneMethodsHeaderFile(rollupTarget) {
 
 async function createStandaloneWasmContract(qjscTarget, standaloneContractTarget) {
     console.log(`Creating ${standaloneContractTarget} contract...`);
-    const WASI_SDK_PATH = `${VENDOR}/wasi-sdk-11.0`;
+    const WASI_SDK_PATH = `${NEAR_SDK_JS}/cli/deps/wasi-sdk`;
 
     const CC = `${WASI_SDK_PATH}/bin/clang --sysroot=${WASI_SDK_PATH}/share/wasi-sysroot`
     let DEFS = `-D_GNU_SOURCE '-DCONFIG_VERSION="2021-03-27"' -DCONFIG_BIGNUM`
@@ -150,22 +139,8 @@ async function createStandaloneWasmContract(qjscTarget, standaloneContractTarget
     await executeCommand(`${CC} --target=wasm32-wasi -nostartfiles -Oz -flto ${DEFS} ${INCLUDES} ${SOURCES} ${LIBS} -Wl,--no-entry -Wl,--allow-undefined -Wl,-z,stack-size=${256 * 1024} -Wl,--lto-O3 -o ${standaloneContractTarget}`);
 }
 
-// Utils
-async function executeCommand(command, silent = false) {
-    console.log(command);
-    const { error, stdout, stderr } = await exec(command);
-
-    if (error) {
-        console.log(error);
-        process.exit(1);
-    }
-    if (stderr && !silent) {
-        console.error(stderr);
-    }
-
-    if (silent) {
-        return stdout.trim();
-    } else {
-        console.log(stdout);
-    }
+async function wasiStubStandaloneContract(standaloneContractTarget) {
+    console.log(`Excecuting wasi-stub...`);
+    const WASI_STUB = `${NEAR_SDK_JS}/cli/deps/binaryen/wasi-stub/run.sh`;
+    await executeCommand(`${WASI_STUB} ${standaloneContractTarget} >/dev/null`);
 }
