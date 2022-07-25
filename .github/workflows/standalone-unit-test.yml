@@ -11,8 +11,6 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: "16"
-      - name: Setup
-        run: ./setup.sh
       - name: Install modules
         run: yarn
       - name: Run standalone unit tests
