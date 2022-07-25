@@ -1,6 +1,6 @@
 {
   "name": "near-sdk-js",
-  "version": "0.3.0",
+  "version": "0.4.0-2",
   "description": "High Level JavaScript SDK for building smart contracts on NEAR",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -29,7 +29,8 @@
     "test:standalone:examples": "cd examples && yarn && yarn rebuild && yarn test && cd ..",
     "test:enclaved": "yarn test:enclaved:unit && yarn test:enclaved:examples",
     "test:enclaved:unit": "cd jsvm/tests && yarn rebuild && yarn test && cd ../..",
-    "test:enclaved:examples": "cd jsvm/examples && yarn && yarn rebuild && yarn test && cd ../.."
+    "test:enclaved:examples": "cd jsvm/examples && yarn && yarn rebuild && yarn test && cd ../..",
+    "postinstall": "cd cli && mkdir -p deps && cd deps && node ../post-install.js"
   },
   "bin": {
     "near-sdk-js": "cli/cli.js"
@@ -48,8 +49,6 @@
   },
   "files": [
     "cli",
-    "jsvm/build/jsvm.wasm",
-    "scripts",
     "lib"
   ],
   "devDependencies": {
