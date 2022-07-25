@@ -28,3 +28,15 @@ export function refund_deposit_to_account(storage_used, account_id) {
         near.promiseReturn(promise_id)    
     }
 }
+
+export function refund_deposit(storage_used) {
+    refund_deposit_to_account(storage_used, near.predecessorAccountId())
+}
+
+export function hash_account_id(account_id) {
+    return near.sha256(account_id)
+}
+
+export function assert_at_least_one_yocto() {
+    utils.assert(env.attachedDeposit() >= 1n, "Requires attached deposit of at least 1 yoctoNEAR")
+}
