@@ -40,3 +40,15 @@ function checkStringIsBytes(str: string) {
   }
   return str;
 }
+
+export function storage_byte_cost(): BigInt {
+    return 10000000000000000000n;
+}
+
+export function assert(b: boolean, str: string) {
+  if (b) {
+      return
+  } else {
+      throw Error("assertion failed: " + str)
+  }
+}

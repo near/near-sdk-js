@@ -11,7 +11,7 @@ import {
   UnorderedSet,
 } from "./collections";
 
-import { bytes, Bytes } from "./utils";
+import { bytes, Bytes, storage_byte_cost } from "./utils";
 
 export {
   call,
