@@ -14,7 +14,7 @@
     "build:counter-ts": "near-sdk build src/counter.ts build/counter-ts.wasm",
     "build:cross-contract-call": "near-sdk build src/status-message.js build/status-message.wasm && near-sdk build src/cross-contract-call.js build/cross-contract-call.wasm",
     "build:fungible-token-lockable": "near-sdk build src/fungible-token-lockable.js build/fungible-token-lockable.wasm",
-    "build:fungible-token": "near-sdk build src/fungible-token.js build/fungible-token.wasm",
+    "build:fungible-token": "near-sdk build src/fungible-token.js build/fungible-token.wasm && near-sdk build src/fungible-token-helper.js build/fungible-token-helper.wasm",
     "build:non-fungible-token": "near-sdk build src/non-fungible-token-receiver.js build/non-fungible-token-receiver.wasm && near-sdk build src/non-fungible-token.js build/non-fungible-token.wasm",
     "build:status-message-collections": "near-sdk build src/status-message-collections.js build/status-message-collections.wasm",
     "test": "ava && yarn test:counter-lowlevel && yarn test:counter-ts && yarn test:check-ts-build",
@@ -34,11 +34,12 @@
   "license": "Apache-2.0",
   "dependencies": {
     "lodash-es": "^4.17.21",
-    "near-sdk-js": "file:../"
+    "near-sdk-js": "file:../",
+    "yargs": "^17.5.1"
   },
   "devDependencies": {
     "ava": "^4.2.0",
-    "typescript": "^4.7.4",
-    "near-workspaces": "2.0.0"
+    "near-workspaces": "2.0.0",
+    "typescript": "^4.7.4"
   }
 }

@@ -1,7 +1,7 @@
 import { Worker } from 'near-workspaces';
 import test from 'ava';
 
-test.beforeEach(async t => {
+test.beforeEach(async (t) => {
     // Init the worker and start a Sandbox server
     const worker = await Worker.init();
 
@@ -9,13 +9,13 @@ test.beforeEach(async t => {
     const root = worker.rootAccount;
 
     // Deploy the ft contract.
-    const ft = await root.createAndDeploy(
-        root.getSubAccount('ft').accountId,
-        './build/fungible-token.wasm',
-    );
+    const ft = await root.createAndDeploy(root.getSubAccount('ft').accountId, './build/fungible-token.wasm');
+    // Deploy helper contract for cross contract call
+    const xcc = await root.createAndDeploy(root.getSubAccount('xcc').accountId, './build/fungible-token-helper.wasm');
 
-    // Init the contract
+    // Init the contracts
     await ft.call(ft, 'init', { prefix: 'a', totalSupply: '1000' });
+    await xcc.call(xcc, 'init', {});
 
     // Create test accounts
     const ali = await root.createSubAccount('ali');
@@ -23,7 +23,7 @@ test.beforeEach(async t => {
 
     // Save state for test runs, it is unique for each test
     t.context.worker = worker;
-    t.context.accounts = { root, ft, ali, bob };
+    t.context.accounts = { root, ft, ali, bob, xcc };
 });
 
 test.afterEach(async t => {
@@ -57,4 +57,13 @@ test('Cannot transfer if balance is not sufficient', async t => {
     }
 });
 
-// TODO: add ftTransferCall test
+test('Cross contract transfer', async (t) => {
+    const { xcc, ft } = t.context.accounts;
+    await ft.call(ft, 'ftTransferCall', { receiverId: xcc.accountId, amount: '900', memo: null, msg: 'test msg' }, { gas: 200000000000000 });
+    const aliBalance = await ft.view('ftBalanceOf', { accountId: xcc.accountId });
+    t.is(aliBalance, '900');
+    const aliSubContractData = await xcc.view('getContractData');
+    t.is(aliSubContractData, `[900 from ${ft.accountId} to ${xcc.accountId}] test msg `);
+    const ownerBalance = await ft.view('ftBalanceOf', { accountId: ft.accountId });
+    t.is(ownerBalance, '100');
+});
