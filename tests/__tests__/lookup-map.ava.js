@@ -111,3 +111,13 @@ test('LookupMap extend', async t => {
         'world2'
     );
 })
+
+test.only('LookupMap set get object', async t => {
+    const { ali, lookupMapContract } = t.context.accounts;
+    await ali.call(lookupMapContract, 'add_house', {});
+    t.is(
+        await lookupMapContract.view('get_house', {}),
+        'house house1 has 2 rooms. room room1 is 200sqft.'
+    )
+    
+})

@@ -1754,7 +1754,7 @@ near-sandbox@^0.0.8:
     tar "^6.1.0"
 
 "near-sdk-js@file:..":
-  version "0.3.0"
+  version "0.4.0-2"
   dependencies:
     "@babel/core" "^7.17.5"
     "@babel/plugin-proposal-decorators" "^7.17.2"
@@ -1764,6 +1764,7 @@ near-sandbox@^0.0.8:
     "@rollup/plugin-node-resolve" "^13.1.1"
     rollup "^2.61.1"
     rollup-plugin-sourcemaps "^0.6.3"
+    superserial "^0.3.0"
     yargs "^17.5.1"
 
 near-units@^0.1.9:
@@ -2172,6 +2173,11 @@ strip-ansi@^7.0.1:
   integrity sha512-cXNxvT8dFNRVfhVME3JAe98mkXDYN2O1l7jmcwMnOslDeESg1rF/OZMtK0nRAhiari1unG5cD4jG3rapUAkLbw==
   dependencies:
     ansi-regex "^6.0.1"
+
+superserial@^0.3.0:
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/superserial/-/superserial-0.3.0.tgz#9bed3a49461cf714e789ccad01722ee2242126e6"
+  integrity sha512-whx28H+uq/0eIoCkLVpRRhpBqjHTfdzugiNv0mIJicBNdm9Z5qKcs9yDx0hvOtL7+JiYKYamxPUO0EWGxAAZBw==
 
 supertap@^3.0.1:
   version "3.0.1"
