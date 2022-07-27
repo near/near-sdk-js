@@ -1,12 +1,4 @@
-import { NearContract, NearBindgen, call, near } from 'near-sdk-js'
-
-function assert(b, str) {
-    if (b) {
-        return
-    } else {
-        throw Error("assertion failed: " + str)
-    }
-}
+import { NearContract, NearBindgen, call, near, assert } from 'near-sdk-js'
 
 @NearBindgen
 class NftContract extends NearContract {
