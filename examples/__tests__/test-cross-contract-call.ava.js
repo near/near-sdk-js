@@ -8,14 +8,6 @@ test.beforeEach(async t => {
     // Prepare sandbox for tests, create accounts, deploy contracts, etx.
     const root = worker.rootAccount;
 
-    // Deploy the onCall contract.
-    const onCall = await root.devDeploy(
-        './build/cross-contract-call.wasm',
-    );
-
-    // Init the contract
-    await onCall.call(onCall, 'init', {});
-
     // Deploy status-message the contract.
     const statusMessage = await root.devDeploy(
         './build/status-message.wasm',
@@ -23,6 +15,14 @@ test.beforeEach(async t => {
 
     // Init the contract
     await statusMessage.call(statusMessage, 'init', {});
+
+    // Deploy the onCall contract.
+    const onCall = await root.devDeploy(
+        './build/cross-contract-call.wasm',
+    );
+
+    // Init the contract
+    await onCall.call(onCall, 'init', { statusMessageContract: statusMessage.accountId });
 
     // Create test accounts
     const ali = await root.createSubAccount('ali');
@@ -58,7 +58,6 @@ test('Person can be set on-call if AVAILABLE', async t => {
     await ali.call(statusMessage, 'set_status', { message: 'AVAILABLE' });
     // Bob sets Ali on-call
     await bob.call(onCall, 'set_person_on_call', { accountId: ali.accountId }, { gas: 120000000000000 });
-
 
     // Check that Ali is on-call
     t.is(
