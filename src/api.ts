@@ -447,3 +447,7 @@ export function storageRemove(key: Bytes): boolean {
   }
   return false;
 }
+
+export function storageByteCost(): BigInt {
+  return 10_000_000_000_000_000_000n;
+}
