@@ -4,16 +4,9 @@ import {
     call,
     view,
     near,
-    LookupMap
+    LookupMap,
+    assert,
 } from 'near-sdk-js'
-
-function assert(b, str) {
-    if (b) {
-        return
-    } else {
-        throw Error("assertion failed: " + str)
-    }
-}
 
 class Account {
     constructor(balance, allowances, lockedBalances) {
