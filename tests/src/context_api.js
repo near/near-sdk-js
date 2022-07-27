@@ -20,6 +20,10 @@ export function get_input() {
     near.valueReturn(near.input())
 }
 
+export function get_storage_usage() {
+    near.valueReturn(near.storageUsage())
+}
+
 export function get_block_height() {
     near.valueReturn(near.blockHeight())
 }

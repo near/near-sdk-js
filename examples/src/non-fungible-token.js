@@ -1,12 +1,4 @@
-import { NearContract, NearBindgen, call, view, near, LookupMap, bytes } from 'near-sdk-js'
-
-function assert(b, str) {
-    if (b) {
-        return
-    } else {
-        throw Error("assertion failed: " + str)
-    }
-}
+import { NearContract, NearBindgen, call, view, near, LookupMap, bytes, assert } from 'near-sdk-js'
 
 class Token {
     constructor(token_id, owner_id) {
