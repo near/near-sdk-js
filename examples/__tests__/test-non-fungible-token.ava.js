@@ -9,8 +9,7 @@ test.beforeEach(async t => {
     const root = worker.rootAccount;
 
     // Deploy the nft contract.
-    const nft = await root.createAndDeploy(
-        root.getSubAccount('nft').accountId,
+    const nft = await root.devDeploy(
         './build/non-fungible-token.wasm',
     );
 
@@ -18,8 +17,7 @@ test.beforeEach(async t => {
     await nft.call(nft, 'init', { owner_id: nft.accountId, owner_by_id_prefix: 'a' });
 
     // Deploy the tokenReceiver contract.
-    const tokenReceiver = await root.createAndDeploy(
-        root.getSubAccount('tokenreceiver').accountId,
+    const tokenReceiver = await root.devDeploy(
         './build/non-fungible-token-receiver.wasm',
     );
 

@@ -10,18 +10,15 @@ test.before(async t => {
     const root = worker.rootAccount;
 
     // Deploy the test contract.
-    const callerContract = await root.createAndDeploy(
-        root.getSubAccount('caller-contract').accountId,
+    const callerContract = await root.devDeploy(
         'build/promise_api.wasm',
     );
 
-    const calleeContract = await root.createAndDeploy(
-        root.getSubAccount('callee-contract').accountId,
+    const calleeContract = await root.devDeploy(
         'build/promise_api.wasm',
     );
 
-    const caller2Contract = await root.createAndDeploy(
-        root.getSubAccount('caller2').accountId,
+    const caller2Contract = await root.devDeploy(
         'build/promise_batch_api.wasm',
         {initialBalance: '100100N'}
     );

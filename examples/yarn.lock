@@ -1594,16 +1594,16 @@ near-api-js@^0.44.1:
     text-encoding-utf-8 "^1.0.2"
     tweetnacl "^1.0.1"
 
-near-sandbox@^0.0.8:
-  version "0.0.8"
-  resolved "https://registry.npmjs.org/near-sandbox/-/near-sandbox-0.0.8.tgz"
-  integrity sha512-3JrDcA9rI+wA9lWqfOtSovGxBE/TDZL011TLk+jz5wGezVbm7m3tDh/zCfq+++eFyJ3ZbGkG0KF6+trMQJFPQQ==
+near-sandbox@^0.0.12:
+  version "0.0.12"
+  resolved "https://registry.npmjs.org/near-sandbox/-/near-sandbox-0.0.12.tgz#b0e36c9458a437c5cb4e1218f715585f087904b1"
+  integrity sha512-NfMSbPYiSpSMijM3JoC1FuNJuc3Pop86OF+/01ahc8phWQbjT404rMR+UvvuCZQ6Qge8/MC76KjBUPg3d7mg1Q==
   dependencies:
     got "^11.8.2"
     tar "^6.1.0"
 
 "near-sdk-js@file:..":
-  version "0.3.0"
+  version "0.4.0-2"
   dependencies:
     "@babel/core" "^7.17.5"
     "@babel/plugin-proposal-decorators" "^7.17.2"
@@ -1622,10 +1622,10 @@ near-units@^0.1.9:
   dependencies:
     bn.js "^5.2.0"
 
-near-workspaces@2.0.0:
-  version "2.0.0"
-  resolved "https://registry.npmjs.org/near-workspaces/-/near-workspaces-2.0.0.tgz"
-  integrity sha512-oxV9B/LBGKM1cQHfZI476GSiUFLRg/0t7PiPGDyUVVsFWpkBLbQEF9EVP2nxctO7HWopAe5SJJTGp0o0ct8B1A==
+near-workspaces@3.0.0:
+  version "3.0.0"
+  resolved "https://registry.npmjs.org/near-workspaces/-/near-workspaces-3.0.0.tgz#535237bd72d1eb38930a35f89915b4240b4c8612"
+  integrity sha512-N3J75Q6KVL0NMnHldfG9BwQOyEuLFKDZuPO055UzXhmC+Kp/G/PPVOQ72tsN5PnLBih72sehOafDxy4q6CpxUg==
   dependencies:
     base64url "^3.0.1"
     bn.js "^5.2.0"
@@ -1635,7 +1635,7 @@ near-workspaces@2.0.0:
     fs-extra "^10.0.0"
     js-sha256 "^0.9.0"
     near-api-js "^0.44.1"
-    near-sandbox "^0.0.8"
+    near-sandbox "^0.0.12"
     near-units "^0.1.9"
     node-port-check "^2.0.1"
     promisify-child-process "^4.1.1"

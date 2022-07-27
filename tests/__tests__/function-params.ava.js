@@ -14,8 +14,7 @@ test.before(async t => {
     const root = worker.rootAccount;
 
     // Deploy the test contract.
-    const functionParamsContract = await root.createAndDeploy(
-        root.getSubAccount('test-contract').accountId,
+    const functionParamsContract = await root.devDeploy(
         'build/function-params.wasm',
     );
     await functionParamsContract.call(functionParamsContract, 'init', {});
