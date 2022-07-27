@@ -33,8 +33,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "lodash-es": "^4.17.21",
-    "near-sdk-js": "file:../",
-    "yargs": "^17.5.1"
+    "near-sdk-js": "file:../"
   },
   "devDependencies": {
     "ava": "^4.2.0",
