@@ -258,8 +258,7 @@ export function input(): Bytes {
 }
 
 export function storageUsage(): BigInt {
-  env.storageUsage(0);
-  return env.storage_usage(0);
+  return env.storage_usage();
 }
 
 export function accountBalance(): BigInt {
