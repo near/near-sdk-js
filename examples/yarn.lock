@@ -1622,10 +1622,10 @@ near-units@^0.1.9:
   dependencies:
     bn.js "^5.2.0"
 
-near-workspaces@3.0.0:
-  version "3.0.0"
-  resolved "https://registry.npmjs.org/near-workspaces/-/near-workspaces-3.0.0.tgz#535237bd72d1eb38930a35f89915b4240b4c8612"
-  integrity sha512-N3J75Q6KVL0NMnHldfG9BwQOyEuLFKDZuPO055UzXhmC+Kp/G/PPVOQ72tsN5PnLBih72sehOafDxy4q6CpxUg==
+near-workspaces@3.1.0:
+  version "3.1.0"
+  resolved "https://registry.npmjs.org/near-workspaces/-/near-workspaces-3.1.0.tgz#d462ecb4bf2ae1cc33063995a1ef7db5e204910f"
+  integrity sha512-0f/S2YU0xNQ7UQwCW/pkqXspjeK0N+nYj3x7/sx+tUMsckNzahTLNww+3I0YBa/UtcMrCVsT5WDG8emvhdRxnQ==
   dependencies:
     base64url "^3.0.1"
     bn.js "^5.2.0"
