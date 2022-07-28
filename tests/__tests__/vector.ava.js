@@ -10,8 +10,7 @@ test.beforeEach(async t => {
     const root = worker.rootAccount;
 
     // Deploy the test contract.
-    const vectorContract = await root.createAndDeploy(
-        root.getSubAccount('test-contract').accountId,
+    const vectorContract = await root.devDeploy(
         'build/vector.wasm',
     );
     await vectorContract.call(vectorContract, 'init', {});

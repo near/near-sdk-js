@@ -14,8 +14,7 @@ test.beforeEach(async t => {
     const root = worker.rootAccount;
 
     // Deploy the test contract.
-    const bytesContract = await root.createAndDeploy(
-        root.getSubAccount('test-contract').accountId,
+    const bytesContract = await root.devDeploy(
         'build/bytes.wasm',
     );
     // Test users
