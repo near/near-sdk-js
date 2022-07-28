@@ -9,8 +9,7 @@ test.before(async t => {
     const root = worker.rootAccount;
     
     // Deploy the contract.
-    const statusMessage = await root.createAndDeploy(
-        root.getSubAccount('statusmessage').accountId,
+    const statusMessage = await root.devDeploy(
         './build/status-message.wasm',
     );
     

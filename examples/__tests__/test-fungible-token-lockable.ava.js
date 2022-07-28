@@ -9,8 +9,7 @@ test.beforeEach(async t => {
     const root = worker.rootAccount;
 
     // Deploy the lockable-ft contract.
-    const lockableFt = await root.createAndDeploy(
-        root.getSubAccount('lockableft').accountId,
+    const lockableFt = await root.devDeploy(
         './build/fungible-token-lockable.wasm',
     );
 
