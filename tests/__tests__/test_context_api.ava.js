@@ -10,8 +10,7 @@ test.before(async t => {
     const root = worker.rootAccount;
 
     // Deploy the test contract.
-    const contextApiContract = await root.createAndDeploy(
-        root.getSubAccount('test-contract').accountId,
+    const contextApiContract = await root.devDeploy(
         'build/context_api.wasm',
     );
 

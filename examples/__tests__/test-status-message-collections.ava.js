@@ -9,8 +9,7 @@ test.beforeEach(async t => {
     const root = worker.rootAccount;
 
     // Deploy the statis-message contract.
-    const statusMessage = await root.createAndDeploy(
-        root.getSubAccount('statusmessage').accountId,
+    const statusMessage = await root.devDeploy(
         './build/status-message-collections.wasm',
     );
 

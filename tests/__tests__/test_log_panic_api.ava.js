@@ -10,8 +10,7 @@ test.before(async t => {
     const root = worker.rootAccount;
 
     // Deploy the test contract.
-    const testContract = await root.createAndDeploy(
-        root.getSubAccount('test-contract').accountId,
+    const testContract = await root.devDeploy(
         'build/log_panic_api.wasm',
     );
 

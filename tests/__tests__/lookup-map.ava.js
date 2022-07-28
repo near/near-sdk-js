@@ -14,8 +14,7 @@ test.beforeEach(async t => {
     const root = worker.rootAccount;
 
     // Deploy the test contract.
-    const lookupMapContract = await root.createAndDeploy(
-        root.getSubAccount('test-contract').accountId,
+    const lookupMapContract = await root.devDeploy(
         'build/lookup-map.wasm',
     );
     await lookupMapContract.call(lookupMapContract, 'init', {});
