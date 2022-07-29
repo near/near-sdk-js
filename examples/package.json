@@ -6,8 +6,8 @@
   "type": "module",
   "scripts": {
     "postinstall": "cd .. && yarn link && cd examples && yarn link near-sdk-js",
-    "build": "yarn build:clean-state && yarn build:counter && yarn build:counter-lowlevel && yarn build:counter-ts && yarn build:cross-contract-call && yarn build:fungible-token-lockable && yarn build:fungible-token && yarn build:non-fungible-token && yarn build:status-message-collections && yarn build:status-message",
-    "build:status-message": "yarn near-sdk-js build src/status-message.js build/status-message.wasm",
+    "build": "yarn build:clean-state && yarn build:counter && yarn build:counter-lowlevel && yarn build:counter-ts && yarn build:cross-contract-call && yarn build:fungible-token-lockable && yarn build:fungible-token && yarn build:non-fungible-token && yarn build:status-message-collections && yarn build:status-message && yarn build:parking-lot",
+    "build:status-message": "near-sdk-js build src/status-message.js build/status-message.wasm",
     "build:clean-state": "near-sdk-js build src/clean-state.js build/clean-state.wasm",
     "build:counter": "near-sdk-js build src/counter.js build/counter.wasm",
     "build:counter-lowlevel": "near-sdk-js build src/counter-lowlevel.js build/counter-lowlevel.wasm",
@@ -17,6 +17,7 @@
     "build:fungible-token": "near-sdk-js build src/fungible-token.js build/fungible-token.wasm && near-sdk-js build src/fungible-token-helper.js build/fungible-token-helper.wasm",
     "build:non-fungible-token": "near-sdk-js build src/non-fungible-token-receiver.js build/non-fungible-token-receiver.wasm && near-sdk-js build src/non-fungible-token.js build/non-fungible-token.wasm",
     "build:status-message-collections": "near-sdk-js build src/status-message-collections.js build/status-message-collections.wasm",
+    "build:parking-lot": "near-sdk-js build src/parking-lot.ts build/parking-lot.wasm",
     "test": "ava && yarn test:counter-lowlevel && yarn test:counter-ts",
     "test:status-message": "ava __tests__/test-status-message.ava.js",
     "test:clean-state": "ava __tests__/test-clean-state.ava.js",
@@ -27,7 +28,8 @@
     "test:fungible-token-lockable": "ava __tests__/test-fungible-token-lockable.ava.js",
     "test:fungible-token": "ava __tests__/test-fungible-token.ava.js",
     "test:non-fungible-token": "ava __tests__/test-non-fungible-token.ava.js",
-    "test:status-message-collections": "ava __tests__/test-status-message-collections.ava.js"
+    "test:status-message-collections": "ava __tests__/test-status-message-collections.ava.js",
+    "test:parking-lot": "ava __tests__/test-parking-lot.ava.js"
   },
   "author": "Near Inc <hello@nearprotocol.com>",
   "license": "Apache-2.0",

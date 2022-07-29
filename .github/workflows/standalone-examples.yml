@@ -33,3 +33,5 @@ jobs:
         run: cd examples && yarn build:status-message-collections && yarn test:status-message-collections
       - name: status-message
         run: cd examples && yarn build:status-message && yarn test:status-message
+      - name: parking-lot
+        run: cd examples && yarn build:parking-lot && yarn test:parking-lot

@@ -1,5 +1,6 @@
 import * as near from "../api";
-import { Bytes, u8ArrayToBytes } from "../utils";
+import { Bytes, u8ArrayToBytes, ClassMap } from "../utils";
+import { Serializer } from 'superserial';
 
 const ERR_INDEX_OUT_OF_BOUNDS = "Index out of bounds";
 const ERR_INCONSISTENT_STATE =
@@ -14,13 +15,15 @@ function indexToKey(prefix: Bytes, index: number): Bytes {
 
 /// An iterable implementation of vector that stores its content on the trie.
 /// Uses the following map: index -> element
-export class Vector {
+export class Vector<E> {
   length: number;
   readonly prefix: Bytes;
+  readonly serializer: Serializer;
 
-  constructor(prefix: Bytes) {
+  constructor(prefix: Bytes, classes?: ClassMap) {
     this.length = 0;
     this.prefix = prefix;
+    this.serializer = new Serializer({classes})
   }
 
   len(): number {
@@ -31,18 +34,18 @@ export class Vector {
     return this.length == 0;
   }
 
-  get(index: number): Bytes | null {
+  get(index: number): E | null {
     if (index >= this.length) {
       return null;
     }
     let storageKey = indexToKey(this.prefix, index);
-    return near.storageRead(storageKey);
+    return this.serializer.deserialize(near.storageRead(storageKey));
   }
 
   /// Removes an element from the vector and returns it in serialized form.
   /// The removed element is replaced by the last element of the vector.
   /// Does not preserve ordering, but is `O(1)`.
-  swapRemove(index: number): Bytes | null {
+  swapRemove(index: number): E | null {
     if (index >= this.length) {
       throw new Error(ERR_INDEX_OUT_OF_BOUNDS);
     } else if (index + 1 == this.length) {
@@ -50,21 +53,21 @@ export class Vector {
     } else {
       let key = indexToKey(this.prefix, index);
       let last = this.pop();
-      if (near.storageWrite(key, last)) {
-        return near.storageGetEvicted();
+      if (near.storageWrite(key, this.serializer.serialize(last))) {
+        return this.serializer.deserialize(near.storageGetEvicted());
       } else {
         throw new Error(ERR_INCONSISTENT_STATE);
       }
     }
   }
 
-  push(element: Bytes) {
+  push(element: E) {
     let key = indexToKey(this.prefix, this.length);
     this.length += 1;
-    near.storageWrite(key, element);
+    near.storageWrite(key, this.serializer.serialize(element));
   }
 
-  pop(): Bytes | null {
+  pop(): E | null {
     if (this.isEmpty()) {
       return null;
     } else {
@@ -72,33 +75,33 @@ export class Vector {
       let lastKey = indexToKey(this.prefix, lastIndex);
       this.length -= 1;
       if (near.storageRemove(lastKey)) {
-        return near.storageGetEvicted();
+        return this.serializer.deserialize(near.storageGetEvicted());
       } else {
         throw new Error(ERR_INCONSISTENT_STATE);
       }
     }
   }
 
-  replace(index: number, element: Bytes): Bytes {
+  replace(index: number, element: E): E {
     if (index >= this.length) {
       throw new Error(ERR_INDEX_OUT_OF_BOUNDS);
     } else {
       let key = indexToKey(this.prefix, index);
-      if (near.storageWrite(key, element)) {
-        return near.storageGetEvicted();
+      if (near.storageWrite(key, this.serializer.serialize(element))) {
+        return this.serializer.deserialize(near.storageGetEvicted());
       } else {
         throw new Error(ERR_INCONSISTENT_STATE);
       }
     }
   }
 
-  extend(elements: Bytes[]) {
+  extend(elements: E[]) {
     for (let element of elements) {
       this.push(element);
     }
   }
 
-  [Symbol.iterator](): VectorIterator {
+  [Symbol.iterator](): VectorIterator<E> {
     return new VectorIterator(this);
   }
 
@@ -110,7 +113,7 @@ export class Vector {
     this.length = 0;
   }
 
-  toArray(): Bytes[] {
+  toArray(): E[] {
     let ret = [];
     for (let v of this) {
       ret.push(v);
@@ -119,15 +122,15 @@ export class Vector {
   }
 }
 
-export class VectorIterator {
+export class VectorIterator<E> {
   private current: number;
-  private vector: Vector;
-  constructor(vector: Vector) {
+  private vector: Vector<E>;
+  constructor(vector: Vector<E>) {
     this.current = 0;
     this.vector = vector;
   }
 
-  next(): { value: Bytes | null; done: boolean } {
+  next(): { value: E | null; done: boolean } {
     if (this.current < this.vector.len()) {
       let value = this.vector.get(this.current);
       this.current += 1;

@@ -172,3 +172,13 @@ test('UnorderedMap extend, remove, clear', async t => {
         true
     );
 })
+
+test('UnorderedMap set get object', async t => {
+    const { ali, unorderedMapContract } = t.context.accounts;
+    await ali.call(unorderedMapContract, 'add_house', {});
+    t.is(
+        await unorderedMapContract.view('get_house', {}),
+        'house house1 has 2 rooms. room room1 is 200sqft.'
+    )
+    
+})

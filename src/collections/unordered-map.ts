@@ -1,23 +1,26 @@
 import * as near from "../api";
-import { u8ArrayToBytes, bytesToU8Array, Bytes } from "../utils";
+import { u8ArrayToBytes, bytesToU8Array, Bytes, ClassMap } from "../utils";
 import { Vector, VectorIterator } from "./vector";
+import { Serializer } from 'superserial';
 
 const ERR_INCONSISTENT_STATE =
   "The collection is an inconsistent state. Did previous smart contract execution terminate unexpectedly?";
 
-export class UnorderedMap {
+export class UnorderedMap<K, V> {
   readonly length: number;
   readonly keyIndexPrefix: Bytes;
-  readonly keys: Vector;
-  readonly values: Vector;
+  readonly keys: Vector<K>;
+  readonly values: Vector<V>;
+  readonly serializer: Serializer;
 
-  constructor(prefix: Bytes) {
+  constructor(prefix: Bytes, classes?: ClassMap) {
     this.length = 0;
     this.keyIndexPrefix = prefix + "i";
     let indexKey = prefix + "k";
     let indexValue = prefix + "v";
-    this.keys = new Vector(indexKey);
-    this.values = new Vector(indexValue);
+    this.keys = new Vector(indexKey, classes);
+    this.values = new Vector(indexValue, classes);
+    this.serializer = new Serializer(classes)
   }
 
   len() {
@@ -50,13 +53,13 @@ export class UnorderedMap {
     return data[0];
   }
 
-  getIndexRaw(key: Bytes): Bytes {
-    let indexLookup = this.keyIndexPrefix + key;
+  getIndexRaw(key: K): Bytes {
+    let indexLookup = this.keyIndexPrefix + this.serializer.serialize(key);
     let indexRaw = near.storageRead(indexLookup);
     return indexRaw;
   }
 
-  get(key: Bytes): Bytes | null {
+  get(key: K): V | null {
     let indexRaw = this.getIndexRaw(key);
     if (indexRaw) {
       let index = this.deserializeIndex(indexRaw);
@@ -70,8 +73,8 @@ export class UnorderedMap {
     return null;
   }
 
-  set(key: Bytes, value: Bytes): Bytes | null {
-    let indexLookup = this.keyIndexPrefix + key;
+  set(key: K, value: V): V | null {
+    let indexLookup = this.keyIndexPrefix + this.serializer.serialize(key);
     let indexRaw = near.storageRead(indexLookup);
     if (indexRaw) {
       let index = this.deserializeIndex(indexRaw);
@@ -86,8 +89,8 @@ export class UnorderedMap {
     }
   }
 
-  remove(key: Bytes): Bytes | null {
-    let indexLookup = this.keyIndexPrefix + key;
+  remove(key: K): V | null {
+    let indexLookup = this.keyIndexPrefix + this.serializer.serialize(key);
     let indexRaw = near.storageRead(indexLookup);
     if (indexRaw) {
       if (this.len() == 1) {
@@ -97,15 +100,15 @@ export class UnorderedMap {
       } else {
         // If there is more than one element then swap remove swaps it with the last
         // element.
-        let lastKeyRaw = this.keys.get(this.len() - 1);
-        if (!lastKeyRaw) {
+        let lastKey = this.keys.get(this.len() - 1);
+        if (!lastKey) {
           throw new Error(ERR_INCONSISTENT_STATE);
         }
         near.storageRemove(indexLookup);
         // If the removed element was the last element from keys, then we don't need to
         // reinsert the lookup back.
-        if (lastKeyRaw != key) {
-          let lastLookupKey = this.keyIndexPrefix + lastKeyRaw;
+        if (lastKey != key) {
+          let lastLookupKey = this.keyIndexPrefix + this.serializer.serialize(lastKey);
           near.storageWrite(lastLookupKey, indexRaw);
         }
       }
@@ -118,14 +121,14 @@ export class UnorderedMap {
 
   clear() {
     for (let key of this.keys) {
-      let indexLookup = this.keyIndexPrefix + key;
+      let indexLookup = this.keyIndexPrefix + this.serializer.serialize(key);
       near.storageRemove(indexLookup);
     }
     this.keys.clear();
     this.values.clear();
   }
 
-  toArray(): [Bytes, Bytes][] {
+  toArray(): [K, V][] {
     let ret = [];
     for (let v of this) {
       ret.push(v);
@@ -133,26 +136,26 @@ export class UnorderedMap {
     return ret;
   }
 
-  [Symbol.iterator](): UnorderedMapIterator {
-    return new UnorderedMapIterator(this);
+  [Symbol.iterator](): UnorderedMapIterator<K, V> {
+    return new UnorderedMapIterator<K, V>(this);
   }
 
-  extend(kvs: [Bytes, Bytes][]) {
+  extend(kvs: [K, V][]) {
     for (let [k, v] of kvs) {
       this.set(k, v);
     }
   }
 }
 
-class UnorderedMapIterator {
-  private keys: VectorIterator;
-  private values: VectorIterator;
-  constructor(unorderedMap: UnorderedMap) {
+class UnorderedMapIterator<K, V> {
+  private keys: VectorIterator<K>;
+  private values: VectorIterator<V>;
+  constructor(unorderedMap: UnorderedMap<K, V>) {
     this.keys = new VectorIterator(unorderedMap.keys);
     this.values = new VectorIterator(unorderedMap.values);
   }
 
-  next(): { value: [Bytes | null, Bytes | null]; done: boolean } {
+  next(): { value: [K | null, V | null]; done: boolean } {
     let key = this.keys.next();
     let value = this.values.next();
     if (key.done != value.done) {
