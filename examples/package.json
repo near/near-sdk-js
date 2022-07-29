@@ -29,7 +29,7 @@
     "test:fungible-token": "ava __tests__/test-fungible-token.ava.js",
     "test:non-fungible-token": "ava __tests__/test-non-fungible-token.ava.js",
     "test:status-message-collections": "ava __tests__/test-status-message-collections.ava.js",
-    "test:parking-lot": "ava __tests__/parking-lot.ava.js"
+    "test:parking-lot": "ava __tests__/test-parking-lot.ava.js"
   },
   "author": "Near Inc <hello@nearprotocol.com>",
   "license": "Apache-2.0",

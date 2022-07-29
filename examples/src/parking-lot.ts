@@ -21,19 +21,19 @@ class ParkingLot extends NearContract {
     }
 
     @call
-    addCar(name: string, specs: CarSpecs) {
+    addCar({ name }: { name: string }, { specs }: { specs: CarSpecs }) {
         near.log(`addCar() called, name: ${name}, specs: ${JSON.stringify(specs)}`)
         this.cars.insert(name, specs)
     }
 
     @call
-    removeCar(name: string) {
+    removeCar({ name }: { name: string }) {
         near.log(`removeCar() called, name: ${name}`)
         this.cars.remove(name)
     }
 
     @view
-    getCarSpecs(name: string) {
+    getCarSpecs({ name }: { name: string }) {
         near.log(`getCarSpecs() called, name: ${name}`)
         this.cars.get(name)
     }
