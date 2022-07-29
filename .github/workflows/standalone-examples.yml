@@ -14,22 +14,22 @@ jobs:
       - name: Install dependencies
         run: yarn && cd examples && yarn
       - name: clean-state
-        run: yarn && cd examples && yarn build:clean-state && yarn test:clean-state
+        run: cd examples && yarn build:clean-state && yarn test:clean-state
       - name: counter
-        run: yarn && cd examples && yarn build:counter && yarn test:counter
+        run: cd examples && yarn build:counter && yarn test:counter
       - name: counter-lowlevel
-        run: yarn && cd examples && yarn build:counter-lowlevel && yarn test:counter-lowlevel
+        run: cd examples && yarn build:counter-lowlevel && yarn test:counter-lowlevel
       - name: counter-ts
-        run: yarn && cd examples && yarn build:counter-ts && yarn test:counter-ts
+        run: cd examples && yarn build:counter-ts && yarn test:counter-ts
       - name: cross-contract-call
-        run: yarn && cd examples && yarn build:cross-contract-call && yarn test:cross-contract-call
+        run: cd examples && yarn build:cross-contract-call && yarn test:cross-contract-call
       - name: fungible-token-lockable
-        run: yarn && cd examples && yarn build:fungible-token-lockable && yarn test:fungible-token-lockable
+        run: cd examples && yarn build:fungible-token-lockable && yarn test:fungible-token-lockable
       - name: fungible-token
-        run: yarn && cd examples && yarn build:fungible-token && yarn test:fungible-token
+        run: cd examples && yarn build:fungible-token && yarn test:fungible-token
       - name: non-fungible-token
-        run: yarn && cd examples && yarn build:non-fungible-token && yarn test:non-fungible-token
+        run: cd examples && yarn build:non-fungible-token && yarn test:non-fungible-token
       - name: status-message-collections
-        run: yarn && cd examples && yarn build:status-message-collections && yarn test:status-message-collections
+        run: cd examples && yarn build:status-message-collections && yarn test:status-message-collections
       - name: status-message
-        run: yarn && cd examples && yarn build:status-message && yarn test:status-message
+        run: cd examples && yarn build:status-message && yarn test:status-message
