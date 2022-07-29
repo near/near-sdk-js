@@ -8,5 +8,5 @@ export declare class LookupMap<K, V> {
     get(key: K): V | null;
     remove(key: K): V | null;
     set(key: K, value: V): V | null;
-    extend(objects: [any, any][]): void;
+    extend(objects: [K, V][]): void;
 }
