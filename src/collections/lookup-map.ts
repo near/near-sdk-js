@@ -1,41 +1,49 @@
 import * as near from '../api'
-import { Bytes } from '../utils';
+import { Bytes, ClassMap } from '../utils';
+import { Serializer } from 'superserial';
 
-export class LookupMap {
+export class LookupMap<K, V> {
     readonly keyPrefix: Bytes;
+    readonly serializer: Serializer;
 
-    constructor(keyPrefix: Bytes) {
+    constructor(keyPrefix: Bytes, classes?: ClassMap) {
         this.keyPrefix = keyPrefix
+        this.serializer = new Serializer({classes})
     }
 
-    containsKey(key: Bytes): boolean {
-        let storageKey = this.keyPrefix + key
+    containsKey(key: K): boolean {
+        let storageKey = this.keyPrefix + this.serializer.serialize(key)
         return near.storageHasKey(storageKey)
     }
 
-    get(key: Bytes): Bytes | null {
-        let storageKey = this.keyPrefix + key
-        return near.storageRead(storageKey)
+    get(key: K): V | null {
+        let storageKey = this.keyPrefix + this.serializer.serialize(key)
+        let raw = near.storageRead(storageKey)
+        if (raw !== null) {
+            return this.serializer.deserialize(raw)
+        }
+        return null
     }
 
-    remove(key: Bytes): Bytes | null {
-        let storageKey = this.keyPrefix + key
+    remove(key: K): V | null {
+        let storageKey = this.keyPrefix + this.serializer.serialize(key)
         if (near.storageRemove(storageKey)) {
-            return near.storageGetEvicted()
+            return this.serializer.deserialize(near.storageGetEvicted())
         }
         return null
     }
 
-    set(key: Bytes, value: Bytes): Bytes | null {
-        let storageKey = this.keyPrefix + key
-        if (near.storageWrite(storageKey, value)) {
-            return near.storageGetEvicted()
+    set(key: K, value: V): V | null {
+        let storageKey = this.keyPrefix + this.serializer.serialize(key)
+        let storageValue = this.serializer.serialize(value)
+        if (near.storageWrite(storageKey, storageValue)) {
+            return this.serializer.deserialize(near.storageGetEvicted())
         }
         return null
     }
 
-    extend(kvs: [Bytes, Bytes][]) {
-        for(let kv of kvs) {
+    extend(objects: [any, any][]) {
+        for(let kv of objects) {
             this.set(kv[0], kv[1])
         }
     }

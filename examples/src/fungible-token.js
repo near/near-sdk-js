@@ -7,6 +7,7 @@ import {
     LookupMap,
     assert
 } from 'near-sdk-js'
+import { Serializer } from 'superserial'
 
 @NearBindgen
 class FungibleToken extends NearContract {
@@ -20,6 +21,7 @@ class FungibleToken extends NearContract {
 
     deserialize() {
         super.deserialize()
+        this.accounts.serializer = new Serializer()
         this.accounts = Object.assign(new LookupMap, this.accounts)
     }
 

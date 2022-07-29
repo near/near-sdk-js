@@ -167,3 +167,17 @@ test('UnorderedSet extend, remove, clear', async t => {
         true
     );
 })
+
+test('Add and check exist of object', async t => {
+    const { ali, unorderedSetContract } = t.context.accounts;
+    let houseSpec = {name: "a", rooms: [{name: "bedroom", size: "300sqft"}]}
+    t.is(
+        await unorderedSetContract.view('house_exist', houseSpec),
+        false
+    );
+    await ali.call(unorderedSetContract, 'add_house', houseSpec);
+    t.is(
+        await unorderedSetContract.view('house_exist', houseSpec),
+        true
+    );
+})

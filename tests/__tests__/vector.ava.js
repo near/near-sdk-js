@@ -146,3 +146,22 @@ test('Vector extend, toArray, swapRemove, clear', async t => {
         true
     );
 })
+
+test('Vector add and get object', async t => {
+    const { ali, vectorContract } = t.context.accounts;
+    await ali.call(vectorContract, 'add_house', {});
+    let result = await vectorContract.view('get_house', {});
+    t.deepEqual(result, {
+        name: 'house1',
+        rooms: [
+            {
+            name: 'room1',
+            size: '200sqft',
+            },
+            {
+            name: 'room2',
+            size: '300sqft',
+            },
+        ],
+    })
+});

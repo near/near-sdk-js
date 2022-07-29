@@ -1,26 +1,28 @@
-import { Bytes } from "../utils";
-export declare class Vector {
+import { Bytes, ClassMap } from "../utils";
+import { Serializer } from 'superserial';
+export declare class Vector<E> {
     length: number;
     readonly prefix: Bytes;
-    constructor(prefix: Bytes);
+    readonly serializer: Serializer;
+    constructor(prefix: Bytes, classes?: ClassMap);
     len(): number;
     isEmpty(): boolean;
-    get(index: number): Bytes | null;
-    swapRemove(index: number): Bytes | null;
-    push(element: Bytes): void;
-    pop(): Bytes | null;
-    replace(index: number, element: Bytes): Bytes;
-    extend(elements: Bytes[]): void;
-    [Symbol.iterator](): VectorIterator;
+    get(index: number): E | null;
+    swapRemove(index: number): E | null;
+    push(element: E): void;
+    pop(): E | null;
+    replace(index: number, element: E): E;
+    extend(elements: E[]): void;
+    [Symbol.iterator](): VectorIterator<E>;
     clear(): void;
-    toArray(): Bytes[];
+    toArray(): E[];
 }
-export declare class VectorIterator {
+export declare class VectorIterator<E> {
     private current;
     private vector;
-    constructor(vector: Vector);
+    constructor(vector: Vector<E>);
     next(): {
-        value: Bytes | null;
+        value: E | null;
         done: boolean;
     };
 }
