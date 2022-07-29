@@ -9,9 +9,9 @@ test.beforeEach(async (t) => {
     const root = worker.rootAccount;
 
     // Deploy the ft contract.
-    const ft = await root.createAndDeploy(root.getSubAccount('ft').accountId, './build/fungible-token.wasm');
-    // Deploy helper contract for cross contract call
-    const xcc = await root.createAndDeploy(root.getSubAccount('xcc').accountId, './build/fungible-token-helper.wasm');
+    const ft = await root.devDeploy(
+        './build/fungible-token.wasm',
+    );
 
     // Init the contracts
     await ft.call(ft, 'init', { prefix: 'a', totalSupply: '1000' });

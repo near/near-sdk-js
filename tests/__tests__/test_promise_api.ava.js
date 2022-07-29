@@ -9,22 +9,17 @@ test.before(async t => {
     // Prepare sandbox for tests, create accounts, deploy contracts, etx.
     const root = worker.rootAccount;
 
-    // Deploy the test contract.
-    const callerContract = await root.createAndDeploy(
-        root.getSubAccount('caller-contract').accountId,
-        'build/promise_api.wasm',
-    );
+    // Create and deploy caller contract
+    const callerContract = await root.createSubAccount('caller-contract');
+    await callerContract.deploy('build/promise_api.wasm');
 
-    const calleeContract = await root.createAndDeploy(
-        root.getSubAccount('callee-contract').accountId,
-        'build/promise_api.wasm',
-    );
+    // Create and deploy callee contract
+    const calleeContract = await root.createSubAccount('callee-contract');
+    await calleeContract.deploy('build/promise_api.wasm');
 
-    const caller2Contract = await root.createAndDeploy(
-        root.getSubAccount('caller2').accountId,
-        'build/promise_batch_api.wasm',
-        {initialBalance: '100100N'}
-    );
+    // Create and deploy caller2 contract
+    const caller2Contract = await root.createSubAccount('caller2', {initialBalance: '100100N'});
+    await caller2Contract.deploy('build/promise_batch_api.wasm');
 
     // Test users
     const ali = await root.createSubAccount('ali');

@@ -7,16 +7,16 @@
   "scripts": {
     "build": "yarn build:clean-state && yarn build:counter && yarn build:counter-lowlevel && yarn build:counter-ts && yarn build:cross-contract-call && yarn build:fungible-token-lockable && yarn build:fungible-token && yarn build:non-fungible-token && yarn build:status-message-collections && yarn build:status-message",
     "rebuild": "cd .. && yarn build && cd examples && rm -rf node_modules && rm -rf build && yarn && yarn build",
-    "build:status-message": "yarn near-sdk build src/status-message.js build/status-message.wasm",
-    "build:clean-state": "near-sdk build src/clean-state.js build/clean-state.wasm",
-    "build:counter": "near-sdk build src/counter.js build/counter.wasm",
-    "build:counter-lowlevel": "near-sdk build src/counter-lowlevel.js build/counter-lowlevel.wasm",
-    "build:counter-ts": "near-sdk build src/counter.ts build/counter-ts.wasm",
-    "build:cross-contract-call": "near-sdk build src/status-message.js build/status-message.wasm && near-sdk build src/cross-contract-call.js build/cross-contract-call.wasm",
-    "build:fungible-token-lockable": "near-sdk build src/fungible-token-lockable.js build/fungible-token-lockable.wasm",
-    "build:fungible-token": "near-sdk build src/fungible-token.js build/fungible-token.wasm && near-sdk build src/fungible-token-helper.js build/fungible-token-helper.wasm",
-    "build:non-fungible-token": "near-sdk build src/non-fungible-token-receiver.js build/non-fungible-token-receiver.wasm && near-sdk build src/non-fungible-token.js build/non-fungible-token.wasm",
-    "build:status-message-collections": "near-sdk build src/status-message-collections.js build/status-message-collections.wasm",
+    "build:status-message": "yarn near-sdk-js build src/status-message.js build/status-message.wasm",
+    "build:clean-state": "near-sdk-js build src/clean-state.js build/clean-state.wasm",
+    "build:counter": "near-sdk-js build src/counter.js build/counter.wasm",
+    "build:counter-lowlevel": "near-sdk-js build src/counter-lowlevel.js build/counter-lowlevel.wasm",
+    "build:counter-ts": "near-sdk-js build src/counter.ts build/counter-ts.wasm",
+    "build:cross-contract-call": "near-sdk-js build src/status-message.js build/status-message.wasm && near-sdk-js build src/cross-contract-call.js build/cross-contract-call.wasm",
+    "build:fungible-token-lockable": "near-sdk-js build src/fungible-token-lockable.js build/fungible-token-lockable.wasm",
+    "build:fungible-token": "near-sdk-js build src/fungible-token.js build/fungible-token.wasm",
+    "build:non-fungible-token": "near-sdk-js build src/non-fungible-token-receiver.js build/non-fungible-token-receiver.wasm && near-sdk-js build src/non-fungible-token.js build/non-fungible-token.wasm",
+    "build:status-message-collections": "near-sdk-js build src/status-message-collections.js build/status-message-collections.wasm",
     "test": "ava && yarn test:counter-lowlevel && yarn test:counter-ts",
     "test:status-message": "ava __tests__/test-status-message.ava.js",
     "test:clean-state": "ava __tests__/test-clean-state.ava.js",
@@ -37,7 +37,7 @@
   },
   "devDependencies": {
     "ava": "^4.2.0",
-    "near-workspaces": "2.0.0",
+    "near-workspaces": "3.1.0",
     "typescript": "^4.7.4"
   }
 }

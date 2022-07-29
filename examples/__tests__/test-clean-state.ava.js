@@ -9,10 +9,7 @@ test.beforeEach(async t => {
     const root = worker.rootAccount;
 
     // Deploy the clean-state contract.
-    const cleanState = await root.createAndDeploy(
-        root.getSubAccount('cleanstate').accountId,
-        './build/clean-state.wasm',
-    );
+    const cleanState = await root.devDeploy('./build/clean-state.wasm');
 
     // Init the contract
     await cleanState.call(cleanState, 'init', {});
