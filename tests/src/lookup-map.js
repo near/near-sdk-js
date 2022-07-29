@@ -69,12 +69,12 @@ class LookupMapTestContract extends NearContract {
 
     @call
     add_house() {
-        this.lookupMap.setObject('house1', new House('house1', [new Room('room1', '200sqft'), new Room('room2', '300sqft')]))
+        this.lookupMap.set('house1', new House('house1', [new Room('room1', '200sqft'), new Room('room2', '300sqft')]))
     }
 
     @view
     get_house() {
-        let house = this.lookupMap.getObject('house1')
+        let house = this.lookupMap.get('house1')
         let room = house.rooms[0]
         // ensure the object's class is preserved
         // if and only if house and room is still of class House and Room, this would work:

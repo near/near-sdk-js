@@ -112,7 +112,7 @@ test('LookupMap extend', async t => {
     );
 })
 
-test.only('LookupMap set get object', async t => {
+test('LookupMap set get object', async t => {
     const { ali, lookupMapContract } = t.context.accounts;
     await ali.call(lookupMapContract, 'add_house', {});
     t.is(
