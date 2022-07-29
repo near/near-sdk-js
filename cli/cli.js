@@ -13,7 +13,7 @@ import { rollup } from 'rollup';
 
 import { executeCommand } from './utils.js';
 
-const PROJECT_DIR = `../../../`;
+const PROJECT_DIR = process.cwd();
 const NEAR_SDK_JS = 'node_modules/near-sdk-js';
 const TSC = 'node_modules/.bin/tsc';
 const QJSC_DIR = `${NEAR_SDK_JS}/cli/deps/quickjs`;
