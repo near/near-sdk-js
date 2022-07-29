@@ -5,16 +5,19 @@ import {
     view,
     Vector
 } from 'near-sdk-js'
+import { Serializer } from 'superserial';
+import {House, Room} from './model.js';
 
 @NearBindgen
 class VectorTestContract extends NearContract {
     constructor() {
         super()
-        this.vector = new Vector('a');
+        this.vector = new Vector('a', {House, Room});
     }
 
     deserialize() {
         super.deserialize();
+        this.vector.serializer = new Serializer({classes: {House, Room}});
         this.vector = Object.assign(new Vector, this.vector);
     }
 
@@ -66,6 +69,16 @@ class VectorTestContract extends NearContract {
     @call
     swapRemove({index}) {
         this.vector.swapRemove(index);
+    }
+
+    @call
+    add_house() {
+        this.vector.push(new House('house1', [new Room('room1', '200sqft'), new Room('room2', '300sqft')]));
+    }
+
+    @view
+    get_house() {
+        return this.vector.get(0);
     }
 }
 
