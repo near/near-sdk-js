@@ -20,7 +20,7 @@ const QJSC_DIR = `${NEAR_SDK_JS}/cli/deps/quickjs`;
 const QJSC = `${NEAR_SDK_JS}/cli/deps/qjsc`;
 
 yargs(hideBin(process.argv))
-    .scriptName('near-sdk')
+    .scriptName('near-sdk-js')
     .usage('$0 <cmd> [args]')
     .command('build [source] [target]', 'Build NEAR JS Smart-contract', (yargs) => {
         yargs
@@ -44,7 +44,12 @@ async function build(argv) {
     const TARGET_DIR = path.dirname(argv.target);
     const TARGET_EXT = argv.target.split('.').pop();
     const TARGET_FILE_NAME = path.basename(argv.target, `.${TARGET_EXT}`);
-    const TARGET_TYPE = TARGET_EXT === 'wasm' ? 'STANDALONE' : TARGET_EXT === 'base64' ? 'ENCLAVED' : undefined;
+
+    if(!["wasm", "base64"].includes(TARGET_EXT)){
+        throw new Error(`Unsupported target ${TARGET_EXT}, make sure target ends with .wasm or .base64`);
+    } 
+
+    const TARGET_TYPE = TARGET_EXT === 'wasm' ? 'STANDALONE' : 'ENCLAVED';
 
     const ROLLUP_TARGET = `${TARGET_DIR}/${TARGET_FILE_NAME}.js`;
     const QJSC_TARGET = `${TARGET_DIR}/${TARGET_FILE_NAME}.h`;
@@ -68,10 +73,8 @@ async function build(argv) {
         await createStandaloneMethodsHeaderFile(ROLLUP_TARGET);
         await createStandaloneWasmContract(QJSC_TARGET, STANDALONE_CONTRACT_TARGET);
         await wasiStubStandaloneContract(STANDALONE_CONTRACT_TARGET);
-    } else if (TARGET_TYPE === 'ENCLAVED') {
-        await createEnclavedContract(QJSC_TARGET, ENCLAVED_CONTRACT_TARGET);
     } else {
-        throw new Error('Unsupported target, make sure target ends with .wasm or .base64');
+        await createEnclavedContract(QJSC_TARGET, ENCLAVED_CONTRACT_TARGET);
     }
 }
 
