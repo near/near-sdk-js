@@ -6,28 +6,7 @@ import {
     LookupMap
 } from 'near-sdk-js'
 import { Serializer } from 'superserial';
-
-class House {
-    constructor(name, rooms) {
-        this.name = name
-        this.rooms = rooms
-    }
-
-    describe() {
-        return `house ${this.name} has ${this.rooms.length} rooms. `
-    }
-}
-
-class Room {
-    constructor(name, size) {
-        this.name = name
-        this.size = size
-    }
-
-    describe() {
-        return `room ${this.name} is ${this.size}.`
-    }
-}
+import {House, Room} from './model.js';
 
 @NearBindgen
 class LookupMapTestContract extends NearContract {

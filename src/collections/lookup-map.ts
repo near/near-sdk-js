@@ -1,14 +1,12 @@
 import * as near from '../api'
-import { Bytes } from '../utils';
+import { Bytes, ClassMap } from '../utils';
 import { Serializer } from 'superserial';
 
 export class LookupMap<K, V> {
     readonly keyPrefix: Bytes;
     readonly serializer: Serializer;
 
-    constructor(keyPrefix: Bytes, classes?: {
-        [className: string]: ((new (...args: any[]) => any) | Function);
-    }) {
+    constructor(keyPrefix: Bytes, classes?: ClassMap) {
         this.keyPrefix = keyPrefix
         this.serializer = new Serializer({classes})
     }
