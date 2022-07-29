@@ -12,6 +12,9 @@ test.beforeEach(async (t) => {
     const ft = await root.devDeploy(
         './build/fungible-token.wasm',
     );
+    const xcc = await root.devDeploy(
+        './build/fungible-token-helper.wasm',
+    );
 
     // Init the contracts
     await ft.call(ft, 'init', { prefix: 'a', totalSupply: '1000' });
