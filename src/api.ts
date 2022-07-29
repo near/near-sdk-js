@@ -258,8 +258,7 @@ export function input(): Bytes {
 }
 
 export function storageUsage(): BigInt {
-  env.storageUsage(0);
-  return env.storage_usage(0);
+  return env.storage_usage();
 }
 
 export function accountBalance(): BigInt {
@@ -447,4 +446,8 @@ export function storageRemove(key: Bytes): boolean {
     return true;
   }
   return false;
+}
+
+export function storageByteCost(): BigInt {
+  return 10_000_000_000_000_000_000n;
 }

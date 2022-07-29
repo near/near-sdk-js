@@ -14,8 +14,7 @@ test.beforeEach(async t => {
     const root = worker.rootAccount;
 
     // Deploy the test contract.
-    const unorderedSetContract = await root.createAndDeploy(
-        root.getSubAccount('test-contract').accountId,
+    const unorderedSetContract = await root.devDeploy(
         'build/unordered-set.wasm',
     );
     await unorderedSetContract.call(unorderedSetContract, 'init', {});

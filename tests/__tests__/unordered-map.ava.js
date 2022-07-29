@@ -14,8 +14,7 @@ test.beforeEach(async t => {
     const root = worker.rootAccount;
 
     // Deploy the test contract.
-    const unorderedMapContract = await root.createAndDeploy(
-        root.getSubAccount('test-contract').accountId,
+    const unorderedMapContract = await root.devDeploy(
         'build/unordered-map.wasm',
     );
     await unorderedMapContract.call(unorderedMapContract, 'init', {});
