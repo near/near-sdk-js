@@ -1,42 +1,37 @@
 import * as near from '../api'
 import { Bytes } from '../utils';
 
-export class LookupMap {
+export class LookupMap<V> {
     readonly keyPrefix: Bytes;
 
     constructor(keyPrefix: Bytes) {
         this.keyPrefix = keyPrefix
     }
 
+    insert(key: Bytes, value: V): Bytes | null {
+        const storageKey = this.keyPrefix + key
+        if (near.storageWrite(storageKey, JSON.stringify(value))) {
+            return near.storageGetEvicted()
+        }
+        return null
+    }
+
     containsKey(key: Bytes): boolean {
-        let storageKey = this.keyPrefix + key
+        const storageKey = this.keyPrefix + key
         return near.storageHasKey(storageKey)
     }
 
-    get(key: Bytes): Bytes | null {
-        let storageKey = this.keyPrefix + key
-        return near.storageRead(storageKey)
+    get(key: Bytes): V | null {
+        const storageKey = this.keyPrefix + key
+        return JSON.parse(near.storageRead(storageKey)) as V
     }
 
     remove(key: Bytes): Bytes | null {
-        let storageKey = this.keyPrefix + key
+        const storageKey = this.keyPrefix + key
         if (near.storageRemove(storageKey)) {
             return near.storageGetEvicted()
         }
         return null
     }
 
-    set(key: Bytes, value: Bytes): Bytes | null {
-        let storageKey = this.keyPrefix + key
-        if (near.storageWrite(storageKey, value)) {
-            return near.storageGetEvicted()
-        }
-        return null
-    }
-
-    extend(kvs: [Bytes, Bytes][]) {
-        for(let kv of kvs) {
-            this.set(kv[0], kv[1])
-        }
-    }
 }
