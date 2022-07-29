@@ -1399,13 +1399,6 @@ strip-ansi@^7.0.1:
   dependencies:
     ansi-regex "^6.0.1"
 
-
-
-@^0.3.0:
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/superserial/-/superserial-0.3.0.tgz#9bed3a49461cf714e789ccad01722ee2242126e6"
-  integrity sha512-whx28H+uq/0eIoCkLVpRRhpBqjHTfdzugiNv0mIJicBNdm9Z5qKcs9yDx0hvOtL7+JiYKYamxPUO0EWGxAAZBw==
-
 supertap@^3.0.1:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/supertap/-/supertap-3.0.1.tgz#aa89e4522104402c6e8fe470a7d2db6dc4037c6a"
