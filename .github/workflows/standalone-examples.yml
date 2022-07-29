@@ -12,7 +12,7 @@ jobs:
         with:
           node-version: "16"
       - name: Install dependencies
-        run: cd examples && yarn
+        run: yarn && cd examples && yarn
       - name: clean-state
         run: cd examples && yarn build:clean-state && yarn test:clean-state
       - name: counter
