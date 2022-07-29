@@ -13,9 +13,9 @@ import { rollup } from 'rollup';
 
 import { executeCommand } from './utils.js';
 
-const PROJECT_DIR = `../../../`;
+const PROJECT_DIR = process.cwd();
 const NEAR_SDK_JS = 'node_modules/near-sdk-js';
-
+const TSC = 'node_modules/.bin/tsc';
 const QJSC_DIR = `${NEAR_SDK_JS}/cli/deps/quickjs`;
 const QJSC = `${NEAR_SDK_JS}/cli/deps/qjsc`;
 
@@ -40,6 +40,7 @@ yargs(hideBin(process.argv))
 
 async function build(argv) {
     const SOURCE_FILE_WITH_PATH = argv.source;
+    const SOURCE_EXT = argv.source.split('.').pop();
     const TARGET_DIR = path.dirname(argv.target);
     const TARGET_EXT = argv.target.split('.').pop();
     const TARGET_FILE_NAME = path.basename(argv.target, `.${TARGET_EXT}`);
@@ -57,6 +58,10 @@ async function build(argv) {
 
     console.log(`Building ${SOURCE_FILE_WITH_PATH} contract...`);
 
+    if (SOURCE_EXT === 'ts') {
+        await checkTsBuildWithTsc(SOURCE_FILE_WITH_PATH);
+    }
+
     console.log(`Creating ${TARGET_DIR} directory...`);
     await executeCommand(`mkdir -p ${TARGET_DIR}`);
 
@@ -71,6 +76,11 @@ async function build(argv) {
     } else {
         await createEnclavedContract(QJSC_TARGET, ENCLAVED_CONTRACT_TARGET);
     }
+}
+
+async function checkTsBuildWithTsc(sourceFileWithPath) {
+    console.log(`check TypeScript build of ${sourceFileWithPath} with tsc`)
+    await executeCommand(`${TSC} --noEmit --experimentalDecorators --target es5 ${sourceFileWithPath}`);
 }
 
 // Common build function

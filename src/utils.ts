@@ -40,3 +40,11 @@ function checkStringIsBytes(str: string) {
   }
   return str;
 }
+
+export function assert(b: boolean, str: string) {
+  if (b) {
+      return
+  } else {
+      throw Error("assertion failed: " + str)
+  }
+}
