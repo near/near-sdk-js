@@ -4,11 +4,29 @@ class CarSpecs {
     id: number;
     color: string;
     price: number;
+    engine: Engine;
 
-    constructor(id: number, color: string, price: number) {
+    constructor(id: number, color: string, price: number, engine: Engine) {
         this.id = id;
         this.color = color;
         this.price = price;
+        this.engine = engine as Engine;
+    }
+}
+
+class Engine {
+    hp: number;
+  
+    constructor(hp: number) {
+      this.hp = hp;
+    }
+
+    run(): string {
+        if (this.hp > 400) {
+            return "boom"
+        } else {
+            return "zoom"
+        }
     }
 }
 
@@ -20,8 +38,12 @@ class ParkingLot extends NearContract {
         this.cars = new LookupMap<CarSpecs>('a');
     }
 
+    deserialize() {
+        this.cars = new LookupMap<CarSpecs>('a');
+    }
+
     @call
-    addCar({ name }: { name: string }, { specs }: { specs: CarSpecs }) {
+    addCar({ name, specs }: { name: string, specs: CarSpecs }) {
         near.log(`addCar() called, name: ${name}, specs: ${JSON.stringify(specs)}`)
         this.cars.insert(name, specs)
     }
@@ -35,7 +57,13 @@ class ParkingLot extends NearContract {
     @view
     getCarSpecs({ name }: { name: string }) {
         near.log(`getCarSpecs() called, name: ${name}`)
-        this.cars.get(name)
+        return this.cars.get(name)
+    }
+
+    @view
+    runCar({name}: {name: string}) {
+        let car = this.cars.get(name)
+        return car.engine.run()
     }
 }
 

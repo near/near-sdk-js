@@ -37,15 +37,37 @@ test('Can get the car after adding it', async t => {
     const bmwSpecs = {
         id: 1,
         color: 'Black',
-        price: 100500
+        price: 100500,
+        engine: {hp: 500},
     };
     
-    ali.call(parkingLot, 'addCar', {
+    await ali.call(parkingLot, 'addCar', {
         name: 'BMW',
         specs: bmwSpecs
     });
 
-    t.is(
+    t.deepEqual(
         await parkingLot.view('getCarSpecs', { name: 'BMW' }), bmwSpecs
     );
+
 });
+
+test('Can run the car after adding it', async t => {
+    const { ali, parkingLot } = t.context.accounts;
+
+    const bmwSpecs = {
+        id: 1,
+        color: 'Black',
+        price: 100500,
+        engine: {hp: 500},
+    };
+    
+    await ali.call(parkingLot, 'addCar', {
+        name: 'BMW',
+        specs: bmwSpecs
+    });
+
+    t.is(await parkingLot.view('runCar', {name: 'BMW'}), 'boom');
+});
+
+
