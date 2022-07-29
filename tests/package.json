@@ -5,6 +5,7 @@
     "main": "index.js",
     "type": "module",
     "scripts": {
+        "postinstall": "cd .. && yarn link && cd tests && yarn link near-sdk-js",
         "build": "yarn build:context-api && yarn build:math-api && yarn build:storage-api && yarn build:log-panic-api && yarn build:promise-api && yarn build:promise-batch-api && yarn build:function-params && yarn build:lookup-map && yarn build:lookup-set && yarn build:unordered-map && yarn build:unordered-set && yarn build:vector && yarn build:bytes",
         "build:context-api": "near-sdk-js build src/context_api.js build/context_api.wasm",
         "build:math-api": "near-sdk-js build src/math_api.js build/math_api.wasm",
@@ -19,7 +20,6 @@
         "build:unordered-set": "near-sdk-js build src/unordered-set.js build/unordered-set.wasm",
         "build:vector": "near-sdk-js build src/vector.js build/vector.wasm",
         "build:bytes": "near-sdk-js build src/bytes.js build/bytes.wasm",
-        "rebuild": "cd .. && yarn build && cd tests && rm -rf node_modules && rm -rf build && yarn && yarn build",
         "test": "ava",
         "test:context-api": "ava __tests__/test_context_api.ava.js",
         "test:math-api": "ava __tests__/test_math_api.ava.js",
@@ -36,9 +36,6 @@
     },
     "author": "Near Inc <hello@nearprotocol.com>",
     "license": "Apache-2.0",
-    "dependencies": {
-        "near-sdk-js": "file:../"
-    },
     "devDependencies": {
         "ava": "^4.2.0",
         "near-workspaces": "3.1.0"

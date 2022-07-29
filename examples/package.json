@@ -5,8 +5,8 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
+    "postinstall": "cd .. && yarn link && cd examples && yarn link near-sdk-js",
     "build": "yarn build:clean-state && yarn build:counter && yarn build:counter-lowlevel && yarn build:counter-ts && yarn build:cross-contract-call && yarn build:fungible-token-lockable && yarn build:fungible-token && yarn build:non-fungible-token && yarn build:status-message-collections && yarn build:status-message && yarn build:parking-lot",
-    "rebuild": "cd .. && yarn build && cd examples && rm -rf node_modules && rm -rf build && yarn && yarn build",
     "build:status-message": "near-sdk-js build src/status-message.js build/status-message.wasm",
     "build:clean-state": "near-sdk-js build src/clean-state.js build/clean-state.wasm",
     "build:counter": "near-sdk-js build src/counter.js build/counter.wasm",
