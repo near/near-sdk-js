@@ -1,9 +1,11 @@
-import { Bytes } from '../utils';
-export declare class LookupSet {
+import { Bytes, ClassMap } from '../utils';
+import { Serializer } from 'superserial';
+export declare class LookupSet<K> {
     readonly keyPrefix: Bytes;
-    constructor(keyPrefix: Bytes);
-    contains(key: Bytes): boolean;
-    remove(key: Bytes): string;
-    set(key: Bytes): string;
-    extend(keys: Bytes[]): void;
+    readonly serializer: Serializer;
+    constructor(keyPrefix: Bytes, classes?: ClassMap);
+    contains(key: K): boolean;
+    remove(key: K): boolean;
+    set(key: K): boolean;
+    extend(keys: K[]): void;
 }
