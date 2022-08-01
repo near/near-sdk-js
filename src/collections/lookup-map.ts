@@ -42,7 +42,7 @@ export class LookupMap<K, V> {
         return null
     }
 
-    extend(objects: [any, any][]) {
+    extend(objects: [K, V][]) {
         for(let kv of objects) {
             this.set(kv[0], kv[1])
         }
