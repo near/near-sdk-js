@@ -1,5 +1,6 @@
 import { NearContract, NearBindgen, near, call, view } from 'near-sdk-js'
 import { isUndefined } from 'lodash-es'
+import { log } from './log'
 
 @NearBindgen
 class Counter extends NearContract {
@@ -25,7 +26,8 @@ class Counter extends NearContract {
         } else {
             this.count -= n
         }
-        near.log(`Counter decreased to ${this.count}`)
+        // this is to illustrate import a local ts module
+        log(`Counter decreased to ${this.count}`)
     }
 
     @view
