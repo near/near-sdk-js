@@ -13,18 +13,11 @@ test.beforeEach(async t => {
     // Prepare sandbox for tests, create accounts, deploy contracts, etx.
     const root = worker.rootAccount;
 
-    // Deploy the jsvm contract.
-    const jsvm = await root.createAndDeploy(
-        root.getSubAccount('jsvm').accountId,
-        '../res/jsvm.wasm',
+    // Deploy the test contract.
+    const lookupSetContract = await root.devDeploy(
+        'build/lookup-set.wasm',
     );
-
-    // Deploy test JS contract
-    const testContract = await root.createSubAccount('test-contract');
-    let contract_base64 = (await readFile('build/lookup-set.base64')).toString();
-    await testContract.call(jsvm, 'deploy_js_contract', Buffer.from(contract_base64, 'base64'), { attachedDeposit: '400000000000000000000000' });
-    await testContract.call(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'init', {}), { attachedDeposit: '400000000000000000000000' });
-
+    await lookupSetContract.call(lookupSetContract, 'init', {});
     // Test users
     const ali = await root.createSubAccount('ali');
     const bob = await root.createSubAccount('bob');
@@ -32,7 +25,7 @@ test.beforeEach(async t => {
 
     // Save state for test runs
     t.context.worker = worker;
-    t.context.accounts = { root, jsvm, testContract, ali, bob, carl };
+    t.context.accounts = { root, lookupSetContract, ali, bob, carl };
 });
 
 test.afterEach(async t => {
@@ -42,56 +35,70 @@ test.afterEach(async t => {
 });
 
 test('LookupSet set() contains()', async t => {
-    const { ali, jsvm, testContract } = t.context.accounts;
+    const { ali, lookupSetContract } = t.context.accounts;
     t.is(
-        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'contains', { key: 'hello' })),
+        await lookupSetContract.view('contains', { key: 'hello' }),
         false
     );
 
-    await ali.call(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'set', { key: 'hello' }), { attachedDeposit: '100000000000000000000000' });
+    await ali.call(lookupSetContract, 'set', { key: 'hello' });
 
     t.is(
-        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'contains', { key: 'hello' })),
+        await lookupSetContract.view('contains', { key: 'hello' }),
         true
     );
 });
 
 
 test('LookupSet remove', async t => {
-    const { ali, jsvm, testContract } = t.context.accounts;
+    const { ali, lookupSetContract } = t.context.accounts;
 
-    await ali.call(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'set', { key: 'hello' }), { attachedDeposit: '100000000000000000000000' });
-    await ali.call(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'set', { key: 'hello1' }), { attachedDeposit: '100000000000000000000000' });
+    await ali.call(lookupSetContract, 'set', { key: 'hello' });
+    await ali.call(lookupSetContract, 'set', { key: 'hello1' });
 
     // remove non existing element should not error
-    await ali.call(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'remove', { key: 'hello3' }), { attachedDeposit: '100000000000000000000000' });
+    await ali.call(lookupSetContract, 'remove_key', { key: 'hello3' });
     // remove existing key should work
-    await ali.call(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'remove', { key: 'hello1' }));
+    await ali.call(lookupSetContract, 'remove_key', { key: 'hello1' });
     t.is(
-        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'contains', { key: 'hello1' })),
+        await lookupSetContract.view('contains', { key: 'hello1' }),
         false
     );
     // not removed key should not affected
     t.is(
-        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'contains', { key: 'hello' })),
+        await lookupSetContract.view('contains', { key: 'hello' }),
         true
     );
 });
 
 test('LookupSet extend', async t => {
-    const { ali, jsvm, testContract } = t.context.accounts;
+    const { ali, lookupSetContract } = t.context.accounts;
 
-    await ali.call(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'extend', { keys: ['hello', 'world', 'hello1'] }), { attachedDeposit: '100000000000000000000000' });
+    await ali.call(lookupSetContract, 'extend', { keys: ['hello', 'world', 'hello1'] });
     t.is(
-        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'contains', { key: 'hello' })),
+        await lookupSetContract.view('contains', { key: 'hello' }),
         true
     );
     t.is(
-        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'contains', { key: 'hello1' })),
+        await lookupSetContract.view('contains', { key: 'hello1' }),
         true
     );
     t.is(
-        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'contains', { key: 'world' })),
+        await lookupSetContract.view('contains', { key: 'world' }),
+        true
+    );
+})
+
+test('Add and check exist of object', async t => {
+    const { ali, lookupSetContract } = t.context.accounts;
+    let houseSpec = {name: "a", rooms: [{name: "bedroom", size: "300sqft"}]}
+    t.is(
+        await lookupSetContract.view('house_exist', houseSpec),
+        false
+    );
+    await ali.call(lookupSetContract, 'add_house', houseSpec);
+    t.is(
+        await lookupSetContract.view('house_exist', houseSpec),
         true
     );
 })

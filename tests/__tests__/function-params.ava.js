@@ -6,24 +6,18 @@ function encodeCall(contract, method, args) {
     return Buffer.concat([Buffer.from(contract), Buffer.from([0]), Buffer.from(method), Buffer.from([0]), Buffer.from(JSON.stringify(args))])
 }
 
-test.beforeEach(async t => {
+test.before(async t => {
     // Init the worker and start a Sandbox server
     const worker = await Worker.init();
 
     // Prepare sandbox for tests, create accounts, deploy contracts, etx.
     const root = worker.rootAccount;
 
-    // Deploy the jsvm contract.
-    const jsvm = await root.createAndDeploy(
-        root.getSubAccount('jsvm').accountId,
-        '../res/jsvm.wasm',
+    // Deploy the test contract.
+    const functionParamsContract = await root.devDeploy(
+        'build/function-params.wasm',
     );
-
-    // Deploy test JS contract
-    const testContract = await root.createSubAccount('test-contract');
-    let contract_base64 = (await readFile('build/function-params.base64')).toString();
-    await testContract.call(jsvm, 'deploy_js_contract', Buffer.from(contract_base64, 'base64'), { attachedDeposit: '400000000000000000000000' });
-    await testContract.call(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'init', {}), { attachedDeposit: '400000000000000000000000' });
+    await functionParamsContract.call(functionParamsContract, 'init', {});
 
     // Test users
     const ali = await root.createSubAccount('ali');
@@ -32,23 +26,18 @@ test.beforeEach(async t => {
 
     // Save state for test runs
     t.context.worker = worker;
-    t.context.accounts = { root, jsvm, testContract, ali, bob, carl };
+    t.context.accounts = { root, functionParamsContract, ali, bob, carl };
 });
 
-test.afterEach(async t => {
+test.after(async t => {
     await t.context.worker.tearDown().catch(error => {
         console.log('Failed to tear down the worker:', error);
     });
 });
 
-
-test('Developer can pass parameters as dictionary', async t => {
-    const { ali, jsvm, testContract } = t.context.accounts;
-
-    await ali.call(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'set_values', { param1: 'newVal1', param2: 'newVal2', param3: 'newVal3' }), { attachedDeposit: '100000000000000000000000' });
-
-    t.deepEqual(
-        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'get_values', {})),
-        { val3: 'newVal3', val2: 'newVal2', val1: 'newVal1' }
-    );
+test('get current account id correct', async t => {
+    const { ali, functionParamsContract } = t.context.accounts;
+    await ali.call(functionParamsContract, 'set_values', { param1: 'newVal1', param2: 'newVal2', param3: 'newVal3' });
+    let values = await functionParamsContract.view('get_values', '');
+    t.deepEqual(values,  { val3: 'newVal3', val2: 'newVal2', val1: 'newVal1' });
 });

@@ -4,16 +4,10 @@ import {
     call,
     view,
     near,
-    LookupMap
+    LookupMap,
+    assert
 } from 'near-sdk-js'
-
-function assert(b, str) {
-    if (b) {
-        return
-    } else {
-        throw Error("assertion failed: " + str)
-    }
-}
+import { Serializer } from 'superserial'
 
 @NearBindgen
 class FungibleToken extends NearContract {
@@ -27,6 +21,7 @@ class FungibleToken extends NearContract {
 
     deserialize() {
         super.deserialize()
+        this.accounts.serializer = new Serializer()
         this.accounts = Object.assign(new LookupMap, this.accounts)
     }
 
@@ -64,11 +59,11 @@ class FungibleToken extends NearContract {
     @call
     ftTransferCall({ receiverId, amount, memo, msg }) {
         let senderId = near.predecessorAccountId()
-        this.internalTransfer({ senderId, receiverId, amount, memo })
-        let onTransferRet = near.jsvmCall(receiverId, 'ftOnTransfer', { senderId, amount, msg, receiverId })
-        // In JS, do not need a callback, ftResolveTransfer after ftOnTransfer Returns
-        // If any logic after ftOnTransfer Returns is required, just do it on onTransferRet.
-        return onTransferRet
+        this.internalTransfer({ senderId, receiverId, amount, memo });
+        const promise = near.promiseBatchCreate(receiverId);
+        const params = { senderId: senderId, amount: amount, msg: msg, receiverId: receiverId };
+        near.promiseBatchActionFunctionCall(promise, 'ftOnTransfer', JSON.stringify(params), 0, 30000000000000);        
+        return near.promiseReturn();
     }
 
     @view

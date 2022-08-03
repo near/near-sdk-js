@@ -5,17 +5,19 @@ import {
     view,
     LookupSet
 } from 'near-sdk-js'
+import { Serializer } from 'superserial';
+import { House, Room } from './model.js';
 
 @NearBindgen
 class LookupSetTestContract extends NearContract {
     constructor() {
         super()
-        this.lookupSet = new LookupSet('a');
+        this.lookupSet = new LookupSet('a', {House, Room});
     }
 
     deserialize() {
         super.deserialize();
-        this.lookupSet = Object.assign(new LookupSet, this.lookupSet);
+        this.lookupSet = new LookupSet('a', {House, Room});
     }
 
     @view
@@ -29,13 +31,31 @@ class LookupSetTestContract extends NearContract {
     }
 
     @call
-    remove({key}) {
+    remove_key({key}) {
         this.lookupSet.remove(key);
     }
 
     @call
     extend({keys}) {
         this.lookupSet.extend(keys);
+    }
+
+    @call
+    add_house({name, rooms}) {
+        let house = new House(name, [])
+        for (let r of rooms) {
+            house.rooms.push(new Room(r.name, r.size))
+        }
+        this.lookupSet.set(house)
+    }
+
+    @view
+    house_exist({name, rooms}) {
+        let house = new House(name, [])
+        for (let r of rooms) {
+            house.rooms.push(new Room(r.name, r.size))
+        }
+        return this.lookupSet.contains(house)
     }
 }
 

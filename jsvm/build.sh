@@ -2,10 +2,10 @@
 set -euo pipefail
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-WASI_SDK_PATH=${SCRIPT_DIR}/vendor/wasi-sdk-11.0
+WASI_SDK_PATH=${SCRIPT_DIR}/../vendor/wasi-sdk-11.0
 CC="${WASI_SDK_PATH}/bin/clang --sysroot=${WASI_SDK_PATH}/share/wasi-sysroot"
 QUICKJS_SRC_DIR=${SCRIPT_DIR}/../quickjs
-WASI_STUB=${SCRIPT_DIR}/vendor/binaryen/wasi-stub/run.sh
+WASI_STUB=${SCRIPT_DIR}/../vendor/binaryen/wasi-stub/run.sh
 TARGET_NAME=jsvm
 
 DEFS='-D_GNU_SOURCE -DCONFIG_VERSION="2021-03-27" -DCONFIG_BIGNUM'
@@ -21,7 +21,7 @@ fi
 set -u
 TARGET_NAME+='.wasm'
 
-INCLUDES="-I${SCRIPT_DIR}/stubs -I${QUICKJS_SRC_DIR} -I."
+INCLUDES="-I${QUICKJS_SRC_DIR} -I."
 LIBS='-lm'
 QUICKJS_SOURCES=(quickjs.c libregexp.c libunicode.c cutils.c quickjs-libc-min.c libbf.c)
 SOURCES="${SCRIPT_DIR}/jsvm.c"
@@ -40,3 +40,6 @@ $CC --target=wasm32-wasi \
     -o ${TARGET_NAME}
 
 ${WASI_STUB} ${TARGET_NAME} >/dev/null
+
+mkdir -p build
+mv ${TARGET_NAME} build
