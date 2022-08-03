@@ -89,7 +89,9 @@ async function createJsFileWithRullup(sourceFileWithPath, rollupTarget) {
     const bundle = await rollup({
         input: sourceFileWithPath,
         plugins: [
-            nodeResolve(),
+            nodeResolve({
+                extensions: ['.js', '.ts']
+            }),
             sourcemaps(),
             // commonjs(),
             babel({ babelHelpers: 'bundled', extensions: ['.ts', '.js', '.jsx', '.es6', '.es', '.mjs'] })

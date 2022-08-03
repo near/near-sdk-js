@@ -59,7 +59,9 @@ test('Decrease works', async t => {
     let result = await counter.view('getCount', {});
     t.is(result, -1);
 
-    await bob.call(counter, 'decrease', { n: 4 });
+    let dec = await bob.callRaw(counter, 'decrease', { n: 4 });
+    // ensure imported log does work, not silent failure
+    t.is(dec.result.receipts_outcome[0].outcome.logs[0], "Counter decreased to -5")
     result = await counter.view('getCount', {});
     t.is(result, -5);
 });
