@@ -467,7 +467,7 @@ npm install near-sdk-js
 
 It is tested on Ubuntu 20.04, Intel Mac and M1 Mac. Other linux should also work but they're not tested.
 
-1. Make sure you have `wget`, `make`, `cmake` and `nodejs`. On Linux, also make sure you have `gcc`.
+1. Make sure you have `curl`, `make`, `cmake` and `nodejs`. On Linux, also make sure you have `gcc`.
 2. Run `make` to get platform specific `qjsc` and `jsvm` contract in `res` folder.
 
 
