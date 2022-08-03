@@ -59,4 +59,11 @@ class LookupMapTestContract extends NearContract {
         // if and only if house and room is still of class House and Room, this would work:
         return house.describe() + room.describe()
     }
+
+    @call
+    store_and_get_utf16_string() {
+        this.lookupMap.set('wave', '👋')
+        let wave = this.lookupMap.get('wave')
+        return wave.length
+    }
 }

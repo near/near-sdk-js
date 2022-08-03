@@ -120,3 +120,11 @@ test('LookupMap set get object', async t => {
     )
     
 })
+
+test('LookupMap set get unicode string', async t => {
+    const { ali, lookupMapContract } = t.context.accounts;
+    t.is(
+        await ali.call(lookupMapContract, 'store_and_get_utf16_string', {}),
+        2 // two utf-16 character
+    );
+});
