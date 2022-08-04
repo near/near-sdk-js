@@ -31,4 +31,13 @@ export class LookupSet {
             this.set(key)
         }
     }
+
+    serialize(): string {
+        return JSON.stringify(this)
+    }
+
+    // converting plain object to class object
+    static deserialize(data: LookupSet): LookupSet {
+        return new LookupSet(data.keyPrefix)
+    }
 }

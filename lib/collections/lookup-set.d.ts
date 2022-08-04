@@ -6,4 +6,6 @@ export declare class LookupSet {
     remove(key: Bytes): boolean;
     set(key: Bytes): boolean;
     extend(keys: Bytes[]): void;
+    serialize(): string;
+    static deserialize(data: LookupSet): LookupSet;
 }

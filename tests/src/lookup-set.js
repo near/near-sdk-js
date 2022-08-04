@@ -14,28 +14,32 @@ class LookupSetTestContract extends NearContract {
         this.lookupSet = new LookupSet('a');
     }
 
+    default() {
+        return new LookupSetTestContract();
+    }
+
     @view
-    contains({key}) {
+    contains({ key }) {
         return this.lookupSet.contains(key);
     }
 
     @call
-    set({key}) {
+    set({ key }) {
         this.lookupSet.set(key);
     }
 
     @call
-    remove_key({key}) {
+    remove_key({ key }) {
         this.lookupSet.remove(key);
     }
 
     @call
-    extend({keys}) {
+    extend({ keys }) {
         this.lookupSet.extend(keys);
     }
 
     @call
-    add_house({name, rooms}) {
+    add_house({ name, rooms }) {
         let house = new House(name, [])
         for (let r of rooms) {
             house.rooms.push(new Room(r.name, r.size))
@@ -44,7 +48,7 @@ class LookupSetTestContract extends NearContract {
     }
 
     @view
-    house_exist({name, rooms}) {
+    house_exist({ name, rooms }) {
         let house = new House(name, [])
         for (let r of rooms) {
             house.rooms.push(new Room(r.name, r.size))
