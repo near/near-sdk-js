@@ -1,5 +1,9 @@
 import { executeCommand } from './utils.js';
 
+async function download(url) {
+    await executeCommand(`curl -LOf ${url}`);
+}
+
 const OS = await executeCommand('uname -s', true);
 const RAW_ARCH = await executeCommand('uname -m', true);
 // This two names represent the same architecture
@@ -22,7 +26,7 @@ const BINARYEN_SYSTEM_NAME = OS === 'Linux' ? 'Linux' : OS === 'Darwin' ? 'macOS
 const BINARYEN_ARCH_NAME = ARCH === 'x86_64' ? 'X64' : ARCH === 'arm64' ? 'arm64' : 'other';
 const BINARYEN_TAR_NAME = `binaryen-${BINARYEN_SYSTEM_NAME}-${BINARYEN_ARCH_NAME}.tar.gz`;
 
-await executeCommand(`wget https://github.com/near/binaryen/releases/download/${BINARYEN_VERSION_TAG}/${BINARYEN_TAR_NAME}`);
+await download(`https://github.com/near/binaryen/releases/download/${BINARYEN_VERSION_TAG}/${BINARYEN_TAR_NAME}`);
 await executeCommand(`mkdir -p binaryen && tar xvf ${BINARYEN_TAR_NAME} --directory binaryen`);
 await executeCommand(`rm ${BINARYEN_TAR_NAME}`);
 
@@ -37,8 +41,8 @@ const QUICK_JS_TARGET_FOLDER_NAME = 'quickjs';
 const QUICK_JS_DOWNLOADED_NAME = `qjsc-${QUICK_JS_SYSTEM_NAME}-${QUICK_JS_ARCH_NAME}`
 const QUICK_JS_TARGET_NAME = 'qjsc';
 // Download QuickJS
-await executeCommand(`wget https://github.com/near/quickjs/releases/download/${QUICK_JS_VERSION_TAG}/qjsc-${QUICK_JS_SYSTEM_NAME}-${QUICK_JS_ARCH_NAME}`);
-await executeCommand(`wget https://github.com/near/quickjs/archive/refs/tags/${QUICK_JS_VERSION_TAG}.tar.gz`);
+await download(`https://github.com/near/quickjs/releases/download/${QUICK_JS_VERSION_TAG}/qjsc-${QUICK_JS_SYSTEM_NAME}-${QUICK_JS_ARCH_NAME}`);
+await download(`https://github.com/near/quickjs/archive/refs/tags/${QUICK_JS_VERSION_TAG}.tar.gz`);
 // Extract QuickJS
 await executeCommand(`tar xvf ${QUICK_JS_TAR_NAME}`);
 // Delete .tar file
@@ -58,7 +62,7 @@ const WASI_SDK_SYSTEM_NAME = OS === 'Linux' ? 'linux' : OS === 'Darwin' ? 'macos
 const WASI_SDK_TAR_NAME = `${WASI_SDK_DOWNLOADED_FOLDER_NAME}-${WASI_SDK_SYSTEM_NAME}.tar.gz`
 
 // Download WASI SDK
-await executeCommand(`wget https://github.com/WebAssembly/wasi-sdk/releases/download/wasi-sdk-${WASI_SDK_MAJOR_VER}/${WASI_SDK_TAR_NAME}`);
+await download(`https://github.com/WebAssembly/wasi-sdk/releases/download/wasi-sdk-${WASI_SDK_MAJOR_VER}/${WASI_SDK_TAR_NAME}`);
 // Extract WASI SDK
 await executeCommand(`tar xvf ${WASI_SDK_TAR_NAME}`);
 // Delete .tar file
