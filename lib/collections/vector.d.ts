@@ -14,6 +14,8 @@ export declare class Vector {
     [Symbol.iterator](): VectorIterator;
     clear(): void;
     toArray(): unknown[];
+    serialize(): string;
+    static deserialize(data: Vector): Vector;
 }
 export declare class VectorIterator {
     private current;

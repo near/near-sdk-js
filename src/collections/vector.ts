@@ -117,6 +117,17 @@ export class Vector {
     }
     return ret;
   }
+
+  serialize(): string {
+    return JSON.stringify(this)
+  }
+
+  // converting plain object to class object
+  static deserialize(data: Vector): Vector {
+    let vector = new Vector(data.prefix);
+    vector.length = data.length;
+    return vector;
+  }
 }
 
 export class VectorIterator {
