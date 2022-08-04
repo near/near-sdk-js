@@ -155,7 +155,7 @@ async function createStandaloneWasmContract(qjscTarget, standaloneContractTarget
 }
 
 async function wasiStubStandaloneContract(standaloneContractTarget) {
-    console.log(`Excecuting wasi-stub...`);
+    console.log(`Executing wasi-stub...`);
     const WASI_STUB = `${NEAR_SDK_JS}/cli/deps/binaryen/wasi-stub/run.sh`;
     await executeCommand(`${WASI_STUB} ${standaloneContractTarget} >/dev/null`);
 }
