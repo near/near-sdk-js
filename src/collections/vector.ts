@@ -1,6 +1,5 @@
 import * as near from "../api";
-import { Bytes, u8ArrayToBytes, ClassMap } from "../utils";
-import { Serializer } from 'superserial';
+import { Bytes, u8ArrayToBytes } from "../utils";
 
 const ERR_INDEX_OUT_OF_BOUNDS = "Index out of bounds";
 const ERR_INCONSISTENT_STATE =
@@ -15,15 +14,13 @@ function indexToKey(prefix: Bytes, index: number): Bytes {
 
 /// An iterable implementation of vector that stores its content on the trie.
 /// Uses the following map: index -> element
-export class Vector<E> {
+export class Vector {
   length: number;
   readonly prefix: Bytes;
-  readonly serializer: Serializer;
 
-  constructor(prefix: Bytes, classes?: ClassMap) {
+  constructor(prefix: Bytes) {
     this.length = 0;
     this.prefix = prefix;
-    this.serializer = new Serializer({classes})
   }
 
   len(): number {
@@ -34,18 +31,18 @@ export class Vector<E> {
     return this.length == 0;
   }
 
-  get(index: number): E | null {
+  get(index: number): unknown | null {
     if (index >= this.length) {
       return null;
     }
     let storageKey = indexToKey(this.prefix, index);
-    return this.serializer.deserialize(near.storageRead(storageKey));
+    return JSON.parse(near.storageRead(storageKey));
   }
 
   /// Removes an element from the vector and returns it in serialized form.
   /// The removed element is replaced by the last element of the vector.
   /// Does not preserve ordering, but is `O(1)`.
-  swapRemove(index: number): E | null {
+  swapRemove(index: number): unknown | null {
     if (index >= this.length) {
       throw new Error(ERR_INDEX_OUT_OF_BOUNDS);
     } else if (index + 1 == this.length) {
@@ -53,21 +50,21 @@ export class Vector<E> {
     } else {
       let key = indexToKey(this.prefix, index);
       let last = this.pop();
-      if (near.storageWrite(key, this.serializer.serialize(last))) {
-        return this.serializer.deserialize(near.storageGetEvicted());
+      if (near.storageWrite(key, JSON.stringify(last))) {
+        return JSON.parse(near.storageGetEvicted());
       } else {
         throw new Error(ERR_INCONSISTENT_STATE);
       }
     }
   }
 
-  push(element: E) {
+  push(element: unknown) {
     let key = indexToKey(this.prefix, this.length);
     this.length += 1;
-    near.storageWrite(key, this.serializer.serialize(element));
+    near.storageWrite(key, JSON.stringify(element));
   }
 
-  pop(): E | null {
+  pop(): unknown | null {
     if (this.isEmpty()) {
       return null;
     } else {
@@ -75,33 +72,33 @@ export class Vector<E> {
       let lastKey = indexToKey(this.prefix, lastIndex);
       this.length -= 1;
       if (near.storageRemove(lastKey)) {
-        return this.serializer.deserialize(near.storageGetEvicted());
+        return JSON.parse(near.storageGetEvicted());
       } else {
         throw new Error(ERR_INCONSISTENT_STATE);
       }
     }
   }
 
-  replace(index: number, element: E): E {
+  replace(index: number, element: unknown): unknown {
     if (index >= this.length) {
       throw new Error(ERR_INDEX_OUT_OF_BOUNDS);
     } else {
       let key = indexToKey(this.prefix, index);
-      if (near.storageWrite(key, this.serializer.serialize(element))) {
-        return this.serializer.deserialize(near.storageGetEvicted());
+      if (near.storageWrite(key, JSON.stringify(element))) {
+        return JSON.parse(near.storageGetEvicted());
       } else {
         throw new Error(ERR_INCONSISTENT_STATE);
       }
     }
   }
 
-  extend(elements: E[]) {
+  extend(elements: unknown[]) {
     for (let element of elements) {
       this.push(element);
     }
   }
 
-  [Symbol.iterator](): VectorIterator<E> {
+  [Symbol.iterator](): VectorIterator {
     return new VectorIterator(this);
   }
 
@@ -113,7 +110,7 @@ export class Vector<E> {
     this.length = 0;
   }
 
-  toArray(): E[] {
+  toArray(): unknown[] {
     let ret = [];
     for (let v of this) {
       ret.push(v);
@@ -122,15 +119,15 @@ export class Vector<E> {
   }
 }
 
-export class VectorIterator<E> {
+export class VectorIterator {
   private current: number;
-  private vector: Vector<E>;
-  constructor(vector: Vector<E>) {
+  private vector: Vector;
+  constructor(vector: Vector) {
     this.current = 0;
     this.vector = vector;
   }
 
-  next(): { value: E | null; done: boolean } {
+  next(): { value: unknown | null; done: boolean } {
     if (this.current < this.vector.len()) {
       let value = this.vector.get(this.current);
       this.current += 1;

@@ -1,21 +1,19 @@
-import { Bytes, ClassMap } from "../utils";
+import { Bytes } from "../utils";
 import { Vector } from "./vector";
-import { Serializer } from 'superserial';
-export declare class UnorderedSet<E> {
+export declare class UnorderedSet {
     readonly length: number;
     readonly elementIndexPrefix: Bytes;
-    readonly elements: Vector<E>;
-    readonly serializer: Serializer;
-    constructor(prefix: Bytes, classes?: ClassMap);
+    readonly elements: Vector;
+    constructor(prefix: Bytes);
     len(): number;
     isEmpty(): boolean;
     serializeIndex(index: number): string;
     deserializeIndex(rawIndex: Bytes): number;
-    contains(element: E): boolean;
-    set(element: E): boolean;
-    remove(element: E): boolean;
+    contains(element: unknown): boolean;
+    set(element: unknown): boolean;
+    remove(element: unknown): boolean;
     clear(): void;
     toArray(): Bytes[];
-    [Symbol.iterator](): import("./vector").VectorIterator<E>;
-    extend(elements: E[]): void;
+    [Symbol.iterator](): import("./vector").VectorIterator;
+    extend(elements: unknown[]): void;
 }

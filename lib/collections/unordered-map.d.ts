@@ -1,32 +1,30 @@
-import { Bytes, ClassMap } from "../utils";
+import { Bytes } from "../utils";
 import { Vector } from "./vector";
-import { Serializer } from 'superserial';
-export declare class UnorderedMap<K, V> {
+export declare class UnorderedMap {
     readonly length: number;
     readonly keyIndexPrefix: Bytes;
-    readonly keys: Vector<K>;
-    readonly values: Vector<V>;
-    readonly serializer: Serializer;
-    constructor(prefix: Bytes, classes?: ClassMap);
+    readonly keys: Vector;
+    readonly values: Vector;
+    constructor(prefix: Bytes);
     len(): number;
     isEmpty(): boolean;
     serializeIndex(index: number): Bytes;
     deserializeIndex(rawIndex: Bytes): number;
-    getIndexRaw(key: K): Bytes;
-    get(key: K): V | null;
-    set(key: K, value: V): V | null;
-    remove(key: K): V | null;
+    getIndexRaw(key: Bytes): Bytes;
+    get(key: Bytes): unknown | null;
+    set(key: Bytes, value: unknown): unknown | null;
+    remove(key: Bytes): unknown | null;
     clear(): void;
-    toArray(): [K, V][];
-    [Symbol.iterator](): UnorderedMapIterator<K, V>;
-    extend(kvs: [K, V][]): void;
+    toArray(): [Bytes, unknown][];
+    [Symbol.iterator](): UnorderedMapIterator;
+    extend(kvs: [Bytes, unknown][]): void;
 }
-declare class UnorderedMapIterator<K, V> {
+declare class UnorderedMapIterator {
     private keys;
     private values;
-    constructor(unorderedMap: UnorderedMap<K, V>);
+    constructor(unorderedMap: UnorderedMap);
     next(): {
-        value: [K | null, V | null];
+        value: [unknown | null, unknown | null];
         done: boolean;
     };
 }

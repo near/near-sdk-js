@@ -48,7 +48,3 @@ export function assert(b: boolean, str: string) {
       throw Error("assertion failed: " + str)
   }
 }
-
-export type ClassMap = {
-  [className: string]: ((new (...args: any[]) => any) | Function);
-};

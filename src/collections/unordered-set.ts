@@ -1,23 +1,20 @@
 import * as near from "../api";
-import { u8ArrayToBytes, bytesToU8Array, Bytes, ClassMap } from "../utils";
+import { u8ArrayToBytes, bytesToU8Array, Bytes } from "../utils";
 import { Vector } from "./vector";
-import { Serializer } from 'superserial';
 
 const ERR_INCONSISTENT_STATE =
   "The collection is an inconsistent state. Did previous smart contract execution terminate unexpectedly?";
 
-export class UnorderedSet<E> {
+export class UnorderedSet {
   readonly length: number;
   readonly elementIndexPrefix: Bytes;
-  readonly elements: Vector<E>;
-  readonly serializer: Serializer;
+  readonly elements: Vector;
 
-  constructor(prefix: Bytes, classes?: ClassMap) {
+  constructor(prefix: Bytes) {
     this.length = 0;
     this.elementIndexPrefix = prefix + "i";
     let elementsPrefix = prefix + "e";
-    this.elements = new Vector(elementsPrefix, classes);
-    this.serializer = new Serializer({classes});
+    this.elements = new Vector(elementsPrefix);
   }
 
   len(): number {
@@ -40,13 +37,13 @@ export class UnorderedSet<E> {
     return data[0];
   }
 
-  contains(element: E): boolean {
-    let indexLookup = this.elementIndexPrefix + this.serializer.serialize(element);
+  contains(element: unknown): boolean {
+    let indexLookup = this.elementIndexPrefix + JSON.stringify(element);
     return near.storageHasKey(indexLookup);
   }
 
-  set(element: E): boolean {
-    let indexLookup = this.elementIndexPrefix + this.serializer.serialize(element);
+  set(element: unknown): boolean {
+    let indexLookup = this.elementIndexPrefix + JSON.stringify(element);
     if (near.storageRead(indexLookup)) {
       return false;
     } else {
@@ -58,8 +55,8 @@ export class UnorderedSet<E> {
     }
   }
 
-  remove(element: E): boolean {
-    let indexLookup = this.elementIndexPrefix + this.serializer.serialize(element);
+  remove(element: unknown): boolean {
+    let indexLookup = this.elementIndexPrefix + JSON.stringify(element);
     let indexRaw = near.storageRead(indexLookup);
     if (indexRaw) {
       if (this.len() == 1) {
@@ -77,7 +74,7 @@ export class UnorderedSet<E> {
         // If the removed element was the last element from keys, then we don't need to
         // reinsert the lookup back.
         if (lastElement != element) {
-          let lastLookupElement = this.elementIndexPrefix + this.serializer.serialize(lastElement);
+          let lastLookupElement = this.elementIndexPrefix + JSON.stringify(lastElement);
           near.storageWrite(lastLookupElement, indexRaw);
         }
       }
@@ -90,7 +87,7 @@ export class UnorderedSet<E> {
 
   clear() {
     for (let element of this.elements) {
-      let indexLookup = this.elementIndexPrefix + this.serializer.serialize(element);
+      let indexLookup = this.elementIndexPrefix + JSON.stringify(element);
       near.storageRemove(indexLookup);
     }
     this.elements.clear();
@@ -108,7 +105,7 @@ export class UnorderedSet<E> {
     return this.elements[Symbol.iterator]();
   }
 
-  extend(elements: E[]) {
+  extend(elements: unknown[]) {
     for (let element of elements) {
       this.set(element);
     }
