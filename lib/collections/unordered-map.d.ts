@@ -2,6 +2,7 @@ import { Bytes } from "../utils";
 import { Vector } from "./vector";
 export declare class UnorderedMap {
     readonly length: number;
+    readonly prefix: Bytes;
     readonly keyIndexPrefix: Bytes;
     readonly keys: Vector;
     readonly values: Vector;
@@ -18,6 +19,8 @@ export declare class UnorderedMap {
     toArray(): [Bytes, unknown][];
     [Symbol.iterator](): UnorderedMapIterator;
     extend(kvs: [Bytes, unknown][]): void;
+    serialize(): string;
+    static deserialize(data: UnorderedMap): UnorderedMap;
 }
 declare class UnorderedMapIterator {
     private keys;

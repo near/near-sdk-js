@@ -15,6 +15,10 @@ class UnorderedMapTestContract extends NearContract {
         this.unorderedMap = new UnorderedMap('a');
     }
 
+    default() {
+        return new UnorderedMapTestContract();
+    }
+
     @view
     len() {
         return this.unorderedMap.len();
@@ -77,8 +81,10 @@ class UnorderedMapTestContract extends NearContract {
 
     @view
     get_house() {
-        let house = this.unorderedMap.get('house1')
-        let room = house.rooms[0]
+        const rawHouse = this.unorderedMap.get('house1')
+        const house = new House(rawHouse.name, rawHouse.rooms)
+        const rawRoom = house.rooms[0]
+        const room = new Room(rawRoom.name, rawRoom.size)
         return house.describe() + room.describe()
     }
 }

@@ -1,5 +1,5 @@
 import * as near from "../api";
-import { u8ArrayToBytes, bytesToU8Array, Bytes } from "../utils";
+import { u8ArrayToBytes, bytesToU8Array, Bytes, Mutable } from "../utils";
 import { Vector, VectorIterator } from "./vector";
 
 const ERR_INCONSISTENT_STATE =
@@ -7,12 +7,14 @@ const ERR_INCONSISTENT_STATE =
 
 export class UnorderedMap {
   readonly length: number;
+  readonly prefix: Bytes;
   readonly keyIndexPrefix: Bytes;
   readonly keys: Vector;
   readonly values: Vector;
 
   constructor(prefix: Bytes) {
     this.length = 0;
+    this.prefix = prefix;
     this.keyIndexPrefix = prefix + "i";
     let indexKey = prefix + "k";
     let indexValue = prefix + "v";
@@ -141,6 +143,26 @@ export class UnorderedMap {
     for (let [k, v] of kvs) {
       this.set(k, v);
     }
+  }
+
+  serialize(): string {
+    return JSON.stringify(this)
+  }
+
+  // converting plain object to class object
+  static deserialize(data: UnorderedMap): UnorderedMap {
+    // removing readonly modifier
+    type MutableUnorderedMap = Mutable<UnorderedMap>;
+    let map = new UnorderedMap(data.prefix) as MutableUnorderedMap;
+    // reconstruct UnorderedMap
+    map.length = data.length;
+    // reconstruct keys Vector
+    map.keys = new Vector(data.prefix + "k");
+    map.keys.length = data.keys.length;
+    // reconstruct values Vector
+    map.values = new Vector(data.prefix + "v");
+    map.values.length = data.values.length;
+    return map;
   }
 }
 
