@@ -49,7 +49,7 @@ export class LookupMap {
         return JSON.stringify(this)
     }
 
-    // converting plain object to LookupMap class object
+    // converting plain object to class object
     static deserialize(data: LookupMap): LookupMap {
         return new LookupMap(data.keyPrefix)
     }

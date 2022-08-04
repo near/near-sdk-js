@@ -14,6 +14,10 @@ class LookupMapTestContract extends NearContract {
         this.lookupMap = new LookupMap('a');
     }
 
+    default() {
+        return new LookupMapTestContract();
+    }
+
     @view
     get({key}) {
         return this.lookupMap.get(key);
@@ -46,10 +50,11 @@ class LookupMapTestContract extends NearContract {
 
     @view
     get_house() {
-        let house = this.lookupMap.get('house1')
-        let room = house.rooms[0]
-        // ensure the object's class is preserved
-        // if and only if house and room is still of class House and Room, this would work:
+        const houseObject = this.lookupMap.get('house1')
+        // restore class object from serialized data
+        const house = new House(houseObject.name, houseObject.rooms)
+        const roomObject = house.rooms[0]
+        const room = new Room(roomObject.name, roomObject.size) 
         return house.describe() + room.describe()
     }
 }
