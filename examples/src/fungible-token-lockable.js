@@ -5,9 +5,7 @@ import {
     view,
     near,
     LookupMap,
-    assert,
 } from 'near-sdk-js'
-import { Serializer } from 'superserial'
 
 class Account {
     constructor(balance, allowances, lockedBalances) {
@@ -61,12 +59,6 @@ class LockableFungibleToken extends NearContract {
         let ownerAccount = this.getAccount(ownerId)
         ownerAccount.balance = totalSupply
         this.setAccount(ownerId, ownerAccount)
-    }
-
-    deserialize() {
-        super.deserialize()
-        this.accounts.serializer = new Serializer({classes: {Account}});
-        this.accounts = Object.assign(new LookupMap, this.accounts)
     }
 
     getAccount(ownerId) {
