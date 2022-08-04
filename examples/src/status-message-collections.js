@@ -33,5 +33,9 @@ class StatusMessage extends NearContract {
         // used for test UnorderedMap
         return this.records.toArray()
     }
+
+    default() {
+        return new StatusMessage()
+    }
 }
 

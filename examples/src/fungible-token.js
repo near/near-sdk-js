@@ -68,4 +68,8 @@ class FungibleToken extends NearContract {
     ftBalanceOf({ accountId }) {
         return this.accounts.get(accountId) || '0'
     }
+
+    default() {
+        return new FungibleToken({ prefix: this.prefix, totalSupply: this.totalSupply })
+    }
 }

@@ -16,4 +16,8 @@ class CleanState extends NearContract {
     get({key}) {
         return near.storageRead(key)
     }
+
+    default() {
+        return new CleanState()
+    }
 }

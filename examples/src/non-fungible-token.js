@@ -85,4 +85,8 @@ class NftContract extends NearContract {
 
         return new Token(token_id, owner_id)
     }
+
+    default() {
+        return new NftContract({ owner_id: this.owner_id, owner_by_id_prefix: this.owner_by_id })
+    }
 }
