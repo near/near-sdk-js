@@ -38,10 +38,6 @@ class ParkingLot extends NearContract {
         this.cars = new LookupMap('a');
     }
 
-    default() {
-        return new ParkingLot()
-    }
-
     @call
     addCar({ name, id, color, price, engineHp }: { name: string, id: number, color: string, price: number, engineHp: number }) {
         // args can be json arguments only, they cannot be of a JS/TS class like following, unless override NearContract.deserializeArgs method.
@@ -71,5 +67,9 @@ class ParkingLot extends NearContract {
         let carSpecs = this.cars.get(name) as CarSpecs;
         let engine = new Engine(carSpecs.engine.hp)
         return engine.run()
+    }
+
+    default() {
+        return new ParkingLot()
     }
 }

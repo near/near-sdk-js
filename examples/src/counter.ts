@@ -11,11 +11,6 @@ class Counter extends NearContract {
         this.count = initial
     }
 
-    default() {
-        // TODO: checkif it works
-        return new Counter({ initial: this.count })
-    }
-
     @call
     increase({ n = 1 }: { n: number }) {
         this.count += n
@@ -38,6 +33,10 @@ class Counter extends NearContract {
     @view
     getCount(): number {
         return this.count
+    }
+
+    default() {
+        return new Counter({ initial: this.count })
     }
 }
 
