@@ -6,24 +6,13 @@ import {
     UnorderedMap,
     Vector
 } from 'near-sdk-js'
-import { Serializer } from 'superserial';
 import {House, Room} from './model.js';
 
 @NearBindgen
 class UnorderedMapTestContract extends NearContract {
     constructor() {
         super()
-        this.unorderedMap = new UnorderedMap('a', {House, Room});
-    }
-
-    deserialize() {
-        super.deserialize()
-        this.unorderedMap.keys.serializer = new Serializer({classes: {House, Room}})
-        this.unorderedMap.keys = Object.assign(new Vector, this.unorderedMap.keys)
-        this.unorderedMap.values.serializer = new Serializer({classes: {House, Room}})
-        this.unorderedMap.values = Object.assign(new Vector, this.unorderedMap.values)
-        this.unorderedMap.serializer = new Serializer({classes: {House, Room}})
-        this.unorderedMap = Object.assign(new UnorderedMap, this.unorderedMap)
+        this.unorderedMap = new UnorderedMap('a');
     }
 
     @view

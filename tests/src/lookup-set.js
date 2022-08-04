@@ -5,19 +5,13 @@ import {
     view,
     LookupSet
 } from 'near-sdk-js'
-import { Serializer } from 'superserial';
 import { House, Room } from './model.js';
 
 @NearBindgen
 class LookupSetTestContract extends NearContract {
     constructor() {
         super()
-        this.lookupSet = new LookupSet('a', {House, Room});
-    }
-
-    deserialize() {
-        super.deserialize();
-        this.lookupSet = new LookupSet('a', {House, Room});
+        this.lookupSet = new LookupSet('a');
     }
 
     @view

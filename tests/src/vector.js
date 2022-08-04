@@ -5,20 +5,13 @@ import {
     view,
     Vector
 } from 'near-sdk-js'
-import { Serializer } from 'superserial';
 import {House, Room} from './model.js';
 
 @NearBindgen
 class VectorTestContract extends NearContract {
     constructor() {
         super()
-        this.vector = new Vector('a', {House, Room});
-    }
-
-    deserialize() {
-        super.deserialize();
-        this.vector.serializer = new Serializer({classes: {House, Room}});
-        this.vector = Object.assign(new Vector, this.vector);
+        this.vector = new Vector('a');
     }
 
     @view

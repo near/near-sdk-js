@@ -4,24 +4,14 @@ import {
     call,
     view,
     UnorderedSet,
-    Vector
 } from 'near-sdk-js'
-import { Serializer } from 'superserial';
 import {House, Room} from './model.js';
 
 @NearBindgen
 class UnorderedSetTestContract extends NearContract {
     constructor() {
         super()
-        this.unorderedSet = new UnorderedSet('a', {House, Room});
-    }
-
-    deserialize() {
-        super.deserialize()
-        this.unorderedSet.elements.serializer = new Serializer({classes: {House, Room}})
-        this.unorderedSet.elements = Object.assign(new Vector, this.unorderedSet.elements)
-        this.unorderedSet.serializer = new Serializer({classes: {House, Room}})
-        this.unorderedSet = Object.assign(new UnorderedSet, this.unorderedSet)
+        this.unorderedSet = new UnorderedSet('a');
     }
 
     @view
