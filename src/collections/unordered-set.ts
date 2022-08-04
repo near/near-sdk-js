@@ -1,17 +1,20 @@
 import * as near from "../api";
 import { u8ArrayToBytes, bytesToU8Array, Bytes } from "../utils";
 import { Vector } from "./vector";
+import { Mutable } from "../utils";
 
 const ERR_INCONSISTENT_STATE =
   "The collection is an inconsistent state. Did previous smart contract execution terminate unexpectedly?";
 
 export class UnorderedSet {
   readonly length: number;
+  readonly prefix: Bytes;
   readonly elementIndexPrefix: Bytes;
   readonly elements: Vector;
 
   constructor(prefix: Bytes) {
     this.length = 0;
+    this.prefix = prefix;
     this.elementIndexPrefix = prefix + "i";
     let elementsPrefix = prefix + "e";
     this.elements = new Vector(elementsPrefix);
@@ -109,5 +112,23 @@ export class UnorderedSet {
     for (let element of elements) {
       this.set(element);
     }
+  }
+
+  serialize(): string {
+    return JSON.stringify(this)
+  }
+
+  // converting plain object to class object
+  static deserialize(data: UnorderedSet): UnorderedSet {
+    // removing readonly modifier
+    type MutableUnorderedSet = Mutable<UnorderedSet>;
+    let set = new UnorderedSet(data.prefix) as MutableUnorderedSet;
+    // reconstruct UnorderedSet
+    set.length = data.length;
+    // reconstruct Vector
+    let elementsPrefix = data.prefix + "e";
+    set.elements = new Vector(elementsPrefix);
+    set.elements.length = data.elements.length;
+    return set;
   }
 }

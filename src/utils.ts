@@ -48,3 +48,5 @@ export function assert(b: boolean, str: string) {
       throw Error("assertion failed: " + str)
   }
 }
+
+export type Mutable<T> = { -readonly [P in keyof T]: T[P] };

@@ -14,6 +14,10 @@ class UnorderedSetTestContract extends NearContract {
         this.unorderedSet = new UnorderedSet('a');
     }
 
+    default() {
+        return new UnorderedSetTestContract();
+    }
+
     @view
     len() {
         return this.unorderedSet.len();
@@ -46,7 +50,8 @@ class UnorderedSetTestContract extends NearContract {
 
     @view
     toArray() {
-        return this.unorderedSet.toArray();
+        const res = this.unorderedSet.toArray();
+        return res;
     }
 
     @call
