@@ -13,7 +13,7 @@ test.before(async t => {
         './build/status-message.wasm',
     );
     
-    // When we skip init the counter, default counter (specified by Counter.default()) will be used.  
+    // When we skip init the status message, default() will be used  
     // await statusMessage.call(statusMessage, 'init', {});
     
     // Create test users
