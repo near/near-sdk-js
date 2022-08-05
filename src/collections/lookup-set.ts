@@ -1,37 +1,43 @@
 import * as near from '../api'
-import { Bytes, ClassMap } from '../utils';
-import { Serializer } from 'superserial';
+import { Bytes } from '../utils';
 
-export class LookupSet<K> {
+export class LookupSet {
     readonly keyPrefix: Bytes;
-    readonly serializer: Serializer;
 
-    constructor(keyPrefix: Bytes, classes?: ClassMap) {
+    constructor(keyPrefix: Bytes) {
         this.keyPrefix = keyPrefix
-        this.serializer = new Serializer({classes})
     }
 
-    contains(key: K): boolean {
-        let storageKey = this.keyPrefix + this.serializer.serialize(key)
+    contains(key: Bytes): boolean {
+        let storageKey = this.keyPrefix + JSON.stringify(key)
         return near.storageHasKey(storageKey)
     }
-    
+
     // Returns true if the element was present in the set.
-    remove(key: K): boolean {
-        let storageKey = this.keyPrefix + this.serializer.serialize(key)
+    remove(key: Bytes): boolean {
+        let storageKey = this.keyPrefix + JSON.stringify(key)
         return near.storageRemove(storageKey)
     }
 
     // If the set did not have this value present, `true` is returned.
     // If the set did have this value present, `false` is returned.
-    set(key: K): boolean {
-        let storageKey = this.keyPrefix + this.serializer.serialize(key)
+    set(key: Bytes): boolean {
+        let storageKey = this.keyPrefix + JSON.stringify(key)
         return !near.storageWrite(storageKey, '')
     }
 
-    extend(keys: K[]) {
-        for(let key of keys) {
+    extend(keys: Bytes[]) {
+        for (let key of keys) {
             this.set(key)
         }
+    }
+
+    serialize(): string {
+        return JSON.stringify(this)
+    }
+
+    // converting plain object to class object
+    static deserialize(data: LookupSet): LookupSet {
+        return new LookupSet(data.keyPrefix)
     }
 }

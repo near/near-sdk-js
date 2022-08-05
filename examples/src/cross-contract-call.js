@@ -37,4 +37,8 @@ class OnCall extends NearContract {
         near.log(`Returning person on-call: ${this.personOnCall}`)
         return this.personOnCall
     }
+
+    default() {
+        return new OnCall({ statusMessageContract: '' })
+    }
 }

@@ -5,20 +5,17 @@ import {
     view,
     LookupMap
 } from 'near-sdk-js'
-import { Serializer } from 'superserial';
 import {House, Room} from './model.js';
 
 @NearBindgen
 class LookupMapTestContract extends NearContract {
     constructor() {
         super()
-        this.lookupMap = new LookupMap('a', {House, Room});
+        this.lookupMap = new LookupMap('a');
     }
 
-    deserialize() {
-        super.deserialize();
-        this.lookupMap.serializer = new Serializer({classes: {House, Room}})
-        this.lookupMap = Object.assign(new LookupMap, this.lookupMap);
+    default() {
+        return new LookupMapTestContract();
     }
 
     @view
@@ -53,10 +50,11 @@ class LookupMapTestContract extends NearContract {
 
     @view
     get_house() {
-        let house = this.lookupMap.get('house1')
-        let room = house.rooms[0]
-        // ensure the object's class is preserved
-        // if and only if house and room is still of class House and Room, this would work:
+        const houseObject = this.lookupMap.get('house1')
+        // restore class object from serialized data
+        const house = new House(houseObject.name, houseObject.rooms)
+        const roomObject = house.rooms[0]
+        const room = new Room(roomObject.name, roomObject.size) 
         return house.describe() + room.describe()
     }
 

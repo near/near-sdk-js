@@ -1,50 +1,56 @@
 import * as near from '../api'
-import { Bytes, ClassMap } from '../utils';
-import { Serializer } from 'superserial';
+import { Bytes } from '../utils';
 
-export class LookupMap<K, V> {
+export class LookupMap {
     readonly keyPrefix: Bytes;
-    readonly serializer: Serializer;
 
-    constructor(keyPrefix: Bytes, classes?: ClassMap) {
+    constructor(keyPrefix: Bytes) {
         this.keyPrefix = keyPrefix
-        this.serializer = new Serializer({classes})
     }
 
-    containsKey(key: K): boolean {
-        let storageKey = this.keyPrefix + this.serializer.serialize(key)
+    containsKey(key: Bytes): boolean {
+        let storageKey = this.keyPrefix + JSON.stringify(key)
         return near.storageHasKey(storageKey)
     }
 
-    get(key: K): V | null {
-        let storageKey = this.keyPrefix + this.serializer.serialize(key)
+    get(key: Bytes): unknown | null {
+        let storageKey = this.keyPrefix + JSON.stringify(key)
         let raw = near.storageRead(storageKey)
         if (raw !== null) {
-            return this.serializer.deserialize(raw)
+            return JSON.parse(raw)
         }
         return null
     }
 
-    remove(key: K): V | null {
-        let storageKey = this.keyPrefix + this.serializer.serialize(key)
+    remove(key: Bytes): unknown | null {
+        let storageKey = this.keyPrefix + JSON.stringify(key)
         if (near.storageRemove(storageKey)) {
-            return this.serializer.deserialize(near.storageGetEvicted())
+            return JSON.parse(near.storageGetEvicted())
         }
         return null
     }
 
-    set(key: K, value: V): V | null {
-        let storageKey = this.keyPrefix + this.serializer.serialize(key)
-        let storageValue = this.serializer.serialize(value)
+    set(key: Bytes, value: unknown): unknown | null {
+        let storageKey = this.keyPrefix + JSON.stringify(key)
+        let storageValue = JSON.stringify(value)
         if (near.storageWrite(storageKey, storageValue)) {
-            return this.serializer.deserialize(near.storageGetEvicted())
+            return JSON.parse(near.storageGetEvicted())
         }
         return null
     }
 
-    extend(objects: [K, V][]) {
-        for(let kv of objects) {
+    extend(objects: [Bytes, unknown][]) {
+        for (let kv of objects) {
             this.set(kv[0], kv[1])
         }
+    }
+
+    serialize(): string {
+        return JSON.stringify(this)
+    }
+
+    // converting plain object to class object
+    static deserialize(data: LookupMap): LookupMap {
+        return new LookupMap(data.keyPrefix)
     }
 }

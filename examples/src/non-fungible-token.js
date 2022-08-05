@@ -1,5 +1,4 @@
 import { NearContract, NearBindgen, call, view, near, LookupMap, bytes, assert } from 'near-sdk-js'
-import { Serializer } from 'superserial';
 
 class Token {
     constructor(token_id, owner_id) {
@@ -14,12 +13,6 @@ class NftContract extends NearContract {
         super()
         this.owner_id = owner_id
         this.owner_by_id = new LookupMap(owner_by_id_prefix)
-    }
-
-    deserialize() {
-        super.deserialize()
-        this.owner_by_id.serializer = new Serializer()
-        this.owner_by_id = Object.assign(new LookupMap, this.owner_by_id)
     }
 
     internalTransfer({ sender_id, receiver_id, token_id, approval_id, memo }) {
@@ -91,5 +84,9 @@ class NftContract extends NearContract {
         }
 
         return new Token(token_id, owner_id)
+    }
+
+    default() {
+        return new NftContract({ owner_id: '', owner_by_id_prefix: '' })
     }
 }

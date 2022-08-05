@@ -1,5 +1,4 @@
 import { NearContract, NearBindgen, call, view, near, LookupSet, UnorderedMap, Vector } from 'near-sdk-js'
-import { Serializer } from 'superserial'
 
 @NearBindgen
 class StatusMessage extends NearContract {
@@ -7,18 +6,6 @@ class StatusMessage extends NearContract {
         super()
         this.records = new UnorderedMap('a')
         this.uniqueValues = new LookupSet('b')
-    }
-
-    deserialize() {
-        super.deserialize()
-        this.records.keys.serializer = new Serializer()
-        this.records.keys = Object.assign(new Vector, this.records.keys)
-        this.records.values.serializer = new Serializer()
-        this.records.values = Object.assign(new Vector, this.records.values)
-        this.records.serializer = new Serializer()
-        this.records = Object.assign(new UnorderedMap, this.records)
-        this.uniqueValues.serializer = new Serializer()
-        this.uniqueValues = Object.assign(new LookupSet, this.uniqueValues)
     }
 
     @call
@@ -45,6 +32,10 @@ class StatusMessage extends NearContract {
     get_all_statuses() {
         // used for test UnorderedMap
         return this.records.toArray()
+    }
+
+    default() {
+        return new StatusMessage()
     }
 }
 

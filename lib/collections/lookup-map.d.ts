@@ -1,12 +1,12 @@
-import { Bytes, ClassMap } from '../utils';
-import { Serializer } from 'superserial';
-export declare class LookupMap<K, V> {
+import { Bytes } from '../utils';
+export declare class LookupMap {
     readonly keyPrefix: Bytes;
-    readonly serializer: Serializer;
-    constructor(keyPrefix: Bytes, classes?: ClassMap);
-    containsKey(key: K): boolean;
-    get(key: K): V | null;
-    remove(key: K): V | null;
-    set(key: K, value: V): V | null;
-    extend(objects: [K, V][]): void;
+    constructor(keyPrefix: Bytes);
+    containsKey(key: Bytes): boolean;
+    get(key: Bytes): unknown | null;
+    remove(key: Bytes): unknown | null;
+    set(key: Bytes, value: unknown): unknown | null;
+    extend(objects: [Bytes, unknown][]): void;
+    serialize(): string;
+    static deserialize(data: LookupMap): LookupMap;
 }
