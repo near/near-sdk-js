@@ -14,8 +14,11 @@ class FungibleToken extends NearContract {
         super()
         this.accounts = new LookupMap(prefix)
         this.totalSupply = totalSupply
-        this.accounts.set(near.signerAccountId(), totalSupply)
-        // don't need accountStorageUsage like rust in JS contract, storage deposit management is automatic in JSVM
+        // In a real world Fungible Token contract, storage management is required to denfense drain-storage attack
+    }
+
+    init() {
+        this.accounts.set(near.signerAccountId(), this.totalSupply)
     }
 
     internalDeposit({ accountId, amount }) {
@@ -70,6 +73,6 @@ class FungibleToken extends NearContract {
     }
 
     default() {
-        return new FungibleToken({ prefix: this.prefix, totalSupply: this.totalSupply })
+        return new FungibleToken({ prefix: '', totalSupply: 0 })
     }
 }

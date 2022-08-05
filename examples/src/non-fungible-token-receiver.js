@@ -26,6 +26,6 @@ class NftContract extends NearContract {
     }
 
     default() {
-        return new NftContract({ nonFungibleTokenAccountId: this.nonFungibleTokenAccountId })
+        return new NftContract({ nonFungibleTokenAccountId: '' })
     }
 }
