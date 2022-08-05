@@ -49,6 +49,4 @@ export function assert(b: boolean, str: string) {
   }
 }
 
-export type ClassMap = {
-  [className: string]: ((new (...args: any[]) => any) | Function);
-};
+export type Mutable<T> = { -readonly [P in keyof T]: T[P] };

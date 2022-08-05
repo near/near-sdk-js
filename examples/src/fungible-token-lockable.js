@@ -5,9 +5,7 @@ import {
     view,
     near,
     LookupMap,
-    assert,
 } from 'near-sdk-js'
-import { Serializer } from 'superserial'
 
 class Account {
     constructor(balance, allowances, lockedBalances) {
@@ -55,18 +53,15 @@ class Account {
 class LockableFungibleToken extends NearContract {
     constructor({ prefix, totalSupply }) {
         super()
-        this.accounts = new LookupMap(prefix, {Account}) // Account ID -> Account mapping
+        this.accounts = new LookupMap(prefix) // Account ID -> Account mapping
         this.totalSupply = totalSupply // Total supply of the all tokens
-        let ownerId = near.signerAccountId()
-        let ownerAccount = this.getAccount(ownerId)
-        ownerAccount.balance = totalSupply
-        this.setAccount(ownerId, ownerAccount)
     }
 
-    deserialize() {
-        super.deserialize()
-        this.accounts.serializer = new Serializer({classes: {Account}});
-        this.accounts = Object.assign(new LookupMap, this.accounts)
+    init() {
+        let ownerId = near.signerAccountId()
+        let ownerAccount = this.getAccount(ownerId)
+        ownerAccount.balance = this.totalSupply
+        this.setAccount(ownerId, ownerAccount)
     }
 
     getAccount(ownerId) {
@@ -74,7 +69,7 @@ class LockableFungibleToken extends NearContract {
         if (account === null) {
             return new Account(0, {}, {})
         }
-        return account
+        return new Account(account.balance, account.allowances, account.lockedBalances)
     }
 
     setAccount(accountId, account) {
@@ -228,5 +223,9 @@ class LockableFungibleToken extends NearContract {
     @view
     getLockedBalance({ ownerId, escrowAccountId }) {
         return this.getAccount(ownerId).getLockedBalance(escrowAccountId)
+    }
+
+    default() {
+        return new LockableFungibleToken({ prefix: '', totalSupply: 0 })
     }
 }

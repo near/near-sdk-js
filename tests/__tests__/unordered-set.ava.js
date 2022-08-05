@@ -100,7 +100,7 @@ test('UnorderedSet insert, len and iterate', async t => {
 test('UnorderedSet extend, remove, clear', async t => {
     const { ali, unorderedSetContract } = t.context.accounts;
 
-    await ali.call(unorderedSetContract, 'extend', { elements: ['hello', 'world', 'hello1'] });
+    await ali.callRaw(unorderedSetContract, 'extend', { elements: ['hello', 'world', 'hello1'] });
 
     t.deepEqual(
         await unorderedSetContract.view('toArray', {}),

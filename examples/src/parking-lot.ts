@@ -18,7 +18,7 @@ class Engine {
     hp: number;
 
     constructor(hp: number) {
-      this.hp = hp;
+        this.hp = hp;
     }
 
     run(): string {
@@ -32,21 +32,16 @@ class Engine {
 
 @NearBindgen
 class ParkingLot extends NearContract {
-    cars: LookupMap<string, CarSpecs>;
+    cars: LookupMap;
     constructor() {
         super()
-        this.cars = new LookupMap<string, CarSpecs>('a', {CarSpecs, Engine});
-    }
-
-    deserialize() {
-        super.deserialize();
-        this.cars = new LookupMap<string, CarSpecs>('a', {CarSpecs, Engine});
+        this.cars = new LookupMap('a');
     }
 
     @call
     addCar({ name, id, color, price, engineHp }: { name: string, id: number, color: string, price: number, engineHp: number }) {
-    // args can be json arguments only, they cannot be of a JS/TS class like following, unless override NearContract.deserializeArgs method.
-    // addCar({ name, specs }: { name: string, specs: CarSpecs }) {
+        // args can be json arguments only, they cannot be of a JS/TS class like following, unless override NearContract.deserializeArgs method.
+        // addCar({ name, specs }: { name: string, specs: CarSpecs }) {
         let engine = new Engine(engineHp)
         let car = new CarSpecs(id, color, price, engine);
         near.log(`addCar() called, name: ${name}, specs: ${JSON.stringify(car)}`)
@@ -66,8 +61,15 @@ class ParkingLot extends NearContract {
     }
 
     @view
-    runCar({name}: {name: string}) {
-        let car = this.cars.get(name)
-        return car.engine.run()
+    runCar({ name }: { name: string }) {
+        /* We are getting plain carSpecs object from the storage.
+        It needs to be converted to the class object in order to execute engine.run() function.*/
+        let carSpecs = this.cars.get(name) as CarSpecs;
+        let engine = new Engine(carSpecs.engine.hp)
+        return engine.run()
+    }
+
+    default() {
+        return new ParkingLot()
     }
 }

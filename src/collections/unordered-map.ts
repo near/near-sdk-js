@@ -1,26 +1,25 @@
 import * as near from "../api";
-import { u8ArrayToBytes, bytesToU8Array, Bytes, ClassMap } from "../utils";
+import { u8ArrayToBytes, bytesToU8Array, Bytes, Mutable } from "../utils";
 import { Vector, VectorIterator } from "./vector";
-import { Serializer } from 'superserial';
 
 const ERR_INCONSISTENT_STATE =
   "The collection is an inconsistent state. Did previous smart contract execution terminate unexpectedly?";
 
-export class UnorderedMap<K, V> {
+export class UnorderedMap {
   readonly length: number;
+  readonly prefix: Bytes;
   readonly keyIndexPrefix: Bytes;
-  readonly keys: Vector<K>;
-  readonly values: Vector<V>;
-  readonly serializer: Serializer;
+  readonly keys: Vector;
+  readonly values: Vector;
 
-  constructor(prefix: Bytes, classes?: ClassMap) {
+  constructor(prefix: Bytes) {
     this.length = 0;
+    this.prefix = prefix;
     this.keyIndexPrefix = prefix + "i";
     let indexKey = prefix + "k";
     let indexValue = prefix + "v";
-    this.keys = new Vector(indexKey, classes);
-    this.values = new Vector(indexValue, classes);
-    this.serializer = new Serializer(classes)
+    this.keys = new Vector(indexKey);
+    this.values = new Vector(indexValue);
   }
 
   len() {
@@ -53,13 +52,13 @@ export class UnorderedMap<K, V> {
     return data[0];
   }
 
-  getIndexRaw(key: K): Bytes {
-    let indexLookup = this.keyIndexPrefix + this.serializer.serialize(key);
+  getIndexRaw(key: Bytes): Bytes {
+    let indexLookup = this.keyIndexPrefix + JSON.stringify(key);
     let indexRaw = near.storageRead(indexLookup);
     return indexRaw;
   }
 
-  get(key: K): V | null {
+  get(key: Bytes): unknown | null {
     let indexRaw = this.getIndexRaw(key);
     if (indexRaw) {
       let index = this.deserializeIndex(indexRaw);
@@ -73,8 +72,8 @@ export class UnorderedMap<K, V> {
     return null;
   }
 
-  set(key: K, value: V): V | null {
-    let indexLookup = this.keyIndexPrefix + this.serializer.serialize(key);
+  set(key: Bytes, value: unknown): unknown | null {
+    let indexLookup = this.keyIndexPrefix + JSON.stringify(key);
     let indexRaw = near.storageRead(indexLookup);
     if (indexRaw) {
       let index = this.deserializeIndex(indexRaw);
@@ -89,8 +88,8 @@ export class UnorderedMap<K, V> {
     }
   }
 
-  remove(key: K): V | null {
-    let indexLookup = this.keyIndexPrefix + this.serializer.serialize(key);
+  remove(key: Bytes): unknown | null {
+    let indexLookup = this.keyIndexPrefix + JSON.stringify(key);
     let indexRaw = near.storageRead(indexLookup);
     if (indexRaw) {
       if (this.len() == 1) {
@@ -108,7 +107,7 @@ export class UnorderedMap<K, V> {
         // If the removed element was the last element from keys, then we don't need to
         // reinsert the lookup back.
         if (lastKey != key) {
-          let lastLookupKey = this.keyIndexPrefix + this.serializer.serialize(lastKey);
+          let lastLookupKey = this.keyIndexPrefix + JSON.stringify(lastKey);
           near.storageWrite(lastLookupKey, indexRaw);
         }
       }
@@ -121,14 +120,14 @@ export class UnorderedMap<K, V> {
 
   clear() {
     for (let key of this.keys) {
-      let indexLookup = this.keyIndexPrefix + this.serializer.serialize(key);
+      let indexLookup = this.keyIndexPrefix + JSON.stringify(key);
       near.storageRemove(indexLookup);
     }
     this.keys.clear();
     this.values.clear();
   }
 
-  toArray(): [K, V][] {
+  toArray(): [Bytes, unknown][] {
     let ret = [];
     for (let v of this) {
       ret.push(v);
@@ -136,26 +135,46 @@ export class UnorderedMap<K, V> {
     return ret;
   }
 
-  [Symbol.iterator](): UnorderedMapIterator<K, V> {
-    return new UnorderedMapIterator<K, V>(this);
+  [Symbol.iterator](): UnorderedMapIterator {
+    return new UnorderedMapIterator(this);
   }
 
-  extend(kvs: [K, V][]) {
+  extend(kvs: [Bytes, unknown][]) {
     for (let [k, v] of kvs) {
       this.set(k, v);
     }
   }
+
+  serialize(): string {
+    return JSON.stringify(this)
+  }
+
+  // converting plain object to class object
+  static deserialize(data: UnorderedMap): UnorderedMap {
+    // removing readonly modifier
+    type MutableUnorderedMap = Mutable<UnorderedMap>;
+    let map = new UnorderedMap(data.prefix) as MutableUnorderedMap;
+    // reconstruct UnorderedMap
+    map.length = data.length;
+    // reconstruct keys Vector
+    map.keys = new Vector(data.prefix + "k");
+    map.keys.length = data.keys.length;
+    // reconstruct values Vector
+    map.values = new Vector(data.prefix + "v");
+    map.values.length = data.values.length;
+    return map;
+  }
 }
 
-class UnorderedMapIterator<K, V> {
-  private keys: VectorIterator<K>;
-  private values: VectorIterator<V>;
-  constructor(unorderedMap: UnorderedMap<K, V>) {
+class UnorderedMapIterator {
+  private keys: VectorIterator;
+  private values: VectorIterator;
+  constructor(unorderedMap: UnorderedMap) {
     this.keys = new VectorIterator(unorderedMap.keys);
     this.values = new VectorIterator(unorderedMap.values);
   }
 
-  next(): { value: [K | null, V | null]; done: boolean } {
+  next(): { value: [unknown | null, unknown | null]; done: boolean } {
     let key = this.keys.next();
     let value = this.values.next();
     if (key.done != value.done) {
