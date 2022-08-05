@@ -15,8 +15,8 @@ test.beforeEach(async t => {
         (process.env['COUNTER_TS'] ? './build/counter-ts.wasm' : './build/counter.wasm')
     );
 
-    // Init the contract
-    await counter.call(counter, 'init', {});
+    // When we skip init the counter, default counter (specified by Counter.default()) will be used.  
+    // await counter.call(counter, 'init', {});
 
     // Test users
     const ali = await root.createSubAccount('ali');
