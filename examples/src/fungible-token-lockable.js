@@ -53,11 +53,14 @@ class Account {
 class LockableFungibleToken extends NearContract {
     constructor({ prefix, totalSupply }) {
         super()
-        this.accounts = new LookupMap(prefix, { Account }) // Account ID -> Account mapping
+        this.accounts = new LookupMap(prefix) // Account ID -> Account mapping
         this.totalSupply = totalSupply // Total supply of the all tokens
+    }
+
+    init() {
         let ownerId = near.signerAccountId()
         let ownerAccount = this.getAccount(ownerId)
-        ownerAccount.balance = totalSupply
+        ownerAccount.balance = this.totalSupply
         this.setAccount(ownerId, ownerAccount)
     }
 
@@ -223,6 +226,6 @@ class LockableFungibleToken extends NearContract {
     }
 
     default() {
-        return new LockableFungibleToken({ prefix: this.prefix, totalSupply: this.totalSupply })
+        return new LockableFungibleToken({ prefix: '', totalSupply: 0 })
     }
 }

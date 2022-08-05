@@ -4,4 +4,5 @@ export declare abstract class NearContract {
     static deserializeArgs(): any;
     static serializeReturn(ret: any): string;
     abstract default(): any;
+    init(): any;
 }
