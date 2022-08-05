@@ -69,7 +69,7 @@ class LockableFungibleToken extends NearContract {
         if (account === null) {
             return new Account(0, {}, {})
         }
-        return account
+        return new Account(account.balance, account.allowances, account.lockedBalances)
     }
 
     setAccount(accountId, account) {
