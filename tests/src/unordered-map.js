@@ -6,24 +6,17 @@ import {
     UnorderedMap,
     Vector
 } from 'near-sdk-js'
-import { Serializer } from 'superserial';
 import {House, Room} from './model.js';
 
 @NearBindgen
 class UnorderedMapTestContract extends NearContract {
     constructor() {
         super()
-        this.unorderedMap = new UnorderedMap('a', {House, Room});
+        this.unorderedMap = new UnorderedMap('a');
     }
 
-    deserialize() {
-        super.deserialize()
-        this.unorderedMap.keys.serializer = new Serializer({classes: {House, Room}})
-        this.unorderedMap.keys = Object.assign(new Vector, this.unorderedMap.keys)
-        this.unorderedMap.values.serializer = new Serializer({classes: {House, Room}})
-        this.unorderedMap.values = Object.assign(new Vector, this.unorderedMap.values)
-        this.unorderedMap.serializer = new Serializer({classes: {House, Room}})
-        this.unorderedMap = Object.assign(new UnorderedMap, this.unorderedMap)
+    default() {
+        return new UnorderedMapTestContract();
     }
 
     @view
@@ -88,8 +81,10 @@ class UnorderedMapTestContract extends NearContract {
 
     @view
     get_house() {
-        let house = this.unorderedMap.get('house1')
-        let room = house.rooms[0]
+        const rawHouse = this.unorderedMap.get('house1')
+        const house = new House(rawHouse.name, rawHouse.rooms)
+        const rawRoom = house.rooms[0]
+        const room = new Room(rawRoom.name, rawRoom.size)
         return house.describe() + room.describe()
     }
 }

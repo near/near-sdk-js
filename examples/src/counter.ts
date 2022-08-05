@@ -6,19 +6,19 @@ import { log } from './log'
 class Counter extends NearContract {
     count: number;
 
-    constructor({ initial = 0 }: {initial : number}) {
+    constructor({ initial = 0 }: { initial: number }) {
         super()
         this.count = initial
     }
 
     @call
-    increase({ n = 1 }: {n: number}) {
+    increase({ n = 1 }: { n: number }) {
         this.count += n
         near.log(`Counter increased to ${this.count}`)
     }
 
     @call
-    decrease({ n }: {n: number}) {
+    decrease({ n }: { n: number }) {
         // you can use default argument `n=1` too
         // this is to illustrate a npm dependency: lodash can be used
         if (isUndefined(n)) {
@@ -33,6 +33,10 @@ class Counter extends NearContract {
     @view
     getCount(): number {
         return this.count
+    }
+
+    default() {
+        return new Counter({ initial: 0 })
     }
 }
 

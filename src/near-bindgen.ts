@@ -12,6 +12,8 @@ export function NearBindgen<T extends { new(...args: any[]): {}}>(target: T) {
             let args = target.deserializeArgs()
             let ret = new target(args)
             // @ts-ignore
+            ret.init()
+            // @ts-ignore
             ret.serialize()
             return ret
         }
