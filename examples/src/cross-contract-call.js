@@ -39,6 +39,6 @@ class OnCall extends NearContract {
     }
 
     default() {
-        return new OnCall({ statusMessageContract: this.statusMessageContract })
+        return new OnCall({ statusMessageContract: '' })
     }
 }
