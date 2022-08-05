@@ -13,8 +13,8 @@ test.before(async t => {
         './build/status-message.wasm',
     );
     
-    // Init the contract
-    await statusMessage.call(statusMessage, 'init', {});
+    // When we skip init the counter, default counter (specified by Counter.default()) will be used.  
+    // await statusMessage.call(statusMessage, 'init', {});
     
     // Create test users
     const ali = await root.createSubAccount('ali');
