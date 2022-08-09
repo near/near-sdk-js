@@ -2,15 +2,16 @@ import { NearContract, NearBindgen, call, view, near, bytes } from 'near-sdk-js'
 
 @NearBindgen
 class OnCall extends NearContract {
-    constructor({ }) {
+    constructor({ statusMessageContract }) {
         super()
         this.personOnCall = "undefined"
+        this.statusMessageContract = statusMessageContract
     }
 
     @call
     set_person_on_call({ accountId }) {
         near.log(`Trying to set ${accountId} on-call`)
-        const promise = near.promiseBatchCreate('statusmessage.test.near')
+        const promise = near.promiseBatchCreate(this.statusMessageContract)
         near.promiseBatchActionFunctionCall(promise, 'get_status', bytes(JSON.stringify({ account_id: accountId })), 0, 30000000000000)
         near.promiseThen(promise, near.currentAccountId(), '_set_person_on_call_private', bytes(JSON.stringify({ accountId: accountId })), 0, 30000000000000);
     }
@@ -35,5 +36,9 @@ class OnCall extends NearContract {
     person_on_call() {
         near.log(`Returning person on-call: ${this.personOnCall}`)
         return this.personOnCall
+    }
+
+    default() {
+        return new OnCall({ statusMessageContract: '' })
     }
 }

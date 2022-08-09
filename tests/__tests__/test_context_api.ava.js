@@ -10,8 +10,7 @@ test.before(async t => {
     const root = worker.rootAccount;
 
     // Deploy the test contract.
-    const contextApiContract = await root.createAndDeploy(
-        root.getSubAccount('test-contract').accountId,
+    const contextApiContract = await root.devDeploy(
         'build/context_api.wasm',
     );
 
@@ -61,6 +60,12 @@ test('get input correct', async t => {
     const { bob, contextApiContract } = t.context.accounts;
     let r = await bob.callRaw(contextApiContract, 'get_input', new Uint8Array([0, 1, 255]));
     t.is(r.result.status.SuccessValue, Buffer.from(new Uint8Array([0, 1, 255])).toString('base64'));
+});
+
+test('get storage usage', async t => {
+    const { carl, contextApiContract } = t.context.accounts;
+    let r = await carl.call(contextApiContract, 'get_storage_usage', '', {gas: '10 TGas'});
+    t.is(r>0, true);
 });
 
 test('get block height', async t => {

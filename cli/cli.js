@@ -13,14 +13,14 @@ import { rollup } from 'rollup';
 
 import { executeCommand } from './utils.js';
 
-const PROJECT_DIR = `../../../`;
+const PROJECT_DIR = process.cwd();
 const NEAR_SDK_JS = 'node_modules/near-sdk-js';
-
+const TSC = 'node_modules/.bin/tsc';
 const QJSC_DIR = `${NEAR_SDK_JS}/cli/deps/quickjs`;
 const QJSC = `${NEAR_SDK_JS}/cli/deps/qjsc`;
 
 yargs(hideBin(process.argv))
-    .scriptName('near-sdk')
+    .scriptName('near-sdk-js')
     .usage('$0 <cmd> [args]')
     .command('build [source] [target]', 'Build NEAR JS Smart-contract', (yargs) => {
         yargs
@@ -40,10 +40,16 @@ yargs(hideBin(process.argv))
 
 async function build(argv) {
     const SOURCE_FILE_WITH_PATH = argv.source;
+    const SOURCE_EXT = argv.source.split('.').pop();
     const TARGET_DIR = path.dirname(argv.target);
     const TARGET_EXT = argv.target.split('.').pop();
     const TARGET_FILE_NAME = path.basename(argv.target, `.${TARGET_EXT}`);
-    const TARGET_TYPE = TARGET_EXT === 'wasm' ? 'STANDALONE' : TARGET_EXT === 'base64' ? 'ENCLAVED' : undefined;
+
+    if(!["wasm", "base64"].includes(TARGET_EXT)){
+        throw new Error(`Unsupported target ${TARGET_EXT}, make sure target ends with .wasm or .base64`);
+    } 
+
+    const TARGET_TYPE = TARGET_EXT === 'wasm' ? 'STANDALONE' : 'ENCLAVED';
 
     const ROLLUP_TARGET = `${TARGET_DIR}/${TARGET_FILE_NAME}.js`;
     const QJSC_TARGET = `${TARGET_DIR}/${TARGET_FILE_NAME}.h`;
@@ -51,6 +57,10 @@ async function build(argv) {
     const ENCLAVED_CONTRACT_TARGET = `${TARGET_DIR}/${TARGET_FILE_NAME}.base64`;
 
     console.log(`Building ${SOURCE_FILE_WITH_PATH} contract...`);
+
+    if (SOURCE_EXT === 'ts') {
+        await checkTsBuildWithTsc(SOURCE_FILE_WITH_PATH);
+    }
 
     console.log(`Creating ${TARGET_DIR} directory...`);
     await executeCommand(`mkdir -p ${TARGET_DIR}`);
@@ -63,11 +73,14 @@ async function build(argv) {
         await createStandaloneMethodsHeaderFile(ROLLUP_TARGET);
         await createStandaloneWasmContract(QJSC_TARGET, STANDALONE_CONTRACT_TARGET);
         await wasiStubStandaloneContract(STANDALONE_CONTRACT_TARGET);
-    } else if (TARGET_TYPE === 'ENCLAVED') {
-        await createEnclavedContract(QJSC_TARGET, ENCLAVED_CONTRACT_TARGET);
     } else {
-        throw new Error('Unsupported target, make sure target ends with .wasm or .base64');
+        await createEnclavedContract(QJSC_TARGET, ENCLAVED_CONTRACT_TARGET);
     }
+}
+
+async function checkTsBuildWithTsc(sourceFileWithPath) {
+    console.log(`check TypeScript build of ${sourceFileWithPath} with tsc`)
+    await executeCommand(`${TSC} --noEmit --experimentalDecorators --target es5 ${sourceFileWithPath}`);
 }
 
 // Common build function
@@ -76,7 +89,9 @@ async function createJsFileWithRullup(sourceFileWithPath, rollupTarget) {
     const bundle = await rollup({
         input: sourceFileWithPath,
         plugins: [
-            nodeResolve(),
+            nodeResolve({
+                extensions: ['.js', '.ts']
+            }),
             sourcemaps(),
             // commonjs(),
             babel({ babelHelpers: 'bundled', extensions: ['.ts', '.js', '.jsx', '.es6', '.es', '.mjs'] })
@@ -140,7 +155,7 @@ async function createStandaloneWasmContract(qjscTarget, standaloneContractTarget
 }
 
 async function wasiStubStandaloneContract(standaloneContractTarget) {
-    console.log(`Excecuting wasi-stub...`);
+    console.log(`Executing wasi-stub...`);
     const WASI_STUB = `${NEAR_SDK_JS}/cli/deps/binaryen/wasi-stub/run.sh`;
     await executeCommand(`${WASI_STUB} ${standaloneContractTarget} >/dev/null`);
 }

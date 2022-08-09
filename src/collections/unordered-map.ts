@@ -1,5 +1,5 @@
 import * as near from "../api";
-import { u8ArrayToBytes, bytesToU8Array, Bytes } from "../utils";
+import { u8ArrayToBytes, bytesToU8Array, Bytes, Mutable } from "../utils";
 import { Vector, VectorIterator } from "./vector";
 
 const ERR_INCONSISTENT_STATE =
@@ -7,12 +7,14 @@ const ERR_INCONSISTENT_STATE =
 
 export class UnorderedMap {
   readonly length: number;
+  readonly prefix: Bytes;
   readonly keyIndexPrefix: Bytes;
   readonly keys: Vector;
   readonly values: Vector;
 
   constructor(prefix: Bytes) {
     this.length = 0;
+    this.prefix = prefix;
     this.keyIndexPrefix = prefix + "i";
     let indexKey = prefix + "k";
     let indexValue = prefix + "v";
@@ -51,12 +53,12 @@ export class UnorderedMap {
   }
 
   getIndexRaw(key: Bytes): Bytes {
-    let indexLookup = this.keyIndexPrefix + key;
+    let indexLookup = this.keyIndexPrefix + JSON.stringify(key);
     let indexRaw = near.storageRead(indexLookup);
     return indexRaw;
   }
 
-  get(key: Bytes): Bytes | null {
+  get(key: Bytes): unknown | null {
     let indexRaw = this.getIndexRaw(key);
     if (indexRaw) {
       let index = this.deserializeIndex(indexRaw);
@@ -70,8 +72,8 @@ export class UnorderedMap {
     return null;
   }
 
-  set(key: Bytes, value: Bytes): Bytes | null {
-    let indexLookup = this.keyIndexPrefix + key;
+  set(key: Bytes, value: unknown): unknown | null {
+    let indexLookup = this.keyIndexPrefix + JSON.stringify(key);
     let indexRaw = near.storageRead(indexLookup);
     if (indexRaw) {
       let index = this.deserializeIndex(indexRaw);
@@ -86,8 +88,8 @@ export class UnorderedMap {
     }
   }
 
-  remove(key: Bytes): Bytes | null {
-    let indexLookup = this.keyIndexPrefix + key;
+  remove(key: Bytes): unknown | null {
+    let indexLookup = this.keyIndexPrefix + JSON.stringify(key);
     let indexRaw = near.storageRead(indexLookup);
     if (indexRaw) {
       if (this.len() == 1) {
@@ -97,15 +99,15 @@ export class UnorderedMap {
       } else {
         // If there is more than one element then swap remove swaps it with the last
         // element.
-        let lastKeyRaw = this.keys.get(this.len() - 1);
-        if (!lastKeyRaw) {
+        let lastKey = this.keys.get(this.len() - 1);
+        if (!lastKey) {
           throw new Error(ERR_INCONSISTENT_STATE);
         }
         near.storageRemove(indexLookup);
         // If the removed element was the last element from keys, then we don't need to
         // reinsert the lookup back.
-        if (lastKeyRaw != key) {
-          let lastLookupKey = this.keyIndexPrefix + lastKeyRaw;
+        if (lastKey != key) {
+          let lastLookupKey = this.keyIndexPrefix + JSON.stringify(lastKey);
           near.storageWrite(lastLookupKey, indexRaw);
         }
       }
@@ -118,14 +120,14 @@ export class UnorderedMap {
 
   clear() {
     for (let key of this.keys) {
-      let indexLookup = this.keyIndexPrefix + key;
+      let indexLookup = this.keyIndexPrefix + JSON.stringify(key);
       near.storageRemove(indexLookup);
     }
     this.keys.clear();
     this.values.clear();
   }
 
-  toArray(): [Bytes, Bytes][] {
+  toArray(): [Bytes, unknown][] {
     let ret = [];
     for (let v of this) {
       ret.push(v);
@@ -137,10 +139,30 @@ export class UnorderedMap {
     return new UnorderedMapIterator(this);
   }
 
-  extend(kvs: [Bytes, Bytes][]) {
+  extend(kvs: [Bytes, unknown][]) {
     for (let [k, v] of kvs) {
       this.set(k, v);
     }
+  }
+
+  serialize(): string {
+    return JSON.stringify(this)
+  }
+
+  // converting plain object to class object
+  static deserialize(data: UnorderedMap): UnorderedMap {
+    // removing readonly modifier
+    type MutableUnorderedMap = Mutable<UnorderedMap>;
+    let map = new UnorderedMap(data.prefix) as MutableUnorderedMap;
+    // reconstruct UnorderedMap
+    map.length = data.length;
+    // reconstruct keys Vector
+    map.keys = new Vector(data.prefix + "k");
+    map.keys.length = data.keys.length;
+    // reconstruct values Vector
+    map.values = new Vector(data.prefix + "v");
+    map.values.length = data.values.length;
+    return map;
   }
 }
 
@@ -152,7 +174,7 @@ class UnorderedMapIterator {
     this.values = new VectorIterator(unorderedMap.values);
   }
 
-  next(): { value: [Bytes | null, Bytes | null]; done: boolean } {
+  next(): { value: [unknown | null, unknown | null]; done: boolean } {
     let key = this.keys.next();
     let value = this.values.next();
     if (key.done != value.done) {

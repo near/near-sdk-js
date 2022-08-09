@@ -5,22 +5,24 @@ export declare class Vector {
     constructor(prefix: Bytes);
     len(): number;
     isEmpty(): boolean;
-    get(index: number): Bytes | null;
-    swapRemove(index: number): Bytes | null;
-    push(element: Bytes): void;
-    pop(): Bytes | null;
-    replace(index: number, element: Bytes): Bytes;
-    extend(elements: Bytes[]): void;
+    get(index: number): unknown | null;
+    swapRemove(index: number): unknown | null;
+    push(element: unknown): void;
+    pop(): unknown | null;
+    replace(index: number, element: unknown): unknown;
+    extend(elements: unknown[]): void;
     [Symbol.iterator](): VectorIterator;
     clear(): void;
-    toArray(): Bytes[];
+    toArray(): unknown[];
+    serialize(): string;
+    static deserialize(data: Vector): Vector;
 }
 export declare class VectorIterator {
     private current;
     private vector;
     constructor(vector: Vector);
     next(): {
-        value: Bytes | null;
+        value: unknown | null;
         done: boolean;
     };
 }

@@ -10,8 +10,7 @@ test.before(async t => {
     const root = worker.rootAccount;
 
     // Deploy the test contract.
-    const mathApiContract = await root.createAndDeploy(
-        root.getSubAccount('test-contract').accountId,
+    const mathApiContract = await root.devDeploy(
         'build/math_api.wasm',
     );
 

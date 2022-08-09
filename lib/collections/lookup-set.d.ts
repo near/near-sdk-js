@@ -3,7 +3,9 @@ export declare class LookupSet {
     readonly keyPrefix: Bytes;
     constructor(keyPrefix: Bytes);
     contains(key: Bytes): boolean;
-    remove(key: Bytes): string;
-    set(key: Bytes): string;
+    remove(key: Bytes): boolean;
+    set(key: Bytes): boolean;
     extend(keys: Bytes[]): void;
+    serialize(): string;
+    static deserialize(data: LookupSet): LookupSet;
 }

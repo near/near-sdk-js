@@ -31,18 +31,18 @@ export class Vector {
     return this.length == 0;
   }
 
-  get(index: number): Bytes | null {
+  get(index: number): unknown | null {
     if (index >= this.length) {
       return null;
     }
     let storageKey = indexToKey(this.prefix, index);
-    return near.storageRead(storageKey);
+    return JSON.parse(near.storageRead(storageKey));
   }
 
   /// Removes an element from the vector and returns it in serialized form.
   /// The removed element is replaced by the last element of the vector.
   /// Does not preserve ordering, but is `O(1)`.
-  swapRemove(index: number): Bytes | null {
+  swapRemove(index: number): unknown | null {
     if (index >= this.length) {
       throw new Error(ERR_INDEX_OUT_OF_BOUNDS);
     } else if (index + 1 == this.length) {
@@ -50,21 +50,21 @@ export class Vector {
     } else {
       let key = indexToKey(this.prefix, index);
       let last = this.pop();
-      if (near.storageWrite(key, last)) {
-        return near.storageGetEvicted();
+      if (near.storageWrite(key, JSON.stringify(last))) {
+        return JSON.parse(near.storageGetEvicted());
       } else {
         throw new Error(ERR_INCONSISTENT_STATE);
       }
     }
   }
 
-  push(element: Bytes) {
+  push(element: unknown) {
     let key = indexToKey(this.prefix, this.length);
     this.length += 1;
-    near.storageWrite(key, element);
+    near.storageWrite(key, JSON.stringify(element));
   }
 
-  pop(): Bytes | null {
+  pop(): unknown | null {
     if (this.isEmpty()) {
       return null;
     } else {
@@ -72,27 +72,27 @@ export class Vector {
       let lastKey = indexToKey(this.prefix, lastIndex);
       this.length -= 1;
       if (near.storageRemove(lastKey)) {
-        return near.storageGetEvicted();
+        return JSON.parse(near.storageGetEvicted());
       } else {
         throw new Error(ERR_INCONSISTENT_STATE);
       }
     }
   }
 
-  replace(index: number, element: Bytes): Bytes {
+  replace(index: number, element: unknown): unknown {
     if (index >= this.length) {
       throw new Error(ERR_INDEX_OUT_OF_BOUNDS);
     } else {
       let key = indexToKey(this.prefix, index);
-      if (near.storageWrite(key, element)) {
-        return near.storageGetEvicted();
+      if (near.storageWrite(key, JSON.stringify(element))) {
+        return JSON.parse(near.storageGetEvicted());
       } else {
         throw new Error(ERR_INCONSISTENT_STATE);
       }
     }
   }
 
-  extend(elements: Bytes[]) {
+  extend(elements: unknown[]) {
     for (let element of elements) {
       this.push(element);
     }
@@ -110,12 +110,23 @@ export class Vector {
     this.length = 0;
   }
 
-  toArray(): Bytes[] {
+  toArray(): unknown[] {
     let ret = [];
     for (let v of this) {
       ret.push(v);
     }
     return ret;
+  }
+
+  serialize(): string {
+    return JSON.stringify(this)
+  }
+
+  // converting plain object to class object
+  static deserialize(data: Vector): Vector {
+    let vector = new Vector(data.prefix);
+    vector.length = data.length;
+    return vector;
   }
 }
 
@@ -127,7 +138,7 @@ export class VectorIterator {
     this.vector = vector;
   }
 
-  next(): { value: Bytes | null; done: boolean } {
+  next(): { value: unknown | null; done: boolean } {
     if (this.current < this.vector.len()) {
       let value = this.vector.get(this.current);
       this.current += 1;

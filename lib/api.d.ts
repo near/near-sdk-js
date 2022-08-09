@@ -69,3 +69,4 @@ export declare function promiseResult(resultIdx: number | BigInt): Bytes | Promi
 export declare function promiseReturn(promiseIdx: number | BigInt): void;
 export declare function storageWrite(key: Bytes, value: Bytes): boolean;
 export declare function storageRemove(key: Bytes): boolean;
+export declare function storageByteCost(): BigInt;

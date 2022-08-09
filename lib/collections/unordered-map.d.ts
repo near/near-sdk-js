@@ -2,6 +2,7 @@ import { Bytes } from "../utils";
 import { Vector } from "./vector";
 export declare class UnorderedMap {
     readonly length: number;
+    readonly prefix: Bytes;
     readonly keyIndexPrefix: Bytes;
     readonly keys: Vector;
     readonly values: Vector;
@@ -11,20 +12,22 @@ export declare class UnorderedMap {
     serializeIndex(index: number): Bytes;
     deserializeIndex(rawIndex: Bytes): number;
     getIndexRaw(key: Bytes): Bytes;
-    get(key: Bytes): Bytes | null;
-    set(key: Bytes, value: Bytes): Bytes | null;
-    remove(key: Bytes): Bytes | null;
+    get(key: Bytes): unknown | null;
+    set(key: Bytes, value: unknown): unknown | null;
+    remove(key: Bytes): unknown | null;
     clear(): void;
-    toArray(): [Bytes, Bytes][];
+    toArray(): [Bytes, unknown][];
     [Symbol.iterator](): UnorderedMapIterator;
-    extend(kvs: [Bytes, Bytes][]): void;
+    extend(kvs: [Bytes, unknown][]): void;
+    serialize(): string;
+    static deserialize(data: UnorderedMap): UnorderedMap;
 }
 declare class UnorderedMapIterator {
     private keys;
     private values;
     constructor(unorderedMap: UnorderedMap);
     next(): {
-        value: [Bytes | null, Bytes | null];
+        value: [unknown | null, unknown | null];
         done: boolean;
     };
 }

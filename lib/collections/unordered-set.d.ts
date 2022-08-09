@@ -2,6 +2,7 @@ import { Bytes } from "../utils";
 import { Vector } from "./vector";
 export declare class UnorderedSet {
     readonly length: number;
+    readonly prefix: Bytes;
     readonly elementIndexPrefix: Bytes;
     readonly elements: Vector;
     constructor(prefix: Bytes);
@@ -9,11 +10,13 @@ export declare class UnorderedSet {
     isEmpty(): boolean;
     serializeIndex(index: number): string;
     deserializeIndex(rawIndex: Bytes): number;
-    contains(element: Bytes): boolean;
-    set(element: Bytes): boolean;
-    remove(element: Bytes): boolean;
+    contains(element: unknown): boolean;
+    set(element: unknown): boolean;
+    remove(element: unknown): boolean;
     clear(): void;
     toArray(): Bytes[];
     [Symbol.iterator](): import("./vector").VectorIterator;
-    extend(elements: Bytes[]): void;
+    extend(elements: unknown[]): void;
+    serialize(): string;
+    static deserialize(data: UnorderedSet): UnorderedSet;
 }

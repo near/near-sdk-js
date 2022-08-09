@@ -11,7 +11,7 @@ import {
   UnorderedSet,
 } from "./collections";
 
-import { bytes, Bytes, storage_byte_cost } from "./utils";
+import { bytes, Bytes, assert } from "./utils";
 
 export {
   call,
@@ -26,4 +26,5 @@ export {
   UnorderedSet,
   bytes,
   Bytes,
+  assert,
 };
