@@ -111,7 +111,7 @@ test('panic tests', async t => {
     r = await ali.callRaw(testContract, 'panic_js_null', '');
     t.assert(
         r.result.receipts_outcome[0].outcome.status.Failure.ActionError.kind.FunctionCallError.ExecutionError
-        .match(/^Smart contract panicked:*/)
+        .match(/^Smart contract panicked: null*/)
     );
 
     r = await ali.callRaw(testContract, 'panic_utf8_test', '');

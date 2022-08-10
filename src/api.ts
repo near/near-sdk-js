@@ -101,10 +101,9 @@ export function ecrecover(
 
 // NOTE: "env.panic(msg)" is not exported, use "throw Error(msg)" instead
 
-export function panicUtf8(msg) {
+export function panicUtf8(msg: string): never {
   env.panic_utf8(msg);
 }
-
 
 export function logUtf8(msg: string) {
   env.log_utf8(msg);
