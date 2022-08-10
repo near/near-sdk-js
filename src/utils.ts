@@ -50,3 +50,7 @@ export function assert(b: boolean, str: string) {
 }
 
 export type Mutable<T> = { -readonly [P in keyof T]: T[P] };
+
+export interface IntoStorageKey {
+  into_storage_key(): Bytes;
+}
