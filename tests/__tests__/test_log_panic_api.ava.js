@@ -86,39 +86,38 @@ test('Log invalid utf-16 sequence panic', async t => {
 test('panic tests', async t => {
     const { ali, testContract } = t.context.accounts;
     let r = await ali.callRaw(testContract, 'panic_test', '');
-    t.deepEqual(
-        r.result.receipts_outcome[0].outcome.status.Failure.ActionError.kind.FunctionCallError.ExecutionError,
-        'Smart contract panicked: explicit guest panic'
-    );
+    t.assert(
+        r.result.receipts_outcome[0].outcome.status.Failure.ActionError.kind.FunctionCallError.ExecutionError
+        .match(/^Smart contract panicked:*/));
 
     r = await ali.callRaw(testContract, 'panic_ascii_test', '');
-    t.deepEqual(
-        r.result.receipts_outcome[0].outcome.status.Failure.ActionError.kind.FunctionCallError.ExecutionError,
-        'Smart contract panicked: abc'
+    t.assert(
+        r.result.receipts_outcome[0].outcome.status.Failure.ActionError.kind.FunctionCallError.ExecutionError
+        .match(/^Smart contract panicked: abc*/)
     );
 
     r = await ali.callRaw(testContract, 'panic_js_number', '');
-    t.deepEqual(
-        r.result.receipts_outcome[0].outcome.status.Failure.ActionError.kind.FunctionCallError.ExecutionError,
-        'Smart contract panicked: 356'
+    t.assert(
+        r.result.receipts_outcome[0].outcome.status.Failure.ActionError.kind.FunctionCallError.ExecutionError
+        .match(/^Smart contract panicked: 356*/)
     );
 
     r = await ali.callRaw(testContract, 'panic_js_undefined', '');
-    t.deepEqual(
-        r.result.receipts_outcome[0].outcome.status.Failure.ActionError.kind.FunctionCallError.ExecutionError,
-        'Smart contract panicked: explicit guest panic'
+    t.assert(
+        r.result.receipts_outcome[0].outcome.status.Failure.ActionError.kind.FunctionCallError.ExecutionError
+        .match(/^Smart contract panicked:*/)
     );
 
     r = await ali.callRaw(testContract, 'panic_js_null', '');
-    t.deepEqual(
-        r.result.receipts_outcome[0].outcome.status.Failure.ActionError.kind.FunctionCallError.ExecutionError,
-        'Smart contract panicked: null'
+    t.assert(
+        r.result.receipts_outcome[0].outcome.status.Failure.ActionError.kind.FunctionCallError.ExecutionError
+        .match(/^Smart contract panicked: null*/)
     );
 
     r = await ali.callRaw(testContract, 'panic_utf8_test', '');
-    t.deepEqual(
-        r.result.receipts_outcome[0].outcome.status.Failure.ActionError.kind.FunctionCallError.ExecutionError,
-        'Smart contract panicked: 水'
+    t.assert(
+        r.result.receipts_outcome[0].outcome.status.Failure.ActionError.kind.FunctionCallError.ExecutionError
+        .match(/Smart contract panicked: 水*/)
     );
 
     r = await ali.callRaw(testContract, 'panicUtf8_valid_utf8_sequence', '');
