@@ -13,7 +13,7 @@ export class Nep171Event extends NearEvent {
     }
 }
 
-class NftMint {
+export class NftMint {
     constructor(public owner_id: string, public token_ids: string[], public memo: string) {}
 
     emit() {
@@ -25,8 +25,8 @@ class NftMint {
     }
 }
 
-class NftTransfer {
-    constructor(public old_owner_id: string, public new_owner_id: string, public token_ids: string[], public memo: string | null) {}
+export class NftTransfer {
+    constructor(public old_owner_id: string, public new_owner_id: string, public token_ids: string[], public authorized_id: string | null, public memo: string | null) {}
 
     emit() {
         NftTransfer.emit_many([this]);
@@ -37,7 +37,7 @@ class NftTransfer {
     }
 }
 
-class NftBurn {
+export class NftBurn {
     constructor(public owner_id: string, public token_ids: string[], authorized_id: string | null, public memo: string | null) {}
     
     emit() {

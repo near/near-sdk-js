@@ -1,7 +1,8 @@
-import { UnorderedMap, LookupMap, Bytes, near, UnorderedSet } from "near-sdk-js";
+import { UnorderedMap, LookupMap, Bytes, near, UnorderedSet, assert } from "near-sdk-js";
 import { IntoStorageKey } from "near-sdk-js/lib/utils"
 import { TokenMetadata } from "../metadata"
 import { hash_account_id } from "../utils"
+import { NftTransfer } from "../events"
 
 const GAS_FOR_RESOLVE_TRANSFER = 5_000_000_000_000n;
 const GAS_FOR_NFT_TRANSFER_CALL = 25_000_000_000_000n + GAS_FOR_RESOLVE_TRANSFER;
@@ -113,6 +114,67 @@ export class NonFungibleToken {
         if (this.tokens_per_owner) {
             this.tokens_per_owner.remove(tmp_owner_id);
         }
+    }
+
+    internal_transfer_unguarded(token_id: string, from: string, to: string) {
+        this.owner_by_id.set(token_id, to)
+
+        if (this.tokens_per_owner) {
+            let owner_tokens = this.tokens_per_owner.get(from)
+            if (owner_tokens == null) {
+                throw new Error("Unable to access tokens per owner in unguarded call.")
+            }
+            let owner_tokens_set = UnorderedSet.deserialize(owner_tokens as UnorderedSet);
+            if (owner_tokens_set.isEmpty()) {
+                this.tokens_per_owner.remove(from)
+            } else {
+                this.tokens_per_owner.set(from, owner_tokens_set)
+            }
+
+            let receiver_tokens = this.tokens_per_owner.get(to)
+            if (receiver_tokens == null) {
+                receiver_tokens = new UnorderedSet(new TokensPerOwner(near.sha256(to)).into_storage_key());
+            } else {
+                receiver_tokens = UnorderedSet.deserialize(receiver_tokens as UnorderedSet);
+            }
+            (receiver_tokens as UnorderedSet).set(token_id);
+            this.tokens_per_owner.set(to, receiver_tokens)
+        }
+    }
+    
+    internal_transfer(sender_id: string, receiver_id: string, token_id: string, approval_id: bigint | null, memo: string | null): [string, Map<string, bigint> | null] {
+        let owner_id = this.owner_by_id.get(token_id);
+        if (owner_id == null) {
+            throw new Error("Token not found");
+        }
+
+        let approved_account_ids = this.approvals_by_id?.remove(token_id);
+
+        let sender_id_authorized: string | null;
+        if (sender_id != owner_id) {
+            if (!approved_account_ids) {
+                throw new Error("Unauthorized");
+            }
+
+            let actual_approval_id = (approved_account_ids as any)[sender_id]
+            if (!actual_approval_id) {
+                throw new Error("Sender not approved")
+            }
+
+            assert(approval_id == null || approval_id == actual_approval_id,
+                `The actual approval_id ${actual_approval_id} is different from the given ${approval_id}`);
+            sender_id_authorized = sender_id
+        } else {
+            sender_id_authorized = null    
+        }
+        assert(owner_id != receiver_id, "Current and next owner must differ")
+        this.internal_transfer_unguarded(token_id, owner_id as string, receiver_id)
+        NonFungibleToken.emit_transfer(owner_id as string, receiver_id, token_id, sender_id_authorized, memo)
+        return [owner_id as string, approved_account_ids == null ? null : approved_account_ids as Map<string, bigint>]
+    }
+
+    static emit_transfer(owner_id: string, receiver_id: string, token_id: string, sender_id: string | null, memo: string | null) {
+        new NftTransfer(owner_id, receiver_id, [token_id], (sender_id && (sender_id == owner_id)) ? sender_id : null, memo).emit()
     }
 }
 
