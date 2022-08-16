@@ -20,6 +20,7 @@
         "build:unordered-set": "near-sdk-js build src/unordered-set.js build/unordered-set.wasm",
         "build:vector": "near-sdk-js build src/vector.js build/vector.wasm",
         "build:bytes": "near-sdk-js build src/bytes.js build/bytes.wasm",
+        "build:typescript": "near-sdk-js build src/typescript.ts build/typescript.wasm",
         "test": "ava",
         "test:context-api": "ava __tests__/test_context_api.ava.js",
         "test:math-api": "ava __tests__/test_math_api.ava.js",
@@ -32,12 +33,14 @@
         "test:unordered-set": "ava __tests__/unordered-set.ava.js",
         "test:unordered-map": "ava __tests__/unordered-map.ava.js",
         "test:vector": "ava __tests__/vector.ava.js",
-        "test:bytes": "ava __tests__/bytes.ava.js"
+        "test:bytes": "ava __tests__/bytes.ava.js",
+        "test:typescript": "ava __tests__/typescript.ava.js"
     },
     "author": "Near Inc <hello@nearprotocol.com>",
     "license": "Apache-2.0",
     "devDependencies": {
         "ava": "^4.2.0",
-        "near-workspaces": "3.1.0"
+        "near-workspaces": "3.1.0",
+        "typescript": "^4.7.4"
     }
 }
