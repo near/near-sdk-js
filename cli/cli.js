@@ -80,7 +80,7 @@ async function build(argv) {
 
 async function checkTsBuildWithTsc(sourceFileWithPath) {
     console.log(`check TypeScript build of ${sourceFileWithPath} with tsc`)
-    await executeCommand(`${TSC} --noEmit --experimentalDecorators --target es5 ${sourceFileWithPath}`);
+    await executeCommand(`${TSC} --noEmit --experimentalDecorators --target es2020 --moduleResolution node ${sourceFileWithPath}`);
 }
 
 // Common build function
