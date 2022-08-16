@@ -34,27 +34,27 @@ export function log_invalid_utf16_sequence_test() {
 }
 
 export function panic_test() {
-    near.panic()
+    throw Error()
 }
 
 export function panic_ascii_test() {
-    near.panic('abc')
+    throw Error('abc')
 }
 
 export function panic_js_number() {
-    near.panic(356)
+    throw Error(356)
 }
 
 export function panic_js_undefined() {
-    near.panic(undefined)
+    throw Error(undefined)
 }
 
 export function panic_js_null() {
-    near.panic(null)
+    throw Error(null)
 }
 
 export function panic_utf8_test() {
-    near.panic('水')
+    throw Error('水')
 }
 
 export function panicUtf8_valid_utf8_sequence() {
