@@ -1,4 +1,5 @@
 import {near, assert, Bytes} from 'near-sdk-js'
+import { AccountId } from 'near-sdk-js/lib/types'
 
 export function bytes_for_approved_account_id(account_id: string): number {
     // The extra 4 bytes are coming from Borsh serialization to store the length of the string.
@@ -10,6 +11,10 @@ export function refund_approved_account_ids_iter(account_id: string, approved_ac
     let promise_id = near.promiseBatchCreate(account_id)
     near.promiseBatchActionTransfer(promise_id, BigInt(storage_released) * near.storageByteCost())
     near.promiseReturn(promise_id)
+}
+
+export function refund_approved_account_ids(account_id: AccountId, approved_account_ids: Map<AccountId, bigint>) {
+    refund_approved_account_ids_iter(account_id, Array.from(approved_account_ids.keys()))
 }
 
 export function refund_deposit_to_account(storage_used: bigint, account_id: string): void {

@@ -1,11 +1,13 @@
 import { UnorderedMap, LookupMap, Bytes, near, UnorderedSet, assert } from "near-sdk-js";
 import { assertOneYocto, IntoStorageKey, Option } from "near-sdk-js/lib/utils"
 import { TokenMetadata } from "../metadata"
-import { hash_account_id, refund_deposit, refund_deposit_to_account } from "../utils"
+import { hash_account_id, refund_approved_account_ids, refund_deposit, refund_deposit_to_account } from "../utils"
 import { NftMint, NftTransfer } from "../events"
 import { Token } from "../token"
 import { NonFungibleTokenCore } from ".";
-import { AccountId } from "../../../../lib/types";
+import { AccountId } from "near-sdk-js/lib/types";
+import { NonFungibleTokenResolver } from "./resolver";
+import { PromiseResult } from "../../../../lib/api";
 
 const GAS_FOR_RESOLVE_TRANSFER = 5_000_000_000_000n;
 const GAS_FOR_NFT_TRANSFER_CALL = 25_000_000_000_000n + GAS_FOR_RESOLVE_TRANSFER;
@@ -14,24 +16,24 @@ function repeat(str: string, n: number) {
     return Array(n + 1).join(str);
 }
 
-export class NonFungibleToken implements NonFungibleTokenCore{
+export class NonFungibleToken implements NonFungibleTokenCore, NonFungibleTokenResolver {
     public owner_id: string;
     public extra_storage_in_bytes_per_token: bigint;
     public owner_by_id: UnorderedMap;
-    public token_metadata_by_id: LookupMap | null;
-    public tokens_per_owner: LookupMap | null;
-    public approvals_by_id: LookupMap | null;
-    public next_approval_id_by_id: LookupMap | null;
+    public token_metadata_by_id: Option<LookupMap>;
+    public tokens_per_owner: Option<LookupMap>;
+    public approvals_by_id: Option<LookupMap>;
+    public next_approval_id_by_id: Option<LookupMap>;
 
     constructor(
         owner_by_id_prefix: IntoStorageKey,
         owner_id: string,
-        token_metadata_prefix: IntoStorageKey | null,
-        enumeration_prefix: IntoStorageKey | null,
-        approval_prefix: IntoStorageKey | null,
+        token_metadata_prefix: Option<IntoStorageKey>,
+        enumeration_prefix: Option<IntoStorageKey>,
+        approval_prefix: Option<IntoStorageKey>,
     ) {
-        let approvals_by_id: LookupMap | null;
-        let next_approval_id_by_id: LookupMap | null;
+        let approvals_by_id: Option<LookupMap>;
+        let next_approval_id_by_id: Option<LookupMap>;
         if (approval_prefix) {
             let prefix = approval_prefix.into_storage_key();
             approvals_by_id = new LookupMap(prefix);
@@ -145,7 +147,7 @@ export class NonFungibleToken implements NonFungibleTokenCore{
         }
     }
     
-    internal_transfer(sender_id: string, receiver_id: string, token_id: string, approval_id: bigint | null, memo: string | null): [string, Map<string, bigint> | null] {
+    internal_transfer(sender_id: string, receiver_id: string, token_id: string, approval_id: Option<bigint>, memo: Option<string>): [string, Map<string, bigint> | null] {
         let owner_id = this.owner_by_id.get(token_id);
         if (owner_id == null) {
             throw new Error("Token not found");
@@ -153,7 +155,7 @@ export class NonFungibleToken implements NonFungibleTokenCore{
 
         let approved_account_ids = this.approvals_by_id?.remove(token_id);
 
-        let sender_id_authorized: string | null;
+        let sender_id_authorized: Option<string>;
         if (sender_id != owner_id) {
             if (!approved_account_ids) {
                 throw new Error("Unauthorized");
@@ -176,7 +178,7 @@ export class NonFungibleToken implements NonFungibleTokenCore{
         return [owner_id as string, approved_account_ids == null ? null : approved_account_ids as Map<string, bigint>]
     }
 
-    static emit_transfer(owner_id: string, receiver_id: string, token_id: string, sender_id: string | null, memo: string | null) {
+    static emit_transfer(owner_id: string, receiver_id: string, token_id: string, sender_id: Option<string>, memo: Option<string>) {
         new NftTransfer(owner_id, receiver_id, [token_id], (sender_id && (sender_id == owner_id)) ? sender_id : null, memo).emit()
     }
 
@@ -238,10 +240,59 @@ export class NonFungibleToken implements NonFungibleTokenCore{
         let approved_account_ids = this.approvals_by_id?.get(token_id) as Option<Map<AccountId, bigint>> || new Map<AccountId, bigint>()
         return new Token(token_id, owner_id, metadata, approved_account_ids)
     }
+
+    nft_resolve_transfer(previous_owner_id: string, receiver_id: string, token_id: string, approved_account_ids: Option<Map<string, bigint>>): boolean {
+        let must_revert: boolean;
+        let p = near.promiseResult(0)
+        if (p === PromiseResult.NotReady) {
+            throw new Error();
+        } else if (p === PromiseResult.Failed) {
+            must_revert = true;
+        } else {
+            try {
+                let yes_or_no = JSON.parse(p as Bytes)
+                if (typeof yes_or_no == 'boolean') {
+                    must_revert = yes_or_no
+                } else {
+                    must_revert = true
+                }
+            } catch (_e) {
+                must_revert = true
+            } 
+        }
+
+        if (!must_revert) {
+            return true
+        }
+
+        let current_owner = this.owner_by_id.get(token_id) as Option<AccountId>
+        if (current_owner) {
+            if (current_owner != receiver_id) {
+                return true
+            }
+        } else {
+            if(approved_account_ids){
+                refund_approved_account_ids(previous_owner_id, approved_account_ids)
+            }
+            return true
+        }
+        
+        this.internal_transfer_unguarded(token_id, receiver_id, previous_owner_id)
+        
+        if(this.approvals_by_id) {
+            let receiver_approvals = this.approvals_by_id.get(token_id) as Option<Map<AccountId, bigint>>
+            if (receiver_approvals) {
+                receiver_approvals = new Map(Object.entries(receiver_approvals))
+                refund_approved_account_ids(receiver_id, receiver_approvals)
+            }
+            if (approved_account_ids) {
+                this.approvals_by_id.set(token_id, approved_account_ids)
+            }
+        }
+        NonFungibleToken.emit_transfer(receiver_id, previous_owner_id, token_id, null, null);
+        return false;
+    }
 }
-
-// TODO: resolver
-
 
 export type StorageKey = TokensPerOwner | TokenPerOwnerInner;
 
