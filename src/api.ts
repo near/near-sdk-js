@@ -4,7 +4,6 @@ const U64_MAX = 2n ** 64n - 1n;
 const EVICTED_REGISTER = U64_MAX - 1n;
 
 interface Env {
-  panic: (msg?: string) => never;
   panic_utf8: (msg: string) => never;
   [x: string]: any;
 }
@@ -100,13 +99,7 @@ export function ecrecover(
   return env.read_register(0);
 }
 
-export function panic(msg?: string): never {
-  if (msg !== undefined) {
-    env.panic(msg);
-  } else {
-    env.panic();
-  }
-}
+// NOTE: "env.panic(msg)" is not exported, use "throw Error(msg)" instead
 
 export function panicUtf8(msg: string): never {
   env.panic_utf8(msg);
@@ -424,7 +417,7 @@ export function promiseResult(
   ) {
     return status;
   } else {
-    panic(`Unexpected return code: ${status}`);
+    throw Error(`Unexpected return code: ${status}`);
   }
 }
 
