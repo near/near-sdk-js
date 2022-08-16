@@ -14,7 +14,7 @@ export class Nep171Event extends NearEvent {
 }
 
 export class NftMint {
-    constructor(public owner_id: string, public token_ids: string[], public memo: string) {}
+    constructor(public owner_id: string, public token_ids: string[], public memo: string | null) {}
 
     emit() {
         NftMint.emit_many([this]);

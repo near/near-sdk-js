@@ -1,3 +1,5 @@
+import * as near from './api'
+
 // Type alias of bytes as string. This is done because internally, JSVM accepts `string`
 // as bytes. In the future, this can be updated to a separate type if added support
 // within quickjs/jsvm.
@@ -53,4 +55,10 @@ export type Mutable<T> = { -readonly [P in keyof T]: T[P] };
 
 export interface IntoStorageKey {
   into_storage_key(): Bytes;
+}
+
+export type Option<T> = T | null;
+
+export function assertOneYocto() {
+  assert(near.attachedDeposit() == 1n, "Requires attached deposit of exactly 1 yoctoNEAR")
 }

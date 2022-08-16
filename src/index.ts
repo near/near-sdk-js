@@ -13,6 +13,8 @@ import {
 
 import { bytes, Bytes, assert } from "./utils";
 
+import "./types"
+
 export {
   call,
   view,

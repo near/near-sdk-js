@@ -1,8 +1,11 @@
 import { UnorderedMap, LookupMap, Bytes, near, UnorderedSet, assert } from "near-sdk-js";
-import { IntoStorageKey } from "near-sdk-js/lib/utils"
+import { assertOneYocto, IntoStorageKey, Option } from "near-sdk-js/lib/utils"
 import { TokenMetadata } from "../metadata"
-import { hash_account_id } from "../utils"
-import { NftTransfer } from "../events"
+import { hash_account_id, refund_deposit, refund_deposit_to_account } from "../utils"
+import { NftMint, NftTransfer } from "../events"
+import { Token } from "../token"
+import { NonFungibleTokenCore } from ".";
+import { AccountId } from "../../../../lib/types";
 
 const GAS_FOR_RESOLVE_TRANSFER = 5_000_000_000_000n;
 const GAS_FOR_NFT_TRANSFER_CALL = 25_000_000_000_000n + GAS_FOR_RESOLVE_TRANSFER;
@@ -11,7 +14,7 @@ function repeat(str: string, n: number) {
     return Array(n + 1).join(str);
 }
 
-export class NonFungibleToken {
+export class NonFungibleToken implements NonFungibleTokenCore{
     public owner_id: string;
     public extra_storage_in_bytes_per_token: bigint;
     public owner_by_id: UnorderedMap;
@@ -176,11 +179,73 @@ export class NonFungibleToken {
     static emit_transfer(owner_id: string, receiver_id: string, token_id: string, sender_id: string | null, memo: string | null) {
         new NftTransfer(owner_id, receiver_id, [token_id], (sender_id && (sender_id == owner_id)) ? sender_id : null, memo).emit()
     }
+
+    internal_mint(token_id: string, token_owner_id: string, token_metadata: Option<TokenMetadata>): Token {
+        let token = this.internal_mint_with_refund(token_id, token_owner_id, token_metadata, near.predecessorAccountId())
+        new NftMint(token.owner_id, [token.token_id], null).emit()
+        return token;
+    }
+
+    internal_mint_with_refund(token_id: string, token_owner_id: string, token_metadata: Option<TokenMetadata>, refund_id: Option<string>): Token {
+        let initial_storage_usage: Option<[string, bigint]> = null;
+        if (refund_id) {
+            initial_storage_usage = [refund_id, near.storageUsage()]
+        }
+        if (this.token_metadata_by_id && token_metadata == null) {
+            throw new Error('Must provide metadata')
+        } 
+        if (this.owner_by_id.get(token_id)) {
+            throw new Error('token_id must be unique')
+        }
+
+        let owner_id = token_owner_id
+        this.owner_by_id.set(token_id, owner_id)
+        this.token_metadata_by_id?.set(token_id, token_metadata)
+        if (this.tokens_per_owner) {
+            let token_ids = this.tokens_per_owner.get(owner_id) as UnorderedSet;
+            token_ids = UnorderedSet.deserialize(token_ids)
+            token_ids.set(token_id)
+            this.tokens_per_owner.set(owner_id, token_ids)
+        }
+
+        let approved_account_ids = (this.approvals_by_id) ? new Map<AccountId, bigint>() : null;
+        if (initial_storage_usage) {
+            let [id, storage_usage] = initial_storage_usage
+            refund_deposit_to_account(near.storageUsage() - storage_usage, id)
+        }
+        return new Token(token_id, owner_id, token_metadata, approved_account_ids)
+    }
+
+    nft_transfer(receiver_id: string, token_id: string, approval_id: Option<bigint>, memo: Option<string>) {
+        assertOneYocto();
+        let sender_id = near.predecessorAccountId();
+        this.internal_transfer(sender_id, receiver_id, token_id, approval_id, memo)
+    }
+
+    nft_transfer_call(receiver_id: string, token_id: string, approval_id: Option<bigint>, memo: Option<string>, msg: string) {
+        assertOneYocto();
+        let sender_id = near.predecessorAccountId();
+        let [old_owner, old_approvals] = this.internal_transfer(sender_id, receiver_id, token_id, approval_id, memo)
+        // TODO: ext_nft_receiver
+    }
+
+    nft_token(token_id: string): Option<Token> {
+        let owner_id = this.owner_by_id.get(token_id) as Option<AccountId>
+        if (owner_id == null) {
+            return null
+        }
+        let metadata = this.token_metadata_by_id?.get(token_id) as Option<TokenMetadata>
+        let approved_account_ids = this.approvals_by_id?.get(token_id) as Option<Map<AccountId, bigint>> || new Map<AccountId, bigint>()
+        return new Token(token_id, owner_id, metadata, approved_account_ids)
+    }
 }
+
+// TODO: resolver
+
 
 export type StorageKey = TokensPerOwner | TokenPerOwnerInner;
 
-export class TokensPerOwner {
+export class TokensPerOwner implements IntoStorageKey {
     constructor(
         public account_hash: Bytes
     ) {}
@@ -190,7 +255,7 @@ export class TokensPerOwner {
     }
 }
 
-export class TokenPerOwnerInner {
+export class TokenPerOwnerInner implements IntoStorageKey {
     constructor(
         public account_id_hash: Bytes
     ) {}

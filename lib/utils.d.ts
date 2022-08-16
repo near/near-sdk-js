@@ -9,3 +9,5 @@ export declare type Mutable<T> = {
 export interface IntoStorageKey {
     into_storage_key(): Bytes;
 }
+export declare type Option<T> = T | null;
+export declare function assertOneYocto(): void;
