@@ -6,7 +6,7 @@
     "type": "module",
     "scripts": {
         "postinstall": "cd .. && yarn link && cd tests && yarn link near-sdk-js",
-        "build": "yarn build:context-api && yarn build:math-api && yarn build:storage-api && yarn build:log-panic-api && yarn build:promise-api && yarn build:promise-batch-api && yarn build:function-params && yarn build:lookup-map && yarn build:lookup-set && yarn build:unordered-map && yarn build:unordered-set && yarn build:vector && yarn build:bytes",
+        "build": "yarn build:context-api && yarn build:math-api && yarn build:storage-api && yarn build:log-panic-api && yarn build:promise-api && yarn build:promise-batch-api && yarn build:function-params && yarn build:lookup-map && yarn build:lookup-set && yarn build:unordered-map && yarn build:unordered-set && yarn build:vector && yarn build:bytes && yarn build:typescript",
         "build:context-api": "near-sdk-js build src/context_api.js build/context_api.wasm",
         "build:math-api": "near-sdk-js build src/math_api.js build/math_api.wasm",
         "build:storage-api": "near-sdk-js build src/storage_api.js build/storage_api.wasm",
