@@ -28,13 +28,13 @@ export class UnorderedSet {
     return this.elements.isEmpty();
   }
 
-  serializeIndex(index: number) {
+  private serializeIndex(index: number) {
     let data = new Uint32Array([index]);
     let array = new Uint8Array(data.buffer);
     return u8ArrayToBytes(array);
   }
 
-  deserializeIndex(rawIndex: Bytes): number {
+  private deserializeIndex(rawIndex: Bytes): number {
     let array = bytesToU8Array(rawIndex);
     let data = new Uint32Array(array.buffer);
     return data[0];
@@ -129,6 +129,6 @@ export class UnorderedSet {
     let elementsPrefix = data.prefix + "e";
     set.elements = new Vector(elementsPrefix);
     set.elements.length = data.elements.length;
-    return set;
+    return set as UnorderedSet;
   }
 }

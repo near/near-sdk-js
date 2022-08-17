@@ -40,19 +40,19 @@ export class UnorderedMap {
     return keysIsEmpty;
   }
 
-  serializeIndex(index: number): Bytes {
+  private serializeIndex(index: number): Bytes {
     let data = new Uint32Array([index]);
     let array = new Uint8Array(data.buffer);
     return u8ArrayToBytes(array);
   }
 
-  deserializeIndex(rawIndex: Bytes) {
+  private deserializeIndex(rawIndex: Bytes) {
     let array = bytesToU8Array(rawIndex);
     let data = new Uint32Array(array.buffer);
     return data[0];
   }
 
-  getIndexRaw(key: Bytes): Bytes {
+  private getIndexRaw(key: Bytes): Bytes {
     let indexLookup = this.keyIndexPrefix + JSON.stringify(key);
     let indexRaw = near.storageRead(indexLookup);
     return indexRaw;
@@ -162,7 +162,7 @@ export class UnorderedMap {
     // reconstruct values Vector
     map.values = new Vector(data.prefix + "v");
     map.values.length = data.values.length;
-    return map;
+    return map as UnorderedMap;
   }
 }
 
