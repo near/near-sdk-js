@@ -1,13 +1,13 @@
 import { Bytes } from "../utils";
 import { Vector } from "./vector";
 export declare class UnorderedMap {
-    readonly length: number;
     readonly prefix: Bytes;
     readonly keyIndexPrefix: Bytes;
     readonly keys: Vector;
     readonly values: Vector;
     constructor(prefix: Bytes);
-    len(): number;
+    get length(): number;
+    set length(_l: number);
     isEmpty(): boolean;
     serializeIndex(index: number): Bytes;
     deserializeIndex(rawIndex: Bytes): number;

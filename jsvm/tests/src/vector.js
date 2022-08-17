@@ -20,7 +20,7 @@ class VectorTestContract extends NearContract {
 
     @view
     len() {
-        return this.vector.len();
+        return this.vector.length;
     }
 
     @view

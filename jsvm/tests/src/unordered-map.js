@@ -23,7 +23,7 @@ class UnorderedMapTestContract extends NearContract {
 
     @view
     len() {
-        return this.unorderedMap.len();
+        return this.unorderedMap.length;
     }
 
     @view

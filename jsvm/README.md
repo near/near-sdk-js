@@ -238,7 +238,7 @@ someMethod() {
     this.v.pop()
 
     // len, isEmpty
-    let len = this.v.len()
+    let len = this.v.length
     let isEmpty = this.v.isEnpty()
 
     // iterate
@@ -366,7 +366,7 @@ someMethod() {
     this.m.set('ghi', 'ddd')
 
     // len, isEmpty
-    let len = this.m.len()
+    let len = this.m.length
     let isEmpty = this.m.isEnpty()
 
     // iterate
@@ -416,7 +416,7 @@ someMethod() {
     this.s.remove('def')
 
     // len, isEmpty
-    let len = this.s.len()
+    let len = this.s.length
     let isEmpty = this.s.isEnpty()
 
     // iterate
