@@ -30,21 +30,6 @@ class UnorderedMapTestContract extends NearContract {
     }
 
     @view
-    serializeIndex({index}) {
-        return this.unorderedMap.serializeIndex(index);
-    }
-
-    @view
-    deserializeIndex({rawIndex}) {
-        return this.unorderedMap.deserializeIndex(rawIndex);
-    }
-
-    @view
-    getIndexRaw({key}) {
-        return this.unorderedMap.getIndexRaw(key);
-    }
-
-    @view
     get({key}) {
         return this.unorderedMap.get(key);
     }
