@@ -6,6 +6,18 @@ import { Mutable } from "../utils";
 const ERR_INCONSISTENT_STATE =
   "The collection is an inconsistent state. Did previous smart contract execution terminate unexpectedly?";
 
+function serializeIndex(index: number) {
+  let data = new Uint32Array([index]);
+  let array = new Uint8Array(data.buffer);
+  return u8ArrayToBytes(array);
+}
+
+function deserializeIndex(rawIndex: Bytes): number {
+  let array = bytesToU8Array(rawIndex);
+  let data = new Uint32Array(array.buffer);
+  return data[0];
+}
+
 export class UnorderedSet {
   readonly length: number;
   readonly prefix: Bytes;
@@ -28,18 +40,6 @@ export class UnorderedSet {
     return this.elements.isEmpty();
   }
 
-  serializeIndex(index: number) {
-    let data = new Uint32Array([index]);
-    let array = new Uint8Array(data.buffer);
-    return u8ArrayToBytes(array);
-  }
-
-  deserializeIndex(rawIndex: Bytes): number {
-    let array = bytesToU8Array(rawIndex);
-    let data = new Uint32Array(array.buffer);
-    return data[0];
-  }
-
   contains(element: unknown): boolean {
     let indexLookup = this.elementIndexPrefix + JSON.stringify(element);
     return near.storageHasKey(indexLookup);
@@ -51,7 +51,7 @@ export class UnorderedSet {
       return false;
     } else {
       let nextIndex = this.len();
-      let nextIndexRaw = this.serializeIndex(nextIndex);
+      let nextIndexRaw = serializeIndex(nextIndex);
       near.storageWrite(indexLookup, nextIndexRaw);
       this.elements.push(element);
       return true;
@@ -81,7 +81,7 @@ export class UnorderedSet {
           near.storageWrite(lastLookupElement, indexRaw);
         }
       }
-      let index = this.deserializeIndex(indexRaw);
+      let index = deserializeIndex(indexRaw);
       this.elements.swapRemove(index);
       return true;
     }
@@ -129,6 +129,6 @@ export class UnorderedSet {
     let elementsPrefix = data.prefix + "e";
     set.elements = new Vector(elementsPrefix);
     set.elements.length = data.elements.length;
-    return set;
+    return set as UnorderedSet;
   }
 }
