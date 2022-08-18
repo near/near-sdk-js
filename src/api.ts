@@ -1,4 +1,5 @@
 import { Bytes } from "./utils";
+import { PromiseResult } from "./types";
 
 const U64_MAX = 2n ** 64n - 1n;
 const EVICTED_REGISTER = U64_MAX - 1n;
@@ -399,23 +400,17 @@ export function promiseResultsCount(): BigInt {
   return env.promise_results_count();
 }
 
-export enum PromiseResult {
-  NotReady = 0,
-  Successful = 1,
-  Failed = 2,
-}
-
 export function promiseResult(
   resultIdx: number | BigInt
-): Bytes | PromiseResult.NotReady | PromiseResult.Failed {
+): [PromiseResult, Bytes | null] {
   let status: PromiseResult = env.promise_result(resultIdx, 0);
   if (status == PromiseResult.Successful) {
-    return env.read_register(0);
+    return [status, env.read_register(0)];
   } else if (
     status == PromiseResult.Failed ||
     status == PromiseResult.NotReady
   ) {
-    return status;
+    return [status, null];
   } else {
     throw Error(`Unexpected return code: ${status}`);
   }
