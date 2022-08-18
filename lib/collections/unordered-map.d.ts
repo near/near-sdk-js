@@ -9,9 +9,6 @@ export declare class UnorderedMap {
     constructor(prefix: Bytes);
     len(): number;
     isEmpty(): boolean;
-    private serializeIndex;
-    private deserializeIndex;
-    private getIndexRaw;
     get(key: Bytes): unknown | null;
     set(key: Bytes, value: unknown): unknown | null;
     remove(key: Bytes): unknown | null;

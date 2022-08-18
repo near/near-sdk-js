@@ -8,8 +8,6 @@ export declare class UnorderedSet {
     constructor(prefix: Bytes);
     len(): number;
     isEmpty(): boolean;
-    private serializeIndex;
-    private deserializeIndex;
     contains(element: unknown): boolean;
     set(element: unknown): boolean;
     remove(element: unknown): boolean;
