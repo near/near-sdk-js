@@ -5,6 +5,24 @@ import { Vector, VectorIterator } from "./vector";
 const ERR_INCONSISTENT_STATE =
   "The collection is an inconsistent state. Did previous smart contract execution terminate unexpectedly?";
 
+function serializeIndex(index: number): Bytes {
+  let data = new Uint32Array([index]);
+  let array = new Uint8Array(data.buffer);
+  return u8ArrayToBytes(array);
+}
+
+function deserializeIndex(rawIndex: Bytes) {
+  let array = bytesToU8Array(rawIndex);
+  let data = new Uint32Array(array.buffer);
+  return data[0];
+}
+
+function getIndexRaw(keyIndexPrefix: Bytes, key: Bytes): Bytes {
+  let indexLookup = keyIndexPrefix + JSON.stringify(key);
+  let indexRaw = near.storageRead(indexLookup);
+  return indexRaw;
+}
+
 export class UnorderedMap {
   readonly prefix: Bytes;
   readonly keyIndexPrefix: Bytes;
@@ -41,28 +59,10 @@ export class UnorderedMap {
     return keysIsEmpty;
   }
 
-  serializeIndex(index: number): Bytes {
-    let data = new Uint32Array([index]);
-    let array = new Uint8Array(data.buffer);
-    return u8ArrayToBytes(array);
-  }
-
-  deserializeIndex(rawIndex: Bytes) {
-    let array = bytesToU8Array(rawIndex);
-    let data = new Uint32Array(array.buffer);
-    return data[0];
-  }
-
-  getIndexRaw(key: Bytes): Bytes {
-    let indexLookup = this.keyIndexPrefix + JSON.stringify(key);
-    let indexRaw = near.storageRead(indexLookup);
-    return indexRaw;
-  }
-
   get(key: Bytes): unknown | null {
-    let indexRaw = this.getIndexRaw(key);
+    let indexRaw = getIndexRaw(this.keyIndexPrefix, key);
     if (indexRaw) {
-      let index = this.deserializeIndex(indexRaw);
+      let index = deserializeIndex(indexRaw);
       let value = this.values.get(index);
       if (value) {
         return value;
@@ -77,11 +77,11 @@ export class UnorderedMap {
     let indexLookup = this.keyIndexPrefix + JSON.stringify(key);
     let indexRaw = near.storageRead(indexLookup);
     if (indexRaw) {
-      let index = this.deserializeIndex(indexRaw);
+      let index = deserializeIndex(indexRaw);
       return this.values.replace(index, value);
     } else {
       let nextIndex = this.length;
-      let nextIndexRaw = this.serializeIndex(nextIndex);
+      let nextIndexRaw = serializeIndex(nextIndex);
       near.storageWrite(indexLookup, nextIndexRaw);
       this.keys.push(key);
       this.values.push(value);
@@ -112,7 +112,7 @@ export class UnorderedMap {
           near.storageWrite(lastLookupKey, indexRaw);
         }
       }
-      let index = this.deserializeIndex(indexRaw);
+      let index = deserializeIndex(indexRaw);
       this.keys.swapRemove(index);
       return this.values.swapRemove(index);
     }
@@ -163,7 +163,7 @@ export class UnorderedMap {
     // reconstruct values Vector
     map.values = new Vector(data.prefix + "v");
     map.values.length = data.values.length;
-    return map;
+    return map as UnorderedMap;
   }
 }
 
