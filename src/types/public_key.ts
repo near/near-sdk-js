@@ -1,5 +1,5 @@
 import { Bytes } from "../utils";
-import bs58 from "bs58";
+import { base58 } from '@scure/base';
 
 export enum CurveType {
     ED25519 = 0,
@@ -66,7 +66,7 @@ export class PublicKey {
 
     static fromString(s: string) {
         let [curve, key_data] = split_key_type_data(s);
-        let data = bs58.decode(key_data);
+        let data = base58.decode(key_data);
         return new PublicKey(String.fromCharCode(curve) + data);
     }
 }
