@@ -2,13 +2,17 @@ import { NearContract, NearBindgen, near, call, view } from 'near-sdk-js'
 import { isUndefined } from 'lodash-es'
 import { log } from './log'
 
+interface CounterState {
+    count?: number
+}
+
 @NearBindgen
 class Counter extends NearContract {
     count: number;
 
-    constructor({ initial = 0 }: { initial: number }) {
+    constructor({ count = 0 }: CounterState) {
         super()
-        this.count = initial
+        this.count = count
     }
 
     @call
@@ -36,7 +40,7 @@ class Counter extends NearContract {
     }
 
     default() {
-        return new Counter({ initial: 0 })
+        return new Counter({})
     }
 }
 

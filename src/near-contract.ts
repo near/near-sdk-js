@@ -14,7 +14,8 @@ export abstract class NearContract {
         }
       }
     } else {
-      throw new Error("Contract state is empty");
+      const defaultState = this.default()
+      Object.assign(this, defaultState)
     }
   }
 
@@ -33,6 +34,4 @@ export abstract class NearContract {
 
   // needed for deserialization of the contract class object from plain object
   abstract default()
-
-  init(): any {}
 }
