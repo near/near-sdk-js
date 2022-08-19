@@ -48,7 +48,7 @@ export class UnorderedMap {
   }
 
   // noop, called by deserialize
-  set length(_l: number) {}
+  private set length(_l: number) {}
 
   isEmpty(): boolean {
     let keysIsEmpty = this.keys.isEmpty();

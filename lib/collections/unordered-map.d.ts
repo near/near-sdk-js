@@ -7,7 +7,7 @@ export declare class UnorderedMap {
     readonly values: Vector;
     constructor(prefix: Bytes);
     get length(): number;
-    set length(_l: number);
+    private set length(value);
     isEmpty(): boolean;
     get(key: Bytes): unknown | null;
     set(key: Bytes, value: unknown): unknown | null;

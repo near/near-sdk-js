@@ -35,7 +35,7 @@ export class UnorderedSet {
   }
 
   // noop, called by deserialize
-  set length(_l: number) {}
+  private set length(_l: number) {}
 
   isEmpty(): boolean {
     return this.elements.isEmpty();
