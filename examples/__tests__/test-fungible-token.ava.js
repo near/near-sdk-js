@@ -35,6 +35,13 @@ test.afterEach(async t => {
     });
 });
 
+test('Call to a function marked as "init" for the secon time throws an error', async t => {
+    const { ft } = t.context.accounts;
+    await ft.call(ft, 'init', { prefix: 'b', totalSupply: '10' });
+    // TODO: check that it is throwing an error
+    t.is(result, '1000');
+});
+
 test('Owner has all balance in the beginning', async t => {
     const { ft } = t.context.accounts;
     const result = await ft.view('ftBalanceOf', { accountId: ft.accountId });

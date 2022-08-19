@@ -1,3 +1,6 @@
+export function init (target: Object, key: string | symbol, descriptor: TypedPropertyDescriptor<Function>): void {
+}
+
 export function call (target: Object, key: string | symbol, descriptor: TypedPropertyDescriptor<Function>): void {
 }
 

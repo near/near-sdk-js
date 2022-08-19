@@ -9,7 +9,7 @@ export default function () {
           let classId = classNode.id
           let contractMethods = {}
 
-          for(let child of classNode.body.body) {
+          for (let child of classNode.body.body) {
             if (child.type == 'ClassMethod' && child.kind == 'method' && child.decorators) {
               if (child.decorators[0].expression.name == 'call') {
                 let callMethod = child.key.name
@@ -17,6 +17,9 @@ export default function () {
               } else if (child.decorators[0].expression.name == 'view') {
                 let viewMethod = child.key.name
                 contractMethods[viewMethod] = 'view'
+              } else if (child.decorators[0].expression.name == 'init') {
+                let initMethod = child.key.name
+                contractMethods[initMethod] = 'init'
               }
             }
           }
@@ -26,18 +29,18 @@ export default function () {
               t.exportNamedDeclaration(
                 t.functionDeclaration(t.identifier(method), [], t.blockStatement([
                   // let _contract = ContractClass._get()
-                  t.variableDeclaration('let', [t.variableDeclarator(t.identifier('_contract'), 
+                  t.variableDeclaration('let', [t.variableDeclarator(t.identifier('_contract'),
                     t.callExpression(t.memberExpression(classId, t.identifier('_get')), []))]),
                   // _contract.deserialize()
                   t.expressionStatement(
                     t.callExpression(t.memberExpression(t.identifier('_contract'), t.identifier('deserialize')), [])),
                   // let args = _contract.constructor.deserializeArgs()
-                  t.variableDeclaration('let', [t.variableDeclarator(t.identifier('args'), 
+                  t.variableDeclaration('let', [t.variableDeclarator(t.identifier('args'),
                     t.callExpression(t.memberExpression(t.memberExpression(t.identifier('_contract'), t.identifier('constructor')), t.identifier('deserializeArgs')), []))]),
                   // let ret = _contract.method(args)
-                  t.variableDeclaration('let', [t.variableDeclarator(t.identifier('ret'), 
+                  t.variableDeclaration('let', [t.variableDeclarator(t.identifier('ret'),
                     t.callExpression(t.memberExpression(t.identifier('_contract'), t.identifier(method)), [t.identifier('args')]))]),
-                  contractMethods[method] == 'call' ?
+                  contractMethods[method] == ('call' || 'init') ?
                     // _contract.serialize()
                     t.expressionStatement(
                       t.callExpression(t.memberExpression(t.identifier('_contract'), t.identifier('serialize')), []))

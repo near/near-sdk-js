@@ -1,7 +1,11 @@
 import * as near from "./api";
 
+enum StateSource {
+  CONTRACT,
+  DEFAULT
+}
 export abstract class NearContract {
-  deserialize() {
+  deserialize(): StateSource {
     const rawState = near.storageRead("STATE");
     if (rawState) {
       const state = JSON.parse(rawState)
@@ -13,9 +17,11 @@ export abstract class NearContract {
           this[item] = c[item].constructor.deserialize(this[item])
         }
       }
+      return StateSource.CONTRACT
     } else {
       const defaultState = this.default()
       Object.assign(this, defaultState)
+      return StateSource.DEFAULT
     }
   }
 
