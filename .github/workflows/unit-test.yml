@@ -1,4 +1,4 @@
-name: Standalone unit
+name: Unit tests
 on: push
 jobs:
   unit-tests:
@@ -13,5 +13,5 @@ jobs:
           node-version: "16"
       - name: Install modules
         run: yarn
-      - name: Run standalone unit tests
-        run: yarn test:standalone:unit
+      - name: Run unit tests
+        run: yarn test:unit

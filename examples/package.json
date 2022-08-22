@@ -1,5 +1,5 @@
 {
-  "name": "standalone-examples",
+  "name": "examples",
   "version": "1.0.0",
   "description": "Status message example with near-sdk-js",
   "main": "index.js",
