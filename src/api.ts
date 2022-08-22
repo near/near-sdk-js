@@ -402,15 +402,15 @@ export function promiseResultsCount(): BigInt {
 
 export function promiseResult(
   resultIdx: number | BigInt
-): [PromiseResult, Bytes | null] {
+): Bytes | PromiseResult.NotReady | PromiseResult.Failed {
   let status: PromiseResult = env.promise_result(resultIdx, 0);
   if (status == PromiseResult.Successful) {
-    return [status, env.read_register(0)];
+    return env.read_register(0);
   } else if (
     status == PromiseResult.Failed ||
     status == PromiseResult.NotReady
   ) {
-    return [status, null];
+    return status;
   } else {
     throw Error(`Unexpected return code: ${status}`);
   }
