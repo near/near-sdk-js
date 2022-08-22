@@ -1,12 +1,12 @@
 import { Bytes } from "../utils";
 import { Vector } from "./vector";
 export declare class UnorderedSet {
-    readonly length: number;
     readonly prefix: Bytes;
     readonly elementIndexPrefix: Bytes;
     readonly elements: Vector;
     constructor(prefix: Bytes);
-    len(): number;
+    get length(): number;
+    private set length(value);
     isEmpty(): boolean;
     contains(element: unknown): boolean;
     set(element: unknown): boolean;
