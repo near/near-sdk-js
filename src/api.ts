@@ -1,13 +1,15 @@
 import { Bytes } from "./utils";
+import { PromiseResult } from "./types";
 
 const U64_MAX = 2n ** 64n - 1n;
 const EVICTED_REGISTER = U64_MAX - 1n;
 
+// Interface available in QuickJS
 interface Env {
   panic_utf8: (msg: string) => never;
   [x: string]: any;
 }
-// env object is injected by JSVM
+
 declare let env: Env;
 
 export function log(...params: any[]) {
@@ -158,88 +160,10 @@ export function altBn128PairingCheck(value: Bytes): boolean {
   }
 }
 
-export function jsvmAccountId(): string {
-  env.jsvm_account_id(0);
-  return env.read_register(0);
-}
-
-export function jsvmJsContractName(): string {
-  env.jsvm_js_contract_name(0);
-  return env.read_register(0);
-}
-
-export function jsvmMethodName(): string {
-  env.jsvm_method_name(0);
-  return env.read_register(0);
-}
-
-export function jsvmArgs(): Bytes {
-  env.jsvm_args(0);
-  return env.read_register(0);
-}
-
-export function jsvmStorageWrite(key: Bytes, value: Bytes): boolean {
-  let exist = env.jsvm_storage_write(key, value, EVICTED_REGISTER);
-  if (exist === 1n) {
-    return true;
-  }
-  return false;
-}
-
-export function jsvmStorageRead(key: Bytes): Bytes | null {
-  let exist = env.jsvm_storage_read(key, 0);
-  if (exist === 1n) {
-    return env.read_register(0);
-  }
-  return null;
-}
-
-export function jsvmStorageRemove(key: Bytes): boolean {
-  let exist = env.jsvm_storage_remove(key, EVICTED_REGISTER);
-  if (exist === 1n) {
-    return true;
-  }
-  return false;
-}
-
-export function jsvmStorageHasKey(key: Bytes): boolean {
-  let exist = env.jsvm_storage_has_key(key);
-  if (exist === 1n) {
-    return true;
-  }
-  return false;
-}
-
-export function jsvmCallRaw(
-  contractName: string,
-  method: string,
-  args: any
-): Bytes | null {
-  env.jsvm_call(contractName, method, JSON.stringify(args), 0);
-  return env.read_register(0);
-}
-
-export function jsvmCall(
-  contractName: string,
-  method: string,
-  args: any
-): any | null {
-  let ret = jsvmCallRaw(contractName, method, args);
-  if (ret === null) {
-    return ret;
-  }
-  return JSON.parse(ret);
-}
-
 export function storageGetEvicted(): Bytes {
   return env.read_register(EVICTED_REGISTER);
 }
 
-export function jsvmValueReturn(value: Bytes) {
-  env.jsvm_value_return(value);
-}
-
-// Standalone only APIs
 export function currentAccountId(): string {
   env.current_account_id(0);
   return env.read_register(0);
@@ -397,12 +321,6 @@ export function promiseBatchActionDeleteAccount(
 
 export function promiseResultsCount(): BigInt {
   return env.promise_results_count();
-}
-
-export enum PromiseResult {
-  NotReady = 0,
-  Successful = 1,
-  Failed = 2,
 }
 
 export function promiseResult(

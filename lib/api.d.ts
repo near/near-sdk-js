@@ -1,4 +1,5 @@
 import { Bytes } from "./utils";
+import { PromiseResult } from "./types";
 export declare function log(...params: any[]): void;
 export declare function signerAccountId(): string;
 export declare function signerAccountPk(): Bytes;
@@ -26,18 +27,7 @@ export declare function validatorTotalStake(): BigInt;
 export declare function altBn128G1Multiexp(value: Bytes): Bytes;
 export declare function altBn128G1Sum(value: Bytes): Bytes;
 export declare function altBn128PairingCheck(value: Bytes): boolean;
-export declare function jsvmAccountId(): string;
-export declare function jsvmJsContractName(): string;
-export declare function jsvmMethodName(): string;
-export declare function jsvmArgs(): Bytes;
-export declare function jsvmStorageWrite(key: Bytes, value: Bytes): boolean;
-export declare function jsvmStorageRead(key: Bytes): Bytes | null;
-export declare function jsvmStorageRemove(key: Bytes): boolean;
-export declare function jsvmStorageHasKey(key: Bytes): boolean;
-export declare function jsvmCallRaw(contractName: string, method: string, args: any): Bytes | null;
-export declare function jsvmCall(contractName: string, method: string, args: any): any | null;
 export declare function storageGetEvicted(): Bytes;
-export declare function jsvmValueReturn(value: Bytes): void;
 export declare function currentAccountId(): string;
 export declare function input(): Bytes;
 export declare function storageUsage(): BigInt;
@@ -59,11 +49,6 @@ export declare function promiseBatchActionAddKeyWithFunctionCall(promiseIndex: n
 export declare function promiseBatchActionDeleteKey(promiseIndex: number | BigInt, publicKey: Bytes): void;
 export declare function promiseBatchActionDeleteAccount(promiseIndex: number | BigInt, beneficiaryId: string): void;
 export declare function promiseResultsCount(): BigInt;
-export declare enum PromiseResult {
-    NotReady = 0,
-    Successful = 1,
-    Failed = 2
-}
 export declare function promiseResult(resultIdx: number | BigInt): Bytes | PromiseResult.NotReady | PromiseResult.Failed;
 export declare function promiseReturn(promiseIdx: number | BigInt): void;
 export declare function storageWrite(key: Bytes, value: Bytes): boolean;
