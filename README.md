@@ -1,4 +1,4 @@
-# NEAR-SDK-JS (Standalone)
+# NEAR-SDK-JS
 
 ## Installation
 It is tested on Ubuntu 20.04, M1 Mac and Intel Mac. Other linux should also work but they're not tested.
