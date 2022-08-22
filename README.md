@@ -218,8 +218,8 @@ someMethod() {
     this.v.pop()
 
     // len, isEmpty
-    let len = this.v.len()
-    let isEmpty = this.v.isEnpty()
+    let len = this.v.length
+    let isEmpty = this.v.isEmpty()
 
     // iterate
     for (let element of this.v) {
@@ -346,8 +346,8 @@ someMethod() {
     this.m.set('ghi', 'ddd')
 
     // len, isEmpty
-    let len = this.m.len()
-    let isEmpty = this.m.isEnpty()
+    let len = this.m.length
+    let isEmpty = this.m.isEmpty()
 
     // iterate
     for (let [k, v] of this.m) {
@@ -396,8 +396,8 @@ someMethod() {
     this.s.remove('def')
 
     // len, isEmpty
-    let len = this.s.len()
-    let isEmpty = this.s.isEnpty()
+    let len = this.s.length
+    let isEmpty = this.s.isEmpty()
 
     // iterate
     for (let e of this.s) {

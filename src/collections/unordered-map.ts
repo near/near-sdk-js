@@ -24,14 +24,12 @@ function getIndexRaw(keyIndexPrefix: Bytes, key: Bytes): Bytes {
 }
 
 export class UnorderedMap {
-  readonly length: number;
   readonly prefix: Bytes;
   readonly keyIndexPrefix: Bytes;
   readonly keys: Vector;
   readonly values: Vector;
 
   constructor(prefix: Bytes) {
-    this.length = 0;
     this.prefix = prefix;
     this.keyIndexPrefix = prefix + "i";
     let indexKey = prefix + "k";
@@ -40,14 +38,17 @@ export class UnorderedMap {
     this.values = new Vector(indexValue);
   }
 
-  len() {
-    let keysLen = this.keys.len();
-    let valuesLen = this.values.len();
+  get length() {
+    let keysLen = this.keys.length;
+    let valuesLen = this.values.length;
     if (keysLen != valuesLen) {
       throw new Error(ERR_INCONSISTENT_STATE);
     }
     return keysLen;
   }
+
+  // noop, called by deserialize
+  private set length(_l: number) {}
 
   isEmpty(): boolean {
     let keysIsEmpty = this.keys.isEmpty();
@@ -79,7 +80,7 @@ export class UnorderedMap {
       let index = deserializeIndex(indexRaw);
       return this.values.replace(index, value);
     } else {
-      let nextIndex = this.len();
+      let nextIndex = this.length;
       let nextIndexRaw = serializeIndex(nextIndex);
       near.storageWrite(indexLookup, nextIndexRaw);
       this.keys.push(key);
@@ -92,14 +93,14 @@ export class UnorderedMap {
     let indexLookup = this.keyIndexPrefix + JSON.stringify(key);
     let indexRaw = near.storageRead(indexLookup);
     if (indexRaw) {
-      if (this.len() == 1) {
+      if (this.length == 1) {
         // If there is only one element then swap remove simply removes it without
         // swapping with the last element.
         near.storageRemove(indexLookup);
       } else {
         // If there is more than one element then swap remove swaps it with the last
         // element.
-        let lastKey = this.keys.get(this.len() - 1);
+        let lastKey = this.keys.get(this.length - 1);
         if (!lastKey) {
           throw new Error(ERR_INCONSISTENT_STATE);
         }
