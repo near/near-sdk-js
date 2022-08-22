@@ -395,6 +395,24 @@ export function promiseBatchActionDeleteAccount(
   env.promise_batch_action_delete_account(promiseIndex, beneficiaryId);
 }
 
+export function promiseBatchActionFunctionCallWeight(
+  promiseIndex: number | BigInt,
+  methodName: string,
+  args: Bytes,
+  amount: number | BigInt,
+  gas: number | BigInt,
+  weight: number | BigInt,
+) {
+  env.promise_batch_action_function_call_weight(
+    promiseIndex,
+    methodName,
+    args,
+    amount,
+    gas,
+    weight
+  );
+}
+
 export function promiseResultsCount(): BigInt {
   return env.promise_results_count();
 }

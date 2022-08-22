@@ -58,6 +58,7 @@ export declare function promiseBatchActionAddKeyWithFullAccess(promiseIndex: num
 export declare function promiseBatchActionAddKeyWithFunctionCall(promiseIndex: number | BigInt, publicKey: Bytes, nonce: number | BigInt, allowance: number | BigInt, receiverId: string, methodNames: string): void;
 export declare function promiseBatchActionDeleteKey(promiseIndex: number | BigInt, publicKey: Bytes): void;
 export declare function promiseBatchActionDeleteAccount(promiseIndex: number | BigInt, beneficiaryId: string): void;
+export declare function promiseBatchActionFunctionCallWeight(promiseIndex: number | BigInt, methodName: string, args: Bytes, amount: number | BigInt, gas: number | BigInt, weight: number | BigInt): void;
 export declare function promiseResultsCount(): BigInt;
 export declare enum PromiseResult {
     NotReady = 0,

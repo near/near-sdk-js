@@ -37,6 +37,12 @@ export function test_promise_batch_create_transfer() {
     near.promiseReturn(promiseId)
 }
 
+export function test_promise_batch_call_weight() {
+    let promiseId = near.promiseBatchCreate('callee-contract.test.near')
+    near.promiseBatchActionFunctionCallWeight(promiseId, 'cross_contract_call_gas', bytes('abc'), 0, 0, 1)
+    near.promiseReturn(promiseId)
+}
+
 export function test_promise_batch_deploy_call() {
     let promiseId = near.promiseBatchCreate('b.caller2.test.near')
     near.promiseBatchActionCreateAccount(promiseId)
