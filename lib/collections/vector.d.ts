@@ -3,7 +3,6 @@ export declare class Vector {
     length: number;
     readonly prefix: Bytes;
     constructor(prefix: Bytes);
-    len(): number;
     isEmpty(): boolean;
     get(index: number): unknown | null;
     swapRemove(index: number): unknown | null;
