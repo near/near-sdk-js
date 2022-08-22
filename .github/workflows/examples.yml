@@ -1,4 +1,4 @@
-name: Standalone examples
+name: Examples
 on: push
 jobs:
   examples:
