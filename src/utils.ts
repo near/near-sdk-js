@@ -1,6 +1,3 @@
-// Type alias of bytes as string. This is done because internally, JSVM accepts `string`
-// as bytes. In the future, this can be updated to a separate type if added support
-// within quickjs/jsvm.
 export type Bytes = string;
 
 export function u8ArrayToBytes(array: Uint8Array) {
