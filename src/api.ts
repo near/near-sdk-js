@@ -1,4 +1,5 @@
 import { Bytes } from "./utils";
+import { PromiseResult } from "./types";
 
 const U64_MAX = 2n ** 64n - 1n;
 const EVICTED_REGISTER = U64_MAX - 1n;
@@ -338,12 +339,6 @@ export function promiseBatchActionFunctionCallWeight(
 
 export function promiseResultsCount(): BigInt {
   return env.promise_results_count();
-}
-
-export enum PromiseResult {
-  NotReady = 0,
-  Successful = 1,
-  Failed = 2,
 }
 
 export function promiseResult(

@@ -1,4 +1,5 @@
 import { Bytes } from "./utils";
+import { PromiseResult } from "./types";
 export declare function log(...params: any[]): void;
 export declare function signerAccountId(): string;
 export declare function signerAccountPk(): Bytes;
@@ -49,11 +50,6 @@ export declare function promiseBatchActionDeleteKey(promiseIndex: number | BigIn
 export declare function promiseBatchActionDeleteAccount(promiseIndex: number | BigInt, beneficiaryId: string): void;
 export declare function promiseBatchActionFunctionCallWeight(promiseIndex: number | BigInt, methodName: string, args: Bytes, amount: number | BigInt, gas: number | BigInt, weight: number | BigInt): void;
 export declare function promiseResultsCount(): BigInt;
-export declare enum PromiseResult {
-    NotReady = 0,
-    Successful = 1,
-    Failed = 2
-}
 export declare function promiseResult(resultIdx: number | BigInt): Bytes | PromiseResult.NotReady | PromiseResult.Failed;
 export declare function promiseReturn(promiseIdx: number | BigInt): void;
 export declare function storageWrite(key: Bytes, value: Bytes): boolean;
