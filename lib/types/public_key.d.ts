@@ -15,10 +15,11 @@ export declare class Base58Error extends ParsePublicKeyError {
     constructor(error: string);
 }
 export declare class UnknownCurve extends ParsePublicKeyError {
+    constructor();
 }
 export declare class PublicKey {
     data: Bytes;
     constructor(data: Bytes);
-    curve_type(): CurveType;
+    curveType(): CurveType;
     static fromString(s: string): PublicKey;
 }

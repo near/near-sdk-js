@@ -1,4 +1,4 @@
-import { Bytes } from "../utils";
+import { Bytes, bytes } from "../utils";
 import { base58 } from '@scure/base';
 
 export enum CurveType {
@@ -48,7 +48,11 @@ export class Base58Error extends ParsePublicKeyError {
         super(`Base58 error: ${error}`);
     }
 }
-export class UnknownCurve extends ParsePublicKeyError {}
+export class UnknownCurve extends ParsePublicKeyError {
+    constructor() {
+        super("Unknown curve");
+    }
+}
 
 export class PublicKey {
     constructor(public data: Bytes) {
@@ -60,13 +64,18 @@ export class PublicKey {
         this.data = data
     }
 
-    curve_type(): CurveType {
+    curveType(): CurveType {
         return this.data.charCodeAt(0) as CurveType
     }
 
     static fromString(s: string) {
         let [curve, key_data] = split_key_type_data(s);
-        let data = base58.decode(key_data);
+        let data: Bytes;
+        try {
+            data = bytes(base58.decode(key_data));
+        } catch (err) {
+            throw new Base58Error(err.message);
+        }
         return new PublicKey(String.fromCharCode(curve) + data);
     }
 }
