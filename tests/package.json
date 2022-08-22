@@ -6,7 +6,7 @@
     "type": "module",
     "scripts": {
         "postinstall": "cd .. && yarn link && cd tests && yarn link near-sdk-js",
-        "build": "yarn build:context-api && yarn build:math-api && yarn build:storage-api && yarn build:log-panic-api && yarn build:promise-api && yarn build:promise-batch-api && yarn build:function-params && yarn build:lookup-map && yarn build:lookup-set && yarn build:unordered-map && yarn build:unordered-set && yarn build:vector && yarn build:bytes && yarn build:typescript",
+        "build": "yarn build:context-api && yarn build:math-api && yarn build:storage-api && yarn build:log-panic-api && yarn build:promise-api && yarn build:promise-batch-api && yarn build:function-params && yarn build:lookup-map && yarn build:lookup-set && yarn build:unordered-map && yarn build:unordered-set && yarn build:vector && yarn build:bytes && yarn build:typescript && yarn build:public-key",
         "build:context-api": "near-sdk-js build src/context_api.js build/context_api.wasm",
         "build:math-api": "near-sdk-js build src/math_api.js build/math_api.wasm",
         "build:storage-api": "near-sdk-js build src/storage_api.js build/storage_api.wasm",
@@ -21,6 +21,7 @@
         "build:vector": "near-sdk-js build src/vector.js build/vector.wasm",
         "build:bytes": "near-sdk-js build src/bytes.js build/bytes.wasm",
         "build:typescript": "near-sdk-js build src/typescript.ts build/typescript.wasm",
+        "build:public-key": "near-sdk-js build src/public-key.js build/public-key.wasm",
         "test": "ava",
         "test:context-api": "ava __tests__/test_context_api.ava.js",
         "test:math-api": "ava __tests__/test_math_api.ava.js",
@@ -34,7 +35,8 @@
         "test:unordered-map": "ava __tests__/unordered-map.ava.js",
         "test:vector": "ava __tests__/vector.ava.js",
         "test:bytes": "ava __tests__/bytes.ava.js",
-        "test:typescript": "ava __tests__/typescript.ava.js"
+        "test:typescript": "ava __tests__/typescript.ava.js",
+        "test:public-key": "ava __tests__/test-public-key.ava.js"
     },
     "author": "Near Inc <hello@nearprotocol.com>",
     "license": "Apache-2.0",
