@@ -170,3 +170,15 @@ test('promise delete account', async t => {
     t.is(r.result.status.SuccessValue, '');
     t.is(await caller2Contract.getSubAccount('e').exists(), false);
 });
+
+test('promise batch transfer overflow', async t => {
+    const { bob, caller2Contract } = t.context.accounts;
+    let r = await bob.callRaw(caller2Contract, 'test_transfer_overflow', '', {gas: '100 Tgas'});
+    t.assert(r.result.status.Failure.ActionError.kind.FunctionCallError.ExecutionError.startsWith('Smart contract panicked: Expect Uint128 for amount'));
+});
+
+test('promise create gas overflow', async t => {
+    const { ali, callerContract } = t.context.accounts;
+    let r = await ali.callRaw(callerContract, 'test_promise_create_gas_overflow', '', {gas: '100 Tgas'});
+    t.assert(r.result.status.Failure.ActionError.kind.FunctionCallError.ExecutionError.startsWith('Smart contract panicked: Expect Uint64 for gas'));
+});
