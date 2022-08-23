@@ -379,6 +379,11 @@
     estree-walker "^1.0.1"
     picomatch "^2.2.2"
 
+"@scure/base@^1.1.1":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@scure/base/-/base-1.1.1.tgz#ebb651ee52ff84f420097055f4bf46cfba403938"
+  integrity sha512-ZxOhsSyxYwLJj3pLZCefNitxsj093tb2vq90mp2txoYeBqbcjDjqFhyM8eUjq/uFm6zJ+mUuqxlS2FkuSY1MTA==
+
 "@sindresorhus/is@^4.0.0":
   version "4.6.0"
   resolved "https://registry.npmjs.org/@sindresorhus/is/-/is-4.6.0.tgz"
@@ -605,6 +610,11 @@ base-x@^3.0.2:
   dependencies:
     safe-buffer "^5.0.1"
 
+base-x@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/base-x/-/base-x-4.0.0.tgz#d0e3b7753450c73f8ad2389b5c018a4af7b2224a"
+  integrity sha512-FuwxlW4H5kh37X/oW59pwTzzTKRzfrrQwhmyspRM7swOEZcHtDZSCt45U6oKgtuFE+WYPblePMVIPR4RZrh/hw==
+
 base64url@^3.0.1:
   version "3.0.1"
   resolved "https://registry.npmjs.org/base64url/-/base64url-3.0.1.tgz"
@@ -679,6 +689,13 @@ bs58@^4.0.0, bs58@^4.0.1:
   integrity sha512-Ok3Wdf5vOIlBrgCvTq96gBkJw+JUEzdBgyaza5HLtPm7yTHkjRy8+JzNyHF7BHa0bNWOQIp3m5YF0nnFcOIKLw==
   dependencies:
     base-x "^3.0.2"
+
+bs58@^5.0.0:
+  version "5.0.0"
+  resolved "https://registry.yarnpkg.com/bs58/-/bs58-5.0.0.tgz#865575b4d13c09ea2a84622df6c8cbeb54ffc279"
+  integrity sha512-r+ihvQJvahgYT50JD05dyJNKlmmSlMoOGwn1lCcEzanPglg7TxYjioQUYehQ9mAR/+hOSd2jRc/Z2y5UxBymvQ==
+  dependencies:
+    base-x "^4.0.0"
 
 builtin-modules@^3.0.0:
   version "3.3.0"
@@ -1594,16 +1611,16 @@ near-api-js@^0.44.1:
     text-encoding-utf-8 "^1.0.2"
     tweetnacl "^1.0.1"
 
-near-sandbox@^0.0.12:
-  version "0.0.12"
-  resolved "https://registry.npmjs.org/near-sandbox/-/near-sandbox-0.0.12.tgz#b0e36c9458a437c5cb4e1218f715585f087904b1"
-  integrity sha512-NfMSbPYiSpSMijM3JoC1FuNJuc3Pop86OF+/01ahc8phWQbjT404rMR+UvvuCZQ6Qge8/MC76KjBUPg3d7mg1Q==
+near-sandbox@^0.0.13:
+  version "0.0.13"
+  resolved "https://registry.yarnpkg.com/near-sandbox/-/near-sandbox-0.0.13.tgz#139b70708ccefcdf2dd406710f6615590d1880e5"
+  integrity sha512-rtRn51BBD1oT9SeGAIInKVedfaS/i4VqKqznZIvFddWo0jcI4lMoK1yHuTVuEE7YfEE12NsspFG1GxN1SlPV2g==
   dependencies:
     got "^11.8.2"
     tar "^6.1.0"
 
 "near-sdk-js@file:..":
-  version "0.4.0-2"
+  version "0.4.0-5"
   dependencies:
     "@babel/core" "^7.17.5"
     "@babel/plugin-proposal-decorators" "^7.17.2"
@@ -1611,6 +1628,8 @@ near-sandbox@^0.0.12:
     "@rollup/plugin-babel" "^5.3.1"
     "@rollup/plugin-commonjs" "^21.0.1"
     "@rollup/plugin-node-resolve" "^13.1.1"
+    "@scure/base" "^1.1.1"
+    bs58 "^5.0.0"
     rollup "^2.61.1"
     rollup-plugin-sourcemaps "^0.6.3"
     yargs "^17.5.1"
@@ -1622,10 +1641,10 @@ near-units@^0.1.9:
   dependencies:
     bn.js "^5.2.0"
 
-near-workspaces@3.1.0:
-  version "3.1.0"
-  resolved "https://registry.npmjs.org/near-workspaces/-/near-workspaces-3.1.0.tgz#d462ecb4bf2ae1cc33063995a1ef7db5e204910f"
-  integrity sha512-0f/S2YU0xNQ7UQwCW/pkqXspjeK0N+nYj3x7/sx+tUMsckNzahTLNww+3I0YBa/UtcMrCVsT5WDG8emvhdRxnQ==
+near-workspaces@3.2.1:
+  version "3.2.1"
+  resolved "https://registry.yarnpkg.com/near-workspaces/-/near-workspaces-3.2.1.tgz#38c33474ece5898323f10cff7c75f771bb5a991a"
+  integrity sha512-761D8lsbSetS+Nu9C4IWdONn0gBSVpfjY8V09AOQt1Zb5XjtURFWpFTZun6vQJhvWv5+RsSNTF6uYsLyTLJBAA==
   dependencies:
     base64url "^3.0.1"
     bn.js "^5.2.0"
@@ -1635,7 +1654,7 @@ near-workspaces@3.1.0:
     fs-extra "^10.0.0"
     js-sha256 "^0.9.0"
     near-api-js "^0.44.1"
-    near-sandbox "^0.0.12"
+    near-sandbox "^0.0.13"
     near-units "^0.1.9"
     node-port-check "^2.0.1"
     promisify-child-process "^4.1.1"
