@@ -13,7 +13,6 @@ test.before(async t => {
     const typescriptContract = await root.devDeploy(
         'build/typescript.wasm',
     );
-    await typescriptContract.call(typescriptContract, 'init', {})
 
     // Test users
     const ali = await root.createSubAccount('ali');

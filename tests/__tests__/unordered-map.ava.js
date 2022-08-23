@@ -17,7 +17,6 @@ test.beforeEach(async t => {
     const unorderedMapContract = await root.devDeploy(
         'build/unordered-map.wasm',
     );
-    await unorderedMapContract.call(unorderedMapContract, 'init', {});
     // Test users
     const ali = await root.createSubAccount('ali');
     const bob = await root.createSubAccount('bob');

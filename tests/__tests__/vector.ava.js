@@ -13,7 +13,6 @@ test.beforeEach(async t => {
     const vectorContract = await root.devDeploy(
         'build/vector.wasm',
     );
-    await vectorContract.call(vectorContract, 'init', {});
 
     // Test users
     const ali = await root.createSubAccount('ali');

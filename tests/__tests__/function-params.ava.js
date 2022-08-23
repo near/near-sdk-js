@@ -17,7 +17,6 @@ test.before(async t => {
     const functionParamsContract = await root.devDeploy(
         'build/function-params.wasm',
     );
-    await functionParamsContract.call(functionParamsContract, 'init', {});
 
     // Test users
     const ali = await root.createSubAccount('ali');

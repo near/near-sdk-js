@@ -13,9 +13,6 @@ test.beforeEach(async t => {
         './build/status-message-collections.wasm',
     );
 
-    // Init the contract
-    await statusMessage.call(statusMessage, 'init', {});
-
     // Test users
     const ali = await root.createSubAccount('ali');
     const bob = await root.createSubAccount('bob');

@@ -14,7 +14,7 @@ test.beforeEach(async t => {
     );
 
     // Init the contract
-    await nft.call(nft, 'init', { owner_id: nft.accountId, owner_by_id_prefix: 'a' });
+    await nft.call(nft, 'constructor', { owner_id: nft.accountId, owner_by_id_prefix: 'a' });
 
     // Deploy the tokenReceiver contract.
     const tokenReceiver = await root.devDeploy(
@@ -22,7 +22,7 @@ test.beforeEach(async t => {
     );
 
     // Init the contract
-    await tokenReceiver.call(tokenReceiver, 'init', { nonFungibleTokenAccountId: nft.accountId });
+    await tokenReceiver.call(tokenReceiver, 'constructor', { nonFungibleTokenAccountId: nft.accountId });
 
     // Mint an NFT
     let tokenId = 'my-cool-nft';

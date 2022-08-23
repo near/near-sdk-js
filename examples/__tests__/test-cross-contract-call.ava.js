@@ -13,16 +13,13 @@ test.beforeEach(async t => {
         './build/status-message.wasm',
     );
 
-    // Init the contract
-    await statusMessage.call(statusMessage, 'init', {});
-
     // Deploy the onCall contract.
     const onCall = await root.devDeploy(
         './build/cross-contract-call.wasm',
     );
 
     // Init the contract
-    await onCall.call(onCall, 'init', { statusMessageContract: statusMessage.accountId });
+    await onCall.call(onCall, 'constructor', { statusMessageContract: statusMessage.accountId });
 
     // Create test accounts
     const ali = await root.createSubAccount('ali');

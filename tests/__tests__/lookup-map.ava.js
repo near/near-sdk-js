@@ -17,7 +17,6 @@ test.beforeEach(async t => {
     const lookupMapContract = await root.devDeploy(
         'build/lookup-map.wasm',
     );
-    await lookupMapContract.call(lookupMapContract, 'init', {});
 
     // Test users
     const ali = await root.createSubAccount('ali');

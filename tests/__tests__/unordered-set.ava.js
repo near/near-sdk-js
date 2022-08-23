@@ -17,7 +17,6 @@ test.beforeEach(async t => {
     const unorderedSetContract = await root.devDeploy(
         'build/unordered-set.wasm',
     );
-    await unorderedSetContract.call(unorderedSetContract, 'init', {});
 
     // Test users
     const ali = await root.createSubAccount('ali');

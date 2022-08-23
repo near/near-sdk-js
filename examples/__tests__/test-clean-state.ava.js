@@ -11,9 +11,6 @@ test.beforeEach(async t => {
     // Deploy the clean-state contract.
     const cleanState = await root.devDeploy('./build/clean-state.wasm');
 
-    // Init the contract
-    await cleanState.call(cleanState, 'init', {});
-
     // Save state for test runs, it is unique for each test
     t.context.worker = worker;
     t.context.accounts = {
