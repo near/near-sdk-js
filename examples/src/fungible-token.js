@@ -3,7 +3,6 @@ import {
     NearBindgen,
     call,
     view,
-    init,
     near,
     LookupMap,
     assert
@@ -18,7 +17,6 @@ class FungibleToken extends NearContract {
         // In a real world Fungible Token contract, storage management is required to denfense drain-storage attack
     }
 
-    @init
     init() {
         this.accounts.set(near.signerAccountId(), this.totalSupply)
     }

@@ -17,9 +17,6 @@ export default function () {
               } else if (child.decorators[0].expression.name == 'view') {
                 let viewMethod = child.key.name
                 contractMethods[viewMethod] = 'view'
-              } else if (child.decorators[0].expression.name == 'init') {
-                let initMethod = child.key.name
-                contractMethods[initMethod] = 'init'
               }
             }
           }
@@ -40,7 +37,7 @@ export default function () {
                   // let ret = _contract.method(args)
                   t.variableDeclaration('let', [t.variableDeclarator(t.identifier('ret'),
                     t.callExpression(t.memberExpression(t.identifier('_contract'), t.identifier(method)), [t.identifier('args')]))]),
-                  contractMethods[method] == ('call' || 'init') ?
+                  contractMethods[method] == 'call'  ?
                     // _contract.serialize()
                     t.expressionStatement(
                       t.callExpression(t.memberExpression(t.identifier('_contract'), t.identifier('serialize')), []))

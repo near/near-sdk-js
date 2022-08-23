@@ -10,10 +10,13 @@ test.beforeEach(async t => {
 
     // Deploy the counter contract.
     const counter = await root.devDeploy(
-        process.env['COUNTER_LOWLEVEL'] ? 
+        process.env['COUNTER_LOWLEVEL'] ?
         './build/counter-lowlevel.wasm' :
         (process.env['COUNTER_TS'] ? './build/counter-ts.wasm' : './build/counter.wasm')
     );
+
+    // Init the contract
+    await counter.call(counter, 'init', {});
 
     // Test users
     const ali = await root.createSubAccount('ali');
