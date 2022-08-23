@@ -1,21 +1,23 @@
 import {near, bytes} from 'near-sdk-js'
 
 export function log_expected_input_tests() {
-    // log ascii string
-    near.log('abc')
-    // log string with utf-8 chars
-    near.log('水')
-    // log number
-    near.log(333)
-    // log aribrary byte sequence
-    near.log(bytes('\x00\x01\xff'))
-    // log valid utf8 seqence
-    near.log(bytes('\xe6\xb0\xb4'))
+    // // log ascii string
+    // near.log('abc')
+    // // log string with utf-8 chars
+    // near.log('水')
+    // // log number
+    // near.log(333)
+    // // log aribrary byte sequence
+    // near.log(bytes('\x00\x01\xff'))
+    // // log valid utf8 seqence
+    // near.log(bytes('\xe6\xb0\xb4'))
 
-    // log valid utf8 sequence 
-    near.logUtf8(bytes('\xe6\xb0\xb4'))
-    // log valid utf16 sequence
-    near.logUtf16(bytes('\x34\x6c'))
+    // // log valid utf8 sequence 
+    // near.logUtf8(bytes('\xe6\xb0\xb4'))
+    // // log valid utf16 sequence
+    // near.logUtf16(bytes('\x34\x6c'))
+    
+    near.logUtf8(new Uint8Array([0x61, 0x62, 0x63]).buffer)
 }
 
 export function log_unexpected_input_tests() {

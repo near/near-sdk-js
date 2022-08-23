@@ -147,7 +147,7 @@ extern uint64_t alt_bn128_pairing_check(uint64_t value_len, uint64_t value_ptr);
 static JSValue near_read_register(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
 {
   uint64_t register_id;
-  char *data;
+  uint8_t *data;
   uint64_t data_len;
   JSValue ret;
 
@@ -158,8 +158,7 @@ static JSValue near_read_register(JSContext *ctx, JSValueConst this_val, int arg
   if (data_len != UINT64_MAX) {
     data = malloc(data_len);
     read_register(register_id, (uint64_t)data);
-    ret = JS_NewStringLenRaw(ctx, data, data_len);
-    free(data);
+    ret = JS_NewArrayBuffer(ctx, data, (size_t)data_len, NULL, NULL, TRUE);
     return ret;
   } else {
     return JS_UNDEFINED;
@@ -471,10 +470,12 @@ static JSValue near_ecrecover(JSContext *ctx, JSValueConst this_val, int argc, J
 
 static JSValue near_value_return(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) 
 {
-  const char *value_ptr;
+  uint8_t *value_ptr;
   size_t value_len;
 
-  value_ptr = JS_ToCStringLenRaw(ctx, &value_len, argv[0]);
+  value_ptr = JS_GetArrayBuffer(ctx, &value_len, argv[0]);
+  if (!value_ptr)
+    return JS_ThrowTypeError(ctx, "Expect ArrayBuffer for value"); 
   value_return(value_len, (uint64_t)value_ptr);
   return JS_UNDEFINED;
 }
@@ -517,10 +518,12 @@ static JSValue near_log(JSContext *ctx, JSValueConst this_val, int argc, JSValue
 
 static JSValue near_log_utf8(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
 {
-  const char *data_ptr;
+  uint8_t *data_ptr;
   size_t data_len;
 
-  data_ptr = JS_ToCStringLenRaw(ctx, &data_len, argv[0]);
+  data_ptr = JS_GetArrayBuffer(ctx, &data_len, argv[0]);
+  if (!data_ptr)
+    return JS_ThrowTypeError(ctx, "Expect ArrayBuffer for message");
   
   log_utf8(data_len, (uint64_t)data_ptr);
   return JS_UNDEFINED;
