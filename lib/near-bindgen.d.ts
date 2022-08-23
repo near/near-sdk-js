@@ -6,5 +6,6 @@ export declare function NearBindgen<T extends {
     new (...args: any[]): {
         _default(): {};
     };
+    _init(): {};
     _get(): any;
 } & T;

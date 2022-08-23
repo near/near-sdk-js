@@ -7,6 +7,18 @@ export function view (target: Object, key: string | symbol, descriptor: TypedPro
 
 export function NearBindgen<T extends { new(...args: any[]): {}}>(target: T) {
     return class extends target {
+
+        static _init() {
+            // @ts-ignore
+            let args = target.deserializeArgs()
+            let ret = new target(args)
+            // @ts-ignore
+            ret.init()
+            // @ts-ignore
+            ret.serialize()
+            return ret
+        }
+
         static _get() {
             let ret = Object.create(target.prototype)
             return ret

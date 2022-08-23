@@ -19,7 +19,7 @@ test.beforeEach(async t => {
     );
 
     // Init the contract
-    await onCall.call(onCall, 'constructor', { statusMessageContract: statusMessage.accountId });
+    await onCall.call(onCall, 'init', { statusMessageContract: statusMessage.accountId });
 
     // Create test accounts
     const ali = await root.createSubAccount('ali');
