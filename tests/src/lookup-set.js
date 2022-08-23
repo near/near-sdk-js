@@ -14,10 +14,6 @@ class LookupSetTestContract extends NearContract {
         this.lookupSet = new LookupSet('a');
     }
 
-    default() {
-        return new LookupSetTestContract();
-    }
-
     @view
     contains({ key }) {
         return this.lookupSet.contains(key);

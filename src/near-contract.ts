@@ -37,7 +37,4 @@ export abstract class NearContract {
   static serializeReturn(ret: any) {
     return JSON.stringify(ret);
   }
-
-  // needed for deserialization of the contract class object from plain object
-  abstract default()
 }

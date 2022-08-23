@@ -24,8 +24,4 @@ class NftContract extends NearContract {
             throw Error("unsupported msg")
         }
     }
-
-    default() {
-        return new NftContract({ nonFungibleTokenAccountId: '' })
-    }
 }

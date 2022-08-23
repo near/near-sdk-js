@@ -19,9 +19,5 @@ class StatusMessage extends NearContract {
         near.log(`get_status for account_id ${account_id}`)
         return this.records[account_id] || null
     }
-
-    default() {
-        return new StatusMessage()
-    }
 }
 

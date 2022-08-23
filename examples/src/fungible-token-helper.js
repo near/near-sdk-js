@@ -17,8 +17,4 @@ class FungibleTokenHelper extends NearContract {
     getContractData() {
         return this.data;
     }
-
-    default() {
-        return new FungibleTokenHelper();
-    }
 }

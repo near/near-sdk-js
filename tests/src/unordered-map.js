@@ -15,10 +15,6 @@ class UnorderedMapTestContract extends NearContract {
         this.unorderedMap = new UnorderedMap('a');
     }
 
-    default() {
-        return new UnorderedMapTestContract();
-    }
-
     @view
     len() {
         return this.unorderedMap.length;

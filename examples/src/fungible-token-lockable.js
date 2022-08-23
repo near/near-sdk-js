@@ -224,8 +224,4 @@ class LockableFungibleToken extends NearContract {
     getLockedBalance({ ownerId, escrowAccountId }) {
         return this.getAccount(ownerId).getLockedBalance(escrowAccountId)
     }
-
-    default() {
-        return new LockableFungibleToken({ prefix: '', totalSupply: 0 })
-    }
 }

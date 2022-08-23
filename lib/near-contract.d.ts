@@ -7,6 +7,5 @@ export declare abstract class NearContract {
     serialize(): void;
     static deserializeArgs(): any;
     static serializeReturn(ret: any): string;
-    abstract default(): any;
 }
 export {};

@@ -14,10 +14,6 @@ class VectorTestContract extends NearContract {
         this.vector = new Vector('a');
     }
 
-    default() {
-        return new VectorTestContract();
-    }
-
     @view
     len() {
         return this.vector.length;

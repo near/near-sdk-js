@@ -30,8 +30,4 @@ class FunctionParamsTestContract extends NearContract {
     get_values() {
         return { val3: this.val3, val2: this.val2, val1: this.val1 }
     }
-
-    default() {
-        return new FunctionParamsTestContract();
-    }
 }

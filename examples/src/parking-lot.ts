@@ -68,8 +68,4 @@ class ParkingLot extends NearContract {
         let engine = new Engine(carSpecs.engine.hp)
         return engine.run()
     }
-
-    default() {
-        return new ParkingLot()
-    }
 }

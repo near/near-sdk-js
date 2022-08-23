@@ -14,10 +14,6 @@ class LookupMapTestContract extends NearContract {
         this.lookupMap = new LookupMap('a');
     }
 
-    default() {
-        return new LookupMapTestContract();
-    }
-
     @view
     get({key}) {
         return this.lookupMap.get(key);

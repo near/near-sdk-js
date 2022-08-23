@@ -34,9 +34,5 @@ class Counter extends NearContract {
     getCount(): number {
         return this.count
     }
-
-    default() {
-        return new Counter({ initial: 0 })
-    }
 }
 
