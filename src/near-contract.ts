@@ -21,7 +21,7 @@ export abstract class NearContract {
       return StateSource.CONTRACT
     } else {
       // @ts-ignore
-      const defaultState = _get()
+      const defaultState = _default()
       Object.assign(this, defaultState)
       return StateSource.DEFAULT
     }

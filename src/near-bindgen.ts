@@ -11,5 +11,9 @@ export function NearBindgen<T extends { new(...args: any[]): {}}>(target: T) {
             let ret = Object.create(target.prototype)
             return ret
         }
+
+        _default() {
+            return new target({})
+        }
     }
 }
