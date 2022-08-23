@@ -10,7 +10,8 @@ export abstract class NearContract {
     if (rawState) {
       const state = JSON.parse(rawState)
       // reconstruction of the contract class object from plain object
-      let c = this.default()
+      // @ts-ignore
+      let c = _get()
       Object.assign(this, state);
       for (const item in c) {
         if (c[item].constructor?.deserialize !== undefined) {
@@ -19,7 +20,8 @@ export abstract class NearContract {
       }
       return StateSource.CONTRACT
     } else {
-      const defaultState = this.default()
+      // @ts-ignore
+      const defaultState = _get()
       Object.assign(this, defaultState)
       return StateSource.DEFAULT
     }
