@@ -54,8 +54,6 @@ export default function () {
             path.scope.registerDeclaration(path.getSibling(path.key + 1))
           }
 
-          
-
           console.log('Near bindgen export done')
         }
       },
