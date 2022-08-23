@@ -20,7 +20,7 @@ class UnorderedSetTestContract extends NearContract {
 
     @view
     len() {
-        return this.unorderedSet.len();
+        return this.unorderedSet.length;
     }
 
     @view
