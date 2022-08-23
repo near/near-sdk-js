@@ -14,11 +14,8 @@ class FungibleToken extends NearContract {
         super()
         this.accounts = new LookupMap(prefix)
         this.totalSupply = totalSupply
-        // In a real world Fungible Token contract, storage management is required to denfense drain-storage attack
-    }
-
-    init() {
         this.accounts.set(near.signerAccountId(), this.totalSupply)
+        // In a real world Fungible Token contract, storage management is required to denfense drain-storage attack
     }
 
     internalDeposit({ accountId, amount }) {

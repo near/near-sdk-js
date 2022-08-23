@@ -55,9 +55,6 @@ class LockableFungibleToken extends NearContract {
         super()
         this.accounts = new LookupMap(prefix) // Account ID -> Account mapping
         this.totalSupply = totalSupply // Total supply of the all tokens
-    }
-
-    init() {
         let ownerId = near.signerAccountId()
         let ownerAccount = this.getAccount(ownerId)
         ownerAccount.balance = this.totalSupply
