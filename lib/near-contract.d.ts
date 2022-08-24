@@ -2,7 +2,7 @@ declare enum StateSource {
     CONTRACT = 0,
     DEFAULT = 1
 }
-export declare abstract class NearContract {
+export declare class NearContract {
     deserialize(): StateSource;
     serialize(): void;
     static deserializeArgs(): any;

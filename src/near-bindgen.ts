@@ -24,7 +24,7 @@ export function NearBindgen<T extends { new(...args: any[]): {}}>(target: T) {
             return ret
         }
 
-        _default() {
+        static _default() {
             return new target({})
         }
     }

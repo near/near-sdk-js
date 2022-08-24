@@ -4,7 +4,7 @@ enum StateSource {
   CONTRACT,
   DEFAULT
 }
-export abstract class NearContract {
+export class NearContract {
   deserialize(): StateSource {
     const rawState = near.storageRead("STATE");
     if (rawState) {

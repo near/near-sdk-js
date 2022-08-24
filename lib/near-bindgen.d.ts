@@ -3,9 +3,8 @@ export declare function view(target: Object, key: string | symbol, descriptor: T
 export declare function NearBindgen<T extends {
     new (...args: any[]): {};
 }>(target: T): {
-    new (...args: any[]): {
-        _default(): {};
-    };
+    new (...args: any[]): {};
     _init(): {};
     _get(): any;
+    _default(): {};
 } & T;
