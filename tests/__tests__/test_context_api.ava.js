@@ -1,7 +1,6 @@
 import { Worker } from 'near-workspaces';
 import test from 'ava';
 
-
 test.before(async t => {
     // Init the worker and start a Sandbox server
     const worker = await Worker.init();
@@ -64,8 +63,8 @@ test('get input correct', async t => {
 
 test('get storage usage', async t => {
     const { carl, contextApiContract } = t.context.accounts;
-    let r = await carl.call(contextApiContract, 'get_storage_usage', '', {gas: '10 TGas'});
-    t.is(r>0, true);
+    let r = await carl.call(contextApiContract, 'get_storage_usage', '', { gas: '10 TGas' });
+    t.is(r > 0, true);
 });
 
 test('get block height', async t => {
@@ -89,21 +88,21 @@ test('get epoch height', async t => {
 
 test('get attached deposit', async t => {
     const { carl, contextApiContract } = t.context.accounts;
-    let r = await carl.call(contextApiContract, 'get_attached_deposit', '', {attachedDeposit: 3});
+    let r = await carl.call(contextApiContract, 'get_attached_deposit', '', { attachedDeposit: 3 });
     t.is(r, 3);
 });
 
 test('get prepaid gas', async t => {
     const { carl, contextApiContract } = t.context.accounts;
-    let r = await carl.call(contextApiContract, 'get_prepaid_gas', '', {gas: '10 TGas'});
+    let r = await carl.call(contextApiContract, 'get_prepaid_gas', '', { gas: '10 TGas' });
     t.is(r, 10000000000000);
 });
 
 test('get used gas', async t => {
     const { carl, contextApiContract } = t.context.accounts;
-    let r = await carl.call(contextApiContract, 'get_used_gas', '', {gas: '10 TGas'});
-    t.is(r>0, true);
-    t.is(r<10000000000000, true);
+    let r = await carl.call(contextApiContract, 'get_used_gas', '', { gas: '10 TGas' });
+    t.is(r > 0, true);
+    t.is(r < 10000000000000, true);
 });
 
 test('get random seed', async t => {

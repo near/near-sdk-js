@@ -1,10 +1,5 @@
 import { Worker } from 'near-workspaces';
-import { readFile } from 'fs/promises'
 import test from 'ava';
-
-function encodeCall(contract, method, args) {
-    return Buffer.concat([Buffer.from(contract), Buffer.from([0]), Buffer.from(method), Buffer.from([0]), Buffer.from(JSON.stringify(args))])
-}
 
 test.beforeEach(async t => {
     // Init the worker and start a Sandbox server
@@ -97,7 +92,7 @@ test('storage write bytes tests', async t => {
     let stateMap = new Map()
     // viewState doesn't work, because it tries to convert key to utf-8 string, which is not. So we use viewStateRaw
     let state = await bytesContract.viewStateRaw()
-    for (let {key, value} of state) {
+    for (let { key, value } of state) {
         stateMap.set(key, value)
     }
 
@@ -122,7 +117,7 @@ test('storage write unexpected types tests', async t => {
     let stateMap = new Map()
     // viewState doesn't work, because it tries to convert key to utf-8 string, which is not
     let state = await bytesContract.viewStateRaw()
-    for (let {key, value} of state) {
+    for (let { key, value } of state) {
         stateMap.set(key, value)
     }
 
@@ -170,43 +165,43 @@ test('panic tests', async t => {
     let r = await ali.callRaw(bytesContract, 'panic_test', '');
     t.assert(
         r.result.receipts_outcome[0].outcome.status.Failure.ActionError.kind.FunctionCallError.ExecutionError
-        .match(/Smart contract panicked:*/)
+            .match(/Smart contract panicked:*/)
     );
 
     r = await ali.callRaw(bytesContract, 'panic_ascii_test', '');
     t.assert(
         r.result.receipts_outcome[0].outcome.status.Failure.ActionError.kind.FunctionCallError.ExecutionError
-        .match(/Smart contract panicked: abc*/)
+            .match(/Smart contract panicked: abc*/)
     );
 
     r = await ali.callRaw(bytesContract, 'panic_js_number', '');
     t.assert(
         r.result.receipts_outcome[0].outcome.status.Failure.ActionError.kind.FunctionCallError.ExecutionError
-        .match(/Smart contract panicked: 356*/)
+            .match(/Smart contract panicked: 356*/)
     );
 
     r = await ali.callRaw(bytesContract, 'panic_js_undefined', '');
     t.assert(
         r.result.receipts_outcome[0].outcome.status.Failure.ActionError.kind.FunctionCallError.ExecutionError
-        .match(/Smart contract panicked:*/)
+            .match(/Smart contract panicked:*/)
     );
 
     r = await ali.callRaw(bytesContract, 'panic_js_null', '');
     t.assert(
         r.result.receipts_outcome[0].outcome.status.Failure.ActionError.kind.FunctionCallError.ExecutionError
-        .match(/Smart contract panicked: null*/)
+            .match(/Smart contract panicked: null*/)
     );
 
     r = await ali.callRaw(bytesContract, 'panic_utf8_test', '');
     t.assert(
         r.result.receipts_outcome[0].outcome.status.Failure.ActionError.kind.FunctionCallError.ExecutionError
-        .match(/Smart contract panicked: 水*/)
+            .match(/Smart contract panicked: 水*/)
     );
 
     r = await ali.callRaw(bytesContract, 'panicUtf8_valid_utf8_sequence', '');
     t.assert(
         r.result.receipts_outcome[0].outcome.status.Failure.ActionError.kind.FunctionCallError.ExecutionError
-        .match(/Smart contract panicked: 水*/)
+            .match(/Smart contract panicked: 水*/)
     );
 
     r = await ali.callRaw(bytesContract, 'panicUtf8_invalid_utf8_sequence', '');

@@ -1,5 +1,4 @@
 import { Worker } from 'near-workspaces';
-import { readFile } from 'fs/promises'
 import test from 'ava';
 
 test.beforeEach(async t => {
