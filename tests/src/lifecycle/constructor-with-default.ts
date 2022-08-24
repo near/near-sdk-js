@@ -6,8 +6,9 @@ import {
 } from 'near-sdk-js'
 
 @NearBindgen
-class SimpleContractNoDefaults extends NearContract {
+class SimpleContractWithDefaults extends NearContract {
     status: string
+
     constructor({ status = 'default status' }: { status: string }) {
         super()
         this.status = status

@@ -8,6 +8,7 @@ import {
 @NearBindgen
 class SimpleContractNoDefaults extends NearContract {
     status: string
+    
     constructor({ status }: { status: string }) {
         super()
         this.status = status

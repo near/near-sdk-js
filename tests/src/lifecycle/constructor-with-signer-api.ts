@@ -7,9 +7,10 @@ import {
 } from 'near-sdk-js'
 
 @NearBindgen
-class SimpleContractNoDefaults extends NearContract {
+class SimpleContractWithSignerApi extends NearContract {
     status: string
     owner: string
+
     constructor({ status = 'default status' }: { status: string }) {
         super()
         this.owner = near.signerAccountId()
