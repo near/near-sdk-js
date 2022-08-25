@@ -6,6 +6,13 @@ export function test_promise_batch_stake() {
     near.promiseReturn(promiseId)
 }
 
+export function test_transfer_overflow() {
+    let promiseId = near.promiseBatchCreate('c.caller2.test.near')
+    near.promiseBatchActionCreateAccount(promiseId)
+    near.promiseBatchActionTransfer(promiseId, BigInt(2) ** BigInt(128))
+    near.promiseReturn(promiseId)
+}
+
 export function test_promise_add_full_access_key() {
     let promiseId = near.promiseBatchCreate('c.caller2.test.near')
     near.promiseBatchActionCreateAccount(promiseId)
