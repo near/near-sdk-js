@@ -5,6 +5,7 @@ import {
     view,
     Vector
 } from 'near-sdk-js'
+import {House, Room} from './model.js';
 
 @NearBindgen
 class VectorTestContract extends NearContract {
@@ -13,9 +14,8 @@ class VectorTestContract extends NearContract {
         this.vector = new Vector('a');
     }
 
-    deserialize() {
-        super.deserialize();
-        this.vector = Object.assign(new Vector, this.vector);
+    default() {
+        return new VectorTestContract();
     }
 
     @view
@@ -66,6 +66,16 @@ class VectorTestContract extends NearContract {
     @call
     swapRemove({index}) {
         this.vector.swapRemove(index);
+    }
+
+    @call
+    add_house() {
+        this.vector.push(new House('house1', [new Room('room1', '200sqft'), new Room('room2', '300sqft')]));
+    }
+
+    @view
+    get_house() {
+        return this.vector.get(0);
     }
 }
 

@@ -8,14 +8,6 @@ class StatusMessage extends NearContract {
         this.uniqueValues = new LookupSet('b')
     }
 
-    deserialize() {
-        super.deserialize()
-        this.records.keys = Object.assign(new Vector, this.records.keys)
-        this.records.values = Object.assign(new Vector, this.records.values)
-        this.records = Object.assign(new UnorderedMap, this.records)
-        this.uniqueValues = Object.assign(new LookupSet, this.uniqueValues)
-    }
-
     @call
     set_status({ message }) {
         let account_id = near.signerAccountId()
@@ -40,6 +32,10 @@ class StatusMessage extends NearContract {
     get_all_statuses() {
         // used for test UnorderedMap
         return this.records.toArray()
+    }
+
+    default() {
+        return new StatusMessage()
     }
 }
 

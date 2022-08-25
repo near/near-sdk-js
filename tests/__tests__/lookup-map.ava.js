@@ -13,17 +13,11 @@ test.beforeEach(async t => {
     // Prepare sandbox for tests, create accounts, deploy contracts, etx.
     const root = worker.rootAccount;
 
-    // Deploy the jsvm contract.
-    const jsvm = await root.createAndDeploy(
-        root.getSubAccount('jsvm').accountId,
-        '../res/jsvm.wasm',
+    // Deploy the test contract.
+    const lookupMapContract = await root.devDeploy(
+        'build/lookup-map.wasm',
     );
-
-    // Deploy test JS contract
-    const testContract = await root.createSubAccount('test-contract');
-    let contract_base64 = (await readFile('build/lookup-map.base64')).toString();
-    await testContract.call(jsvm, 'deploy_js_contract', Buffer.from(contract_base64, 'base64'), { attachedDeposit: '400000000000000000000000' });
-    await testContract.call(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'init', {}), { attachedDeposit: '400000000000000000000000' });
+    await lookupMapContract.call(lookupMapContract, 'init', {});
 
     // Test users
     const ali = await root.createSubAccount('ali');
@@ -32,7 +26,7 @@ test.beforeEach(async t => {
 
     // Save state for test runs
     t.context.worker = worker;
-    t.context.accounts = { root, jsvm, testContract, ali, bob, carl };
+    t.context.accounts = { root, lookupMapContract, ali, bob, carl };
 });
 
 test.afterEach(async t => {
@@ -42,76 +36,87 @@ test.afterEach(async t => {
 });
 
 test('LookupMap set() get()', async t => {
-    const { ali, jsvm, testContract } = t.context.accounts;
+    const { ali, lookupMapContract } = t.context.accounts;
+
     t.is(
-        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'get', { key: 'hello' })),
+        await lookupMapContract.view('get', { key: 'hello' }),
         null
     );
     t.is(
-        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'containsKey', { key: 'hello' })),
+        await lookupMapContract.view('containsKey', { key: 'hello' }),
         false
     );
 
-    await ali.call(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'set', { key: 'hello', value: 'world' }), { attachedDeposit: '100000000000000000000000' });
+    await ali.call(lookupMapContract, 'set', { key: 'hello', value: 'world' });
 
     t.is(
-        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'get', { key: 'hello' })),
+        await lookupMapContract.view('get', { key: 'hello' }),
         'world'
     );
     t.is(
-        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'containsKey', { key: 'hello' })),
+        await lookupMapContract.view('containsKey', { key: 'hello' }),
         true
     );
 });
 
 
 test('LookupMap update, remove', async t => {
-    const { ali, jsvm, testContract } = t.context.accounts;
+    const { ali, lookupMapContract } = t.context.accounts;
 
-    await ali.call(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'set', { key: 'hello', value: 'world' }), { attachedDeposit: '100000000000000000000000' });
-    await ali.call(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'set', { key: 'hello1', value: 'world0' }), { attachedDeposit: '100000000000000000000000' });
+    await ali.call(lookupMapContract, 'set', { key: 'hello', value: 'world' });
+    await ali.call(lookupMapContract, 'set', { key: 'hello1', value: 'world0' });
 
     // update a value, len shouldn't change
-    await ali.call(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'set', { key: 'hello1', value: 'world1' }), { attachedDeposit: '100000000000000000000000' });
+    await ali.call(lookupMapContract, 'set', { key: 'hello1', value: 'world1' });
     // update should have effect
     t.is(
-        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'get', { key: 'hello1' })),
+        await lookupMapContract.view('get', { key: 'hello1' }),
         'world1'
     );
     // not update key should not changed
     t.is(
-        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'get', { key: 'hello' })),
+        await lookupMapContract.view('get', { key: 'hello' }),
         'world'
     );
     // remove non existing element should not error
-    await ali.call(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'remove', { key: 'hello3' }), { attachedDeposit: '100000000000000000000000' });
+    await ali.call(lookupMapContract, 'remove_key', { key: 'hello3' });
     // remove existing key should work
-    await ali.call(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'remove', { key: 'hello1' }));
+    await ali.call(lookupMapContract, 'remove_key', { key: 'hello1' });
     t.is(
-        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'containsKey', { key: 'hello1' })),
+        await lookupMapContract.view('containsKey', { key: 'hello1' }),
         false
     );
     // not removed key should not affected
     t.is(
-        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'get', { key: 'hello' })),
+        await lookupMapContract.view('get', { key: 'hello' }),
         'world'
     );
 });
 
 test('LookupMap extend', async t => {
-    const { ali, jsvm, testContract } = t.context.accounts;
+    const { ali, lookupMapContract } = t.context.accounts;
 
-    await ali.call(jsvm, 'call_js_contract', encodeCall(testContract.accountId, 'extend', { kvs: [['hello', 'world'], ['hello1', 'world1'], ['hello2', 'world2']] }), { attachedDeposit: '100000000000000000000000' });
+    await ali.call(lookupMapContract, 'extend', { kvs: [['hello', 'world'], ['hello1', 'world1'], ['hello2', 'world2']] });
     t.is(
-        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'get', { key: 'hello' })),
+        await lookupMapContract.view('get', { key: 'hello' }),
         'world'
     );
     t.is(
-        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'get', { key: 'hello1' })),
+        await lookupMapContract.view('get', { key: 'hello1' }),
         'world1'
     );
     t.is(
-        await jsvm.view('view_js_contract', encodeCall(testContract.accountId, 'get', { key: 'hello2' })),
+        await lookupMapContract.view('get', { key: 'hello2' }),
         'world2'
     );
+})
+
+test('LookupMap set get object', async t => {
+    const { ali, lookupMapContract } = t.context.accounts;
+    await ali.call(lookupMapContract, 'add_house', {});
+    t.is(
+        await lookupMapContract.view('get_house', {}),
+        'house house1 has 2 rooms. room room1 is 200sqft.'
+    )
+    
 })

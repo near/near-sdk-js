@@ -4,16 +4,9 @@ import {
     call,
     view,
     near,
-    LookupMap
+    LookupMap,
+    assert
 } from 'near-sdk-js'
-
-function assert(b, str) {
-    if (b) {
-        return
-    } else {
-        throw Error("assertion failed: " + str)
-    }
-}
 
 @NearBindgen
 class FungibleToken extends NearContract {
@@ -21,13 +14,11 @@ class FungibleToken extends NearContract {
         super()
         this.accounts = new LookupMap(prefix)
         this.totalSupply = totalSupply
-        this.accounts.set(near.signerAccountId(), totalSupply)
-        // don't need accountStorageUsage like rust in JS contract, storage deposit management is automatic in JSVM
+        // In a real world Fungible Token contract, storage management is required to denfense drain-storage attack
     }
 
-    deserialize() {
-        super.deserialize()
-        this.accounts = Object.assign(new LookupMap, this.accounts)
+    init() {
+        this.accounts.set(near.signerAccountId(), this.totalSupply)
     }
 
     internalDeposit({ accountId, amount }) {
@@ -64,11 +55,11 @@ class FungibleToken extends NearContract {
     @call
     ftTransferCall({ receiverId, amount, memo, msg }) {
         let senderId = near.predecessorAccountId()
-        this.internalTransfer({ senderId, receiverId, amount, memo })
-        let onTransferRet = near.jsvmCall(receiverId, 'ftOnTransfer', { senderId, amount, msg, receiverId })
-        // In JS, do not need a callback, ftResolveTransfer after ftOnTransfer Returns
-        // If any logic after ftOnTransfer Returns is required, just do it on onTransferRet.
-        return onTransferRet
+        this.internalTransfer({ senderId, receiverId, amount, memo });
+        const promise = near.promiseBatchCreate(receiverId);
+        const params = { senderId: senderId, amount: amount, msg: msg, receiverId: receiverId };
+        near.promiseBatchActionFunctionCall(promise, 'ftOnTransfer', JSON.stringify(params), 0, 30000000000000);
+        return near.promiseReturn();
     }
 
     @view
@@ -79,5 +70,9 @@ class FungibleToken extends NearContract {
     @view
     ftBalanceOf({ accountId }) {
         return this.accounts.get(accountId) || '0'
+    }
+
+    default() {
+        return new FungibleToken({ prefix: '', totalSupply: 0 })
     }
 }

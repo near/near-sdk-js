@@ -1,13 +1,6 @@
 import { Worker } from 'near-workspaces';
-import { readFile } from 'fs/promises'
 import test from 'ava';
 
-function encodeCall(contract, method, args) {
-    return Buffer.concat([Buffer.from(contract), Buffer.from([0]), Buffer.from(method), Buffer.from([0]), Buffer.from(JSON.stringify(args))])
-}
-
-// Use test.beforeEach to setup the environment with clean state before each test
-// If tests can be run in parallel in any order, you can reuse the environment by use test.before
 test.beforeEach(async t => {
     // Init the worker and start a Sandbox server
     const worker = await Worker.init();
@@ -15,17 +8,15 @@ test.beforeEach(async t => {
     // Prepare sandbox for tests, create accounts, deploy contracts, etc.
     const root = worker.rootAccount;
 
-    // Deploy the jsvm contract.
-    const jsvm = await root.createAndDeploy(
-        root.getSubAccount('jsvm').accountId,
-        './node_modules/near-sdk-js/res/jsvm.wasm',
+    // Deploy the counter contract.
+    const counter = await root.devDeploy(
+        process.env['COUNTER_LOWLEVEL'] ? 
+        './build/counter-lowlevel.wasm' :
+        (process.env['COUNTER_TS'] ? './build/counter-ts.wasm' : './build/counter.wasm')
     );
 
-    // Deploy and init the counter JS contract
-    const counter = await root.createSubAccount('counter');
-    let contract_base64 = (await readFile('build/counter.base64')).toString();
-    await counter.call(jsvm, 'deploy_js_contract', Buffer.from(contract_base64, 'base64'), { attachedDeposit: '400000000000000000000000' });
-    await counter.call(jsvm, 'call_js_contract', encodeCall(counter.accountId, 'init', {}), { attachedDeposit: '400000000000000000000000' });
+    // Init the contract
+    await counter.call(counter, 'init', {});
 
     // Test users
     const ali = await root.createSubAccount('ali');
@@ -33,7 +24,7 @@ test.beforeEach(async t => {
 
     // Save state for test runs
     t.context.worker = worker;
-    t.context.accounts = { root, jsvm, counter, ali, bob };
+    t.context.accounts = { root, counter, ali, bob };
 });
 
 // If the environment is reused, use test.after to replace test.afterEach
@@ -44,31 +35,33 @@ test.afterEach(async t => {
 });
 
 test('Initial count is 0', async t => {
-    const { jsvm, counter } = t.context.accounts;
-    const result = await jsvm.view('view_js_contract', encodeCall(counter.accountId, 'getCount', {}));
+    const { counter } = t.context.accounts;
+    const result = await counter.view('getCount', {});
     t.is(result, 0);
 });
 
 test('Increase works', async t => {
-    const { jsvm, counter, ali, bob } = t.context.accounts;
-    await ali.call(jsvm, 'call_js_contract', encodeCall(counter.accountId, 'increase', {}), { attachedDeposit: '100000000000000000000000' });
+    const { counter, ali, bob } = t.context.accounts;
+    await ali.call(counter, 'increase', {});
 
-    let result = await jsvm.view('view_js_contract', encodeCall(counter.accountId, 'getCount', {}));
+    let result = await counter.view('getCount', {});
     t.is(result, 1);
 
-    await bob.call(jsvm, 'call_js_contract', encodeCall(counter.accountId, 'increase', { n: 4 }), { attachedDeposit: '100000000000000000000000' });
-    result = await jsvm.view('view_js_contract', encodeCall(counter.accountId, 'getCount', {}));
+    await bob.call(counter, 'increase', { n: 4 });
+    result = await counter.view('getCount', {});
     t.is(result, 5);
 });
 
 test('Decrease works', async t => {
-    const { jsvm, counter, ali, bob } = t.context.accounts;
-    await ali.call(jsvm, 'call_js_contract', encodeCall(counter.accountId, 'decrease', {}), { attachedDeposit: '100000000000000000000000' });
+    const { counter, ali, bob } = t.context.accounts;
+    await ali.call(counter, 'decrease', {});
 
-    let result = await jsvm.view('view_js_contract', encodeCall(counter.accountId, 'getCount', {}));
+    let result = await counter.view('getCount', {});
     t.is(result, -1);
 
-    await bob.call(jsvm, 'call_js_contract', encodeCall(counter.accountId, 'decrease', { n: 4 }), { attachedDeposit: '100000000000000000000000' });
-    result = await jsvm.view('view_js_contract', encodeCall(counter.accountId, 'getCount', {}));
+    let dec = await bob.callRaw(counter, 'decrease', { n: 4 });
+    // ensure imported log does work, not silent failure
+    t.is(dec.result.receipts_outcome[0].outcome.logs[0], "Counter decreased to -5")
+    result = await counter.view('getCount', {});
     t.is(result, -5);
 });

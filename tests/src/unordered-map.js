@@ -6,6 +6,7 @@ import {
     UnorderedMap,
     Vector
 } from 'near-sdk-js'
+import {House, Room} from './model.js';
 
 @NearBindgen
 class UnorderedMapTestContract extends NearContract {
@@ -14,11 +15,8 @@ class UnorderedMapTestContract extends NearContract {
         this.unorderedMap = new UnorderedMap('a');
     }
 
-    deserialize() {
-        super.deserialize()
-        this.unorderedMap.keys = Object.assign(new Vector, this.unorderedMap.keys)
-        this.unorderedMap.values = Object.assign(new Vector, this.unorderedMap.values)
-        this.unorderedMap = Object.assign(new UnorderedMap, this.unorderedMap)
+    default() {
+        return new UnorderedMapTestContract();
     }
 
     @view
@@ -57,7 +55,7 @@ class UnorderedMapTestContract extends NearContract {
     }
 
     @call
-    remove({key}) {
+    remove_key({key}) {
         this.unorderedMap.remove(key);
     }
 
@@ -74,6 +72,20 @@ class UnorderedMapTestContract extends NearContract {
     @call
     extend({kvs}) {
         this.unorderedMap.extend(kvs);
+    }
+
+    @call
+    add_house() {
+        this.unorderedMap.set('house1', new House('house1', [new Room('room1', '200sqft'), new Room('room2', '300sqft')]))
+    }
+
+    @view
+    get_house() {
+        const rawHouse = this.unorderedMap.get('house1')
+        const house = new House(rawHouse.name, rawHouse.rooms)
+        const rawRoom = house.rooms[0]
+        const room = new Room(rawRoom.name, rawRoom.size)
+        return house.describe() + room.describe()
     }
 }
 

@@ -44,21 +44,23 @@ export default function () {
                     : t.emptyStatement(),
                   // if (ret !== undefined)
                   t.ifStatement(t.binaryExpression('!==', t.identifier('ret'), t.identifier('undefined')),
-                    // env.jsvm_value_return(_contract.constructor.serializeReturn(ret))
-                    t.expressionStatement(t.callExpression(t.memberExpression(t.identifier('env'), t.identifier('jsvm_value_return')), [
+                    // env.value_return(_contract.constructor.serializeReturn(ret))
+                    t.expressionStatement(t.callExpression(t.memberExpression(t.identifier('env'), t.identifier('value_return')), [
                       t.callExpression(t.memberExpression(t.memberExpression(t.identifier('_contract'), t.identifier('constructor')), t.identifier('serializeReturn')), [t.identifier('ret')])
                     ]))
                   )
                 ])),
                 [t.exportSpecifier(t.identifier(method), t.identifier(method))]))
+            path.scope.registerDeclaration(path.getSibling(path.key + 1))
           }
 
           path.insertAfter(
             t.exportNamedDeclaration(
               t.functionDeclaration(t.identifier('init'), [], t.blockStatement([
-                t.expressionStatement(t.newExpression(classId, [])),
+                t.expressionStatement(t.callExpression(t.memberExpression(classId, t.identifier('_init')), [])),
               ])),
               [t.exportSpecifier(t.identifier('init'), t.identifier('init'))]))
+          path.scope.registerDeclaration(path.getSibling(path.key + 1))
 
           console.log('Near bindgen export done')
         }

@@ -1,56 +1,40 @@
-# NEAR-SDK-JS (Enclave)
+# NEAR-SDK-JS (Standalone)
 
-## Getting started with template project
+## Installation
+It is tested on Ubuntu 20.04, M1 Mac and Intel Mac. Other linux should also work but they're not tested.
 
-The fastest and recommended way to develop with near-sdk-js is to create a project with our github template: https://github.com/near/near-sdk-js-template-project.
+1. Make sure you have make, cmake and nodejs. On Linux, also make sure you have gcc.
+2. `make setup`
 
-## Running examples
+## Usage
 
+1. Copy project layout including configurations from `examples/` as a starting point
+2. Write smart contracts with JavaScript. You can use most npm packages that uses portable ES2020 features. 
+3. Build the contract with `yarn build`.
+4. If no errors happens, a `<contract-name>.wasm` will be generate at `<project-dir>/build/`. It can be tested with workspaces-js and deployed to a NEAR node.
+
+## Running Examples
 There are a couple of contract examples in the project:
 
-- [Clean contract state](/examples/README-CLEAN-STATE.md)
-- [Doing cross contract call](/examples/README-CROSS-CONTRACT-CALL.md)
-- [Fungible token](/examples/README-FT.md)
-- [Lockable fungible token](/examples/README-LOCKABLE-FT.md)
-- [Non fungible token](/examples/README-NFT.md)
-- [Status message board](/examples/README-STATUS-MESSAGE.md)
+- [Clean contract state](https://github.com/near/near-sdk-js/tree/develop/examples/src/clean-state.js)
+- [Counter using low level API](https://github.com/near/near-sdk-js/tree/develop/examples/src/counter-lowlevel.js)
+- [Counter in JavaScript](https://github.com/near/near-sdk-js/tree/develop/examples/src/counter.js)
+- [Counter in TypeScript](https://github.com/near/near-sdk-js/tree/develop/examples/src/counter.ts)
+- [Doing cross contract call](https://github.com/near/near-sdk-js/tree/develop/examples/src/cross-contract-call.js)
+- [Fungible token](https://github.com/near/near-sdk-js/tree/develop/examples/src/fungible-token.js)
+- [Lockable fungible token](https://github.com/near/near-sdk-js/tree/develop/examples/src/fungible-token-lockable.js)
+- [Non fungible token](https://github.com/near/near-sdk-js/tree/develop/examples/src/non-fungible-token.js)
+- [Non fungible token receiver contract](https://github.com/near/near-sdk-js/tree/develop/examples/src/non-fungible-token-receiver.js)
+- [Status message board](https://github.com/near/near-sdk-js/tree/develop/examples/src/status-message.js)
+- [Status message board with unique messages](https://github.com/near/near-sdk-js/tree/develop/examples/src/status-message-collections.js)
 
-The general steps to run these contracts are same. You can also follow their corresponding READMEs to build, test and run the contracts.
+To build all examples, run `yarn build` in `examples/`. To test all examples, run `yarn test`. You can also build and test one specific example with `yarn build:<example-name>` and `yarn test:<example-name>`, see `examples/package.json`.
 
-### General steps to run examples locally
-1. Use near-cli to deploy `jsvm.wasm` from the `res` folder to one of account you controlled. For example, `jsvm.<your-account>`:
-```sh
-export NEAR_ENV=local
-near deploy <jsvm-account> res/jsvm.wasm
-```
-2. `cd examples/<example>`
-3. `yarn && yarn build` to get <contract>.base64 file (JS smart-contract).
-4. Deploy <contract>.base64 file to `JSVM` account from the previous step.
-```sh
-near js deploy --accountId <your-account> --base64File build/<contract-name>.base64 --deposit 0.1 --jsvm <jsvm-account>
-```
-
-5. Interact with your contract using NEAR CLI or `near-api-js`. Encode the parameters and call. If the call cause the state increasement, you also need to attach NEAR to cover the storage deposit for the delta.
-
-```sh
-near js call <account-that-deployed-js-contract-to-jsvm> <method-name> --accountId <account-performing-call> --args <args> --deposit 0.1 --jsvm <jsvm-account>
-```
-
-6. If you want to remove the js contract and withdraw the storage deposit, use:
-
-```sh
-near js remove --accountId <your-account> --jsvm <jsvm-account>
-```
-
-### General steps to run examples on testnet
-1. `export NEAR_ENV=testnet`
-2. `cd examples/<example>`
-3. `yarn && yarn build` to get <contract>.base64 file (JS smart-contract).
-4. Deploy, call and remove JS contract is same as above, except <jsvm-account> is `jsvm.testnet`. This is also the default value, so you omit `--jsvm`.
+To deploy and call a contract on a NEAR node, use near-cli's `near deploy` and `near call`.
 
 ## Error Handling in NEAR-SDK-JS
 
-If you want to indicate an error happened and fail the transaction, just throw an error object in JavaScript. Our JSVM runtime will detect and automatically invoke `panic_utf8` with `"{error.message}\n:{error.stack}"`. As a result, transaction will fail with `"Smart contract panicked: {error.message}\n{error.stack}"` error message. You can also use an error utilities library to organize your errors, such as verror.
+If you want to indicate an error happened and fail the transaction, just throw an error object in JavaScript. The compiled JavaScript contract includes error handling capability. It will catch throwed errors and automatically invoke `panic_utf8` with `"{error.message}\n:{error.stack}"`. As a result, transaction will fail with `"Smart contract panicked: {error.message}\n{error.stack}"` error message. You can also use an error utilities library to organize your errors, such as verror.
 
 When your JS code or library throws an error, uncaught, the transaction will also fail with GuestPanic error, with the error message and stacktrace.
 
@@ -65,7 +49,7 @@ We recommend to use near-workspaces to write tests for your smart contracts. See
 
 ## NEAR-SDK-JS API Reference
 
-All NEAR blockchain provided functionality (host functions) are defined in `src/api.js` and exported as `near`. You can use them by:
+All NEAR blockchain provided functionality (host functions) are defined in `src/api.ts` and exported as `near`. You can use them by:
 ```js
 import {near} from 'near-sdk-js'
 
@@ -73,34 +57,46 @@ import {near} from 'near-sdk-js'
 let signer = near.signerAccountId()
 ```
 
-To use nightly host functions, such as `altBn128G1Sum`, the enclave contract need to be built with `make jsvm-nightly` and deployed to a nearcore node that has nightly enabled.
+To use nightly host functions, such as `altBn128G1Sum`, your contract need to be built with nightly enabled. Use:
+```
+export NEAR_NIGHTLY=1
+yarn build
+```
 
 ### About Type
 
-- In arguments, `Uint64: Number | BigInt`. In return, `Uint64: BigInt`. Because JavaScript Number cannot hold all Uint64 without losing precision. But as arguments, interger number is also allowed for convinience. Same for `Uint128`.
-- `Bytes` in both arguments and return represent a byte buffer, internally it's a JavaScript String Object. Any binary data `0x00-0xff` is stored as the char '\x00-\xff'. This is because QuickJS doesn't have ArrayBuffer in C API. If the bytes happens to have only 1-byte chars, it happens to be same as the the same content string.
+NEAR-SDK-JS is written in TypeScript, so every API function has a type specified by signature that looks familiar to JavaScript/TypeScript Developers. Two types in the signature need a special attention:
+- Most of the API take `BigInt` instead of Number as type. This because JavaScript Number cannot hold 64 bit and 128 bit integer without losing precision.
+- `Bytes` in both arguments and return represent a byte buffer, internally it's a JavaScript String Object. Any binary data `0x00-0xff` is stored as the char '\x00-\xff'. This is because QuickJS doesn't have ArrayBuffer in C API.
+    - To ensure correctness, every `Bytes` argument need to be pass in with the `bytes()` function to runtime type check it's indeed a `Bytes`.
+    - If `Bytes` is too long that `bytes()` can cause gas limit problem, such as in factory contract, represents the content of contract to be deployed. In this case you can precheck and guarantee the correctness of the content and use without `bytes()`.
 
 ### Context API
 
 ```
+function currentAccountId(): String;
 function signerAccountId(): String;
-function signerAccountPk(): String;
+function signerAccountPk(): Bytes;
 function predecessorAccountId(): String;
-function blockIndex(): Uint64;
-function blockHeight(): Uint64;
-function blockTimestamp(): Uint64;
-function epochHeight(): Uint64;
+function input(): Bytes;
+function blockIndex(): BigInt;
+function blockHeight(): BigInt;
+function blockTimestamp(): BigInt;
+function epochHeight(): BigInt;
+function storageUsage(): BigInt
 ```
-
 
 ### Economics API
 ```
-function attachedDeposit(): Uint128;
-function prepaidGas(): Uint64;
-function usedGas(): Uint64;
+function accountBalance(): BigInt;
+function accountLockedBalance(): BigInt;
+function attachedDeposit(): BigInt;
+function prepaidGas(): BigInt;
+function usedGas(): BigInt;
 ```
 
 ### Math API
+
 
 ```
 function randomSeed(): Bytes;
@@ -108,12 +104,14 @@ function sha256(value: Bytes): Bytes;
 function keccak256(value: Bytes): Bytes;
 function keccak512(value: Bytes): Bytes;
 function ripemd160(value: Bytes): Bytes;
-function ecrecover(hash: Bytes, sign: Bytes, v: Uint64, malleability_flag: Uint64): Bytes | null;
+function ecrecover(hash: Bytes, sign: Bytes, v: BigInt, malleability_flag: BigInt): Bytes | null;
 ```
 
 ### Miscellaneous API
 
+
 ```
+function valueReturn(value: Bytes);
 function panic(msg?: String);
 function panicUtf8(msg: Bytes);
 function log(msg: String);
@@ -121,79 +119,61 @@ function logUtf8(msg: Bytes);
 function logUtf16(msg: Bytes);
 ```
 
+### Promises API
+
+```
+function promiseCreate(account_id: String, method_name: String, arguments: Bytes, amount: BigInt, gas: BigInt): BigInt;
+function promiseThen(promise_index: BigInt, account_id: String, method_name: String, arguments: Bytes, amount: BigInt, gas: BigInt): BigInt;
+function promiseAnd(...promise_idx: BigInt): BigInt;
+function promiseBatchCreate(account_id: String): BigInt;
+function promiseBatchThen(promise_index: BigInt, account_id: String): BigInt;
+```
+
+### Promise API actions
+
+```
+function promiseBatchActionCreateAccount(promise_index: BigInt);
+function promiseBatchActionDeployContract(promise_index: BigInt, code: Bytes);
+function promiseBatchActionFunctionCall(promise_index: BigInt, method_name: String, arguments: Bytes, amount: BigInt, gas: BigInt);
+function promiseBatchActionTransfer(promise_index: BigInt, amount: BigInt);
+function promiseBatchActionStake(promise_index: BigInt, amount: BigInt, public_key: Bytes);
+function promiseBatchActionAddKeyWithFullAccess(promise_index: BigInt, public_key: Bytes, nonce: BigInt);
+function promiseBatchActionAddKeyWithFunctionCall(promise_index: BigInt, public_key: Bytes, nonce: BigInt, allowance: BigInt, receiver_id: String, method_names: String);
+function promiseBatchActionDeleteKey(promise_index: BigInt, public_key: Bytes);
+function promiseBatchActionDeleteAccount(promise_index: BigInt, beneficiary_id: String);
+```
+
+### Promise API results
+
+```
+function promiseResultsCount(): BigInt;
+function promiseResult(result_idx: BigInt, register_id: BigInt): BigInt;
+function promiseReturn(promise_idx: BigInt);
+```
+
 ### Storage API
 
 ```
-function storageRead(key: Bytes): Bytes | null;
-function storageHasKey(key: Bytes): bool;
+function storageWrite(key: Bytes, value: Bytes, register_id: BigInt): BigInt;
+function storageRead(key: Bytes, register_id: BigInt): BigInt;
+function storageRemove(key: Bytes, register_id: BigInt): BigInt;
+function storageHasKey(key: Bytes): BigInt;
 ```
 
 ### Validator API
 
 ```
-function validatorStake(account_id: String): Uint128;
-function validatorTotalStake(): Uint128;
+function validatorStake(account_id: String): BigInt;
+function validatorTotalStake(): BigInt;
 ```
 
 ### Alt BN128
 
 ```
-function altBn128G1Multiexp(value: Bytes): Bytes;
-function altBn128G1Sum(value: Bytes): Bytes;
-function altBn128PairingCheck(value: Bytes): bool;
+function altBn128G1Multiexp(value: Bytes, register_id: BigInt);
+function altBn128G1Sum(value: Bytes, register_id: BigInt);
+function altBn128PairingCheck(value: Bytes): BigInt;
 ```
-
-### JSVM Specific APIs
-Due to the design of JavaScript VM Contract, some additonal APIs are provided to obtain context, access storage and cross contract call. Since they're not documented at [NEAR nomicon](https://nomicon.io/). They're explained here.
-
-#### Obtain Context
-```
-function jsvmAccountId(): String;
-function jsvmJsContractName(): String;
-function jsvmMethodName(): String;
-function jsvmArgs(): Bytes;
-```
-
-The `jsvmAccountId` returns the JavaScript VM's contract account ID.
-
-The `jsvmJsContractName`, when called, returns the JavaScript contract name that are called at the moment.
-
-The `jsvmJsContractName` returns the method name being called.
-
-The `jsvmArgs` return the arguments passed to the method.
-
-#### Storage Access
-```
-function jsvmStorageWrite(key: Bytes, value: Bytes): bool;
-function jsvmStorageRead(key: Bytes): Bytes | null;
-function jsvmStorageRemove(key: Bytes): bool;
-function jsvmStorageHasKey(key: Bytes): bool;
-function storageGetEvicted(): Bytes;
-```
-
-These are equivalent to `storage*` but access limit to the substate of current JS contract. The `jsvmStorageWrite` and `jsvmStorageRemove` require and refund deposit to cover the storage delta. `jsvmStorage*` access the substate of current JS contract by prefix the key of current JS contract name (deployer's account id). You can use `storageRead` and `storageHasKey` to get code and state of other JS contracts. More specifically: code of `contractA` is stored under the key `contractA/code`. state of `contractA` is stored under `contractA/state/` concat with developer specifid key. And:
-```
-jsvmStorageRead(k)
-// equvalent to
-storageRead(jsvmJsContractName() + '/state/' + k)
-```
-
-When `jsvmStorageWrite` write to a key that already exists, the old value would be saved and can be obtained by `storageGetEvicted()`. In this case, jsvmStorageWrite returns `true`. If key doesn't exist before, returns `false`.
-
-When `jsvmStroageRemove` remove a key that exists, the old value would be saved and can be obtained by `storageGetEvicted()`. In this case, jsvmStroageRemove returns `true`. If key doesn't exist before, nothing is removed and returns `false`.
-
-#### Cross Contract Call
-```
-function jsvmValueReturn(value: Bytes);
-function jsvmCall(contract_name: String, method: String, args: Bytes): any;
-function jsvmCallRaw(contract_name: String, method: String, args: Bytes): Bytes;
-```
-
-The `jsvmValueReturn` is the version of `valueReturn` that should be used in all JavaScript contracts. It play well with `jsvmCall`.
-
-The `jsvmCall` invoke a synchronous cross contract call, to the given JavaScript `contract_name`, `method` with `args`. And returned the return value parsed as JSON into a JS object.
-
-The `jsvmCallRaw` is similar to `jsvmCall`, but return the raw, unparsed Bytes.
 
 ### Collections
 A few useful on-chain persistent collections are provided. All keys, values and elements are of type `Bytes`.
@@ -431,86 +411,3 @@ someMethod() {
     this.s.clear()
 }
 ```
-
-### APIs not available in JSVM
-Due to the architecture of the JSVM, some NEAR host functions, part of Standalone SDK or Rust SDK, are not revelant or being replaced by above JSVM specific APIs. Those unavailable APIs are explained here.
-
-- The `current_account_id` would always puts the account id of the JavaScript VM contract account in given register. The naming `current_account_id` is therefore confusing and not as helpful as a Rust contract. In some case, developer may want to get JavaScript VM contract account name, for example, determines whether it's running on testnet or mainnet, and behaves differently. So we expose this functionality under `jsvm_account_id()`.
-
-- The `input` puts the argument passed to call the contract in given register. In JavaScript VM, this is encoded as `"js_contract_name\0method_name\0args...`. This format isn't very convinient to developer, therefore, separate API `jsvm_js_contract_name`, `jsvm_method_name` and `jsvm_args` are provided.
-
-- The `storage_usage` return the storage bytes used by JavaScript VM contract. User doesn't care about the storage usage of the JSVM. Instead, users care about storage usage of a given JavaScript contract. This can be obtained by `storage_read` and count the sum of `register_len`.
-
-- The `account_balance` and `account_locked_balance` returns balance and locked_balance of JavaScript VM. Those are also not cared by users.
-
-- The `value_return` is a NEAR primitive that puts the value to return in a receipt. However we would want to access it as a JavaScript return value in a cross contract call. So we have a new API `jsvmValueReturn`, which does return the value in receipt and also as a JavaScript value returned by `jsvm_call`. The `jsvmValueReturn` should be used whenever you need `value_return`.
-
-- `abort` is intended to mark error location (line number). A full stacktrace with line numbers is provided by QuickJS, available when you throw a JS Error. So this API isn't needed.
-
-- Promise APIs act on the JSVM contract and could create subaccount, use the balance from JSVM account.JSVM would be a common VM used by the community instead of a Rust contract owned by the deployer. Therefore, promise APIs are not allowed.
-
-- The `storage_write` and `storage_remove` have access to all JavaScript contract codes and states deployed on JSVM. User can only write to their account owned code and state, as a substate of the JSVM. Therefor these two APIs are disallowed. Use `jsvm_storage_write` and `jsvm_storage_remove` instead. Read to other people owned code and state is allowed, as they're public as part of the blockchain anyway.
-
-
-## Advanced guides
-
-### Manual setup with npm package
-
-You can also layout your project by install the npm package manually:
-```
-yarn add near-sdk-js
-# or
-npm install near-sdk-js
-```
-
-### NEAR-SDK-JS contributor setup
-
-It is tested on Ubuntu 20.04, Intel Mac and M1 Mac. Other linux should also work but they're not tested.
-
-1. Make sure you have `wget`, `make`, `cmake` and `nodejs`. On Linux, also make sure you have `gcc`.
-2. Run `make` to get platform specific `qjsc` and `jsvm` contract in `res` folder.
-
-
-### Run NEAR-SDK-JS tests
-See https://github.com/near/near-sdk-js/tree/master/tests
-
-
-### Low level way to invoke NEAR-CLI
-
-`near js` subcommand in near-cli is a recent feature. Under the hood, it is encoding a special function call to jsvm contract. 
-
-#### Deploy a JS contract
-
-<details>
-<summary><strong>The equivalent raw command is:</strong></summary>
-<p>
-
-    near call <jsvm-account> deploy_js_contract --accountId <your-account> --args $(cat <contract-name>.base64) --base64 --deposit 0.1
-
-</p>
-</details>
-
-#### Call a JS contract
-
-<details>
-<summary><strong>The equivalent raw command is:</strong></summary>
-<p>
-
-    near call <jsvm-account> call_js_contract --accountId <your-account> --args <encoded-args> --base64
-
-    # where `<encoded-args>` can be obtained by:
-    node scripts/encode_call.js <your-account> <method-name> <args>
-
-</p>
-</details>
-
-#### Remove a JS contract
-
-<details>
-<summary><strong>The equivalent raw command is:</strong></summary>
-<p>
-
-    near call <jsvm-account> remove_js_contract --accountId <your-account>
-
-</p>
-</details>
