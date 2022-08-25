@@ -7,7 +7,6 @@ export function view (target: Object, key: string | symbol, descriptor: TypedPro
 
 export function NearBindgen<T extends { new(...args: any[]): {}}>(target: T) {
     return class extends target {
-
         static _init() {
             // @ts-ignore
             let args = target.deserializeArgs()
@@ -24,7 +23,7 @@ export function NearBindgen<T extends { new(...args: any[]): {}}>(target: T) {
             return ret
         }
 
-        static _default() {
+        static _default() { // TODO: can we use it?
             return new target({})
         }
     }

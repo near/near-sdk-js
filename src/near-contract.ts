@@ -1,29 +1,20 @@
 import * as near from "./api";
 
-enum StateSource {
-  CONTRACT,
-  DEFAULT
-}
-export class NearContract {
-  deserialize(): StateSource {
+export abstract class NearContract {
+  deserialize() {
     const rawState = near.storageRead("STATE");
     if (rawState) {
       const state = JSON.parse(rawState)
       // reconstruction of the contract class object from plain object
-      // @ts-ignore
-      let c = _get()
+      let c = this.default()
       Object.assign(this, state);
       for (const item in c) {
         if (c[item].constructor?.deserialize !== undefined) {
           this[item] = c[item].constructor.deserialize(this[item])
         }
       }
-      return StateSource.CONTRACT
     } else {
-      // @ts-ignore
-      const defaultState = _default()
-      Object.assign(this, defaultState)
-      return StateSource.DEFAULT
+      throw new Error("Contract state is empty");
     }
   }
 
@@ -39,4 +30,7 @@ export class NearContract {
   static serializeReturn(ret: any) {
     return JSON.stringify(ret);
   }
+
+  // needed for deserialization of the contract class object from plain object
+  abstract default()
 }
