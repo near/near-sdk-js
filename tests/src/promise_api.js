@@ -17,6 +17,10 @@ export function cross_contract_callee() {
     near.valueReturn(bytes(JSON.stringify(callingData())))
 }
 
+export function cross_contract_call_gas() {
+    near.valueReturn(bytes(near.prepaidGas().toString()))
+}
+
 export function cross_contract_callback() {
     near.valueReturn(bytes(JSON.stringify({...callingData(), promiseResults: arrayN(near.promiseResultsCount()).map(i => near.promiseResult(i))})))
 }
