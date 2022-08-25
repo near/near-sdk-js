@@ -7,7 +7,7 @@ import {
 } from 'near-sdk-js'
 
 @NearBindgen
-class SimpleContractWithSignerApi extends NearContract {
+class SimpleContractWithSignerApiAndDefault extends NearContract {
     status: string
     owner: string
 
