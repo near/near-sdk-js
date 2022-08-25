@@ -144,12 +144,28 @@ extern void alt_bn128_g1_sum(uint64_t value_len, uint64_t value_ptr, uint64_t re
 extern uint64_t alt_bn128_pairing_check(uint64_t value_len, uint64_t value_ptr);
 #endif
 
+static uint8_t* JS_Uint8Array_to_C(JSContext *ctx, JSValue array, size_t *len) {
+  uint8_t *ptr;
+  JSValue buffer;
+  size_t pbyte_offset, pbytes_per_element = 0;
+
+  buffer = JS_GetTypedArrayBuffer(ctx, array, &pbyte_offset, len, &pbytes_per_element);
+  if (JS_IsException(buffer) || pbytes_per_element != 1) {
+    return NULL;
+  }
+  ptr = JS_GetArrayBuffer(ctx, NULL, buffer);
+  if (ptr == NULL) {
+    return NULL;
+  }
+  return ptr + pbyte_offset;
+}
+
 static JSValue near_read_register(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
 {
   uint64_t register_id;
   uint8_t *data;
   uint64_t data_len;
-  JSValue ret;
+  JSValue arraybuffer, ret;
 
   if (JS_ToUint64Ext(ctx, &register_id, argv[0]) < 0) {
     return JS_ThrowTypeError(ctx, "Expect Uint64 for register_id");
@@ -158,8 +174,8 @@ static JSValue near_read_register(JSContext *ctx, JSValueConst this_val, int arg
   if (data_len != UINT64_MAX) {
     data = malloc(data_len);
     read_register(register_id, (uint64_t)data);
-    ret = JS_NewArrayBuffer(ctx, data, (size_t)data_len, NULL, NULL, TRUE);
-    return ret;
+    arraybuffer = JS_NewArrayBuffer(ctx, data, (size_t)data_len, NULL, NULL, TRUE);
+    return JS_CallConstructor(ctx, JS_GetPropertyStr(ctx, JS_GetGlobalObject(ctx), "Uint8Array"), 1, (JSValueConst *)&arraybuffer);
   } else {
     return JS_UNDEFINED;
   }
@@ -473,10 +489,11 @@ static JSValue near_value_return(JSContext *ctx, JSValueConst this_val, int argc
   uint8_t *value_ptr;
   size_t value_len;
 
-  value_ptr = JS_GetArrayBuffer(ctx, &value_len, argv[0]);
-  if (!value_ptr)
-    return JS_ThrowTypeError(ctx, "Expect ArrayBuffer for value"); 
-  value_return(value_len, (uint64_t)value_ptr);
+  value_ptr = JS_Uint8Array_to_C(ctx, argv[0], &value_len);
+  if (value_ptr == NULL) {
+    return JS_ThrowTypeError(ctx, "Expect Uint8Array for value"); 
+  }
+  value_return(value_len, (uint64_t)(value_ptr));
   return JS_UNDEFINED;
 }
 

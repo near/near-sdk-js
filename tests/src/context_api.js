@@ -1,7 +1,12 @@
 import {near} from 'near-sdk-js'
 
 export function get_current_account_id() {
-    near.valueReturn(near.currentAccountId())
+    near.valueReturn(new Uint8Array([
+        97, 108, 105, 46, 116,
+       101, 115, 116, 46, 110,
+       101,  97, 114
+     ]));
+    // near.valueReturn(near.currentAccountId())
 }
 
 export function get_signer_account_id() {
