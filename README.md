@@ -1,4 +1,14 @@
-# NEAR-SDK-JS (Standalone)
+# NEAR JavaScript SDK (Standalone)
+
+## Quick Start
+
+Use [`create-near-app`](https://github.com/near/create-near-app) to quickly get started writing smart contracts in JavaScript on NEAR.
+
+    npx create-near-app
+
+This will scaffold a basic template for you 😎
+
+Learn more in our [Quick Start guide](https://docs.near.org/develop/quickstart-guide).
 
 ## Installation
 It is tested on Ubuntu 20.04, M1 Mac and Intel Mac. Other linux should also work but they're not tested.
