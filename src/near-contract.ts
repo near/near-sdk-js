@@ -33,4 +33,6 @@ export abstract class NearContract {
 
   // needed for deserialization of the contract class object from plain object
   abstract default()
+
+  init() {}
 }

@@ -13,8 +13,11 @@ class SimpleContractWithSignerApiAndDefault extends NearContract {
 
     constructor({ status = 'default status' }: { status: string }) {
         super()
-        this.owner = near.signerAccountId()
         this.status = status
+    }
+
+    init() {
+        this.owner = near.signerAccountId()
     }
 
     @view
