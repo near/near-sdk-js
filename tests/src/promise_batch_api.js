@@ -6,6 +6,13 @@ export function test_promise_batch_stake() {
     near.promiseReturn(promiseId)
 }
 
+export function test_transfer_overflow() {
+    let promiseId = near.promiseBatchCreate('c.caller2.test.near')
+    near.promiseBatchActionCreateAccount(promiseId)
+    near.promiseBatchActionTransfer(promiseId, BigInt(2) ** BigInt(128))
+    near.promiseReturn(promiseId)
+}
+
 export function test_promise_add_full_access_key() {
     let promiseId = near.promiseBatchCreate('c.caller2.test.near')
     near.promiseBatchActionCreateAccount(promiseId)
@@ -34,6 +41,12 @@ export function test_promise_batch_create_transfer() {
     let promiseId = near.promiseBatchCreate('a.caller2.test.near')
     near.promiseBatchActionCreateAccount(promiseId)
     near.promiseBatchActionTransfer(promiseId, 10000000000000000000000000n)
+    near.promiseReturn(promiseId)
+}
+
+export function test_promise_batch_call_weight() {
+    let promiseId = near.promiseBatchCreate('callee-contract.test.near')
+    near.promiseBatchActionFunctionCallWeight(promiseId, 'cross_contract_call_gas', bytes('abc'), 0, 0, 1)
     near.promiseReturn(promiseId)
 }
 
