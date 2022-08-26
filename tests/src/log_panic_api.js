@@ -17,7 +17,7 @@ export function log_expected_input_tests() {
     // // log valid utf16 sequence
     // near.logUtf16(bytes('\x34\x6c'))
     
-    near.logUtf8(new Uint8Array([0x61, 0x62, 0x63]).buffer)
+    near.logUtf8(new Uint8Array([0x61, 0x62, 0x63]))
 }
 
 export function log_unexpected_input_tests() {
