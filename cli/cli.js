@@ -2,6 +2,7 @@
 
 import fs from 'fs/promises'
 import path from 'path';
+import { fileURLToPath } from 'url';
 
 import yargs from 'yargs'
 import { hideBin } from 'yargs/helpers'
@@ -13,11 +14,13 @@ import { rollup } from 'rollup';
 
 import { executeCommand } from './utils.js';
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const PROJECT_DIR = process.cwd();
-const NEAR_SDK_JS = 'node_modules/near-sdk-js';
-const TSC = 'node_modules/.bin/tsc';
-const QJSC_DIR = `${NEAR_SDK_JS}/cli/deps/quickjs`;
-const QJSC = `${NEAR_SDK_JS}/cli/deps/qjsc`;
+const NEAR_CLI_DIR = __dirname;
+const QJSC_DIR = `${NEAR_CLI_DIR}/deps/quickjs`;
+const QJSC = `${NEAR_CLI_DIR}/deps/qjsc`;
 
 yargs(hideBin(process.argv))
     .scriptName('near-sdk-js')
@@ -73,7 +76,7 @@ async function build(argv) {
 
 async function checkTsBuildWithTsc(sourceFileWithPath) {
     console.log(`check TypeScript build of ${sourceFileWithPath} with tsc`)
-    await executeCommand(`${TSC} --noEmit --experimentalDecorators --target es2020 --moduleResolution node ${sourceFileWithPath}`);
+    await executeCommand(`tsc --noEmit --experimentalDecorators --target es2020 --moduleResolution node ${sourceFileWithPath}`);
 }
 
 // Common build function
@@ -119,7 +122,7 @@ async function createMethodsHeaderFile(rollupTarget) {
 
 async function createWasmContract(qjscTarget, contractTarget) {
     console.log(`Creating ${contractTarget} contract...`);
-    const WASI_SDK_PATH = `${NEAR_SDK_JS}/cli/deps/wasi-sdk`;
+    const WASI_SDK_PATH = `${NEAR_CLI_DIR}/deps/wasi-sdk`;
 
     const CC = `${WASI_SDK_PATH}/bin/clang --sysroot=${WASI_SDK_PATH}/share/wasi-sysroot`
     let DEFS = `-D_GNU_SOURCE '-DCONFIG_VERSION="2021-03-27"' -DCONFIG_BIGNUM`
@@ -127,7 +130,7 @@ async function createWasmContract(qjscTarget, contractTarget) {
         DEFS = DEFS + ' -DNIGHTLY'
     }
     const INCLUDES = `-I${QJSC_DIR} -I.`
-    const ORIGINAL_BUILDER_PATH = `${NEAR_SDK_JS}/cli/builder/builder.c`;
+    const ORIGINAL_BUILDER_PATH = `${NEAR_CLI_DIR}/builder/builder.c`;
     const NEW_BUILDER_PATH = `${path.dirname(contractTarget)}/builder.c`
     const SOURCES = `${NEW_BUILDER_PATH} ${QJSC_DIR}/quickjs.c ${QJSC_DIR}/libregexp.c ${QJSC_DIR}/libunicode.c ${QJSC_DIR}/cutils.c ${QJSC_DIR}/quickjs-libc-min.c ${QJSC_DIR}/libbf.c`;
     const LIBS = `-lm`
@@ -141,6 +144,6 @@ async function createWasmContract(qjscTarget, contractTarget) {
 
 async function wasiStubContract(contractTarget) {
     console.log(`Executing wasi-stub...`);
-    const WASI_STUB = `${NEAR_SDK_JS}/cli/deps/binaryen/wasi-stub/run.sh`;
+    const WASI_STUB = `${NEAR_CLI_DIR}/deps/binaryen/wasi-stub/run.sh`;
     await executeCommand(`${WASI_STUB} ${contractTarget} >/dev/null`);
 }
