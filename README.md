@@ -10,19 +10,6 @@ This will scaffold a basic template for you 😎
 
 Learn more in our [Quick Start guide](https://docs.near.org/develop/quickstart-guide).
 
-## Installation
-It is tested on Ubuntu 20.04, M1 Mac and Intel Mac. Other linux should also work but they're not tested.
-
-1. Make sure you have make, cmake and nodejs. On Linux, also make sure you have gcc.
-2. `make setup`
-
-## Usage
-
-1. Copy project layout including configurations from `examples/` as a starting point
-2. Write smart contracts with JavaScript. You can use most npm packages that uses portable ES2020 features. 
-3. Build the contract with `yarn build`.
-4. If no errors happens, a `<contract-name>.wasm` will be generate at `<project-dir>/build/`. It can be tested with workspaces-js and deployed to a NEAR node.
-
 ## Running Examples
 There are a couple of contract examples in the project:
 
