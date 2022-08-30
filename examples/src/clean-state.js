@@ -14,6 +14,7 @@ class CleanState {
 
     @view
     get({ key }) {
+        
         return near.storageRead(key)
     }
 }
