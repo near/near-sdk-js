@@ -1,6 +1,6 @@
 import { NearBindgen, call, view, near } from 'near-sdk-js'
 
-@NearBindgen({ requireInit: false })
+@NearBindgen({})
 class CleanState {
     @call
     clean({ keys }) {

@@ -1,7 +1,7 @@
 import { NearBindgen, near, call, view, initialize } from 'near-sdk-js'
 import { isUndefined } from 'lodash-es'
 
-@NearBindgen
+@NearBindgen({})
 class Counter {
     @initialize
     init({ initial = 0 }) {

@@ -2,7 +2,7 @@ import { NearBindgen, near, call, view, initialize } from 'near-sdk-js'
 import { isUndefined } from 'lodash-es'
 import { log } from './log'
 
-@NearBindgen
+@NearBindgen({})
 class Counter {
     count: number;
     

@@ -1,9 +1,9 @@
-import { NearContract, NearBindgen, call, view, near, bytes } from 'near-sdk-js'
+import { NearBindgen, call, view, initialize, near, bytes } from 'near-sdk-js'
 
-@NearBindgen
-class OnCall extends NearContract {
-    constructor({ statusMessageContract }) {
-        super()
+@NearBindgen({ requireInit: true })
+class OnCall {
+    @initialize
+    init({ statusMessageContract }) {
         this.personOnCall = "undefined"
         this.statusMessageContract = statusMessageContract
     }
@@ -36,9 +36,5 @@ class OnCall extends NearContract {
     person_on_call() {
         near.log(`Returning person on-call: ${this.personOnCall}`)
         return this.personOnCall
-    }
-
-    default() {
-        return new OnCall({ statusMessageContract: '' })
     }
 }
