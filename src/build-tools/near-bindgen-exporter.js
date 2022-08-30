@@ -45,13 +45,13 @@ export default function () {
               // let _result = _contract.method(args);
               t.variableDeclaration('let', [t.variableDeclarator(t.identifier('_result'), t.callExpression(t.memberExpression(t.identifier('_contract'), t.identifier(method)), [t.identifier('_args')]))]),
               contractMethods[method] === 'initialize' || contractMethods[method] === 'call' ?
-                // _contract._saveToStorage();
-                t.expressionStatement(t.callExpression(t.memberExpression(t.identifier('_contract'), t.identifier('_saveToStorage')), []))
+                // Counter._saveToStorage(_contract);
+                t.expressionStatement(t.callExpression(t.memberExpression(classId, t.identifier('_saveToStorage')), [t.identifier('_contract')]))
                 : t.emptyStatement(),
               // if (_result !== undefined) near.valueReturn(_contract._serialize(result));
-              t.ifStatement(t.binaryExpression('!==', t.identifier('_result'), t.identifier('undefined')), t.expressionStatement(t.callExpression(t.memberExpression(t.identifier('near'), t.identifier('valueReturn')), [t.callExpression(t.memberExpression(t.identifier('_contract'), t.identifier('_serialize')), [t.identifier('_result')])]))),
+              t.ifStatement(t.binaryExpression('!==', t.identifier('_result'), t.identifier('undefined')), t.expressionStatement(t.callExpression(t.memberExpression(t.identifier('near'), t.identifier('valueReturn')), [t.callExpression(t.memberExpression(classId, t.identifier('_serialize')), [t.identifier('_result')])]))),
             ]))));
-            console.log('Near bindgen export done');
+            console.log(`Babel ${method} method export done`);
           }
         }
       }

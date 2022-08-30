@@ -21,8 +21,8 @@ export function NearBindgen<T extends { new(...args: any[]): {} }>(target: T) {
             return rawState ? this._deserialize(rawState) : null;
         }
 
-        static _saveToStorage(): void {
-            near.storageWrite("STATE", this._serialize(this));
+        static _saveToStorage(obj: Object): void {
+            near.storageWrite("STATE", this._serialize(obj));
         }
 
         static _getArgs(): JSON {

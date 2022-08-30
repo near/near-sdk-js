@@ -7,7 +7,7 @@ export declare function NearBindgen<T extends {
     new (...args: any[]): {};
     _create(): {};
     _getState(): Object;
-    _saveToStorage(): void;
+    _saveToStorage(obj: Object): void;
     _getArgs(): JSON;
     _serialize(value: Object): string;
     _deserialize(value: string): Object;
