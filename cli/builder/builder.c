@@ -117,6 +117,7 @@ extern void promise_batch_action_add_key_with_full_access(uint64_t promise_index
 extern void promise_batch_action_add_key_with_function_call(uint64_t promise_index, uint64_t public_key_len, uint64_t public_key_ptr, uint64_t nonce, uint64_t allowance_ptr, uint64_t receiver_id_len, uint64_t receiver_id_ptr, uint64_t method_names_len, uint64_t method_names_ptr);
 extern void promise_batch_action_delete_key(uint64_t promise_index, uint64_t public_key_len, uint64_t public_key_ptr);
 extern void promise_batch_action_delete_account(uint64_t promise_index, uint64_t beneficiary_id_len, uint64_t beneficiary_id_ptr);
+extern void promise_batch_action_function_call_weight(uint64_t promise_index, uint64_t function_name_len, uint64_t function_name_ptr, uint64_t arguments_len, uint64_t arguments_ptr, uint64_t amount_ptr, uint64_t gas, uint64_t weight);
 // #######################
 // # Promise API results #
 // #######################
@@ -761,6 +762,33 @@ static JSValue near_promise_batch_action_delete_key(JSContext *ctx, JSValueConst
   return JS_UNDEFINED;
 }
 
+static JSValue near_promise_batch_action_function_call_weight(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+  uint64_t promise_index;
+  const char *method_name_ptr, *arguments_ptr;
+  size_t method_name_len, arguments_len;
+  uint64_t amount_ptr[2]; // amount is u128
+  uint64_t gas;
+  uint64_t weight;
+
+  if (JS_ToUint64Ext(ctx, &promise_index, argv[0]) < 0) {
+    return JS_ThrowTypeError(ctx, "Expect Uint64 for promise_index");
+  }
+  method_name_ptr = JS_ToCStringLen(ctx, &method_name_len, argv[1]);
+  arguments_ptr = JS_ToCStringLenRaw(ctx, &arguments_len, argv[2]);
+  if (quickjs_to_u128(ctx, argv[3], amount_ptr) != 0) {
+    return JS_ThrowTypeError(ctx, "Expect Uint128 for amount");
+  }
+  if (JS_ToUint64Ext(ctx, &gas, argv[4]) < 0) {
+    return JS_ThrowTypeError(ctx, "Expect Uint64 for gas");
+  }
+  if (JS_ToUint64Ext(ctx, &weight, argv[5]) < 0) {
+    return JS_ThrowTypeError(ctx, "Expect Uint64 for weight");
+  }
+  promise_batch_action_function_call_weight(promise_index, method_name_len, (uint64_t)method_name_ptr, arguments_len, (uint64_t)arguments_ptr, (uint64_t)amount_ptr, gas, weight);
+  return JS_UNDEFINED;
+}
+
 static JSValue near_promise_batch_action_delete_account(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
 {
   uint64_t promise_index;
@@ -979,6 +1007,7 @@ static void js_add_near_host_functions(JSContext* ctx) {
   JS_SetPropertyStr(ctx, env, "promise_batch_action_add_key_with_function_call", JS_NewCFunction(ctx, near_promise_batch_action_add_key_with_function_call, "promise_batch_action_add_key_with_function_call", 6));
   JS_SetPropertyStr(ctx, env, "promise_batch_action_delete_key", JS_NewCFunction(ctx, near_promise_batch_action_delete_key, "promise_batch_action_delete_key", 2));
   JS_SetPropertyStr(ctx, env, "promise_batch_action_delete_account", JS_NewCFunction(ctx, near_promise_batch_action_delete_account, "promise_batch_action_delete_account", 2));
+  JS_SetPropertyStr(ctx, env, "promise_batch_action_function_call_weight", JS_NewCFunction(ctx, near_promise_batch_action_function_call_weight, "promise_batch_action_function_call_weight", 6));
   JS_SetPropertyStr(ctx, env, "promise_results_count", JS_NewCFunction(ctx, near_promise_results_count, "promise_results_count", 0));
   JS_SetPropertyStr(ctx, env, "promise_result", JS_NewCFunction(ctx, near_promise_result, "promise_result", 2));
   JS_SetPropertyStr(ctx, env, "promise_return", JS_NewCFunction(ctx, near_promise_return, "promise_return", 1));
