@@ -1,20 +1,20 @@
 import { Bytes } from "../utils";
 import { Vector } from "./vector";
-export declare class UnorderedSet {
+export declare class UnorderedSet<T> {
     readonly prefix: Bytes;
     readonly elementIndexPrefix: Bytes;
-    readonly elements: Vector;
+    readonly elements: Vector<T>;
     constructor(prefix: Bytes);
     get length(): number;
     private set length(value);
     isEmpty(): boolean;
-    contains(element: unknown): boolean;
-    set(element: unknown): boolean;
-    remove(element: unknown): boolean;
+    contains(element: T): boolean;
+    set(element: T): boolean;
+    remove(element: T): boolean;
     clear(): void;
     toArray(): Bytes[];
     [Symbol.iterator](): import("./vector").VectorIterator;
-    extend(elements: unknown[]): void;
+    extend(elements: T[]): void;
     serialize(): string;
-    static deserialize(data: UnorderedSet): UnorderedSet;
+    static deserialize(data: UnorderedSet<unknown>): UnorderedSet<unknown>;
 }

@@ -1,28 +1,28 @@
 import { Bytes } from "../utils";
 import { Vector } from "./vector";
-export declare class UnorderedMap {
+export declare class UnorderedMap<T> {
     readonly prefix: Bytes;
     readonly keyIndexPrefix: Bytes;
-    readonly keys: Vector;
-    readonly values: Vector;
+    readonly keys: Vector<Bytes>;
+    readonly values: Vector<T>;
     constructor(prefix: Bytes);
     get length(): number;
     private set length(value);
     isEmpty(): boolean;
-    get(key: Bytes): unknown | null;
-    set(key: Bytes, value: unknown): unknown | null;
+    get(key: Bytes): T | null;
+    set(key: Bytes, value: T): unknown | null;
     remove(key: Bytes): unknown | null;
     clear(): void;
-    toArray(): [Bytes, unknown][];
-    [Symbol.iterator](): UnorderedMapIterator;
-    extend(kvs: [Bytes, unknown][]): void;
+    toArray(): [Bytes, T][];
+    [Symbol.iterator](): UnorderedMapIterator<T>;
+    extend(kvs: [Bytes, T][]): void;
     serialize(): string;
-    static deserialize(data: UnorderedMap): UnorderedMap;
+    static deserialize(data: UnorderedMap<unknown>): UnorderedMap<unknown>;
 }
-declare class UnorderedMapIterator {
+declare class UnorderedMapIterator<T> {
     private keys;
     private values;
-    constructor(unorderedMap: UnorderedMap);
+    constructor(unorderedMap: UnorderedMap<T>);
     next(): {
         value: [unknown | null, unknown | null];
         done: boolean;

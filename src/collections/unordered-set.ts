@@ -18,10 +18,10 @@ function deserializeIndex(rawIndex: Bytes): number {
   return data[0];
 }
 
-export class UnorderedSet {
+export class UnorderedSet<T> {
   readonly prefix: Bytes;
   readonly elementIndexPrefix: Bytes;
-  readonly elements: Vector;
+  readonly elements: Vector<T>;
 
   constructor(prefix: Bytes) {
     this.prefix = prefix;
@@ -41,12 +41,12 @@ export class UnorderedSet {
     return this.elements.isEmpty();
   }
 
-  contains(element: unknown): boolean {
+  contains(element: T): boolean {
     let indexLookup = this.elementIndexPrefix + JSON.stringify(element);
     return near.storageHasKey(indexLookup);
   }
 
-  set(element: unknown): boolean {
+  set(element: T): boolean {
     let indexLookup = this.elementIndexPrefix + JSON.stringify(element);
     if (near.storageRead(indexLookup)) {
       return false;
@@ -59,7 +59,7 @@ export class UnorderedSet {
     }
   }
 
-  remove(element: unknown): boolean {
+  remove(element: T): boolean {
     let indexLookup = this.elementIndexPrefix + JSON.stringify(element);
     let indexRaw = near.storageRead(indexLookup);
     if (indexRaw) {
@@ -78,7 +78,8 @@ export class UnorderedSet {
         // If the removed element was the last element from keys, then we don't need to
         // reinsert the lookup back.
         if (lastElement != element) {
-          let lastLookupElement = this.elementIndexPrefix + JSON.stringify(lastElement);
+          let lastLookupElement =
+            this.elementIndexPrefix + JSON.stringify(lastElement);
           near.storageWrite(lastLookupElement, indexRaw);
         }
       }
@@ -109,20 +110,20 @@ export class UnorderedSet {
     return this.elements[Symbol.iterator]();
   }
 
-  extend(elements: unknown[]) {
+  extend(elements: T[]) {
     for (let element of elements) {
       this.set(element);
     }
   }
 
   serialize(): string {
-    return JSON.stringify(this)
+    return JSON.stringify(this);
   }
 
   // converting plain object to class object
-  static deserialize(data: UnorderedSet): UnorderedSet {
+  static deserialize(data: UnorderedSet<unknown>): UnorderedSet<unknown> {
     // removing readonly modifier
-    type MutableUnorderedSet = Mutable<UnorderedSet>;
+    type MutableUnorderedSet = Mutable<UnorderedSet<unknown>>;
     let set = new UnorderedSet(data.prefix) as MutableUnorderedSet;
     // reconstruct UnorderedSet
     set.length = data.length;
@@ -130,6 +131,6 @@ export class UnorderedSet {
     let elementsPrefix = data.prefix + "e";
     set.elements = new Vector(elementsPrefix);
     set.elements.length = data.elements.length;
-    return set as UnorderedSet;
+    return set as UnorderedSet<unknown>;
   }
 }

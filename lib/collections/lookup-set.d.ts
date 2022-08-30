@@ -1,4 +1,4 @@
-import { Bytes } from '../utils';
+import { Bytes } from "../utils";
 export declare class LookupSet {
     readonly keyPrefix: Bytes;
     constructor(keyPrefix: Bytes);

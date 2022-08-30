@@ -14,7 +14,7 @@ function indexToKey(prefix: Bytes, index: number): Bytes {
 
 /// An iterable implementation of vector that stores its content on the trie.
 /// Uses the following map: index -> element
-export class Vector {
+export class Vector<T> {
   length: number;
   readonly prefix: Bytes;
 
@@ -54,13 +54,13 @@ export class Vector {
     }
   }
 
-  push(element: unknown) {
+  push(element: T) {
     let key = indexToKey(this.prefix, this.length);
     this.length += 1;
     near.storageWrite(key, JSON.stringify(element));
   }
 
-  pop(): unknown | null {
+  pop(): T | null {
     if (this.isEmpty()) {
       return null;
     } else {
@@ -75,7 +75,7 @@ export class Vector {
     }
   }
 
-  replace(index: number, element: unknown): unknown {
+  replace(index: number, element: T): T {
     if (index >= this.length) {
       throw new Error(ERR_INDEX_OUT_OF_BOUNDS);
     } else {
@@ -88,7 +88,7 @@ export class Vector {
     }
   }
 
-  extend(elements: unknown[]) {
+  extend(elements: T[]) {
     for (let element of elements) {
       this.push(element);
     }
@@ -106,7 +106,7 @@ export class Vector {
     this.length = 0;
   }
 
-  toArray(): unknown[] {
+  toArray(): T[] {
     let ret = [];
     for (let v of this) {
       ret.push(v);
@@ -115,11 +115,11 @@ export class Vector {
   }
 
   serialize(): string {
-    return JSON.stringify(this)
+    return JSON.stringify(this);
   }
 
   // converting plain object to class object
-  static deserialize(data: Vector): Vector {
+  static deserialize(data: Vector<unknown>): Vector<unknown> {
     let vector = new Vector(data.prefix);
     vector.length = data.length;
     return vector;
@@ -128,8 +128,8 @@ export class Vector {
 
 export class VectorIterator {
   private current: number;
-  private vector: Vector;
-  constructor(vector: Vector) {
+  private vector: Vector<unknown>;
+  constructor(vector: Vector<unknown>) {
     this.current = 0;
     this.vector = vector;
   }

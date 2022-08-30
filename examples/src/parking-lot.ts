@@ -32,10 +32,10 @@ class Engine {
 
 @NearBindgen
 class ParkingLot extends NearContract {
-    cars: LookupMap;
+    cars: LookupMap<CarSpecs>;
     constructor() {
         super()
-        this.cars = new LookupMap('a');
+        this.cars = new LookupMap<CarSpecs>('a');
     }
 
     @call

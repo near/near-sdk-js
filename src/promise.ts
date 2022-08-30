@@ -1,5 +1,5 @@
 import { Bytes } from "..";
-import { Balance } from "./types";
+import { Balance, PublicKey } from "./types";
 
 export class CreateAccount {}
 export class DeployContract {
