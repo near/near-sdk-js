@@ -1,13 +1,13 @@
-import { NearContract, NearBindgen, near, call, view } from 'near-sdk-js'
+import { NearBindgen, near, call, view, initialize } from 'near-sdk-js'
 import { isUndefined } from 'lodash-es'
 import { log } from './log'
 
 @NearBindgen
-class Counter extends NearContract {
+class Counter {
     count: number;
-
-    constructor({ initial = 0 }: { initial: number }) {
-        super()
+    
+    @initialize
+    init({ initial = 0 }: { initial: number }) {
         this.count = initial
     }
 
@@ -33,10 +33,6 @@ class Counter extends NearContract {
     @view
     getCount(): number {
         return this.count
-    }
-
-    default() {
-        return new Counter({ initial: 0 })
     }
 }
 
