@@ -11,5 +11,6 @@ export declare function NearBindgen({ requireInit }: {
     _getArgs(): JSON;
     _serialize(value: Object): string;
     _deserialize(value: string): Object;
+    _reconstruct(classObject: any, plainObject: JSON): any;
     _requireInit(): boolean;
 } & T;

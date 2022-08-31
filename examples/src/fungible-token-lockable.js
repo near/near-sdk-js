@@ -51,10 +51,15 @@ class Account {
 
 @NearBindgen({ initRequired: true })
 class LockableFungibleToken {
+    constructor() {
+        this.accounts = new LookupMap('a') // Account ID -> Account mapping
+        this.totalSupply = 0 // Total supply of the all tokens
+    }
+
     @initialize
     init({ prefix, totalSupply }) {
-        this.accounts = new LookupMap(prefix) // Account ID -> Account mapping
-        this.totalSupply = totalSupply // Total supply of the all tokens
+        this.accounts = new LookupMap(prefix)
+        this.totalSupply = totalSupply
         let ownerId = near.signerAccountId()
         let ownerAccount = this.getAccount(ownerId)
         ownerAccount.balance = this.totalSupply
