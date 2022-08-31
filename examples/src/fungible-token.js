@@ -1,24 +1,27 @@
 import {
-    NearContract,
     NearBindgen,
     call,
     view,
+    initialize,
     near,
     LookupMap,
     assert
 } from 'near-sdk-js'
 
-@NearBindgen
-class FungibleToken extends NearContract {
-    constructor({ prefix, totalSupply }) {
-        super()
-        this.accounts = new LookupMap(prefix)
-        this.totalSupply = totalSupply
-        // In a real world Fungible Token contract, storage management is required to denfense drain-storage attack
+
+@NearBindgen({ initRequired: true })
+class FungibleToken {
+    constructor() {
+        this.accounts = new LookupMap('a')
+        this.totalSupply = 0
     }
 
-    init() {
+    @initialize
+    init({ prefix, totalSupply }) {
+        this.accounts = new LookupMap(prefix)
+        this.totalSupply = totalSupply
         this.accounts.set(near.signerAccountId(), this.totalSupply)
+        // In a real world Fungible Token contract, storage management is required to denfense drain-storage attack
     }
 
     internalDeposit({ accountId, amount }) {
@@ -70,9 +73,5 @@ class FungibleToken extends NearContract {
     @view
     ftBalanceOf({ accountId }) {
         return this.accounts.get(accountId) || '0'
-    }
-
-    default() {
-        return new FungibleToken({ prefix: '', totalSupply: 0 })
     }
 }

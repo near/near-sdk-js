@@ -1,4 +1,5 @@
 import * as t from "@babel/types";
+
 export default function () {
   return {
     visitor: {
@@ -50,7 +51,7 @@ export default function () {
                 t.expressionStatement(t.callExpression(t.memberExpression(classId, t.identifier('_saveToStorage')), [t.identifier('_contract')]))
                 : t.emptyStatement(),
               // if (_result !== undefined) near.valueReturn(_contract._serialize(result));
-              t.ifStatement(t.binaryExpression('!==', t.identifier('_result'), t.identifier('undefined')), t.expressionStatement(t.callExpression(t.memberExpression(t.identifier('near'), t.identifier('valueReturn')), [t.callExpression(t.memberExpression(classId, t.identifier('_serialize')), [t.identifier('_result')])]))),
+              t.ifStatement(t.binaryExpression('!==', t.identifier('_result'), t.identifier('undefined')), t.expressionStatement(t.callExpression(t.memberExpression(t.identifier('env'), t.identifier('value_return')), [t.callExpression(t.memberExpression(classId, t.identifier('_serialize')), [t.identifier('_result')])]))),
             ]))));
             console.log(`Babel ${method} method export done`);
           }

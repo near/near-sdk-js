@@ -3,7 +3,6 @@ import { NearBindgen, call, view } from "near-sdk-js";
 @NearBindgen({})
 class FungibleTokenHelper {
     constructor() {
-        super();
         this.data = "";
     }
 
