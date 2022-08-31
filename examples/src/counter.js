@@ -30,9 +30,5 @@ class Counter {
     getCount() {
         return this.count
     }
-
-    default() {
-        return new Counter({ initial: 0 })
-    }
 }
 
