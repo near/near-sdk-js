@@ -3,9 +3,8 @@ import { isUndefined } from 'lodash-es'
 
 @NearBindgen({})
 class Counter {
-    @initialize
-    init({ initial = 0 }) {
-        this.count = initial
+    constructor() {
+        this.count = 0
     }
 
     @call

@@ -4,12 +4,7 @@ import { log } from './log'
 
 @NearBindgen({})
 class Counter {
-    count: number;
-    
-    @initialize
-    init({ initial = 0 }: { initial: number }) {
-        this.count = initial
-    }
+    count: number = 0;
 
     @call
     increase({ n = 1 }: { n: number }) {
