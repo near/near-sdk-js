@@ -1,21 +1,15 @@
 import {
-    NearContract,
     NearBindgen,
     call,
     view,
     UnorderedSet,
 } from 'near-sdk-js'
-import {House, Room} from './model.js';
+import { House, Room } from './model.js';
 
-@NearBindgen
-class UnorderedSetTestContract extends NearContract {
+@NearBindgen({})
+class UnorderedSetTestContract {
     constructor() {
-        super()
         this.unorderedSet = new UnorderedSet('a');
-    }
-
-    default() {
-        return new UnorderedSetTestContract();
     }
 
     @view
@@ -29,17 +23,17 @@ class UnorderedSetTestContract extends NearContract {
     }
 
     @view
-    contains({element}) {
+    contains({ element }) {
         return this.unorderedSet.contains(element);
     }
 
     @call
-    set({element}) {
+    set({ element }) {
         this.unorderedSet.set(element);
     }
 
     @call
-    remove_key({element}) {
+    remove_key({ element }) {
         this.unorderedSet.remove(element);
     }
 
@@ -55,12 +49,12 @@ class UnorderedSetTestContract extends NearContract {
     }
 
     @call
-    extend({elements}) {
+    extend({ elements }) {
         this.unorderedSet.extend(elements);
     }
 
     @call
-    add_house({name, rooms}) {
+    add_house({ name, rooms }) {
         let house = new House(name, [])
         for (let r of rooms) {
             house.rooms.push(new Room(r.name, r.size))
@@ -69,7 +63,7 @@ class UnorderedSetTestContract extends NearContract {
     }
 
     @view
-    house_exist({name, rooms}) {
+    house_exist({ name, rooms }) {
         let house = new House(name, [])
         for (let r of rooms) {
             house.rooms.push(new Room(r.name, r.size))

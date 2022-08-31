@@ -1,5 +1,4 @@
 import {
-    NearContract,
     NearBindgen,
     call,
     view,
@@ -9,10 +8,9 @@ import {
 /**
  * Simple contract to test function parameters
  */
-@NearBindgen
-class FunctionParamsTestContract extends NearContract {
+@NearBindgen({})
+class FunctionParamsTestContract {
     constructor() {
-        super()
         this.val1 = 'default1';
         this.val2 = 'default2';
         this.val3 = 'default3';
@@ -29,9 +27,5 @@ class FunctionParamsTestContract extends NearContract {
     @view
     get_values() {
         return { val3: this.val3, val2: this.val2, val1: this.val1 }
-    }
-
-    default() {
-        return new FunctionParamsTestContract();
     }
 }

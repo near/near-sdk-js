@@ -1,10 +1,5 @@
 import { Worker } from 'near-workspaces';
-import { readFile } from 'fs/promises'
 import test from 'ava';
-
-function encodeCall(contract, method, args) {
-    return Buffer.concat([Buffer.from(contract), Buffer.from([0]), Buffer.from(method), Buffer.from([0]), Buffer.from(JSON.stringify(args))])
-}
 
 test.before(async t => {
     // Init the worker and start a Sandbox server
@@ -17,7 +12,6 @@ test.before(async t => {
     const functionParamsContract = await root.devDeploy(
         'build/function-params.wasm',
     );
-    await functionParamsContract.call(functionParamsContract, 'init', {});
 
     // Test users
     const ali = await root.createSubAccount('ali');
