@@ -2,6 +2,11 @@ import { NearBindgen, call, view, initialize, near, bytes } from 'near-sdk-js'
 
 @NearBindgen({ requireInit: true })
 class OnCall {
+    constructor() {
+        this.personOnCall = ''
+        this.statusMessageContract = ''
+    }
+
     @initialize
     init({ statusMessageContract }) {
         this.personOnCall = "undefined"
