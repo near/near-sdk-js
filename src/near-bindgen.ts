@@ -9,7 +9,7 @@ export function call(target: Object, key: string | symbol, descriptor: TypedProp
 export function view(target: Object, key: string | symbol, descriptor: TypedPropertyDescriptor<Function>): void {
 }
 
-export function NearBindgen({ requireInit = false }: { requireInit: boolean }) {
+export function NearBindgen({ requireInit = false }: { requireInit?: boolean }) {
     return <T extends { new(...args: any[]): {} }>(target: T) => {
         return class extends target {
             static _create() {

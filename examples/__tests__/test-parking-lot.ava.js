@@ -8,7 +8,7 @@ test.beforeEach(async t => {
     const parkingLot = await root.devDeploy(
         'build/parking-lot.wasm',
     );
-    await parkingLot.call(parkingLot, 'init', {});
+
 
     const ali = await root.createSubAccount('ali');
 
