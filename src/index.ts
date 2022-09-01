@@ -11,7 +11,7 @@ import {
   UnorderedSet,
 } from "./collections";
 
-import { bytes, Bytes, assert } from "./utils";
+import { assert, Bytes } from "./utils";
 
 export {
   call,
@@ -24,7 +24,6 @@ export {
   LookupSet,
   UnorderedMap,
   UnorderedSet,
-  bytes,
-  Bytes,
   assert,
+  Bytes
 };

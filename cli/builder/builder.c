@@ -574,10 +574,14 @@ static JSValue near_log_utf8(JSContext *ctx, JSValueConst this_val, int argc, JS
 
 static JSValue near_log_utf16(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
 {
-  const char *data_ptr;
+  uint8_t *data_ptr;
   size_t data_len;
 
-  data_ptr = JS_ToCStringLenRaw(ctx, &data_len, argv[0]);
+  data_ptr = JS_Uint8Array_to_C(ctx, argv[0], &data_len);
+  if (data_ptr == NULL) {
+    return JS_ThrowTypeError(ctx, "Expect Uint8Array for message"); 
+  }
+
   log_utf16(data_len, (uint64_t)data_ptr);
   return JS_UNDEFINED;
 }
