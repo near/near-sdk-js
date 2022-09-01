@@ -1,45 +1,39 @@
 import {
-    NearContract,
     NearBindgen,
     call,
     view,
     LookupMap
 } from 'near-sdk-js'
-import {House, Room} from './model.js';
+import { House, Room } from './model.js';
 
-@NearBindgen
-class LookupMapTestContract extends NearContract {
+@NearBindgen({})
+class LookupMapTestContract {
     constructor() {
-        super()
         this.lookupMap = new LookupMap('a');
     }
 
-    default() {
-        return new LookupMapTestContract();
-    }
-
     @view
-    get({key}) {
+    get({ key }) {
         return this.lookupMap.get(key);
     }
 
     @view
-    containsKey({key}) {
+    containsKey({ key }) {
         return this.lookupMap.containsKey(key);
     }
 
     @call
-    set({key, value}) {
+    set({ key, value }) {
         this.lookupMap.set(key, value);
     }
 
     @call
-    remove_key({key}) {
+    remove_key({ key }) {
         this.lookupMap.remove(key);
     }
 
     @call
-    extend({kvs}) {
+    extend({ kvs }) {
         this.lookupMap.extend(kvs);
     }
 
@@ -54,7 +48,7 @@ class LookupMapTestContract extends NearContract {
         // restore class object from serialized data
         const house = new House(houseObject.name, houseObject.rooms)
         const roomObject = house.rooms[0]
-        const room = new Room(roomObject.name, roomObject.size) 
+        const room = new Room(roomObject.name, roomObject.size)
         return house.describe() + room.describe()
     }
 }

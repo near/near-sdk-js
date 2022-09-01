@@ -1,5 +1,4 @@
 import {
-    NearContract,
     NearBindgen,
     call,
     view,
@@ -7,15 +6,10 @@ import {
 } from 'near-sdk-js'
 import {House, Room} from './model.js';
 
-@NearBindgen
-class VectorTestContract extends NearContract {
+@NearBindgen({})
+class VectorTestContract {
     constructor() {
-        super()
         this.vector = new Vector('a');
-    }
-
-    default() {
-        return new VectorTestContract();
     }
 
     @view

@@ -1,5 +1,4 @@
 import {
-    NearContract,
     NearBindgen,
     call,
     view,
@@ -7,15 +6,10 @@ import {
 } from 'near-sdk-js'
 import { House, Room } from './model.js';
 
-@NearBindgen
-class LookupSetTestContract extends NearContract {
+@NearBindgen({})
+class LookupSetTestContract {
     constructor() {
-        super()
         this.lookupSet = new LookupSet('a');
-    }
-
-    default() {
-        return new LookupSetTestContract();
     }
 
     @view

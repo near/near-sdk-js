@@ -1,8 +1,8 @@
 import {
-    NearContract,
     NearBindgen,
     call,
     view,
+    initialize,
     near,
     LookupMap,
 } from 'near-sdk-js'
@@ -49,15 +49,17 @@ class Account {
     }
 }
 
-@NearBindgen
-class LockableFungibleToken extends NearContract {
-    constructor({ prefix, totalSupply }) {
-        super()
-        this.accounts = new LookupMap(prefix) // Account ID -> Account mapping
-        this.totalSupply = totalSupply // Total supply of the all tokens
+@NearBindgen({ initRequired: true })
+class LockableFungibleToken {
+    constructor() {
+        this.accounts = new LookupMap('a') // Account ID -> Account mapping
+        this.totalSupply = 0 // Total supply of the all tokens
     }
 
-    init() {
+    @initialize
+    init({ prefix, totalSupply }) {
+        this.accounts = new LookupMap(prefix)
+        this.totalSupply = totalSupply
         let ownerId = near.signerAccountId()
         let ownerAccount = this.getAccount(ownerId)
         ownerAccount.balance = this.totalSupply
@@ -223,9 +225,5 @@ class LockableFungibleToken extends NearContract {
     @view
     getLockedBalance({ ownerId, escrowAccountId }) {
         return this.getAccount(ownerId).getLockedBalance(escrowAccountId)
-    }
-
-    default() {
-        return new LockableFungibleToken({ prefix: '', totalSupply: 0 })
     }
 }

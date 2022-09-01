@@ -1,6 +1,9 @@
-import { call, view, NearBindgen } from "./near-bindgen";
-
-import { NearContract } from "./near-contract";
+import {
+  call,
+  view,
+  initialize,
+  NearBindgen
+} from "./near-bindgen";
 
 import * as near from "./api";
 import {
@@ -16,8 +19,8 @@ import { bytes, Bytes, assert } from "./utils";
 export {
   call,
   view,
+  initialize,
   NearBindgen,
-  NearContract,
   near,
   LookupMap,
   Vector,

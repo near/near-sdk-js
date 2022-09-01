@@ -1,9 +1,8 @@
-import { NearContract, NearBindgen, call, view, near } from 'near-sdk-js'
+import { NearBindgen, call, view, near } from 'near-sdk-js'
 
-@NearBindgen
-class StatusMessage extends NearContract {
+@NearBindgen({})
+class StatusMessage {
     constructor() {
-        super()
         this.records = {}
     }
 
@@ -18,10 +17,6 @@ class StatusMessage extends NearContract {
     get_status({ account_id }) {
         near.log(`get_status for account_id ${account_id}`)
         return this.records[account_id] || null
-    }
-
-    default() {
-        return new StatusMessage()
     }
 }
 

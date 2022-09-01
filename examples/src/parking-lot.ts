@@ -1,4 +1,4 @@
-import { NearContract, NearBindgen, near, call, view, LookupMap } from 'near-sdk-js'
+import { NearBindgen, near, call, view, LookupMap } from 'near-sdk-js'
 
 class CarSpecs {
     id: number;
@@ -30,11 +30,10 @@ class Engine {
     }
 }
 
-@NearBindgen
-class ParkingLot extends NearContract {
+@NearBindgen({})
+class ParkingLot {
     cars: LookupMap;
     constructor() {
-        super()
         this.cars = new LookupMap('a');
     }
 
@@ -67,9 +66,5 @@ class ParkingLot extends NearContract {
         let carSpecs = this.cars.get(name) as CarSpecs;
         let engine = new Engine(carSpecs.engine.hp)
         return engine.run()
-    }
-
-    default() {
-        return new ParkingLot()
     }
 }

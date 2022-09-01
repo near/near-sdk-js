@@ -1,7 +1,6 @@
 import { Worker } from 'near-workspaces';
 import test from 'ava';
 
-
 test.before(async t => {
     // Init the worker and start a Sandbox server
     const worker = await Worker.init();

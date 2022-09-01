@@ -1,22 +1,15 @@
 import {
-    NearContract,
     NearBindgen,
     call,
     view,
     UnorderedMap,
-    Vector
 } from 'near-sdk-js'
-import {House, Room} from './model.js';
+import { House, Room } from './model.js';
 
-@NearBindgen
-class UnorderedMapTestContract extends NearContract {
+@NearBindgen({})
+class UnorderedMapTestContract {
     constructor() {
-        super()
         this.unorderedMap = new UnorderedMap('a');
-    }
-
-    default() {
-        return new UnorderedMapTestContract();
     }
 
     @view
@@ -30,17 +23,17 @@ class UnorderedMapTestContract extends NearContract {
     }
 
     @view
-    get({key}) {
+    get({ key }) {
         return this.unorderedMap.get(key);
     }
 
     @call
-    set({key, value}) {
+    set({ key, value }) {
         this.unorderedMap.set(key, value);
     }
 
     @call
-    remove_key({key}) {
+    remove_key({ key }) {
         this.unorderedMap.remove(key);
     }
 
@@ -55,7 +48,7 @@ class UnorderedMapTestContract extends NearContract {
     }
 
     @call
-    extend({kvs}) {
+    extend({ kvs }) {
         this.unorderedMap.extend(kvs);
     }
 

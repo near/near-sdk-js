@@ -1,9 +1,8 @@
-import { NearContract, NearBindgen, call, view, near, LookupSet, UnorderedMap, Vector } from 'near-sdk-js'
+import { NearBindgen, call, view, near, LookupSet, UnorderedMap } from 'near-sdk-js'
 
-@NearBindgen
-class StatusMessage extends NearContract {
+@NearBindgen({})
+class StatusMessage {
     constructor() {
-        super()
         this.records = new UnorderedMap('a')
         this.uniqueValues = new LookupSet('b')
     }
@@ -32,10 +31,6 @@ class StatusMessage extends NearContract {
     get_all_statuses() {
         // used for test UnorderedMap
         return this.records.toArray()
-    }
-
-    default() {
-        return new StatusMessage()
     }
 }
 

@@ -1,23 +1,20 @@
-import { NearContract, NearBindgen, call, view, near } from 'near-sdk-js'
+import { NearBindgen, call, view, near } from 'near-sdk-js'
 
-@NearBindgen
-class CleanState extends NearContract {
+@NearBindgen({})
+class CleanState {
     @call
-    clean({keys}) {
+    clean({ keys }) {
         keys.forEach(key => near.storageRemove(key))
     }
 
     @call
-    put({key, value}) {
+    put({ key, value }) {
         near.storageWrite(key, value)
     }
 
     @view
-    get({key}) {
+    get({ key }) {
+        
         return near.storageRead(key)
-    }
-
-    default() {
-        return new CleanState()
     }
 }
