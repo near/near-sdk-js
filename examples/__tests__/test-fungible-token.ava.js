@@ -18,7 +18,6 @@ test.beforeEach(async (t) => {
 
     // Init the contracts
     await ft.call(ft, 'init', { prefix: 'a', totalSupply: '1000' });
-    await xcc.call(xcc, 'init', {});
 
     // Create test accounts
     const ali = await root.createSubAccount('ali');

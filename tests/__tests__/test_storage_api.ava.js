@@ -1,7 +1,6 @@
 import { Worker } from 'near-workspaces';
 import test from 'ava';
 
-
 test.beforeEach(async t => {
     // Use beforeEach instead of before to start from scratch state for each test
     // Init the worker and start a Sandbox server

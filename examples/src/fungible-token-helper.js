@@ -1,9 +1,8 @@
-import { NearContract, NearBindgen, call, view } from "near-sdk-js";
+import { NearBindgen, call, view } from "near-sdk-js";
 
-@NearBindgen
-class FungibleTokenHelper extends NearContract {
+@NearBindgen({})
+class FungibleTokenHelper {
     constructor() {
-        super();
         this.data = "";
     }
 
@@ -16,9 +15,5 @@ class FungibleTokenHelper extends NearContract {
     @view 
     getContractData() {
         return this.data;
-    }
-
-    default() {
-        return new FungibleTokenHelper();
     }
 }

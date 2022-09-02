@@ -1,4 +1,4 @@
-import { NearContract, NearBindgen, call, view, near, LookupMap, bytes, assert } from 'near-sdk-js'
+import { NearBindgen, call, view, initialize, near, LookupMap, bytes, assert } from 'near-sdk-js'
 
 class Token {
     constructor(token_id, owner_id) {
@@ -7,10 +7,15 @@ class Token {
     }
 }
 
-@NearBindgen
-class NftContract extends NearContract {
-    constructor({ owner_id, owner_by_id_prefix }) {
-        super()
+@NearBindgen({ requireInit: true })
+class NftContract {
+    constructor() {
+        this.owner_id = ''
+        this.owner_by_id = new LookupMap('a')
+    }
+
+    @initialize
+    init({ owner_id, owner_by_id_prefix }) {
         this.owner_id = owner_id
         this.owner_by_id = new LookupMap(owner_by_id_prefix)
     }
@@ -84,9 +89,5 @@ class NftContract extends NearContract {
         }
 
         return new Token(token_id, owner_id)
-    }
-
-    default() {
-        return new NftContract({ owner_id: '', owner_by_id_prefix: '' })
     }
 }

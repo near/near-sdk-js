@@ -15,8 +15,6 @@ test.beforeEach(async t => {
         (process.env['COUNTER_TS'] ? './build/counter-ts.wasm' : './build/counter.wasm')
     );
 
-    // Init the contract
-    await counter.call(counter, 'init', {});
 
     // Test users
     const ali = await root.createSubAccount('ali');
