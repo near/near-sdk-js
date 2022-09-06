@@ -13,13 +13,13 @@ class PrivateTest {
         this.value = '';
     }
 
-    @call({ private: true })
+    @call({ privateFunction: true })
     setValueWithPrivateFunction({ value }: { value: string }): void {
         near.log(`setValueWithPrivateFunction: ${value}`)
         this.value = value;
     }
 
-    @call({ private: false })
+    @call({ privateFunction: false })
     setValueWithNotPrivateFunction({ value }: { value: string }): void {
         near.log(`setValueWithNotPrivateFunction: ${value}`)
         this.value = value;
