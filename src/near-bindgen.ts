@@ -7,6 +7,16 @@ export function initialize({ }) {
 
 export function call({ privateFunction = false, payableFunction = false }: { privateFunction?: boolean, payableFunction?: boolean }) {
     return function (target: Object, key: string | symbol, descriptor: TypedPropertyDescriptor<Function>): void {
+        const originalMethod = descriptor.value;
+        descriptor.value = function (...args: any[]) {
+            if (privateFunction && near.predecessorAccountId() !== near.currentAccountId()) {
+                throw Error("Function is private");
+            }
+            if (!payableFunction && near.attachedDeposit() > BigInt(0)) {
+                throw Error("Function is not payable");
+            }
+            originalMethod.apply(this, args);
+        }
     }
 }
 
@@ -14,16 +24,6 @@ export function view({ }) {
     return function (target: Object, key: string | symbol, descriptor: TypedPropertyDescriptor<Function>): void {
     }
 }
-
-// // privat check
-// if (privateFunction && near.predecessorAccountId() !== near.currentAccountId()) {
-//     throw Error("Function is private");
-// }
-
-// // payable check
-// if (!payableFunction && near.attachedDeposit() > BigInt(0)) {
-//     throw Error("Function is not payable");
-// }
 
 export function NearBindgen({ requireInit = false }: { requireInit?: boolean }) {
     return <T extends { new(...args: any[]): {} }>(target: T) => {
