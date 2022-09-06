@@ -12,37 +12,37 @@ class LookupMapTestContract {
         this.lookupMap = new LookupMap('a');
     }
 
-    @view
+    @view({})
     get({ key }) {
         return this.lookupMap.get(key);
     }
 
-    @view
+    @view({})
     containsKey({ key }) {
         return this.lookupMap.containsKey(key);
     }
 
-    @call
+    @call({})
     set({ key, value }) {
         this.lookupMap.set(key, value);
     }
 
-    @call
+    @call({})
     remove_key({ key }) {
         this.lookupMap.remove(key);
     }
 
-    @call
+    @call({})
     extend({ kvs }) {
         this.lookupMap.extend(kvs);
     }
 
-    @call
+    @call({})
     add_house() {
         this.lookupMap.set('house1', new House('house1', [new Room('room1', '200sqft'), new Room('room2', '300sqft')]))
     }
 
-    @view
+    @view({})
     get_house() {
         const houseObject = this.lookupMap.get('house1')
         // restore class object from serialized data

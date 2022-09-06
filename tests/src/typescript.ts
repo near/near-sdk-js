@@ -5,7 +5,7 @@ import {
 
 @NearBindgen({})
 class TypeScriptTestContract {
-    @view
+    @view({})
     bigint() {
         // JSON.stringify cannot seriaize a BigInt, need manually toString
         return (1n + 2n).toString()

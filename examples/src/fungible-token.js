@@ -16,7 +16,7 @@ class FungibleToken {
         this.totalSupply = 0
     }
 
-    @initialize
+    @initialize({})
     init({ prefix, totalSupply }) {
         this.accounts = new LookupMap(prefix)
         this.totalSupply = totalSupply
@@ -49,13 +49,13 @@ class FungibleToken {
         this.internalDeposit({ accountId: receiverId, amount })
     }
 
-    @call
+    @call({})
     ftTransfer({ receiverId, amount, memo }) {
         let senderId = near.predecessorAccountId()
         this.internalTransfer({ senderId, receiverId, amount, memo })
     }
 
-    @call
+    @call({})
     ftTransferCall({ receiverId, amount, memo, msg }) {
         let senderId = near.predecessorAccountId()
         this.internalTransfer({ senderId, receiverId, amount, memo });
@@ -65,12 +65,12 @@ class FungibleToken {
         return near.promiseReturn();
     }
 
-    @view
+    @view({})
     ftTotalSupply() {
         return this.totalSupply
     }
 
-    @view
+    @view({})
     ftBalanceOf({ accountId }) {
         return this.accounts.get(accountId) || '0'
     }

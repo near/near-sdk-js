@@ -6,13 +6,13 @@ class FungibleTokenHelper {
         this.data = "";
     }
 
-    @call 
+    @call({})
     ftOnTransfer({ senderId, amount, msg, receiverId }) {
         const concatString = `[${amount} from ${senderId} to ${receiverId}] ${msg} `;
         this.data = this.data.concat("", concatString);
     }
 
-    @view 
+    @view({})
     getContractData() {
         return this.data;
     }

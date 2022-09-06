@@ -7,13 +7,13 @@ class OnCall {
         this.statusMessageContract = ''
     }
 
-    @initialize
+    @initialize({})
     init({ statusMessageContract }) {
         this.personOnCall = "undefined"
         this.statusMessageContract = statusMessageContract
     }
 
-    @call
+    @call({})
     set_person_on_call({ accountId }) {
         near.log(`Trying to set ${accountId} on-call`)
         const promise = near.promiseBatchCreate(this.statusMessageContract)
@@ -21,7 +21,7 @@ class OnCall {
         near.promiseThen(promise, near.currentAccountId(), '_set_person_on_call_private', bytes(JSON.stringify({ accountId: accountId })), 0, 30000000000000);
     }
 
-    @call
+    @call({})
     _set_person_on_call_private({ accountId }) {
         near.log(`_set_person_on_call_private called, accountId ${accountId}`)
         if (near.currentAccountId() !== near.predecessorAccountId()) {
@@ -37,7 +37,7 @@ class OnCall {
         }
     }
 
-    @view
+    @view({})
     person_on_call() {
         near.log(`Returning person on-call: ${this.personOnCall}`)
         return this.personOnCall

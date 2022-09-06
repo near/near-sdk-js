@@ -12,48 +12,48 @@ class UnorderedSetTestContract {
         this.unorderedSet = new UnorderedSet('a');
     }
 
-    @view
+    @view({})
     len() {
         return this.unorderedSet.length;
     }
 
-    @view
+    @view({})
     isEmpty() {
         return this.unorderedSet.isEmpty();
     }
 
-    @view
+    @view({})
     contains({ element }) {
         return this.unorderedSet.contains(element);
     }
 
-    @call
+    @call({})
     set({ element }) {
         this.unorderedSet.set(element);
     }
 
-    @call
+    @call({})
     remove_key({ element }) {
         this.unorderedSet.remove(element);
     }
 
-    @call
+    @call({})
     clear() {
         this.unorderedSet.clear();
     }
 
-    @view
+    @view({})
     toArray() {
         const res = this.unorderedSet.toArray();
         return res;
     }
 
-    @call
+    @call({})
     extend({ elements }) {
         this.unorderedSet.extend(elements);
     }
 
-    @call
+    @call({})
     add_house({ name, rooms }) {
         let house = new House(name, [])
         for (let r of rooms) {
@@ -62,7 +62,7 @@ class UnorderedSetTestContract {
         this.unorderedSet.set(house)
     }
 
-    @view
+    @view({})
     house_exist({ name, rooms }) {
         let house = new House(name, [])
         for (let r of rooms) {
