@@ -1,13 +1,29 @@
 import * as near from "./api";
 
-export function initialize(target: Object, key: string | symbol, descriptor: TypedPropertyDescriptor<Function>): void {
+export function initialize({ }) {
+    return function (target: Object, key: string | symbol, descriptor: TypedPropertyDescriptor<Function>): void {
+    }
 }
 
-export function call(target: Object, key: string | symbol, descriptor: TypedPropertyDescriptor<Function>): void {
+export function call({ privateFunction = false, payableFunction = false }: { privateFunction?: boolean, payableFunction?: boolean }) {
+    return function (target: Object, key: string | symbol, descriptor: TypedPropertyDescriptor<Function>): void {
+    }
 }
 
-export function view(target: Object, key: string | symbol, descriptor: TypedPropertyDescriptor<Function>): void {
+export function view({ }) {
+    return function (target: Object, key: string | symbol, descriptor: TypedPropertyDescriptor<Function>): void {
+    }
 }
+
+// // privat check
+// if (privateFunction && near.predecessorAccountId() !== near.currentAccountId()) {
+//     throw Error("Function is private");
+// }
+
+// // payable check
+// if (!payableFunction && near.attachedDeposit() > BigInt(0)) {
+//     throw Error("Function is not payable");
+// }
 
 export function NearBindgen({ requireInit = false }: { requireInit?: boolean }) {
     return <T extends { new(...args: any[]): {} }>(target: T) => {

@@ -22,7 +22,9 @@
         "build:bytes": "near-sdk-js build src/bytes.js build/bytes.wasm",
         "build:typescript": "near-sdk-js build src/typescript.ts build/typescript.wasm",
         "build:public-key": "near-sdk-js build src/public-key.js build/public-key.wasm",
-        "build:near-bindgen": "near-sdk-js build src/near_bindgen/require_init_true.ts build/require_init_true.wasm && near-sdk-js build src/near_bindgen/require_init_false.ts build/require_init_false.wasm",
+        "build:near-bindgen": "near-sdk-js build src/decorators/require_init_true.ts build/require_init_true.wasm && near-sdk-js build src/decorators/require_init_false.ts build/require_init_false.wasm",
+        "build:payable": "near-sdk-js build src/decorators/payable.ts build/payable.wasm",
+        "build:private": "near-sdk-js build src/decorators/private.ts build/private.wasm",
         "test": "ava",
         "test:context-api": "ava __tests__/test_context_api.ava.js",
         "test:math-api": "ava __tests__/test_math_api.ava.js",
@@ -38,7 +40,9 @@
         "test:bytes": "ava __tests__/bytes.ava.js",
         "test:typescript": "ava __tests__/typescript.ava.js",
         "test:public-key": "ava __tests__/test-public-key.ava.js",
-        "test:near-bindgen": "ava __tests__/near_bindgen.ava.js"
+        "test:near-bindgen": "ava __tests__/decorators/near_bindgen.ava.js",
+        "test:payable": "ava __tests__/decorators/payable.ava.js",
+        "test:private": "ava __tests__/decorators/private.ava.js"
     },
     "author": "Near Inc <hello@nearprotocol.com>",
     "license": "Apache-2.0",

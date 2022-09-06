@@ -13,13 +13,13 @@ class PayableTest {
         this.value = '';
     }
 
-    @call({ payable: true })
+    @call({ payableFunction: true })
     setValueWithPayableFunction({ value }: { value: string }): void {
         near.log(`payableFunction: ${value}`)
         this.value = value;
     }
 
-    @call({ payable: false })
+    @call({ payableFunction: false })
     setValueWithNotPayableFunction({ value }: { value: string }): void {
         near.log(`notPayableFunction: ${value}`)
         this.value = value;
