@@ -49,12 +49,9 @@ class NftContract {
         near.promiseThen(promise, near.currentAccountId(), '_nftResolveTransfer', bytes(JSON.stringify({ sender_id, receiver_id, token_id })), 0, 30000000000000);
     }
 
-    @call({})
+    @call({ privateFunction: true })
     _nftResolveTransfer({ sender_id, receiver_id, token_id }) {
         near.log(`_nftResolveTransfer called, receiver_id ${receiver_id}, token_id ${token_id}`)
-        if (near.currentAccountId() == !near.predecessorAccountId()) {
-            throw Error('Function can be used as a callback only')
-        }
         const isTokenTransfered = JSON.parse(near.promiseResult(0))
         near.log(`${token_id} ${isTokenTransfered ? 'was transfered' : 'was NOT transfered'}`)
 
