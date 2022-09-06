@@ -220,7 +220,7 @@ export class NearPromise {
 
     // Called by NearBindgen, when return object is a NearPromise instance.
     onReturn() {
-        this.constructRecursively();
+        this.asReturn().constructRecursively();
     }
 }
 
