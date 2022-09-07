@@ -4,7 +4,7 @@ export function log_expected_input_tests() {
     // log ascii string
     near.log('abc')
     // log string with utf-8 chars
-    near.log('水')
+    near.log('水') // Buffer([0xe6, 0xb0, 0xb4])
     // log number
     near.log(333)
     // log aribrary byte sequence

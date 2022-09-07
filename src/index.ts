@@ -16,6 +16,8 @@ import {
 
 import { bytes, Bytes, assert } from "./utils";
 
+import { NearPromise, PromiseOrValue } from "./promise";
+
 export {
   call,
   view,
@@ -30,4 +32,6 @@ export {
   bytes,
   Bytes,
   assert,
+  NearPromise,
+  PromiseOrValue
 };
