@@ -56,7 +56,7 @@ class LockableFungibleToken {
         this.totalSupply = 0 // Total supply of the all tokens
     }
 
-    @initialize
+    @initialize({})
     init({ prefix, totalSupply }) {
         this.accounts = new LookupMap(prefix)
         this.totalSupply = totalSupply
@@ -78,7 +78,7 @@ class LockableFungibleToken {
         this.accounts.set(accountId, account)
     }
 
-    @call
+    @call({})
     setAllowance({ escrowAccountId, allowance }) {
         let ownerId = near.predecessorAccountId()
         if (escrowAccountId === ownerId) {
@@ -94,7 +94,7 @@ class LockableFungibleToken {
         this.setAccount(ownerId, account)
     }
 
-    @call
+    @call({})
     lock({ ownerId, lockAmount }) {
         if (lockAmount <= 0) {
             throw Error("Can't lock 0 or less tokens")
@@ -124,7 +124,7 @@ class LockableFungibleToken {
         this.setAccount(ownerId, account)
     }
 
-    @call
+    @call({})
     unlock({ ownerId, unlockAmount }) {
         if (unlockAmount <= 0) {
             throw Error("Can't unlock 0 or less tokens")
@@ -151,7 +151,7 @@ class LockableFungibleToken {
         this.setAccount(ownerId, account)
     }
 
-    @call
+    @call({})
     transferFrom({ ownerId, newOwnerId, amount }) {
         if (amount <= 0) {
             throw Error("Can't transfer 0 or less tokens")
@@ -197,32 +197,32 @@ class LockableFungibleToken {
         this.setAccount(newOwnerId, newAccount)
     }
 
-    @call
+    @call({})
     transfer({ newOwnerId, amount }) {
         this.transferFrom({ ownerId: near.predecessorAccountId(), newOwnerId, amount })
     }
 
-    @view
+    @view({})
     getTotalSupply() {
         return this.totalSupply
     }
 
-    @view
+    @view({})
     getTotalBalance({ ownerId }) {
         return this.getAccount(ownerId).totalBalance()
     }
 
-    @view
+    @view({})
     getUnlockedBalance({ ownerId }) {
         return this.getAccount(ownerId).balance
     }
 
-    @view
+    @view({})
     getAllowance({ ownerId, escrowAccountId }) {
         return this.getAccount(ownerId).getAllowance(escrowAccountId)
     }
 
-    @view
+    @view({})
     getLockedBalance({ ownerId, escrowAccountId }) {
         return this.getAccount(ownerId).getLockedBalance(escrowAccountId)
     }

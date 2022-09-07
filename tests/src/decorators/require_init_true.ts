@@ -6,7 +6,7 @@ import {
     initialize,
 } from 'near-sdk-js'
 
-@NearBindgen({ requireInit: false })
+@NearBindgen({ requireInit: true })
 class NBTest {
     status: string;
 
@@ -14,21 +14,23 @@ class NBTest {
         this.status = '';
     }
 
-    @initialize
+    @initialize({})
     init({ status }: { status: string }): void {
         near.log(`init: ${status}`)
         this.status = status;
     }
 
-    @view
+    @view({})
     getStatus(): string {
         near.log(`getStatus: ${this.status}`)
         return this.status;
     }
 
-    @call
+    @call({})
     setStatus({ status }: { status: string }): void {
         near.log(`setStatus: ${status}`)
         this.status = status;
     }
 }
+
+

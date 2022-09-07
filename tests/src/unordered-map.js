@@ -12,52 +12,52 @@ class UnorderedMapTestContract {
         this.unorderedMap = new UnorderedMap('a');
     }
 
-    @view
+    @view({})
     len() {
         return this.unorderedMap.length;
     }
 
-    @view
+    @view({})
     isEmpty() {
         return this.unorderedMap.isEmpty();
     }
 
-    @view
+    @view({})
     get({ key }) {
         return this.unorderedMap.get(key);
     }
 
-    @call
+    @call({})
     set({ key, value }) {
         this.unorderedMap.set(key, value);
     }
 
-    @call
+    @call({})
     remove_key({ key }) {
         this.unorderedMap.remove(key);
     }
 
-    @call
+    @call({})
     clear() {
         this.unorderedMap.clear();
     }
 
-    @view
+    @view({})
     toArray() {
         return this.unorderedMap.toArray();
     }
 
-    @call
+    @call({})
     extend({ kvs }) {
         this.unorderedMap.extend(kvs);
     }
 
-    @call
+    @call({})
     add_house() {
         this.unorderedMap.set('house1', new House('house1', [new Room('room1', '200sqft'), new Room('room2', '300sqft')]))
     }
 
-    @view
+    @view({})
     get_house() {
         const rawHouse = this.unorderedMap.get('house1')
         const house = new House(rawHouse.name, rawHouse.rooms)

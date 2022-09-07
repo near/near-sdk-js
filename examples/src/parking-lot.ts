@@ -37,7 +37,7 @@ class ParkingLot {
         this.cars = new LookupMap('a');
     }
 
-    @call
+    @call({})
     addCar({ name, id, color, price, engineHp }: { name: string, id: number, color: string, price: number, engineHp: number }) {
         // args can be json arguments only, they cannot be of a JS/TS class like following, unless override NearContract.deserializeArgs method.
         // addCar({ name, specs }: { name: string, specs: CarSpecs }) {
@@ -47,19 +47,19 @@ class ParkingLot {
         this.cars.set(name, car)
     }
 
-    @call
+    @call({})
     removeCar({ name }: { name: string }) {
         near.log(`removeCar() called, name: ${name}`)
         this.cars.remove(name)
     }
 
-    @view
+    @view({})
     getCarSpecs({ name }: { name: string }) {
         near.log(`getCarSpecs() called, name: ${name}`)
         return this.cars.get(name)
     }
 
-    @view
+    @view({})
     runCar({ name }: { name: string }) {
         /* We are getting plain carSpecs object from the storage.
         It needs to be converted to the class object in order to execute engine.run() function.*/
