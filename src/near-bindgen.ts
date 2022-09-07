@@ -15,7 +15,7 @@ export function call({ privateFunction = false, payableFunction = false }: { pri
             if (!payableFunction && near.attachedDeposit() > BigInt(0)) {
                 throw Error("Function is not payable");
             }
-            originalMethod.apply(this, args);
+            return originalMethod.apply(this, args);
         }
     }
 }
