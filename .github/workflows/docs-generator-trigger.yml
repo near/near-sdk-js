@@ -1,0 +1,28 @@
+name: Docs Generator trigger
+
+on:
+  release:
+    types:
+      - released
+
+concurrency:
+  group: "docs"
+  cancel-in-progress: true
+
+jobs:
+  trigger-generator:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Trigger generator
+      run: |
+        curl -i -v --location --request POST 'https://docs-bot.vercel.app/api/on-release' \
+        --header 'bot-auth: ${{ secrets.DOCS_BOT_SECRET }}' \
+        --header 'Content-Type: application/json' \
+        --data-raw '{
+          "event_type": "release-publish",
+          "client_payload": {
+            "source_repo": "near/near-sdk-js",
+            "builder_name": "near-sdk-js",
+            "release_version": "${{ github.ref_name }}"
+          }
+        }'
