@@ -6,3 +6,7 @@ import { PublicKey, CurveType, curveTypeFromStr, ParsePublicKeyError, InvalidLen
 
 export {AccountId, BlockHeight, EpochHeight, Balance, StorageUsage, PromiseResult, PromiseError, PromiseIndex, ReceiptIndex, IteratorIndex, Gas, ONE_TERA_GAS,
     PublicKey, CurveType, curveTypeFromStr, ParsePublicKeyError, InvalidLengthError, Base58Error, UnknownCurve} 
+
+export type GasWeight = bigint;
+export const ONE_YOCTO: Balance = 1n;
+export const ONE_NEAR: Balance = 1_000_000_000_000_000_000_000_000n;
