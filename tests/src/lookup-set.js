@@ -12,27 +12,27 @@ class LookupSetTestContract {
         this.lookupSet = new LookupSet('a');
     }
 
-    @view
+    @view({})
     contains({ key }) {
         return this.lookupSet.contains(key);
     }
 
-    @call
+    @call({})
     set({ key }) {
         this.lookupSet.set(key);
     }
 
-    @call
+    @call({})
     remove_key({ key }) {
         this.lookupSet.remove(key);
     }
 
-    @call
+    @call({})
     extend({ keys }) {
         this.lookupSet.extend(keys);
     }
 
-    @call
+    @call({})
     add_house({ name, rooms }) {
         let house = new House(name, [])
         for (let r of rooms) {
@@ -41,7 +41,7 @@ class LookupSetTestContract {
         this.lookupSet.set(house)
     }
 
-    @view
+    @view({})
     house_exist({ name, rooms }) {
         let house = new House(name, [])
         for (let r of rooms) {

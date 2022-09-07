@@ -6,7 +6,7 @@
     "type": "module",
     "scripts": {
         "postinstall": "cd .. && yarn link && cd tests && yarn link near-sdk-js",
-        "build": "yarn build:context-api && yarn build:math-api && yarn build:storage-api && yarn build:log-panic-api && yarn build:promise-api && yarn build:promise-batch-api && yarn build:function-params && yarn build:lookup-map && yarn build:lookup-set && yarn build:unordered-map && yarn build:unordered-set && yarn build:vector && yarn build:bytes && yarn build:typescript && yarn build:public-key && yarn build:near-bindgen && yarn build:highlevel-promise",
+        "build": "yarn build:context-api && yarn build:math-api && yarn build:storage-api && yarn build:log-panic-api && yarn build:promise-api && yarn build:promise-batch-api && yarn build:function-params && yarn build:lookup-map && yarn build:lookup-set && yarn build:unordered-map && yarn build:unordered-set && yarn build:vector && yarn build:bytes && yarn build:typescript && yarn build:public-key && yarn build:near-bindgen && yarn build:payable && yarn build:private && yarn build:highlevel-promise",
         "build:context-api": "near-sdk-js build src/context_api.js build/context_api.wasm",
         "build:math-api": "near-sdk-js build src/math_api.js build/math_api.wasm",
         "build:storage-api": "near-sdk-js build src/storage_api.js build/storage_api.wasm",
@@ -23,7 +23,9 @@
         "build:bytes": "near-sdk-js build src/bytes.js build/bytes.wasm",
         "build:typescript": "near-sdk-js build src/typescript.ts build/typescript.wasm",
         "build:public-key": "near-sdk-js build src/public-key.js build/public-key.wasm",
-        "build:near-bindgen": "near-sdk-js build src/near_bindgen/require_init_true.ts build/require_init_true.wasm && near-sdk-js build src/near_bindgen/require_init_false.ts build/require_init_false.wasm",
+        "build:near-bindgen": "near-sdk-js build src/decorators/require_init_true.ts build/require_init_true.wasm && near-sdk-js build src/decorators/require_init_false.ts build/require_init_false.wasm",
+        "build:payable": "near-sdk-js build src/decorators/payable.ts build/payable.wasm",
+        "build:private": "near-sdk-js build src/decorators/private.ts build/private.wasm",
         "test": "ava",
         "test:context-api": "ava __tests__/test_context_api.ava.js",
         "test:math-api": "ava __tests__/test_math_api.ava.js",
@@ -40,7 +42,9 @@
         "test:bytes": "ava __tests__/bytes.ava.js",
         "test:typescript": "ava __tests__/typescript.ava.js",
         "test:public-key": "ava __tests__/test-public-key.ava.js",
-        "test:near-bindgen": "ava __tests__/near_bindgen.ava.js"
+        "test:near-bindgen": "ava __tests__/decorators/near_bindgen.ava.js",
+        "test:payable": "ava __tests__/decorators/payable.ava.js",
+        "test:private": "ava __tests__/decorators/private.ava.js"
     },
     "author": "Near Inc <hello@nearprotocol.com>",
     "license": "Apache-2.0",

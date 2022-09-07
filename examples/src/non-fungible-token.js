@@ -14,7 +14,7 @@ class NftContract {
         this.owner_by_id = new LookupMap('a')
     }
 
-    @initialize
+    @initialize({})
     init({ owner_id, owner_by_id_prefix }) {
         this.owner_id = owner_id
         this.owner_by_id = new LookupMap(owner_by_id_prefix)
@@ -32,13 +32,13 @@ class NftContract {
         return owner_id
     }
 
-    @call
+    @call({})
     nftTransfer({ receiver_id, token_id, approval_id, memo }) {
         let sender_id = near.predecessorAccountId()
         this.internalTransfer({ sender_id, receiver_id, token_id, approval_id, memo })
     }
 
-    @call
+    @call({})
     nftTransferCall({ receiver_id, token_id, approval_id, memo, msg }) {
         near.log(`nftTransferCall called, receiver_id ${receiver_id}, token_id ${token_id}`)
         let sender_id = near.predecessorAccountId()
@@ -49,12 +49,9 @@ class NftContract {
         near.promiseThen(promise, near.currentAccountId(), '_nftResolveTransfer', bytes(JSON.stringify({ sender_id, receiver_id, token_id })), 0, 30000000000000);
     }
 
-    @call
+    @call({ privateFunction: true })
     _nftResolveTransfer({ sender_id, receiver_id, token_id }) {
         near.log(`_nftResolveTransfer called, receiver_id ${receiver_id}, token_id ${token_id}`)
-        if (near.currentAccountId() == !near.predecessorAccountId()) {
-            throw Error('Function can be used as a callback only')
-        }
         const isTokenTransfered = JSON.parse(near.promiseResult(0))
         near.log(`${token_id} ${isTokenTransfered ? 'was transfered' : 'was NOT transfered'}`)
 
@@ -70,7 +67,7 @@ class NftContract {
         }
     }
 
-    @call
+    @call({})
     nftMint({ token_id, token_owner_id, token_metadata }) {
         let sender_id = near.predecessorAccountId()
         assert(sender_id === this.owner_id, "Unauthorized")
@@ -81,7 +78,7 @@ class NftContract {
         return new Token(token_id, token_owner_id)
     }
 
-    @view
+    @view({})
     nftToken({ token_id }) {
         let owner_id = this.owner_by_id.get(token_id)
         if (owner_id === null) {

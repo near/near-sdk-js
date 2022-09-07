@@ -16,7 +16,7 @@ function arrayN(n) {
 
 @NearBindgen({})
 class HighlevelPromiseContract {
-    @call
+    @call({})
     test_promise_batch_stake() {
         let promise = NearPromise.new('highlevel-promise.test.near')
             .stake(100000000000000000000000000000n, new PublicKey(near.signerAccountPk()))
@@ -24,7 +24,7 @@ class HighlevelPromiseContract {
         return promise;
     }
 
-    @call
+    @call({})
     test_promise_batch_create_transfer() {
         let promise = NearPromise.new('a.highlevel-promise.test.near')
             .createAccount()
@@ -32,7 +32,7 @@ class HighlevelPromiseContract {
         return promise;
     }
 
-    @call
+    @call({})
     test_promise_add_full_access_key() {
         let promise = NearPromise.new('c.highlevel-promise.test.near')
             .createAccount()
@@ -41,7 +41,7 @@ class HighlevelPromiseContract {
         return promise;
     }
     
-    @call
+    @call({})
     test_promise_add_function_call_access_key() {
         let promise = NearPromise.new('d.highlevel-promise.test.near')
             .createAccount()
@@ -50,7 +50,7 @@ class HighlevelPromiseContract {
         return promise;
     }
 
-    @call
+    @call({})
     test_delete_account() {
         let promise = NearPromise.new('e.highlevel-promise.test.near')
             .createAccount()
@@ -59,7 +59,7 @@ class HighlevelPromiseContract {
         return promise;
     }
 
-    @call
+    @call({})
     test_promise_then() {
         let promise = NearPromise.new('callee-contract.test.near')
             .functionCall('cross_contract_callee', bytes('abc'), 0, 2 * Math.pow(10, 13))
@@ -67,7 +67,7 @@ class HighlevelPromiseContract {
         return promise;
     }
     
-    @call
+    @call({})
     test_promise_and() {
         let promise = NearPromise.new('callee-contract.test.near')
             .functionCall('cross_contract_callee', bytes('abc'), 0, 2 * Math.pow(10, 13))
@@ -80,7 +80,7 @@ class HighlevelPromiseContract {
         return retPromise;
     }
     
-    @call
+    @call({})
     cross_contract_callback({callbackArg1}) {
         return {...callingData(), promiseResults: arrayN(near.promiseResultsCount()).map(i => near.promiseResult(i)), callbackArg1}
     }
