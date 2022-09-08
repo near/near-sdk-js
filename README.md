@@ -29,6 +29,9 @@ To build all examples, run `yarn build` in `examples/`. To test all examples, ru
 
 To deploy and call a contract on a NEAR node, use near-cli's `near deploy` and `near call`.
 
+## Test
+We recommend to use near-workspaces to write tests for your smart contracts. See any of the examples for how tests are setup and written.
+
 ## Error Handling in NEAR-SDK-JS
 
 If you want to indicate an error happened and fail the transaction, just throw an error object in JavaScript. The compiled JavaScript contract includes error handling capability. It will catch throwed errors and automatically invoke `panic_utf8` with `"{error.message}\n:{error.stack}"`. As a result, transaction will fail with `"Smart contract panicked: {error.message}\n{error.stack}"` error message. You can also use an error utilities library to organize your errors, such as verror.
@@ -40,9 +43,6 @@ When call host function with inappropriate type, means incorrect number of argum
     - if arguments more than params, remaining argument are ignored
     - if argument is different than the required type, it'll be coerced to required type
     - if argument is different than the required type but cannot be coerced, will throw runtime type error, also with message and stacktrace
-
-## Test
-We recommend to use near-workspaces to write tests for your smart contracts. See any of the examples for how tests are setup and written.
 
 ## NEAR-SDK-JS API Reference
 
@@ -173,6 +173,36 @@ function altBn128G1Multiexp(value: Bytes, register_id: bigint);
 function altBn128G1Sum(value: Bytes, register_id: bigint);
 function altBn128PairingCheck(value: Bytes): bigint;
 ```
+
+### NearBindgen and other decorators
+You can write a simple smart contract by only using low-level APIs, such as `near.input()`, `near.storageRead()`, etc. In this case, the API of your contract will consist of all the exported JS functions. You can find an example of such a contract [here](https://github.com/near/near-sdk-js/blob/develop/examples/src/counter-lowlevel.js).
+
+But if you want to build a more complex contracts with ease, you can use decorators from this SDK that will handle serialization, deserialization, and other boilerplate operations for you.
+
+In order to do that, your contract must be a class decorated with `@NearBindgen({})`. Each method in this class with `@call({})`, `@view({})`, and `@initialize({})` decorators will become functions of your smart contract. `call` functions can change state, and `view` functions can only read it.
+
+Your class must have a `constructor()`. You will not be able to call it, which is why it should not accept any parameters. You must declare all the parameters that you are planning to use in the constructor and set default values.
+
+The simplest example of the contract that follows all these rules can be found [here](https://github.com/near/near-sdk-js/blob/develop/examples/src/status-message.js)
+
+`NearBindgen` decorator can accept `requireInit parameter`.
+```JS
+@NearBindgen({ requireInit: true })
+class YourContract {
+    ...
+}
+```
+
+It is `false` by default, but if you will set it to `true`, it will prevent all the `call` functions from being executed before you initialize the state of the contract.
+
+In order to initialize the contract, you need to add functions flagged with `@initialize({})` decorator.
+
+`@call({})` decorator can accept two parameters: `privateFunction` and `payableFunction`. They are both `false` by default.
+
+`privateFunction: true` can restrict access to this function to the contract itself.
+
+`payableFunction: true` will allow the function to accept payments (deposit). Without this flag, it will panic if any deposit was provided. 
+
 
 ### Collections
 A few useful on-chain persistent collections are provided. All keys, values and elements are of type `Bytes`.
