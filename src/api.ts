@@ -341,19 +341,15 @@ export function promiseResultsCount(): bigint {
   return env.promise_results_count();
 }
 
-export function promiseResult(
-  resultIdx: number | bigint
-): Bytes | PromiseResult.NotReady | PromiseResult.Failed {
+export function promiseResult(resultIdx: number | bigint): Bytes {
   let status: PromiseResult = env.promise_result(resultIdx, 0);
   if (status == PromiseResult.Successful) {
     return env.read_register(0);
-  } else if (
-    status == PromiseResult.Failed ||
-    status == PromiseResult.NotReady
-  ) {
-    return status;
   } else {
-    throw Error(`Unexpected return code: ${status}`);
+    throw Error(
+      `Promise result ${status == PromiseResult.Failed ? "Failed" :
+        status == PromiseResult.NotReady ? "NotReady" : status}`
+    );
   }
 }
 
