@@ -27,12 +27,13 @@ export class Vector<DataType> {
     return this.length == 0;
   }
 
-  get(index: number): DataType | null {
+  get(index: number, deserializer?: (value: unknown) => DataType): DataType | null {
     if (index >= this.length) {
       return null;
     }
     let storageKey = indexToKey(this.prefix, index);
-    return JSON.parse(near.storageRead(storageKey));
+    const value = JSON.parse(near.storageRead(storageKey))
+    return !!deserializer ? deserializer(value) : value as DataType
   }
 
   /// Removes an element from the vector and returns it in serialized form.

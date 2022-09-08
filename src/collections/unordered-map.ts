@@ -59,13 +59,13 @@ export class UnorderedMap<DataType> {
     return keysIsEmpty;
   }
 
-  get(key: Bytes): DataType | null {
+  get(key: Bytes, deserializer?: (value: unknown) => DataType): DataType | null {
     let indexRaw = getIndexRaw(this.keyIndexPrefix, key);
     if (indexRaw) {
       let index = deserializeIndex(indexRaw);
       let value = this.values.get(index);
       if (value) {
-        return value as DataType;
+        return !!deserializer ? deserializer(value) : value as DataType;
       } else {
         throw new Error(ERR_INCONSISTENT_STATE);
       }

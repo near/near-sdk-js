@@ -13,11 +13,12 @@ export class LookupMap<DataType> {
         return near.storageHasKey(storageKey)
     }
 
-    get(key: Bytes): DataType | null {
+    get(key: Bytes, deserializer?: (value: unknown) => DataType): DataType | null {
         let storageKey = this.keyPrefix + JSON.stringify(key)
         let raw = near.storageRead(storageKey)
         if (raw !== null) {
-            return JSON.parse(raw)
+            const value = JSON.parse(raw)
+            return !!deserializer ? deserializer(value) : value as DataType
         }
         return null
     }
