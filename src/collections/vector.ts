@@ -14,7 +14,7 @@ function indexToKey(prefix: Bytes, index: number): Bytes {
 
 /// An iterable implementation of vector that stores its content on the trie.
 /// Uses the following map: index -> element
-export class Vector<T> {
+export class Vector<DataType> {
   length: number;
   readonly prefix: Bytes;
 
@@ -27,7 +27,7 @@ export class Vector<T> {
     return this.length == 0;
   }
 
-  get(index: number): unknown | null {
+  get(index: number): DataType | null {
     if (index >= this.length) {
       return null;
     }
@@ -54,13 +54,13 @@ export class Vector<T> {
     }
   }
 
-  push(element: T) {
+  push(element: DataType) {
     let key = indexToKey(this.prefix, this.length);
     this.length += 1;
     near.storageWrite(key, JSON.stringify(element));
   }
 
-  pop(): T | null {
+  pop(): DataType | null {
     if (this.isEmpty()) {
       return null;
     } else {
@@ -75,7 +75,7 @@ export class Vector<T> {
     }
   }
 
-  replace(index: number, element: T): T {
+  replace(index: number, element: DataType): DataType {
     if (index >= this.length) {
       throw new Error(ERR_INDEX_OUT_OF_BOUNDS);
     } else {
@@ -88,13 +88,13 @@ export class Vector<T> {
     }
   }
 
-  extend(elements: T[]) {
+  extend(elements: DataType[]) {
     for (let element of elements) {
       this.push(element);
     }
   }
 
-  [Symbol.iterator](): VectorIterator {
+  [Symbol.iterator](): VectorIterator<DataType> {
     return new VectorIterator(this);
   }
 
@@ -106,7 +106,7 @@ export class Vector<T> {
     this.length = 0;
   }
 
-  toArray(): T[] {
+  toArray(): DataType[] {
     let ret = [];
     for (let v of this) {
       ret.push(v);
@@ -119,17 +119,17 @@ export class Vector<T> {
   }
 
   // converting plain object to class object
-  static deserialize(data: Vector<unknown>): Vector<unknown> {
-    let vector = new Vector(data.prefix);
+  static deserialize<DataType>(data: Vector<DataType>): Vector<DataType> {
+    let vector = new Vector<DataType>(data.prefix);
     vector.length = data.length;
     return vector;
   }
 }
 
-export class VectorIterator {
+export class VectorIterator<DataType> {
   private current: number;
-  private vector: Vector<unknown>;
-  constructor(vector: Vector<unknown>) {
+  private vector: Vector<DataType>;
+  constructor(vector: Vector<DataType>) {
     this.current = 0;
     this.vector = vector;
   }

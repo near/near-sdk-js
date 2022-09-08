@@ -18,10 +18,10 @@ function deserializeIndex(rawIndex: Bytes): number {
   return data[0];
 }
 
-export class UnorderedSet<T> {
+export class UnorderedSet<DataType> {
   readonly prefix: Bytes;
   readonly elementIndexPrefix: Bytes;
-  readonly elements: Vector<T>;
+  readonly elements: Vector<DataType>;
 
   constructor(prefix: Bytes) {
     this.prefix = prefix;
@@ -41,12 +41,12 @@ export class UnorderedSet<T> {
     return this.elements.isEmpty();
   }
 
-  contains(element: T): boolean {
+  contains(element: DataType): boolean {
     let indexLookup = this.elementIndexPrefix + JSON.stringify(element);
     return near.storageHasKey(indexLookup);
   }
 
-  set(element: T): boolean {
+  set(element: DataType): boolean {
     let indexLookup = this.elementIndexPrefix + JSON.stringify(element);
     if (near.storageRead(indexLookup)) {
       return false;
@@ -59,7 +59,7 @@ export class UnorderedSet<T> {
     }
   }
 
-  remove(element: T): boolean {
+  remove(element: DataType): boolean {
     let indexLookup = this.elementIndexPrefix + JSON.stringify(element);
     let indexRaw = near.storageRead(indexLookup);
     if (indexRaw) {
@@ -110,7 +110,7 @@ export class UnorderedSet<T> {
     return this.elements[Symbol.iterator]();
   }
 
-  extend(elements: T[]) {
+  extend(elements: DataType[]) {
     for (let element of elements) {
       this.set(element);
     }
@@ -121,9 +121,9 @@ export class UnorderedSet<T> {
   }
 
   // converting plain object to class object
-  static deserialize(data: UnorderedSet<unknown>): UnorderedSet<unknown> {
+  static deserialize<DataType>(data: UnorderedSet<DataType>): UnorderedSet<DataType> {
     // removing readonly modifier
-    type MutableUnorderedSet = Mutable<UnorderedSet<unknown>>;
+    type MutableUnorderedSet = Mutable<UnorderedSet<DataType>>;
     let set = new UnorderedSet(data.prefix) as MutableUnorderedSet;
     // reconstruct UnorderedSet
     set.length = data.length;
@@ -131,6 +131,6 @@ export class UnorderedSet<T> {
     let elementsPrefix = data.prefix + "e";
     set.elements = new Vector(elementsPrefix);
     set.elements.length = data.elements.length;
-    return set as UnorderedSet<unknown>;
+    return set as UnorderedSet<DataType>;
   }
 }

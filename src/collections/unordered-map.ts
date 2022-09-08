@@ -23,11 +23,11 @@ function getIndexRaw(keyIndexPrefix: Bytes, key: Bytes): Bytes {
   return indexRaw;
 }
 
-export class UnorderedMap<T> {
+export class UnorderedMap<DataType> {
   readonly prefix: Bytes;
   readonly keyIndexPrefix: Bytes;
   readonly keys: Vector<Bytes>;
-  readonly values: Vector<T>;
+  readonly values: Vector<DataType>;
 
   constructor(prefix: Bytes) {
     this.prefix = prefix;
@@ -59,13 +59,13 @@ export class UnorderedMap<T> {
     return keysIsEmpty;
   }
 
-  get(key: Bytes): T | null {
+  get(key: Bytes): DataType | null {
     let indexRaw = getIndexRaw(this.keyIndexPrefix, key);
     if (indexRaw) {
       let index = deserializeIndex(indexRaw);
       let value = this.values.get(index);
       if (value) {
-        return value as T;
+        return value as DataType;
       } else {
         throw new Error(ERR_INCONSISTENT_STATE);
       }
@@ -73,7 +73,7 @@ export class UnorderedMap<T> {
     return null;
   }
 
-  set(key: Bytes, value: T): unknown | null {
+  set(key: Bytes, value: DataType): unknown | null {
     let indexLookup = this.keyIndexPrefix + JSON.stringify(key);
     let indexRaw = near.storageRead(indexLookup);
     if (indexRaw) {
@@ -128,7 +128,7 @@ export class UnorderedMap<T> {
     this.values.clear();
   }
 
-  toArray(): [Bytes, T][] {
+  toArray(): [Bytes, DataType][] {
     let ret = [];
     for (let v of this) {
       ret.push(v);
@@ -136,11 +136,11 @@ export class UnorderedMap<T> {
     return ret;
   }
 
-  [Symbol.iterator](): UnorderedMapIterator<T> {
+  [Symbol.iterator](): UnorderedMapIterator<DataType> {
     return new UnorderedMapIterator(this);
   }
 
-  extend(kvs: [Bytes, T][]) {
+  extend(kvs: [Bytes, DataType][]) {
     for (let [k, v] of kvs) {
       this.set(k, v);
     }
@@ -151,9 +151,9 @@ export class UnorderedMap<T> {
   }
 
   // converting plain object to class object
-  static deserialize(data: UnorderedMap<unknown>): UnorderedMap<unknown> {
+  static deserialize<DataType>(data: UnorderedMap<DataType>): UnorderedMap<DataType> {
     // removing readonly modifier
-    type MutableUnorderedMap = Mutable<UnorderedMap<unknown>>;
+    type MutableUnorderedMap = Mutable<UnorderedMap<DataType>>;
     let map = new UnorderedMap(data.prefix) as MutableUnorderedMap;
     // reconstruct UnorderedMap
     map.length = data.length;
@@ -163,14 +163,14 @@ export class UnorderedMap<T> {
     // reconstruct values Vector
     map.values = new Vector(data.prefix + "v");
     map.values.length = data.values.length;
-    return map as UnorderedMap<unknown>;
+    return map as UnorderedMap<DataType>;
   }
 }
 
-class UnorderedMapIterator<T> {
-  private keys: VectorIterator;
-  private values: VectorIterator;
-  constructor(unorderedMap: UnorderedMap<T>) {
+class UnorderedMapIterator<DataType> {
+  private keys: VectorIterator<Bytes>;
+  private values: VectorIterator<DataType>;
+  constructor(unorderedMap: UnorderedMap<DataType>) {
     this.keys = new VectorIterator(unorderedMap.keys);
     this.values = new VectorIterator(unorderedMap.values);
   }

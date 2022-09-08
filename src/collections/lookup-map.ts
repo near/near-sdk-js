@@ -1,7 +1,7 @@
 import * as near from '../api'
 import { Bytes } from '../utils';
 
-export class LookupMap<T> {
+export class LookupMap<DataType> {
     readonly keyPrefix: Bytes;
 
     constructor(keyPrefix: Bytes) {
@@ -13,7 +13,7 @@ export class LookupMap<T> {
         return near.storageHasKey(storageKey)
     }
 
-    get(key: Bytes): T | null {
+    get(key: Bytes): DataType | null {
         let storageKey = this.keyPrefix + JSON.stringify(key)
         let raw = near.storageRead(storageKey)
         if (raw !== null) {
@@ -22,7 +22,7 @@ export class LookupMap<T> {
         return null
     }
 
-    remove(key: Bytes): T | null {
+    remove(key: Bytes): DataType | null {
         let storageKey = this.keyPrefix + JSON.stringify(key)
         if (near.storageRemove(storageKey)) {
             return JSON.parse(near.storageGetEvicted())
@@ -30,7 +30,7 @@ export class LookupMap<T> {
         return null
     }
 
-    set(key: Bytes, value: T): T | null {
+    set(key: Bytes, value: DataType): DataType | null {
         let storageKey = this.keyPrefix + JSON.stringify(key)
         let storageValue = JSON.stringify(value)
         if (near.storageWrite(storageKey, storageValue)) {
@@ -39,7 +39,7 @@ export class LookupMap<T> {
         return null
     }
 
-    extend(objects: [Bytes, T][]) {
+    extend(objects: [Bytes, DataType][]) {
         for (let kv of objects) {
             this.set(kv[0], kv[1])
         }
@@ -50,7 +50,7 @@ export class LookupMap<T> {
     }
 
     // converting plain object to class object
-    static deserialize(data: LookupMap<unknown>): LookupMap<unknown> {
+    static deserialize<DataType>(data: LookupMap<DataType>): LookupMap<DataType> {
         return new LookupMap(data.keyPrefix)
     }
 }
