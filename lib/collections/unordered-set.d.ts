@@ -6,7 +6,6 @@ export declare class UnorderedSet {
     readonly elements: Vector;
     constructor(prefix: Bytes);
     get length(): number;
-    private set length(value);
     isEmpty(): boolean;
     contains(element: unknown): boolean;
     set(element: unknown): boolean;
