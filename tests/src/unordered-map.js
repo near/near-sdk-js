@@ -62,7 +62,6 @@ class UnorderedMapTestContract {
     get_house() {
         const house = this.unorderedMap.get('house1', {reconstructor: (rawHouse) => new House(rawHouse.name, rawHouse.rooms.map((rawRoom) => new Room(rawRoom.name, rawRoom.size)))})
         const room = house.rooms[0]
-        near.log(house.name, house.rooms.length, 'OMER')
         return house.describe() + room.describe()
     }
 }
