@@ -1,4 +1,5 @@
 import * as near from "../api";
+import { GetOptions } from "../types/collections";
 import { u8ArrayToBytes, bytesToU8Array, Bytes, Mutable } from "../utils";
 import { Vector, VectorIterator } from "./vector";
 
@@ -59,13 +60,13 @@ export class UnorderedMap<DataType> {
     return keysIsEmpty;
   }
 
-  get(key: Bytes, deserializer?: (value: unknown) => DataType): DataType | null {
+  get(key: Bytes, options?: GetOptions<DataType>): DataType | null {
     let indexRaw = getIndexRaw(this.keyIndexPrefix, key);
     if (indexRaw) {
       let index = deserializeIndex(indexRaw);
       let value = this.values.get(index);
       if (value) {
-        return !!deserializer ? deserializer(value) : value as DataType;
+        return !!options?.reconstructor ? options.reconstructor(value) : value as DataType;
       } else {
         throw new Error(ERR_INCONSISTENT_STATE);
       }

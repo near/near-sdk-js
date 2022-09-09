@@ -1,6 +1,6 @@
 import * as near from "../api";
 import { Bytes, u8ArrayToBytes } from "../utils";
-
+import {GetOptions} from '../types/collections'
 const ERR_INDEX_OUT_OF_BOUNDS = "Index out of bounds";
 const ERR_INCONSISTENT_STATE =
   "The collection is an inconsistent state. Did previous smart contract execution terminate unexpectedly?";
@@ -27,13 +27,13 @@ export class Vector<DataType> {
     return this.length == 0;
   }
 
-  get(index: number, deserializer?: (value: unknown) => DataType): DataType | null {
+  get(index: number, options?: GetOptions<DataType>): DataType | null {
     if (index >= this.length) {
       return null;
     }
     let storageKey = indexToKey(this.prefix, index);
     const value = JSON.parse(near.storageRead(storageKey))
-    return !!deserializer ? deserializer(value) : value as DataType
+    return !!options?.reconstructor ? options.reconstructor(value) : value as DataType
   }
 
   /// Removes an element from the vector and returns it in serialized form.

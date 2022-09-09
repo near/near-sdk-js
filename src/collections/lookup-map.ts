@@ -1,4 +1,5 @@
 import * as near from '../api'
+import { GetOptions } from '../types/collections';
 import { Bytes } from '../utils';
 
 export class LookupMap<DataType> {
@@ -13,12 +14,12 @@ export class LookupMap<DataType> {
         return near.storageHasKey(storageKey)
     }
 
-    get(key: Bytes, deserializer?: (value: unknown) => DataType): DataType | null {
+    get(key: Bytes, options?: GetOptions<DataType>): DataType | null {
         let storageKey = this.keyPrefix + JSON.stringify(key)
         let raw = near.storageRead(storageKey)
         if (raw !== null) {
             const value = JSON.parse(raw)
-            return !!deserializer ? deserializer(value) : value as DataType
+            return !!options?.reconstructor ? options.reconstructor(value) : value as DataType
         }
         return null
     }

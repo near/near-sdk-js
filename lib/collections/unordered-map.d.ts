@@ -1,3 +1,4 @@
+import { GetOptions } from "../types/collections";
 import { Bytes } from "../utils";
 import { Vector } from "./vector";
 export declare class UnorderedMap<DataType> {
@@ -9,7 +10,7 @@ export declare class UnorderedMap<DataType> {
     get length(): number;
     private set length(value);
     isEmpty(): boolean;
-    get(key: Bytes): DataType | null;
+    get(key: Bytes, options?: GetOptions<DataType>): DataType | null;
     set(key: Bytes, value: DataType): unknown | null;
     remove(key: Bytes): unknown | null;
     clear(): void;

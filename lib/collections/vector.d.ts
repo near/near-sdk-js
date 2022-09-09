@@ -1,10 +1,11 @@
 import { Bytes } from "../utils";
+import { GetOptions } from '../types/collections';
 export declare class Vector<DataType> {
     length: number;
     readonly prefix: Bytes;
     constructor(prefix: Bytes);
     isEmpty(): boolean;
-    get(index: number): DataType | null;
+    get(index: number, options?: GetOptions<DataType>): DataType | null;
     swapRemove(index: number): unknown | null;
     push(element: DataType): void;
     pop(): DataType | null;
