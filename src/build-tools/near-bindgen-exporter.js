@@ -1,9 +1,12 @@
 import * as t from "@babel/types";
+import { readFileSync } from 'fs'
+import path from 'path'
 
 export default function () {
   return {
     visitor: {
       ClassDeclaration(path) {
+        const cFunctions = getCFunctions()
         let classNode = path.node;
         if (classNode.decorators && classNode.decorators[0].expression.callee.name == 'NearBindgen') {
           let classId = classNode.id;
@@ -25,6 +28,7 @@ export default function () {
             }
           }
           for (let method of Object.keys(contractMethods)) {
+            validateMethod(method, cFunctions)
             path.insertAfter(t.exportNamedDeclaration(t.functionDeclaration(t.identifier(method), [], t.blockStatement([
               // const _state = Counter._getState();
               t.variableDeclaration('let', [t.variableDeclarator(t.identifier('_state'), t.callExpression(t.memberExpression(classId, t.identifier('_getState')), []))]),
@@ -67,3 +71,19 @@ export default function () {
     }
   };
 }
+
+
+function getCFunctions(){
+  const builderRaw = readFileSync(path.resolve('../cli/builder/builder.c'), 'utf-8')
+  const regex = new RegExp(/(?<=JS_SetPropertyStr\(ctx, env, ").+?(?=", JS_NewCFunction\(ctx,)/gm)
+  const cFunctions = builderRaw.match(regex)
+  return cFunctions
+}
+
+function validateMethod(method, cFunctions) {
+  const includeMethod = cFunctions.includes(method)
+  if(includeMethod){
+    throw new Error(`Method ${method} is reserved by Near SDK, use another naming`)
+  }
+}
+
