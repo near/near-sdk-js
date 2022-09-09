@@ -7,13 +7,13 @@ class Counter {
         this.count = 0
     }
 
-    @call
+    @call({})
     increase({ n = 1 }) {
         this.count += n
         near.log(`Counter increased to ${this.count}`)
     }
 
-    @call
+    @call({})
     decrease({ n }) {
         // you can use default argument `n=1` too
         // this is to illustrate a npm dependency: lodash can be used
@@ -25,7 +25,7 @@ class Counter {
         near.log(`Counter decreased to ${this.count}`)
     }
 
-    @view
+    @view({})
     getCount() {
         return this.count
     }

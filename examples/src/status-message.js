@@ -6,14 +6,14 @@ class StatusMessage {
         this.records = {}
     }
 
-    @call
+    @call({})
     set_status({ message }) {
         let account_id = near.signerAccountId()
         near.log(`${account_id} set_status with message ${message}`)
         this.records[account_id] = message
     }
 
-    @view
+    @view({})
     get_status({ account_id }) {
         near.log(`get_status for account_id ${account_id}`)
         return this.records[account_id] || null

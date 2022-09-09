@@ -2,3 +2,4 @@ export declare type StorageUsage = bigint;
 export declare type BlockHeight = bigint;
 export declare type EpochHeight = bigint;
 export declare type Balance = bigint;
+export declare type Nonce = bigint;

@@ -6,12 +6,12 @@ class NftContract {
         this.nonFungibleTokenAccountId = ''
     }
 
-    @initialize
+    @initialize({})
     init({ nonFungibleTokenAccountId }) {
         this.nonFungibleTokenAccountId = nonFungibleTokenAccountId
     }
 
-    @call
+    @call({})
     nftOnTransfer({ senderId, previousOwnerId, tokenId, msg }) {
         near.log(`nftOnTransfer called, params: senderId: ${senderId}, previousOwnerId: ${previousOwnerId}, tokenId: ${tokenId}, msg: ${msg}`)
         assert(

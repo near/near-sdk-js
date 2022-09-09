@@ -1,18 +1,18 @@
-import { GetOptions } from "../types/collections";
 import { Bytes } from "../utils";
 import { Vector } from "./vector";
+import { LookupMap } from "./lookup-map";
+import { GetOptions } from "../types/collections";
+declare type ValueAndIndex<DataType> = [value: DataType, index: number];
 export declare class UnorderedMap<DataType> {
     readonly prefix: Bytes;
-    readonly keyIndexPrefix: Bytes;
     readonly keys: Vector<Bytes>;
-    readonly values: Vector<DataType>;
+    readonly values: LookupMap<ValueAndIndex<DataType>>;
     constructor(prefix: Bytes);
     get length(): number;
-    private set length(value);
     isEmpty(): boolean;
     get(key: Bytes, options?: GetOptions<DataType>): DataType | null;
-    set(key: Bytes, value: DataType): unknown | null;
-    remove(key: Bytes): unknown | null;
+    set(key: Bytes, value: DataType): DataType | null;
+    remove(key: Bytes): DataType | null;
     clear(): void;
     toArray(): [Bytes, DataType][];
     [Symbol.iterator](): UnorderedMapIterator<DataType>;
@@ -22,7 +22,7 @@ export declare class UnorderedMap<DataType> {
 }
 declare class UnorderedMapIterator<DataType> {
     private keys;
-    private values;
+    private map;
     constructor(unorderedMap: UnorderedMap<DataType>);
     next(): {
         value: [unknown | null, unknown | null];

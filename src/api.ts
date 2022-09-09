@@ -35,31 +35,31 @@ export function predecessorAccountId(): string {
   return env.read_register(0);
 }
 
-export function blockIndex(): BigInt {
+export function blockIndex(): bigint {
   return env.block_index();
 }
 
-export function blockHeight(): BigInt {
+export function blockHeight(): bigint {
   return blockIndex();
 }
 
-export function blockTimestamp(): BigInt {
+export function blockTimestamp(): bigint {
   return env.block_timestamp();
 }
 
-export function epochHeight(): BigInt {
+export function epochHeight(): bigint {
   return env.epoch_height();
 }
 
-export function attachedDeposit(): BigInt {
+export function attachedDeposit(): bigint {
   return env.attached_deposit();
 }
 
-export function prepaidGas(): BigInt {
+export function prepaidGas(): bigint {
   return env.prepaid_gas();
 }
 
-export function usedGas(): BigInt {
+export function usedGas(): bigint {
   return env.used_gas();
 }
 
@@ -103,15 +103,15 @@ export function ecrecover(
 
 // NOTE: "env.panic(msg)" is not exported, use "throw Error(msg)" instead
 
-export function panicUtf8(msg: string): never {
+export function panicUtf8(msg: Bytes): never {
   env.panic_utf8(msg);
 }
 
-export function logUtf8(msg: string) {
+export function logUtf8(msg: Bytes) {
   env.log_utf8(msg);
 }
 
-export function logUtf16(msg: string) {
+export function logUtf16(msg: Bytes) {
   env.log_utf16(msg);
 }
 
@@ -137,7 +137,7 @@ export function validatorStake(accountId: string) {
   return env.validator_stake(accountId);
 }
 
-export function validatorTotalStake(): BigInt {
+export function validatorTotalStake(): bigint {
   return env.validator_total_stake();
 }
 
@@ -174,15 +174,15 @@ export function input(): Bytes {
   return env.read_register(0);
 }
 
-export function storageUsage(): BigInt {
+export function storageUsage(): bigint {
   return env.storage_usage();
 }
 
-export function accountBalance(): BigInt {
+export function accountBalance(): bigint {
   return env.account_balance();
 }
 
-export function accountLockedBalance(): BigInt {
+export function accountLockedBalance(): bigint {
   return env.account_locked_balance();
 }
 
@@ -194,19 +194,19 @@ export function promiseCreate(
   accountId: string,
   methodName: string,
   args: Bytes,
-  amount: number | BigInt,
-  gas: number | BigInt
-): BigInt {
+  amount: number | bigint,
+  gas: number | bigint
+): bigint {
   return env.promise_create(accountId, methodName, args, amount, gas);
 }
 
 export function promiseThen(
-  promiseIndex: number | BigInt,
+  promiseIndex: number | bigint,
   accountId: string,
   methodName: string,
   args: Bytes,
-  amount: number | BigInt,
-  gas: number | BigInt
+  amount: number | bigint,
+  gas: number | bigint
 ) {
   return env.promise_then(
     promiseIndex,
@@ -218,38 +218,38 @@ export function promiseThen(
   );
 }
 
-export function promiseAnd(...promiseIndex: number[] | BigInt[]): BigInt {
+export function promiseAnd(...promiseIndex: number[] | bigint[]): bigint {
   return env.promise_and(...promiseIndex);
 }
 
-export function promiseBatchCreate(accountId: string): BigInt {
+export function promiseBatchCreate(accountId: string): bigint {
   return env.promise_batch_create(accountId);
 }
 
 export function promiseBatchThen(
-  promiseIndex: number | BigInt,
+  promiseIndex: number | bigint,
   accountId: string
-): BigInt {
+): bigint {
   return env.promise_batch_then(promiseIndex, accountId);
 }
 
-export function promiseBatchActionCreateAccount(promiseIndex: number | BigInt) {
+export function promiseBatchActionCreateAccount(promiseIndex: number | bigint) {
   env.promise_batch_action_create_account(promiseIndex);
 }
 
 export function promiseBatchActionDeployContract(
-  promiseIndex: number | BigInt,
+  promiseIndex: number | bigint,
   code: Bytes
 ) {
   env.promise_batch_action_deploy_contract(promiseIndex, code);
 }
 
 export function promiseBatchActionFunctionCall(
-  promiseIndex: number | BigInt,
+  promiseIndex: number | bigint,
   methodName: string,
   args: Bytes,
-  amount: number | BigInt,
-  gas: number | BigInt
+  amount: number | bigint,
+  gas: number | bigint
 ) {
   env.promise_batch_action_function_call(
     promiseIndex,
@@ -261,24 +261,24 @@ export function promiseBatchActionFunctionCall(
 }
 
 export function promiseBatchActionTransfer(
-  promiseIndex: number | BigInt,
-  amount: number | BigInt
+  promiseIndex: number | bigint,
+  amount: number | bigint
 ) {
   env.promise_batch_action_transfer(promiseIndex, amount);
 }
 
 export function promiseBatchActionStake(
-  promiseIndex: number | BigInt,
-  amount: number | BigInt,
+  promiseIndex: number | bigint,
+  amount: number | bigint,
   publicKey: Bytes
 ) {
   env.promise_batch_action_stake(promiseIndex, amount, publicKey);
 }
 
 export function promiseBatchActionAddKeyWithFullAccess(
-  promiseIndex: number | BigInt,
+  promiseIndex: number | bigint,
   publicKey: Bytes,
-  nonce: number | BigInt
+  nonce: number | bigint
 ) {
   env.promise_batch_action_add_key_with_full_access(
     promiseIndex,
@@ -288,10 +288,10 @@ export function promiseBatchActionAddKeyWithFullAccess(
 }
 
 export function promiseBatchActionAddKeyWithFunctionCall(
-  promiseIndex: number | BigInt,
+  promiseIndex: number | bigint,
   publicKey: Bytes,
-  nonce: number | BigInt,
-  allowance: number | BigInt,
+  nonce: number | bigint,
+  allowance: number | bigint,
   receiverId: string,
   methodNames: string
 ) {
@@ -306,26 +306,26 @@ export function promiseBatchActionAddKeyWithFunctionCall(
 }
 
 export function promiseBatchActionDeleteKey(
-  promiseIndex: number | BigInt,
+  promiseIndex: number | bigint,
   publicKey: Bytes
 ) {
   env.promise_batch_action_delete_key(promiseIndex, publicKey);
 }
 
 export function promiseBatchActionDeleteAccount(
-  promiseIndex: number | BigInt,
+  promiseIndex: number | bigint,
   beneficiaryId: string
 ) {
   env.promise_batch_action_delete_account(promiseIndex, beneficiaryId);
 }
 
 export function promiseBatchActionFunctionCallWeight(
-  promiseIndex: number | BigInt,
+  promiseIndex: number | bigint,
   methodName: string,
   args: Bytes,
-  amount: number | BigInt,
-  gas: number | BigInt,
-  weight: number | BigInt,
+  amount: number | bigint,
+  gas: number | bigint,
+  weight: number | bigint,
 ) {
   env.promise_batch_action_function_call_weight(
     promiseIndex,
@@ -337,27 +337,23 @@ export function promiseBatchActionFunctionCallWeight(
   );
 }
 
-export function promiseResultsCount(): BigInt {
+export function promiseResultsCount(): bigint {
   return env.promise_results_count();
 }
 
-export function promiseResult(
-  resultIdx: number | BigInt
-): Bytes | PromiseResult.NotReady | PromiseResult.Failed {
+export function promiseResult(resultIdx: number | bigint): Bytes {
   let status: PromiseResult = env.promise_result(resultIdx, 0);
   if (status == PromiseResult.Successful) {
     return env.read_register(0);
-  } else if (
-    status == PromiseResult.Failed ||
-    status == PromiseResult.NotReady
-  ) {
-    return status;
   } else {
-    throw Error(`Unexpected return code: ${status}`);
+    throw Error(
+      `Promise result ${status == PromiseResult.Failed ? "Failed" :
+        status == PromiseResult.NotReady ? "NotReady" : status}`
+    );
   }
 }
 
-export function promiseReturn(promiseIdx: number | BigInt) {
+export function promiseReturn(promiseIdx: number | bigint) {
   env.promise_return(promiseIdx);
 }
 
@@ -377,6 +373,6 @@ export function storageRemove(key: Bytes): boolean {
   return false;
 }
 
-export function storageByteCost(): BigInt {
+export function storageByteCost(): bigint {
   return 10_000_000_000_000_000_000n;
 }

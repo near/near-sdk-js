@@ -1,132 +1,87 @@
-import * as near from "../api";
-import { GetOptions } from "../types/collections";
-import { u8ArrayToBytes, bytesToU8Array, Bytes, Mutable } from "../utils";
+import { Bytes, Mutable } from "../utils";
 import { Vector, VectorIterator } from "./vector";
+import { LookupMap } from "./lookup-map";
+import { GetOptions } from "../types/collections";
 
 const ERR_INCONSISTENT_STATE =
   "The collection is an inconsistent state. Did previous smart contract execution terminate unexpectedly?";
 
-function serializeIndex(index: number): Bytes {
-  let data = new Uint32Array([index]);
-  let array = new Uint8Array(data.buffer);
-  return u8ArrayToBytes(array);
-}
-
-function deserializeIndex(rawIndex: Bytes) {
-  let array = bytesToU8Array(rawIndex);
-  let data = new Uint32Array(array.buffer);
-  return data[0];
-}
-
-function getIndexRaw(keyIndexPrefix: Bytes, key: Bytes): Bytes {
-  let indexLookup = keyIndexPrefix + JSON.stringify(key);
-  let indexRaw = near.storageRead(indexLookup);
-  return indexRaw;
-}
+type ValueAndIndex<DataType> = [value: DataType, index: number]
 
 export class UnorderedMap<DataType> {
   readonly prefix: Bytes;
-  readonly keyIndexPrefix: Bytes;
   readonly keys: Vector<Bytes>;
-  readonly values: Vector<DataType>;
+  readonly values: LookupMap<ValueAndIndex<DataType>>;
 
   constructor(prefix: Bytes) {
     this.prefix = prefix;
-    this.keyIndexPrefix = prefix + "i";
-    let indexKey = prefix + "k";
-    let indexValue = prefix + "v";
-    this.keys = new Vector(indexKey);
-    this.values = new Vector(indexValue);
+    this.keys = new Vector<Bytes>(prefix + 'u'); // intentional different prefix with old UnorderedMap
+    this.values = new LookupMap<ValueAndIndex<DataType>>(prefix + 'm');
   }
 
   get length() {
     let keysLen = this.keys.length;
-    let valuesLen = this.values.length;
-    if (keysLen != valuesLen) {
-      throw new Error(ERR_INCONSISTENT_STATE);
-    }
     return keysLen;
   }
 
-  // noop, called by deserialize
-  private set length(_l: number) {}
-
   isEmpty(): boolean {
     let keysIsEmpty = this.keys.isEmpty();
-    let valuesIsEmpty = this.values.isEmpty();
-    if (keysIsEmpty != valuesIsEmpty) {
-      throw new Error(ERR_INCONSISTENT_STATE);
-    }
     return keysIsEmpty;
   }
 
   get(key: Bytes, options?: GetOptions<DataType>): DataType | null {
-    let indexRaw = getIndexRaw(this.keyIndexPrefix, key);
-    if (indexRaw) {
-      let index = deserializeIndex(indexRaw);
-      let value = this.values.get(index);
-      if (value) {
-        return !!options?.reconstructor ? options.reconstructor(value) : value as DataType;
-      } else {
-        throw new Error(ERR_INCONSISTENT_STATE);
-      }
-    }
-    return null;
-  }
-
-  set(key: Bytes, value: DataType): unknown | null {
-    let indexLookup = this.keyIndexPrefix + JSON.stringify(key);
-    let indexRaw = near.storageRead(indexLookup);
-    if (indexRaw) {
-      let index = deserializeIndex(indexRaw);
-      return this.values.replace(index, value);
-    } else {
-      let nextIndex = this.length;
-      let nextIndexRaw = serializeIndex(nextIndex);
-      near.storageWrite(indexLookup, nextIndexRaw);
-      this.keys.push(key);
-      this.values.push(value);
+    let valueAndIndex = this.values.get(key);
+    if (valueAndIndex === null) {
       return null;
     }
+    let value = (valueAndIndex as ValueAndIndex<DataType>)[0];
+    return !!options?.reconstructor ? options.reconstructor(value) : value;
   }
 
-  remove(key: Bytes): unknown | null {
-    let indexLookup = this.keyIndexPrefix + JSON.stringify(key);
-    let indexRaw = near.storageRead(indexLookup);
-    if (indexRaw) {
-      if (this.length == 1) {
-        // If there is only one element then swap remove simply removes it without
-        // swapping with the last element.
-        near.storageRemove(indexLookup);
-      } else {
-        // If there is more than one element then swap remove swaps it with the last
-        // element.
-        let lastKey = this.keys.get(this.length - 1);
-        if (!lastKey) {
-          throw new Error(ERR_INCONSISTENT_STATE);
-        }
-        near.storageRemove(indexLookup);
-        // If the removed element was the last element from keys, then we don't need to
-        // reinsert the lookup back.
-        if (lastKey != key) {
-          let lastLookupKey = this.keyIndexPrefix + JSON.stringify(lastKey);
-          near.storageWrite(lastLookupKey, indexRaw);
-        }
-      }
-      let index = deserializeIndex(indexRaw);
-      this.keys.swapRemove(index);
-      return this.values.swapRemove(index);
+  set(key: Bytes, value: DataType): DataType | null {
+    let valueAndIndex = this.values.get(key);
+    if (valueAndIndex !== null) {
+      let oldValue = (valueAndIndex as ValueAndIndex<DataType>)[0];
+      (valueAndIndex as ValueAndIndex<DataType>)[0] = value;
+      this.values.set(key, valueAndIndex)
+      return oldValue as DataType;
     }
+
+    let nextIndex = this.length;
+    this.keys.push(key);
+    this.values.set(key, [value, nextIndex]);
     return null;
+  }
+
+  remove(key: Bytes): DataType | null {
+    let oldValueAndIndex = this.values.remove(key);
+    if (oldValueAndIndex === null) {
+      return null;
+    }
+    let index = (oldValueAndIndex as ValueAndIndex<DataType>)[1];
+    if (this.keys.swapRemove(index) === null) {
+      throw new Error(ERR_INCONSISTENT_STATE);
+    }
+
+    // the last key is swapped to key[index], the corresponding [value, index] need update
+    if (this.keys.length > 0 && index != this.keys.length) {
+      // if there is still elements and it was not the last element
+      let swappedKey = this.keys.get(index) as Bytes;
+      let swappedValueAndIndex = this.values.get(swappedKey);
+      if (swappedValueAndIndex === null) {
+        throw new Error(ERR_INCONSISTENT_STATE)
+      }
+      this.values.set(swappedKey, [swappedValueAndIndex[0], index])
+    }
+    return (oldValueAndIndex as ValueAndIndex<DataType>)[0];
   }
 
   clear() {
     for (let key of this.keys) {
-      let indexLookup = this.keyIndexPrefix + JSON.stringify(key);
-      near.storageRemove(indexLookup);
+      // Set instead of remove to avoid loading the value from storage.
+      this.values.set(key as Bytes, null);
     }
     this.keys.clear();
-    this.values.clear();
   }
 
   toArray(): [Bytes, DataType][] {
@@ -138,7 +93,7 @@ export class UnorderedMap<DataType> {
   }
 
   [Symbol.iterator](): UnorderedMapIterator<DataType> {
-    return new UnorderedMapIterator(this);
+    return new UnorderedMapIterator<DataType>(this);
   }
 
   extend(kvs: [Bytes, DataType][]) {
@@ -156,32 +111,33 @@ export class UnorderedMap<DataType> {
     // removing readonly modifier
     type MutableUnorderedMap = Mutable<UnorderedMap<DataType>>;
     let map = new UnorderedMap(data.prefix) as MutableUnorderedMap;
-    // reconstruct UnorderedMap
-    map.length = data.length;
     // reconstruct keys Vector
-    map.keys = new Vector(data.prefix + "k");
+    map.keys = new Vector(data.prefix + "u");
     map.keys.length = data.keys.length;
-    // reconstruct values Vector
-    map.values = new Vector(data.prefix + "v");
-    map.values.length = data.values.length;
+    // reconstruct values LookupMap
+    map.values = new LookupMap(data.prefix + "m");
     return map as UnorderedMap<DataType>;
   }
 }
 
 class UnorderedMapIterator<DataType> {
   private keys: VectorIterator<Bytes>;
-  private values: VectorIterator<DataType>;
+  private map: LookupMap<ValueAndIndex<DataType>>;
+
   constructor(unorderedMap: UnorderedMap<DataType>) {
     this.keys = new VectorIterator(unorderedMap.keys);
-    this.values = new VectorIterator(unorderedMap.values);
+    this.map = unorderedMap.values;
   }
 
   next(): { value: [unknown | null, unknown | null]; done: boolean } {
     let key = this.keys.next();
-    let value = this.values.next();
-    if (key.done != value.done) {
-      throw new Error(ERR_INCONSISTENT_STATE);
+    let value;
+    if (!key.done) {
+      value = this.map.get(key.value as Bytes);
+      if (value === null) {
+        throw new Error(ERR_INCONSISTENT_STATE);
+      }
     }
-    return { value: [key.value, value.value], done: key.done };
+    return { value: [key.value, value ? value[0] : value], done: key.done };
   }
 }
