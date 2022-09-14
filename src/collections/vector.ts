@@ -119,7 +119,7 @@ export class Vector {
   }
 
   // converting plain object to class object
-  static deserialize(data: Vector): Vector {
+  static reconstruct(data: Vector): Vector {
     let vector = new Vector(data.prefix);
     vector.length = data.length;
     return vector;
