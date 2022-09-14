@@ -14,7 +14,7 @@ export declare class Vector {
     clear(): void;
     toArray(): unknown[];
     serialize(): string;
-    static deserialize(data: Vector): Vector;
+    static reconstruct(data: Vector): Vector;
 }
 export declare class VectorIterator {
     private current;
