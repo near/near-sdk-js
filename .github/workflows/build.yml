@@ -1,0 +1,19 @@
+name: Build
+on: push
+jobs:
+  unit-tests:
+    strategy:
+      matrix:
+        platform: [ubuntu-latest]
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: "16"
+      - name: Install modules
+        run: yarn
+      - name: Run build
+        run: yarn build
+      - name: check build is included in branch
+        run: test -z "$(git status --porcelain)"
