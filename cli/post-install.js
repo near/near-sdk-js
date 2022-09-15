@@ -5,7 +5,9 @@ async function download(url) {
 }
 
 const OS = await executeCommand('uname -s', true);
-const ARCH = await executeCommand('uname -m', true);
+const RAW_ARCH = await executeCommand('uname -m', true);
+// This two names represent the same architecture
+const ARCH = RAW_ARCH === 'aarch64' ? 'arm64' : RAW_ARCH;
 
 if (OS !== 'Linux' && OS !== 'Darwin') {
     console.error(`OS ${OS} is not supported at the moment`);
