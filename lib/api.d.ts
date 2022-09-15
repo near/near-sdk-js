@@ -1,5 +1,4 @@
 import { Bytes } from "./utils";
-import { PromiseResult } from "./types";
 export declare function log(...params: any[]): void;
 export declare function signerAccountId(): string;
 export declare function signerAccountPk(): Bytes;
@@ -17,9 +16,9 @@ export declare function keccak256(value: Bytes): Bytes;
 export declare function keccak512(value: Bytes): Bytes;
 export declare function ripemd160(value: Bytes): Bytes;
 export declare function ecrecover(hash: Bytes, sig: Bytes, v: number, malleabilityFlag: number): Bytes | null;
-export declare function panicUtf8(msg: string): never;
-export declare function logUtf8(msg: string): void;
-export declare function logUtf16(msg: string): void;
+export declare function panicUtf8(msg: Bytes): never;
+export declare function logUtf8(msg: Bytes): void;
+export declare function logUtf16(msg: Bytes): void;
 export declare function storageRead(key: Bytes): Bytes | null;
 export declare function storageHasKey(key: Bytes): boolean;
 export declare function validatorStake(accountId: string): any;
@@ -50,7 +49,7 @@ export declare function promiseBatchActionDeleteKey(promiseIndex: number | bigin
 export declare function promiseBatchActionDeleteAccount(promiseIndex: number | bigint, beneficiaryId: string): void;
 export declare function promiseBatchActionFunctionCallWeight(promiseIndex: number | bigint, methodName: string, args: Bytes, amount: number | bigint, gas: number | bigint, weight: number | bigint): void;
 export declare function promiseResultsCount(): bigint;
-export declare function promiseResult(resultIdx: number | bigint): Bytes | PromiseResult.NotReady | PromiseResult.Failed;
+export declare function promiseResult(resultIdx: number | bigint): Bytes;
 export declare function promiseReturn(promiseIdx: number | bigint): void;
 export declare function storageWrite(key: Bytes, value: Bytes): boolean;
 export declare function storageRemove(key: Bytes): boolean;

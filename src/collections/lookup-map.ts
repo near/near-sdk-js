@@ -50,7 +50,7 @@ export class LookupMap {
     }
 
     // converting plain object to class object
-    static deserialize(data: LookupMap): LookupMap {
+    static reconstruct(data: LookupMap): LookupMap {
         return new LookupMap(data.keyPrefix)
     }
 }

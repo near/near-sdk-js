@@ -103,15 +103,15 @@ export function ecrecover(
 
 // NOTE: "env.panic(msg)" is not exported, use "throw Error(msg)" instead
 
-export function panicUtf8(msg: string): never {
+export function panicUtf8(msg: Bytes): never {
   env.panic_utf8(msg);
 }
 
-export function logUtf8(msg: string) {
+export function logUtf8(msg: Bytes) {
   env.log_utf8(msg);
 }
 
-export function logUtf16(msg: string) {
+export function logUtf16(msg: Bytes) {
   env.log_utf16(msg);
 }
 
@@ -341,19 +341,15 @@ export function promiseResultsCount(): bigint {
   return env.promise_results_count();
 }
 
-export function promiseResult(
-  resultIdx: number | bigint
-): Bytes | PromiseResult.NotReady | PromiseResult.Failed {
+export function promiseResult(resultIdx: number | bigint): Bytes {
   let status: PromiseResult = env.promise_result(resultIdx, 0);
   if (status == PromiseResult.Successful) {
     return env.read_register(0);
-  } else if (
-    status == PromiseResult.Failed ||
-    status == PromiseResult.NotReady
-  ) {
-    return status;
   } else {
-    throw Error(`Unexpected return code: ${status}`);
+    throw Error(
+      `Promise result ${status == PromiseResult.Failed ? "Failed" :
+        status == PromiseResult.NotReady ? "NotReady" : status}`
+    );
   }
 }
 

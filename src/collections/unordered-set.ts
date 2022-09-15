@@ -34,9 +34,6 @@ export class UnorderedSet {
     return this.elements.length;
   }
 
-  // noop, called by deserialize
-  private set length(_l: number) {}
-
   isEmpty(): boolean {
     return this.elements.isEmpty();
   }
@@ -120,12 +117,10 @@ export class UnorderedSet {
   }
 
   // converting plain object to class object
-  static deserialize(data: UnorderedSet): UnorderedSet {
+  static reconstruct(data: UnorderedSet): UnorderedSet {
     // removing readonly modifier
     type MutableUnorderedSet = Mutable<UnorderedSet>;
     let set = new UnorderedSet(data.prefix) as MutableUnorderedSet;
-    // reconstruct UnorderedSet
-    set.length = data.length;
     // reconstruct Vector
     let elementsPrefix = data.prefix + "e";
     set.elements = new Vector(elementsPrefix);

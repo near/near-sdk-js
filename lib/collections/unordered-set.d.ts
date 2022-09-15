@@ -6,7 +6,6 @@ export declare class UnorderedSet {
     readonly elements: Vector;
     constructor(prefix: Bytes);
     get length(): number;
-    private set length(value);
     isEmpty(): boolean;
     contains(element: unknown): boolean;
     set(element: unknown): boolean;
@@ -16,5 +15,5 @@ export declare class UnorderedSet {
     [Symbol.iterator](): import("./vector").VectorIterator;
     extend(elements: unknown[]): void;
     serialize(): string;
-    static deserialize(data: UnorderedSet): UnorderedSet;
+    static reconstruct(data: UnorderedSet): UnorderedSet;
 }
