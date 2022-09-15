@@ -25,7 +25,7 @@ test.before(async t => {
     t.context.accounts = { root, highlevelPromise, ali, bob, calleeContract };
 });
 
-test.after(async t => {
+test.after.always(async t => {
     await t.context.worker.tearDown().catch(error => {
         console.log('Failed to tear down the worker:', error);
     });
