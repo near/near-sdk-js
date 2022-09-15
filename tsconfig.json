@@ -27,5 +27,6 @@
     "files": [
         "src/index.ts",
         "src/build-tools/near-bindgen-exporter.js",
+        "src/build-tools/include-bytes.js",
     ]
 }

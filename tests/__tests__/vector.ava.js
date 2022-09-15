@@ -1,5 +1,4 @@
 import { Worker } from 'near-workspaces';
-import { readFile } from 'fs/promises'
 import test from 'ava';
 
 test.beforeEach(async t => {
@@ -13,7 +12,6 @@ test.beforeEach(async t => {
     const vectorContract = await root.devDeploy(
         'build/vector.wasm',
     );
-    await vectorContract.call(vectorContract, 'init', {});
 
     // Test users
     const ali = await root.createSubAccount('ali');
@@ -25,7 +23,7 @@ test.beforeEach(async t => {
     t.context.accounts = { root, vectorContract, ali, bob, carl };
 });
 
-test.afterEach(async t => {
+test.afterEach.always(async t => {
     await t.context.worker.tearDown().catch(error => {
         console.log('Failed to tear down the worker:', error);
     });

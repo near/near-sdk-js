@@ -1,8 +1,8 @@
 import {
-    NearContract,
     NearBindgen,
     call,
     view,
+    initialize,
     near,
     LookupMap,
 } from 'near-sdk-js'
@@ -49,15 +49,17 @@ class Account {
     }
 }
 
-@NearBindgen
-class LockableFungibleToken extends NearContract {
-    constructor({ prefix, totalSupply }) {
-        super()
-        this.accounts = new LookupMap(prefix) // Account ID -> Account mapping
-        this.totalSupply = totalSupply // Total supply of the all tokens
+@NearBindgen({ initRequired: true })
+class LockableFungibleToken {
+    constructor() {
+        this.accounts = new LookupMap('a') // Account ID -> Account mapping
+        this.totalSupply = 0 // Total supply of the all tokens
     }
 
-    init() {
+    @initialize({})
+    init({ prefix, totalSupply }) {
+        this.accounts = new LookupMap(prefix)
+        this.totalSupply = totalSupply
         let ownerId = near.signerAccountId()
         let ownerAccount = this.getAccount(ownerId)
         ownerAccount.balance = this.totalSupply
@@ -76,7 +78,7 @@ class LockableFungibleToken extends NearContract {
         this.accounts.set(accountId, account)
     }
 
-    @call
+    @call({})
     setAllowance({ escrowAccountId, allowance }) {
         let ownerId = near.predecessorAccountId()
         if (escrowAccountId === ownerId) {
@@ -92,7 +94,7 @@ class LockableFungibleToken extends NearContract {
         this.setAccount(ownerId, account)
     }
 
-    @call
+    @call({})
     lock({ ownerId, lockAmount }) {
         if (lockAmount <= 0) {
             throw Error("Can't lock 0 or less tokens")
@@ -122,7 +124,7 @@ class LockableFungibleToken extends NearContract {
         this.setAccount(ownerId, account)
     }
 
-    @call
+    @call({})
     unlock({ ownerId, unlockAmount }) {
         if (unlockAmount <= 0) {
             throw Error("Can't unlock 0 or less tokens")
@@ -149,7 +151,7 @@ class LockableFungibleToken extends NearContract {
         this.setAccount(ownerId, account)
     }
 
-    @call
+    @call({})
     transferFrom({ ownerId, newOwnerId, amount }) {
         if (amount <= 0) {
             throw Error("Can't transfer 0 or less tokens")
@@ -195,37 +197,33 @@ class LockableFungibleToken extends NearContract {
         this.setAccount(newOwnerId, newAccount)
     }
 
-    @call
+    @call({})
     transfer({ newOwnerId, amount }) {
         this.transferFrom({ ownerId: near.predecessorAccountId(), newOwnerId, amount })
     }
 
-    @view
+    @view({})
     getTotalSupply() {
         return this.totalSupply
     }
 
-    @view
+    @view({})
     getTotalBalance({ ownerId }) {
         return this.getAccount(ownerId).totalBalance()
     }
 
-    @view
+    @view({})
     getUnlockedBalance({ ownerId }) {
         return this.getAccount(ownerId).balance
     }
 
-    @view
+    @view({})
     getAllowance({ ownerId, escrowAccountId }) {
         return this.getAccount(ownerId).getAllowance(escrowAccountId)
     }
 
-    @view
+    @view({})
     getLockedBalance({ ownerId, escrowAccountId }) {
         return this.getAccount(ownerId).getLockedBalance(escrowAccountId)
-    }
-
-    default() {
-        return new LockableFungibleToken({ prefix: '', totalSupply: 0 })
     }
 }

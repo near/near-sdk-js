@@ -1,13 +1,17 @@
-import { NearContract, NearBindgen, call, near, assert } from 'near-sdk-js'
+import { NearBindgen, call, near, assert, initialize } from 'near-sdk-js'
 
-@NearBindgen
-class NftContract extends NearContract {
-    constructor({ nonFungibleTokenAccountId }) {
-        super()
+@NearBindgen({ requireInit: true })
+class NftContract {
+    constructor() {
+        this.nonFungibleTokenAccountId = ''
+    }
+
+    @initialize({})
+    init({ nonFungibleTokenAccountId }) {
         this.nonFungibleTokenAccountId = nonFungibleTokenAccountId
     }
 
-    @call
+    @call({})
     nftOnTransfer({ senderId, previousOwnerId, tokenId, msg }) {
         near.log(`nftOnTransfer called, params: senderId: ${senderId}, previousOwnerId: ${previousOwnerId}, tokenId: ${tokenId}, msg: ${msg}`)
         assert(
@@ -23,9 +27,5 @@ class NftContract extends NearContract {
         } else {
             throw Error("unsupported msg")
         }
-    }
-
-    default() {
-        return new NftContract({ nonFungibleTokenAccountId: '' })
     }
 }

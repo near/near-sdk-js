@@ -13,8 +13,6 @@ test.beforeEach(async t => {
         './build/status-message-collections.wasm',
     );
 
-    // Init the contract
-    await statusMessage.call(statusMessage, 'init', {});
 
     // Test users
     const ali = await root.createSubAccount('ali');
@@ -26,7 +24,7 @@ test.beforeEach(async t => {
     t.context.accounts = { root, statusMessage, ali, bob, carl };
 });
 
-test.afterEach(async t => {
+test.afterEach.always(async t => {
     await t.context.worker.tearDown().catch(error => {
         console.log('Failed to tear down the worker:', error);
     });

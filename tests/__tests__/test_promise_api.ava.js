@@ -30,7 +30,7 @@ test.before(async t => {
     t.context.accounts = { root, callerContract, calleeContract, ali, bob, caller2Contract };
 });
 
-test.after(async t => {
+test.after.always(async t => {
     await t.context.worker.tearDown().catch(error => {
         console.log('Failed to tear down the worker:', error);
     });
@@ -169,4 +169,22 @@ test('promise delete account', async t => {
     let r = await bob.callRaw(caller2Contract, 'test_delete_account', '', {gas: '100 Tgas'});
     t.is(r.result.status.SuccessValue, '');
     t.is(await caller2Contract.getSubAccount('e').exists(), false);
+});
+
+test('promise batch function call weight', async t => {
+    const { ali, caller2Contract, calleeContract } = t.context.accounts;
+    let r = await ali.callRaw(caller2Contract, 'test_promise_batch_call_weight', '', {gas: '100 Tgas'});
+    t.assert(r.result.status.SuccessValue);
+});
+
+test('promise batch transfer overflow', async t => {
+    const { bob, caller2Contract } = t.context.accounts;
+    let r = await bob.callRaw(caller2Contract, 'test_transfer_overflow', '', {gas: '100 Tgas'});
+    t.assert(r.result.status.Failure.ActionError.kind.FunctionCallError.ExecutionError.startsWith('Smart contract panicked: Expect Uint128 for amount'));
+});
+
+test('promise create gas overflow', async t => {
+    const { ali, callerContract } = t.context.accounts;
+    let r = await ali.callRaw(callerContract, 'test_promise_create_gas_overflow', '', {gas: '100 Tgas'});
+    t.assert(r.result.status.Failure.ActionError.kind.FunctionCallError.ExecutionError.startsWith('Smart contract panicked: Expect Uint64 for gas'));
 });

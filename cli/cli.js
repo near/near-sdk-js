@@ -45,16 +45,13 @@ async function build(argv) {
     const TARGET_EXT = argv.target.split('.').pop();
     const TARGET_FILE_NAME = path.basename(argv.target, `.${TARGET_EXT}`);
 
-    if(!["wasm", "base64"].includes(TARGET_EXT)){
-        throw new Error(`Unsupported target ${TARGET_EXT}, make sure target ends with .wasm or .base64`);
-    } 
-
-    const TARGET_TYPE = TARGET_EXT === 'wasm' ? 'STANDALONE' : 'ENCLAVED';
+    if (!["wasm"].includes(TARGET_EXT)) {
+        throw new Error(`Unsupported target ${TARGET_EXT}, make sure target ends with .wasm`);
+    }
 
     const ROLLUP_TARGET = `${TARGET_DIR}/${TARGET_FILE_NAME}.js`;
     const QJSC_TARGET = `${TARGET_DIR}/${TARGET_FILE_NAME}.h`;
-    const STANDALONE_CONTRACT_TARGET = `${TARGET_DIR}/${TARGET_FILE_NAME}.wasm`;
-    const ENCLAVED_CONTRACT_TARGET = `${TARGET_DIR}/${TARGET_FILE_NAME}.base64`;
+    const CONTRACT_TARGET = `${TARGET_DIR}/${TARGET_FILE_NAME}.wasm`;
 
     console.log(`Building ${SOURCE_FILE_WITH_PATH} contract...`);
 
@@ -69,13 +66,9 @@ async function build(argv) {
 
     await createHeaderFileWithQjsc(ROLLUP_TARGET, QJSC_TARGET);
 
-    if (TARGET_TYPE === 'STANDALONE') {
-        await createStandaloneMethodsHeaderFile(ROLLUP_TARGET);
-        await createStandaloneWasmContract(QJSC_TARGET, STANDALONE_CONTRACT_TARGET);
-        await wasiStubStandaloneContract(STANDALONE_CONTRACT_TARGET);
-    } else {
-        await createEnclavedContract(QJSC_TARGET, ENCLAVED_CONTRACT_TARGET);
-    }
+    await createMethodsHeaderFile(ROLLUP_TARGET);
+    await createWasmContract(QJSC_TARGET, CONTRACT_TARGET);
+    await wasiStubContract(CONTRACT_TARGET);
 }
 
 async function checkTsBuildWithTsc(sourceFileWithPath) {
@@ -110,15 +103,7 @@ async function createHeaderFileWithQjsc(rollupTarget, qjscTarget) {
     await executeCommand(`${QJSC} -c -m -o ${qjscTarget} -N code ${rollupTarget}`);
 }
 
-// Enclaved build functions
-async function createEnclavedContract(qjscTarget, enclavedContractTarget) {
-    console.log(`Saving enclaved bytecode to ${enclavedContractTarget}`);
-    const SAVE_BYTECODE_SCRIPT = `${NEAR_SDK_JS}/cli/save_bytecode.js`;
-    await executeCommand(`node ${SAVE_BYTECODE_SCRIPT} ${qjscTarget} ${enclavedContractTarget}`);
-}
-
-// Standalone build functions
-async function createStandaloneMethodsHeaderFile(rollupTarget) {
+async function createMethodsHeaderFile(rollupTarget) {
     console.log(`Genereting methods.h file`);
     let source = rollupTarget;
     const buildPath = path.dirname(source);
@@ -132,8 +117,8 @@ async function createStandaloneMethodsHeaderFile(rollupTarget) {
     await fs.writeFile(`${buildPath}/methods.h`, methods);
 }
 
-async function createStandaloneWasmContract(qjscTarget, standaloneContractTarget) {
-    console.log(`Creating ${standaloneContractTarget} contract...`);
+async function createWasmContract(qjscTarget, contractTarget) {
+    console.log(`Creating ${contractTarget} contract...`);
     const WASI_SDK_PATH = `${NEAR_SDK_JS}/cli/deps/wasi-sdk`;
 
     const CC = `${WASI_SDK_PATH}/bin/clang --sysroot=${WASI_SDK_PATH}/share/wasi-sysroot`
@@ -143,7 +128,7 @@ async function createStandaloneWasmContract(qjscTarget, standaloneContractTarget
     }
     const INCLUDES = `-I${QJSC_DIR} -I.`
     const ORIGINAL_BUILDER_PATH = `${NEAR_SDK_JS}/cli/builder/builder.c`;
-    const NEW_BUILDER_PATH = `${path.dirname(standaloneContractTarget)}/builder.c`
+    const NEW_BUILDER_PATH = `${path.dirname(contractTarget)}/builder.c`
     const SOURCES = `${NEW_BUILDER_PATH} ${QJSC_DIR}/quickjs.c ${QJSC_DIR}/libregexp.c ${QJSC_DIR}/libunicode.c ${QJSC_DIR}/cutils.c ${QJSC_DIR}/quickjs-libc-min.c ${QJSC_DIR}/libbf.c`;
     const LIBS = `-lm`
 
@@ -151,11 +136,11 @@ async function createStandaloneWasmContract(qjscTarget, standaloneContractTarget
     await executeCommand(`cp ${ORIGINAL_BUILDER_PATH} ${NEW_BUILDER_PATH}`);
     await executeCommand(`mv ${qjscTarget} build/code.h`);
 
-    await executeCommand(`${CC} --target=wasm32-wasi -nostartfiles -Oz -flto ${DEFS} ${INCLUDES} ${SOURCES} ${LIBS} -Wl,--no-entry -Wl,--allow-undefined -Wl,-z,stack-size=${256 * 1024} -Wl,--lto-O3 -o ${standaloneContractTarget}`);
+    await executeCommand(`${CC} --target=wasm32-wasi -nostartfiles -Oz -flto ${DEFS} ${INCLUDES} ${SOURCES} ${LIBS} -Wl,--no-entry -Wl,--allow-undefined -Wl,-z,stack-size=${256 * 1024} -Wl,--lto-O3 -o ${contractTarget}`);
 }
 
-async function wasiStubStandaloneContract(standaloneContractTarget) {
+async function wasiStubContract(contractTarget) {
     console.log(`Executing wasi-stub...`);
     const WASI_STUB = `${NEAR_SDK_JS}/cli/deps/binaryen/wasi-stub/run.sh`;
-    await executeCommand(`${WASI_STUB} ${standaloneContractTarget} >/dev/null`);
+    await executeCommand(`${WASI_STUB} ${contractTarget} >/dev/null`);
 }

@@ -1,13 +1,12 @@
 import { Bytes } from "../utils";
 import { Vector } from "./vector";
+import { LookupMap } from "./lookup-map";
 export declare class UnorderedMap {
-    readonly length: number;
     readonly prefix: Bytes;
-    readonly keyIndexPrefix: Bytes;
     readonly keys: Vector;
-    readonly values: Vector;
+    readonly values: LookupMap;
     constructor(prefix: Bytes);
-    len(): number;
+    get length(): number;
     isEmpty(): boolean;
     get(key: Bytes): unknown | null;
     set(key: Bytes, value: unknown): unknown | null;
@@ -17,11 +16,11 @@ export declare class UnorderedMap {
     [Symbol.iterator](): UnorderedMapIterator;
     extend(kvs: [Bytes, unknown][]): void;
     serialize(): string;
-    static deserialize(data: UnorderedMap): UnorderedMap;
+    static reconstruct(data: UnorderedMap): UnorderedMap;
 }
 declare class UnorderedMapIterator {
     private keys;
-    private values;
+    private map;
     constructor(unorderedMap: UnorderedMap);
     next(): {
         value: [unknown | null, unknown | null];

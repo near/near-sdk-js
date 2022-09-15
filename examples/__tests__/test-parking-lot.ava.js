@@ -8,7 +8,7 @@ test.beforeEach(async t => {
     const parkingLot = await root.devDeploy(
         'build/parking-lot.wasm',
     );
-    await parkingLot.call(parkingLot, 'init', {});
+
 
     const ali = await root.createSubAccount('ali');
 
@@ -16,7 +16,7 @@ test.beforeEach(async t => {
     t.context.accounts = { root, parkingLot, ali };
 });
 
-test.afterEach(async t => {
+test.afterEach.always(async t => {
     await t.context.worker.tearDown().catch(error => {
         console.log('Failed to tear down the worker:', error);
     });

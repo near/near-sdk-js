@@ -1,66 +1,60 @@
 import {
-    NearContract,
     NearBindgen,
     call,
     view,
     UnorderedSet,
 } from 'near-sdk-js'
-import {House, Room} from './model.js';
+import { House, Room } from './model.js';
 
-@NearBindgen
-class UnorderedSetTestContract extends NearContract {
+@NearBindgen({})
+class UnorderedSetTestContract {
     constructor() {
-        super()
         this.unorderedSet = new UnorderedSet('a');
     }
 
-    default() {
-        return new UnorderedSetTestContract();
-    }
-
-    @view
+    @view({})
     len() {
-        return this.unorderedSet.len();
+        return this.unorderedSet.length;
     }
 
-    @view
+    @view({})
     isEmpty() {
         return this.unorderedSet.isEmpty();
     }
 
-    @view
-    contains({element}) {
+    @view({})
+    contains({ element }) {
         return this.unorderedSet.contains(element);
     }
 
-    @call
-    set({element}) {
+    @call({})
+    set({ element }) {
         this.unorderedSet.set(element);
     }
 
-    @call
-    remove_key({element}) {
+    @call({})
+    remove_key({ element }) {
         this.unorderedSet.remove(element);
     }
 
-    @call
+    @call({})
     clear() {
         this.unorderedSet.clear();
     }
 
-    @view
+    @view({})
     toArray() {
         const res = this.unorderedSet.toArray();
         return res;
     }
 
-    @call
-    extend({elements}) {
+    @call({})
+    extend({ elements }) {
         this.unorderedSet.extend(elements);
     }
 
-    @call
-    add_house({name, rooms}) {
+    @call({})
+    add_house({ name, rooms }) {
         let house = new House(name, [])
         for (let r of rooms) {
             house.rooms.push(new Room(r.name, r.size))
@@ -68,8 +62,8 @@ class UnorderedSetTestContract extends NearContract {
         this.unorderedSet.set(house)
     }
 
-    @view
-    house_exist({name, rooms}) {
+    @view({})
+    house_exist({ name, rooms }) {
         let house = new House(name, [])
         for (let r of rooms) {
             house.rooms.push(new Room(r.name, r.size))

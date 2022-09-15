@@ -1,6 +1,6 @@
 {
   "name": "near-sdk-js",
-  "version": "0.4.0-5",
+  "version": "0.5.0-1",
   "description": "High Level JavaScript SDK for building smart contracts on NEAR",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -23,13 +23,9 @@
   "scripts": {
     "build": "tsc -p ./tsconfig.json",
     "pretest": "yarn build",
-    "test": "yarn test:standalone && yarn test:enclaved",
-    "test:standalone": "yarn test:standalone:unit && yarn test:standalone:examples",
-    "test:standalone:unit": "yarn && cd tests && yarn && yarn build && yarn test && cd ..",
-    "test:standalone:examples": "yarn && cd examples && yarn && yarn build && yarn test && cd ..",
-    "test:enclaved": "yarn test:enclaved:unit && yarn test:enclaved:examples",
-    "test:enclaved:unit": "cd jsvm/tests && yarn rebuild && yarn test && cd ../..",
-    "test:enclaved:examples": "cd jsvm/examples && yarn && yarn rebuild && yarn test && cd ../..",
+    "test": "yarn test:unit && yarn test:examples",
+    "test:unit": "yarn && cd tests && yarn && yarn build && yarn test && cd ..",
+    "test:examples": "yarn && cd examples && yarn && yarn build && yarn test && cd ..",
     "postinstall": "cd cli && rm -rf deps && mkdir -p deps && cd deps && node ../post-install.js"
   },
   "bin": {
@@ -43,6 +39,7 @@
     "@rollup/plugin-babel": "^5.3.1",
     "@rollup/plugin-commonjs": "^21.0.1",
     "@rollup/plugin-node-resolve": "^13.1.1",
+    "@scure/base": "^1.1.1",
     "rollup": "^2.61.1",
     "rollup-plugin-sourcemaps": "^0.6.3",
     "yargs": "^17.5.1"

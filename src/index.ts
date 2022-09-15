@@ -1,6 +1,9 @@
-import { call, view, NearBindgen } from "./near-bindgen";
-
-import { NearContract } from "./near-contract";
+import {
+  call,
+  view,
+  initialize,
+  NearBindgen
+} from "./near-bindgen";
 
 import * as near from "./api";
 import {
@@ -13,13 +16,13 @@ import {
 
 import { bytes, Bytes, assert } from "./utils";
 
-import "./types"
+import { NearPromise, PromiseOrValue } from "./promise";
 
 export {
   call,
   view,
+  initialize,
   NearBindgen,
-  NearContract,
   near,
   LookupMap,
   Vector,
@@ -29,4 +32,6 @@ export {
   bytes,
   Bytes,
   assert,
+  NearPromise,
+  PromiseOrValue
 };

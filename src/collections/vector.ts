@@ -23,10 +23,6 @@ export class Vector {
     this.prefix = prefix;
   }
 
-  len(): number {
-    return this.length;
-  }
-
   isEmpty(): boolean {
     return this.length == 0;
   }
@@ -123,7 +119,7 @@ export class Vector {
   }
 
   // converting plain object to class object
-  static deserialize(data: Vector): Vector {
+  static reconstruct(data: Vector): Vector {
     let vector = new Vector(data.prefix);
     vector.length = data.length;
     return vector;
@@ -139,7 +135,7 @@ export class VectorIterator {
   }
 
   next(): { value: unknown | null; done: boolean } {
-    if (this.current < this.vector.len()) {
+    if (this.current < this.vector.length) {
       let value = this.vector.get(this.current);
       this.current += 1;
       return { value, done: false };

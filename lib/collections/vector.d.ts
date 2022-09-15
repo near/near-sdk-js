@@ -3,7 +3,6 @@ export declare class Vector {
     length: number;
     readonly prefix: Bytes;
     constructor(prefix: Bytes);
-    len(): number;
     isEmpty(): boolean;
     get(index: number): unknown | null;
     swapRemove(index: number): unknown | null;
@@ -15,7 +14,7 @@ export declare class Vector {
     clear(): void;
     toArray(): unknown[];
     serialize(): string;
-    static deserialize(data: Vector): Vector;
+    static reconstruct(data: Vector): Vector;
 }
 export declare class VectorIterator {
     private current;

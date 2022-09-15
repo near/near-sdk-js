@@ -15,8 +15,6 @@ test.beforeEach(async t => {
         (process.env['COUNTER_TS'] ? './build/counter-ts.wasm' : './build/counter.wasm')
     );
 
-    // Init the contract
-    await counter.call(counter, 'init', {});
 
     // Test users
     const ali = await root.createSubAccount('ali');
@@ -28,7 +26,7 @@ test.beforeEach(async t => {
 });
 
 // If the environment is reused, use test.after to replace test.afterEach
-test.afterEach(async t => {
+test.afterEach.always(async t => {
     await t.context.worker.tearDown().catch(error => {
         console.log('Failed to tear down the worker:', error);
     });

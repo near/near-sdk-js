@@ -13,9 +13,6 @@ test.beforeEach(async t => {
         './build/status-message.wasm',
     );
 
-    // Init the contract
-    await statusMessage.call(statusMessage, 'init', {});
-
     // Deploy the onCall contract.
     const onCall = await root.devDeploy(
         './build/cross-contract-call.wasm',
@@ -39,7 +36,7 @@ test.beforeEach(async t => {
     };
 });
 
-test.afterEach(async t => {
+test.afterEach.always(async t => {
     await t.context.worker.tearDown().catch(error => {
         console.log('Failed tear down the worker:', error);
     });

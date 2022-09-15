@@ -1,5 +1,4 @@
 import {
-    NearContract,
     NearBindgen,
     call,
     view,
@@ -7,73 +6,68 @@ import {
 } from 'near-sdk-js'
 import {House, Room} from './model.js';
 
-@NearBindgen
-class VectorTestContract extends NearContract {
+@NearBindgen({})
+class VectorTestContract {
     constructor() {
-        super()
         this.vector = new Vector('a');
     }
 
-    default() {
-        return new VectorTestContract();
-    }
-
-    @view
+    @view({})
     len() {
-        return this.vector.len();
+        return this.vector.length;
     }
 
-    @view
+    @view({})
     isEmpty() {
         return this.vector.isEmpty();
     }
 
-    @view
+    @view({})
     get({index}) {
         return this.vector.get(index);
     }
 
-    @call
+    @call({})
     push({value}) {
         this.vector.push(value);
     }
 
-    @call
+    @call({})
     pop() {
         this.vector.pop();
     }
 
-    @call
+    @call({})
     clear() {
         this.vector.clear();
     }
 
-    @view
+    @view({})
     toArray() {
         return this.vector.toArray();
     }
 
-    @call
+    @call({})
     extend({kvs}) {
         this.vector.extend(kvs);
     }
 
-    @call
+    @call({})
     replace({index, value}) {
         this.vector.replace(index, value);
     }
 
-    @call
+    @call({})
     swapRemove({index}) {
         this.vector.swapRemove(index);
     }
 
-    @call
+    @call({})
     add_house() {
         this.vector.push(new House('house1', [new Room('room1', '200sqft'), new Room('room2', '300sqft')]));
     }
 
-    @view
+    @view({})
     get_house() {
         return this.vector.get(0);
     }

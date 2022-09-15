@@ -1,7 +1,6 @@
 import { Worker } from 'near-workspaces';
 import test from 'ava';
 
-
 test.before(async t => {
     // Init the worker and start a Sandbox server
     const worker = await Worker.init();
@@ -13,8 +12,6 @@ test.before(async t => {
     const typescriptContract = await root.devDeploy(
         'build/typescript.wasm',
     );
-    await typescriptContract.call(typescriptContract, 'init', {})
-
     // Test users
     const ali = await root.createSubAccount('ali');
 
@@ -23,7 +20,7 @@ test.before(async t => {
     t.context.accounts = { root, typescriptContract, ali };
 });
 
-test.after(async t => {
+test.after.always(async t => {
     await t.context.worker.tearDown().catch(error => {
         console.log('Failed to tear down the worker:', error);
     });

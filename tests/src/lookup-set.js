@@ -1,5 +1,4 @@
 import {
-    NearContract,
     NearBindgen,
     call,
     view,
@@ -7,38 +6,33 @@ import {
 } from 'near-sdk-js'
 import { House, Room } from './model.js';
 
-@NearBindgen
-class LookupSetTestContract extends NearContract {
+@NearBindgen({})
+class LookupSetTestContract {
     constructor() {
-        super()
         this.lookupSet = new LookupSet('a');
     }
 
-    default() {
-        return new LookupSetTestContract();
-    }
-
-    @view
+    @view({})
     contains({ key }) {
         return this.lookupSet.contains(key);
     }
 
-    @call
+    @call({})
     set({ key }) {
         this.lookupSet.set(key);
     }
 
-    @call
+    @call({})
     remove_key({ key }) {
         this.lookupSet.remove(key);
     }
 
-    @call
+    @call({})
     extend({ keys }) {
         this.lookupSet.extend(keys);
     }
 
-    @call
+    @call({})
     add_house({ name, rooms }) {
         let house = new House(name, [])
         for (let r of rooms) {
@@ -47,7 +41,7 @@ class LookupSetTestContract extends NearContract {
         this.lookupSet.set(house)
     }
 
-    @view
+    @view({})
     house_exist({ name, rooms }) {
         let house = new House(name, [])
         for (let r of rooms) {

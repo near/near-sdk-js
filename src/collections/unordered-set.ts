@@ -19,21 +19,19 @@ function deserializeIndex(rawIndex: Bytes): number {
 }
 
 export class UnorderedSet {
-  readonly length: number;
   readonly prefix: Bytes;
   readonly elementIndexPrefix: Bytes;
   readonly elements: Vector;
 
   constructor(prefix: Bytes) {
-    this.length = 0;
     this.prefix = prefix;
     this.elementIndexPrefix = prefix + "i";
     let elementsPrefix = prefix + "e";
     this.elements = new Vector(elementsPrefix);
   }
 
-  len(): number {
-    return this.elements.len();
+  get length(): number {
+    return this.elements.length;
   }
 
   isEmpty(): boolean {
@@ -50,7 +48,7 @@ export class UnorderedSet {
     if (near.storageRead(indexLookup)) {
       return false;
     } else {
-      let nextIndex = this.len();
+      let nextIndex = this.length;
       let nextIndexRaw = serializeIndex(nextIndex);
       near.storageWrite(indexLookup, nextIndexRaw);
       this.elements.push(element);
@@ -62,14 +60,14 @@ export class UnorderedSet {
     let indexLookup = this.elementIndexPrefix + JSON.stringify(element);
     let indexRaw = near.storageRead(indexLookup);
     if (indexRaw) {
-      if (this.len() == 1) {
+      if (this.length == 1) {
         // If there is only one element then swap remove simply removes it without
         // swapping with the last element.
         near.storageRemove(indexLookup);
       } else {
         // If there is more than one element then swap remove swaps it with the last
         // element.
-        let lastElement = this.elements.get(this.len() - 1);
+        let lastElement = this.elements.get(this.length - 1);
         if (!lastElement) {
           throw new Error(ERR_INCONSISTENT_STATE);
         }
@@ -119,12 +117,10 @@ export class UnorderedSet {
   }
 
   // converting plain object to class object
-  static deserialize(data: UnorderedSet): UnorderedSet {
+  static reconstruct(data: UnorderedSet): UnorderedSet {
     // removing readonly modifier
     type MutableUnorderedSet = Mutable<UnorderedSet>;
     let set = new UnorderedSet(data.prefix) as MutableUnorderedSet;
-    // reconstruct UnorderedSet
-    set.length = data.length;
     // reconstruct Vector
     let elementsPrefix = data.prefix + "e";
     set.elements = new Vector(elementsPrefix);

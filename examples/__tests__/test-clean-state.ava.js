@@ -11,9 +11,6 @@ test.beforeEach(async t => {
     // Deploy the clean-state contract.
     const cleanState = await root.devDeploy('./build/clean-state.wasm');
 
-    // Init the contract
-    await cleanState.call(cleanState, 'init', {});
-
     // Save state for test runs, it is unique for each test
     t.context.worker = worker;
     t.context.accounts = {
@@ -22,7 +19,7 @@ test.beforeEach(async t => {
     };
 });
 
-test.afterEach(async t => {
+test.afterEach.always(async t => {
     await t.context.worker.tearDown().catch(error => {
         console.log('Failed tear down the worker:', error);
     });

@@ -1,7 +1,6 @@
 import { Worker } from 'near-workspaces';
 import test from 'ava';
 
-
 test.beforeEach(async t => {
     // Use beforeEach instead of before to start from scratch state for each test
     // Init the worker and start a Sandbox server
@@ -23,7 +22,7 @@ test.beforeEach(async t => {
     t.context.accounts = { root, storageApiContract, ali };
 });
 
-test.afterEach(async t => {
+test.afterEach.always(async t => {
     await t.context.worker.tearDown().catch(error => {
         console.log('Failed to tear down the worker:', error);
     });
