@@ -1,5 +1,7 @@
 name: Unit tests
-on: push
+on: 
+  pull_request:
+  push:
 jobs:
   unit-tests:
     strategy:
