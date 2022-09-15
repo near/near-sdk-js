@@ -117,7 +117,7 @@ export class UnorderedSet {
   }
 
   // converting plain object to class object
-  static deserialize(data: UnorderedSet): UnorderedSet {
+  static reconstruct(data: UnorderedSet): UnorderedSet {
     // removing readonly modifier
     type MutableUnorderedSet = Mutable<UnorderedSet>;
     let set = new UnorderedSet(data.prefix) as MutableUnorderedSet;
