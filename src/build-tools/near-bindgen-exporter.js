@@ -78,7 +78,7 @@ function transformCBuilderToMatrix(builderRaw){
   return lines;
 }
 
-// receive cords in file
+
 function collectCFunction(x, y, cMatrix){
   let cFunc = [];
   let line = cMatrix[x];
@@ -95,7 +95,7 @@ function collectCFunction(x, y, cMatrix){
     
     }
   }
-  return cFunc.length > 0 ? {name: cFunc.reverse().join(''), cords: {x, y: newY}} : null;
+  return cFunc.length > 0 ? {name: cFunc.reverse().join(''), coords: {x, y: newY}} : null;
 }
 
 function collectCFunctions(cMatrix){
@@ -118,9 +118,9 @@ function groupCFunctions(cFunctions){
   cFunctions.forEach(fun => {
     let existFun = newCFunctions.get(fun.name);
     if(existFun){
-      newCFunctions.set(fun.name, [...existFun, fun.cords])
+      newCFunctions.set(fun.name, [...existFun, fun.coords])
     }else {
-      newCFunctions.set(fun.name, [fun.cords])
+      newCFunctions.set(fun.name, [fun.coords])
     }
   })
 
@@ -131,7 +131,7 @@ function getCFunctions(){
   const builderRaw = readFileSync(path.resolve('../cli/builder/builder.c'), 'utf-8')
   let cMatrix = transformCBuilderToMatrix(builderRaw);
   const cFunctions = groupCFunctions(collectCFunctions(cMatrix));
-  // TODO get cords from regex match 
+  // TODO get coords from regex match 
   // const regex = new RegExp(/(?<=JS_SetPropertyStr\(ctx, env, ").+?(?=", JS_NewCFunction\(ctx,)/gm)
   // const cFunctions = builderRaw.match(regex)
   // return cFunctions
