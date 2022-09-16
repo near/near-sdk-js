@@ -55,8 +55,8 @@ export function NearBindgen({ requireInit = false }: { requireInit?: boolean }) 
 
             static _reconstruct(classObject: any, plainObject: JSON) {
                 for (const item in classObject) {
-                    if (classObject[item].constructor?.deserialize !== undefined) {
-                        classObject[item] = classObject[item].constructor.deserialize(plainObject[item])
+                    if (classObject[item].constructor?.reconstruct !== undefined) {
+                        classObject[item] = classObject[item].constructor.reconstruct(plainObject[item])
                     } else {
                         classObject[item] = plainObject[item]
                     }

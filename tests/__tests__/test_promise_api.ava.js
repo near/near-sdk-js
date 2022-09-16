@@ -30,7 +30,7 @@ test.before(async t => {
     t.context.accounts = { root, callerContract, calleeContract, ali, bob, caller2Contract };
 });
 
-test.after(async t => {
+test.after.always(async t => {
     await t.context.worker.tearDown().catch(error => {
         console.log('Failed to tear down the worker:', error);
     });
