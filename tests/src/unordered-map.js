@@ -7,11 +7,17 @@ import {
 } from 'near-sdk-js'
 import { House, Room } from './model.js';
 
+class Test {
+    constructor(){}
+}
+
 @NearBindgen({})
 class UnorderedMapTestContract {
-    constructor() {
-        this.unorderedMap = new UnorderedMap('a');
-    }
+
+
+    // constructor() {
+    //     this.unorderedMap = new UnorderedMap('a');
+    // }
 
     @view({})
     len() {
