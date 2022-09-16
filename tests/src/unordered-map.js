@@ -3,6 +3,7 @@ import {
     call,
     view,
     UnorderedMap,
+    near,
 } from 'near-sdk-js'
 import { House, Room } from './model.js';
 
@@ -59,10 +60,8 @@ class UnorderedMapTestContract {
 
     @view({})
     get_house() {
-        const rawHouse = this.unorderedMap.get('house1')
-        const house = new House(rawHouse.name, rawHouse.rooms)
-        const rawRoom = house.rooms[0]
-        const room = new Room(rawRoom.name, rawRoom.size)
+        const house = this.unorderedMap.get('house1', {reconstructor: (rawHouse) => new House(rawHouse.name, rawHouse.rooms.map((rawRoom) => new Room(rawRoom.name, rawRoom.size)))})
+        const room = house.rooms[0]
         return house.describe() + room.describe()
     }
 }

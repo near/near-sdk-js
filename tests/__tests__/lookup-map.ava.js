@@ -114,3 +114,15 @@ test('LookupMap set get object', async t => {
     )
     
 })
+
+test('LookupMap allows you to use the same key for the second time', async t => {
+    const { ali, lookupMapContract } = t.context.accounts;
+
+    await ali.call(lookupMapContract, 'set', { key: 'hello', value: 'world' });
+    await ali.call(lookupMapContract, 'set', { key: 'hello', value: 'world' });
+
+    t.is(
+        await lookupMapContract.view('get', { key: 'hello' }),
+        'world'
+    );
+});
