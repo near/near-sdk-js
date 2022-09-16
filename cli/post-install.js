@@ -1,27 +1,33 @@
 import { executeCommand } from './utils.js';
+import os from 'os';
 
 async function download(url) {
     await executeCommand(`curl -LOf ${url}`);
 }
 
-const OS = await executeCommand('uname -s', true);
-const ARCH = await executeCommand('uname -m', true);
+const PLATFORM = os.platform();
+const ARCH = os.arch();
 
-if (OS !== 'Linux' && OS !== 'Darwin') {
-    console.error(`OS ${OS} is not supported at the moment`);
+console.log(`Current platform: ${PLATFORM}, current architecture: ${ARCH}`);
+
+const SUPPORTED_PLATFORMS = ['linux', 'darwin', 'win32']; // Unsaported platforms: 'aix', 'freebsd', 'openbsd', 'sunos', 'android'
+const SUPPORTED_ARCH = ['x64', 'arm64']; // Unsaported arch: 'arm', 'ia32', 'mips','mipsel', 'ppc', 'ppc64', 's390', 's390x', 'x32'
+
+if (!SUPPORTED_PLATFORMS.includes(PLATFORM)) {
+    console.error(`Platform ${PLATFORM} is not supported at the moment`);
     process.exit(1);
 }
 
-if (ARCH !== 'x86_64' && ARCH !== 'arm64') {
-    console.error(` ${ARCH} architecture is unsapported at the moment`);
+if (!SUPPORTED_ARCH.includes(ARCH)) {
+    console.error(`Architecture ${ARCH} is not supported at the moment`);
     process.exit(1);
 }
 
 console.log('Installing wasi-stub...');
 const BINARYEN_VERSION = `0.1.10`;
 const BINARYEN_VERSION_TAG = `v${BINARYEN_VERSION}`;
-const BINARYEN_SYSTEM_NAME = OS === 'Linux' ? 'Linux' : OS === 'Darwin' ? 'macOS' : 'other';
-const BINARYEN_ARCH_NAME = ARCH === 'x86_64' ? 'X64' : ARCH === 'arm64' ? 'arm64' : 'other';
+const BINARYEN_SYSTEM_NAME = PLATFORM === 'linux' ? 'Linux' : PLATFORM === 'darwin' ? 'macOS' : PLATFORM === 'win32' ? 'windows' : 'other';
+const BINARYEN_ARCH_NAME = ARCH === 'x64' ? 'X64' : ARCH === 'arm64' ? 'arm64' : 'other';
 const BINARYEN_TAR_NAME = `binaryen-${BINARYEN_SYSTEM_NAME}-${BINARYEN_ARCH_NAME}.tar.gz`;
 
 await download(`https://github.com/near/binaryen/releases/download/${BINARYEN_VERSION_TAG}/${BINARYEN_TAR_NAME}`);
@@ -31,8 +37,8 @@ await executeCommand(`rm ${BINARYEN_TAR_NAME}`);
 console.log('Installing QuickJS...');
 const QUICK_JS_VERSION = `0.1.1`;
 const QUICK_JS_VERSION_TAG = `v${QUICK_JS_VERSION}`;
-const QUICK_JS_SYSTEM_NAME = OS === 'Linux' ? 'Linux' : OS === 'Darwin' ? 'macOS' : 'other';
-const QUICK_JS_ARCH_NAME = ARCH === 'x86_64' ? 'X64' : ARCH === 'arm64' ? 'arm64' : 'other';
+const QUICK_JS_SYSTEM_NAME = PLATFORM === 'linux' ? 'Linux' : PLATFORM === 'darwin' ? 'macOS' : PLATFORM === 'win32' ? 'windows' : 'other';
+const QUICK_JS_ARCH_NAME = ARCH === 'x64' ? 'X64' : ARCH === 'arm64' ? 'arm64' : 'other';
 const QUICK_JS_TAR_NAME = `${QUICK_JS_VERSION_TAG}.tar.gz`
 const QUICK_JS_DOWNLOADED_FOLDER_NAME = `quickjs-${QUICK_JS_VERSION}`
 const QUICK_JS_TARGET_FOLDER_NAME = 'quickjs';
@@ -56,7 +62,7 @@ console.log('Installing wasi-sdk...');
 const WASI_SDK_MAJOR_VER = 11;
 const WASI_SDK_MINOR_VER = 0;
 const WASI_SDK_DOWNLOADED_FOLDER_NAME = `wasi-sdk-${WASI_SDK_MAJOR_VER}.${WASI_SDK_MINOR_VER}`
-const WASI_SDK_SYSTEM_NAME = OS === 'Linux' ? 'linux' : OS === 'Darwin' ? 'macos' : 'other';
+const WASI_SDK_SYSTEM_NAME = PLATFORM === 'linux' ? 'linux' : PLATFORM === 'darwin' ? 'macos' :  PLATFORM === 'win32' ? 'windows' : 'other';
 const WASI_SDK_TAR_NAME = `${WASI_SDK_DOWNLOADED_FOLDER_NAME}-${WASI_SDK_SYSTEM_NAME}.tar.gz`
 
 // Download WASI SDK
