@@ -1,7 +1,8 @@
 import * as near from '../api'
+import { GetOptions } from '../types/collections';
 import { Bytes } from '../utils';
 
-export class LookupMap {
+export class LookupMap<DataType> {
     readonly keyPrefix: Bytes;
 
     constructor(keyPrefix: Bytes) {
@@ -13,16 +14,17 @@ export class LookupMap {
         return near.storageHasKey(storageKey)
     }
 
-    get(key: Bytes): unknown | null {
+    get(key: Bytes, options?: GetOptions<DataType>): DataType | null {
         let storageKey = this.keyPrefix + JSON.stringify(key)
         let raw = near.storageRead(storageKey)
         if (raw !== null) {
-            return JSON.parse(raw)
+            const value = JSON.parse(raw)
+            return !!options?.reconstructor ? options.reconstructor(value) : value as DataType
         }
         return null
     }
 
-    remove(key: Bytes): unknown | null {
+    remove(key: Bytes): DataType | null {
         let storageKey = this.keyPrefix + JSON.stringify(key)
         if (near.storageRemove(storageKey)) {
             return JSON.parse(near.storageGetEvicted())
@@ -30,7 +32,7 @@ export class LookupMap {
         return null
     }
 
-    set(key: Bytes, value: unknown): unknown | null {
+    set(key: Bytes, value: DataType): DataType | null {
         let storageKey = this.keyPrefix + JSON.stringify(key)
         let storageValue = JSON.stringify(value)
         if (near.storageWrite(storageKey, storageValue)) {
@@ -39,7 +41,7 @@ export class LookupMap {
         return null
     }
 
-    extend(objects: [Bytes, unknown][]) {
+    extend(objects: [Bytes, DataType][]) {
         for (let kv of objects) {
             this.set(kv[0], kv[1])
         }
@@ -50,7 +52,7 @@ export class LookupMap {
     }
 
     // converting plain object to class object
-    static reconstruct(data: LookupMap): LookupMap {
+    static reconstruct<DataType>(data: LookupMap<DataType>): LookupMap<DataType> {
         return new LookupMap(data.keyPrefix)
     }
 }

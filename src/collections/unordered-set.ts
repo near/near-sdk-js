@@ -18,10 +18,10 @@ function deserializeIndex(rawIndex: Bytes): number {
   return data[0];
 }
 
-export class UnorderedSet {
+export class UnorderedSet<DataType> {
   readonly prefix: Bytes;
   readonly elementIndexPrefix: Bytes;
-  readonly elements: Vector;
+  readonly elements: Vector<DataType>;
 
   constructor(prefix: Bytes) {
     this.prefix = prefix;
@@ -38,12 +38,12 @@ export class UnorderedSet {
     return this.elements.isEmpty();
   }
 
-  contains(element: unknown): boolean {
+  contains(element: DataType): boolean {
     let indexLookup = this.elementIndexPrefix + JSON.stringify(element);
     return near.storageHasKey(indexLookup);
   }
 
-  set(element: unknown): boolean {
+  set(element: DataType): boolean {
     let indexLookup = this.elementIndexPrefix + JSON.stringify(element);
     if (near.storageRead(indexLookup)) {
       return false;
@@ -56,7 +56,7 @@ export class UnorderedSet {
     }
   }
 
-  remove(element: unknown): boolean {
+  remove(element: DataType): boolean {
     let indexLookup = this.elementIndexPrefix + JSON.stringify(element);
     let indexRaw = near.storageRead(indexLookup);
     if (indexRaw) {
@@ -75,7 +75,8 @@ export class UnorderedSet {
         // If the removed element was the last element from keys, then we don't need to
         // reinsert the lookup back.
         if (lastElement != element) {
-          let lastLookupElement = this.elementIndexPrefix + JSON.stringify(lastElement);
+          let lastLookupElement =
+            this.elementIndexPrefix + JSON.stringify(lastElement);
           near.storageWrite(lastLookupElement, indexRaw);
         }
       }
@@ -106,25 +107,25 @@ export class UnorderedSet {
     return this.elements[Symbol.iterator]();
   }
 
-  extend(elements: unknown[]) {
+  extend(elements: DataType[]) {
     for (let element of elements) {
       this.set(element);
     }
   }
 
   serialize(): string {
-    return JSON.stringify(this)
+    return JSON.stringify(this);
   }
 
   // converting plain object to class object
-  static reconstruct(data: UnorderedSet): UnorderedSet {
+  static reconstruct<DataType>(data: UnorderedSet<DataType>): UnorderedSet<DataType> {
     // removing readonly modifier
-    type MutableUnorderedSet = Mutable<UnorderedSet>;
+    type MutableUnorderedSet = Mutable<UnorderedSet<DataType>>;
     let set = new UnorderedSet(data.prefix) as MutableUnorderedSet;
     // reconstruct Vector
     let elementsPrefix = data.prefix + "e";
     set.elements = new Vector(elementsPrefix);
     set.elements.length = data.elements.length;
-    return set as UnorderedSet;
+    return set as UnorderedSet<DataType>;
   }
 }
