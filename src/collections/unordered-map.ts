@@ -1,21 +1,22 @@
 import { Bytes, Mutable } from "../utils";
 import { Vector, VectorIterator } from "./vector";
 import { LookupMap } from "./lookup-map";
+import { GetOptions } from "../types/collections";
 
 const ERR_INCONSISTENT_STATE =
   "The collection is an inconsistent state. Did previous smart contract execution terminate unexpectedly?";
 
-type ValueAndIndex = [value: unknown, index: number]
+type ValueAndIndex<DataType> = [value: DataType, index: number]
 
-export class UnorderedMap {
+export class UnorderedMap<DataType> {
   readonly prefix: Bytes;
-  readonly keys: Vector;
-  readonly values: LookupMap;
+  readonly keys: Vector<Bytes>;
+  readonly values: LookupMap<ValueAndIndex<DataType>>;
 
   constructor(prefix: Bytes) {
     this.prefix = prefix;
-    this.keys = new Vector(prefix + 'u'); // intentional different prefix with old UnorderedMap
-    this.values = new LookupMap(prefix + 'm');
+    this.keys = new Vector<Bytes>(prefix + 'u'); // intentional different prefix with old UnorderedMap
+    this.values = new LookupMap<ValueAndIndex<DataType>>(prefix + 'm');
   }
 
   get length() {
@@ -28,22 +29,22 @@ export class UnorderedMap {
     return keysIsEmpty;
   }
 
-  get(key: Bytes): unknown | null {
+  get(key: Bytes, options?: GetOptions<DataType>): DataType | null {
     let valueAndIndex = this.values.get(key);
     if (valueAndIndex === null) {
       return null;
     }
-    let value = (valueAndIndex as ValueAndIndex)[0];
-    return value;
+    let value = (valueAndIndex as ValueAndIndex<DataType>)[0];
+    return !!options?.reconstructor ? options.reconstructor(value) : value;
   }
 
-  set(key: Bytes, value: unknown): unknown | null {
+  set(key: Bytes, value: DataType): DataType | null {
     let valueAndIndex = this.values.get(key);
     if (valueAndIndex !== null) {
-      let oldValue = (valueAndIndex as ValueAndIndex)[0];
-      (valueAndIndex as ValueAndIndex)[0] = value;
+      let oldValue = (valueAndIndex as ValueAndIndex<DataType>)[0];
+      (valueAndIndex as ValueAndIndex<DataType>)[0] = value;
       this.values.set(key, valueAndIndex)
-      return oldValue;
+      return oldValue as DataType;
     }
 
     let nextIndex = this.length;
@@ -52,12 +53,12 @@ export class UnorderedMap {
     return null;
   }
 
-  remove(key: Bytes): unknown | null {
+  remove(key: Bytes): DataType | null {
     let oldValueAndIndex = this.values.remove(key);
     if (oldValueAndIndex === null) {
       return null;
     }
-    let index = (oldValueAndIndex as ValueAndIndex)[1];
+    let index = (oldValueAndIndex as ValueAndIndex<DataType>)[1];
     if (this.keys.swapRemove(index) === null) {
       throw new Error(ERR_INCONSISTENT_STATE);
     }
@@ -72,7 +73,7 @@ export class UnorderedMap {
       }
       this.values.set(swappedKey, [swappedValueAndIndex[0], index])
     }
-    return (oldValueAndIndex as ValueAndIndex)[0];
+    return (oldValueAndIndex as ValueAndIndex<DataType>)[0];
   }
 
   clear() {
@@ -83,7 +84,7 @@ export class UnorderedMap {
     this.keys.clear();
   }
 
-  toArray(): [Bytes, unknown][] {
+  toArray(): [Bytes, DataType][] {
     let ret = [];
     for (let v of this) {
       ret.push(v);
@@ -91,39 +92,39 @@ export class UnorderedMap {
     return ret;
   }
 
-  [Symbol.iterator](): UnorderedMapIterator {
-    return new UnorderedMapIterator(this);
+  [Symbol.iterator](): UnorderedMapIterator<DataType> {
+    return new UnorderedMapIterator<DataType>(this);
   }
 
-  extend(kvs: [Bytes, unknown][]) {
+  extend(kvs: [Bytes, DataType][]) {
     for (let [k, v] of kvs) {
       this.set(k, v);
     }
   }
 
   serialize(): string {
-    return JSON.stringify(this)
+    return JSON.stringify(this);
   }
 
   // converting plain object to class object
-  static reconstruct(data: UnorderedMap): UnorderedMap {
+  static reconstruct<DataType>(data: UnorderedMap<DataType>): UnorderedMap<DataType> {
     // removing readonly modifier
-    type MutableUnorderedMap = Mutable<UnorderedMap>;
+    type MutableUnorderedMap = Mutable<UnorderedMap<DataType>>;
     let map = new UnorderedMap(data.prefix) as MutableUnorderedMap;
     // reconstruct keys Vector
     map.keys = new Vector(data.prefix + "u");
     map.keys.length = data.keys.length;
     // reconstruct values LookupMap
     map.values = new LookupMap(data.prefix + "m");
-    return map as UnorderedMap;
+    return map as UnorderedMap<DataType>;
   }
 }
 
-class UnorderedMapIterator {
-  private keys: VectorIterator;
-  private map: LookupMap;
+class UnorderedMapIterator<DataType> {
+  private keys: VectorIterator<Bytes>;
+  private map: LookupMap<ValueAndIndex<DataType>>;
 
-  constructor(unorderedMap: UnorderedMap) {
+  constructor(unorderedMap: UnorderedMap<DataType>) {
     this.keys = new VectorIterator(unorderedMap.keys);
     this.map = unorderedMap.values;
   }

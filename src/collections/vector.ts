@@ -1,6 +1,6 @@
 import * as near from "../api";
 import { Bytes, u8ArrayToBytes } from "../utils";
-
+import {GetOptions} from '../types/collections'
 const ERR_INDEX_OUT_OF_BOUNDS = "Index out of bounds";
 const ERR_INCONSISTENT_STATE =
   "The collection is an inconsistent state. Did previous smart contract execution terminate unexpectedly?";
@@ -14,7 +14,7 @@ function indexToKey(prefix: Bytes, index: number): Bytes {
 
 /// An iterable implementation of vector that stores its content on the trie.
 /// Uses the following map: index -> element
-export class Vector {
+export class Vector<DataType> {
   length: number;
   readonly prefix: Bytes;
 
@@ -27,12 +27,13 @@ export class Vector {
     return this.length == 0;
   }
 
-  get(index: number): unknown | null {
+  get(index: number, options?: GetOptions<DataType>): DataType | null {
     if (index >= this.length) {
       return null;
     }
     let storageKey = indexToKey(this.prefix, index);
-    return JSON.parse(near.storageRead(storageKey));
+    const value = JSON.parse(near.storageRead(storageKey))
+    return !!options?.reconstructor ? options.reconstructor(value) : value as DataType
   }
 
   /// Removes an element from the vector and returns it in serialized form.
@@ -54,13 +55,13 @@ export class Vector {
     }
   }
 
-  push(element: unknown) {
+  push(element: DataType) {
     let key = indexToKey(this.prefix, this.length);
     this.length += 1;
     near.storageWrite(key, JSON.stringify(element));
   }
 
-  pop(): unknown | null {
+  pop(): DataType | null {
     if (this.isEmpty()) {
       return null;
     } else {
@@ -75,7 +76,7 @@ export class Vector {
     }
   }
 
-  replace(index: number, element: unknown): unknown {
+  replace(index: number, element: DataType): DataType {
     if (index >= this.length) {
       throw new Error(ERR_INDEX_OUT_OF_BOUNDS);
     } else {
@@ -88,13 +89,13 @@ export class Vector {
     }
   }
 
-  extend(elements: unknown[]) {
+  extend(elements: DataType[]) {
     for (let element of elements) {
       this.push(element);
     }
   }
 
-  [Symbol.iterator](): VectorIterator {
+  [Symbol.iterator](): VectorIterator<DataType> {
     return new VectorIterator(this);
   }
 
@@ -106,7 +107,7 @@ export class Vector {
     this.length = 0;
   }
 
-  toArray(): unknown[] {
+  toArray(): DataType[] {
     let ret = [];
     for (let v of this) {
       ret.push(v);
@@ -115,21 +116,21 @@ export class Vector {
   }
 
   serialize(): string {
-    return JSON.stringify(this)
+    return JSON.stringify(this);
   }
 
   // converting plain object to class object
-  static reconstruct(data: Vector): Vector {
-    let vector = new Vector(data.prefix);
+  static reconstruct<DataType>(data: Vector<DataType>): Vector<DataType> {
+    let vector = new Vector<DataType>(data.prefix);
     vector.length = data.length;
     return vector;
   }
 }
 
-export class VectorIterator {
+export class VectorIterator<DataType> {
   private current: number;
-  private vector: Vector;
-  constructor(vector: Vector) {
+  private vector: Vector<DataType>;
+  constructor(vector: Vector<DataType>) {
     this.current = 0;
     this.vector = vector;
   }
