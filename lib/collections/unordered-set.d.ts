@@ -15,5 +15,5 @@ export declare class UnorderedSet<DataType> {
     [Symbol.iterator](): import("./vector").VectorIterator<DataType>;
     extend(elements: DataType[]): void;
     serialize(): string;
-    static deserialize<DataType>(data: UnorderedSet<DataType>): UnorderedSet<DataType>;
+    static reconstruct<DataType>(data: UnorderedSet<DataType>): UnorderedSet<DataType>;
 }
