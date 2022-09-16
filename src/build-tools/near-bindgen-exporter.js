@@ -72,16 +72,75 @@ export default function () {
   };
 }
 
+function transformCBuilderToMatrix(builderRaw){
+  let lines = builderRaw.split('\n');
+  lines = lines.map((line) => [...line])
+  return lines;
+}
+
+// receive cords in file
+function collectCFunction(x, y, cMatrix){
+  let cFunc = [];
+  let line = cMatrix[x];
+  let i = y - 1;
+  let newY = 0;
+  while(i > -1){
+    if(line[i] != " " && line[i] != "(" && line[i] != "*"){
+      
+      cFunc.push(line[i]);
+      i= i - 1;
+    }else {
+      newY = i + 1;
+      i = -1;
+    
+    }
+  }
+  return cFunc.length > 0 ? {name: cFunc.reverse().join(''), cords: {x, y: newY}} : null;
+}
+
+function collectCFunctions(cMatrix){
+  let cFunctions = [];
+  for (let i=0; i<cMatrix.length; i++){
+    for(let j = 0; j < cMatrix[i].length; j++){
+       if (cMatrix[i][j] === "("){
+       const cFunc = collectCFunction(i, j, cMatrix);
+        cFunctions.push(cFunc)
+       }
+    }
+  }
+
+ 
+  return cFunctions.filter((cFunc) => cFunc != null)
+}
+
+function groupCFunctions(cFunctions){
+  let newCFunctions = new Map();
+  cFunctions.forEach(fun => {
+    let existFun = newCFunctions.get(fun.name);
+    if(existFun){
+      newCFunctions.set(fun.name, [...existFun, fun.cords])
+    }else {
+      newCFunctions.set(fun.name, [fun.cords])
+    }
+  })
+
+  return newCFunctions;
+}
 
 function getCFunctions(){
   const builderRaw = readFileSync(path.resolve('../cli/builder/builder.c'), 'utf-8')
-  const regex = new RegExp(/(?<=JS_SetPropertyStr\(ctx, env, ").+?(?=", JS_NewCFunction\(ctx,)/gm)
-  const cFunctions = builderRaw.match(regex)
-  return cFunctions
+  let cMatrix = transformCBuilderToMatrix(builderRaw);
+  const cFunctions = groupCFunctions(collectCFunctions(cMatrix));
+  // TODO get cords from regex match 
+  // const regex = new RegExp(/(?<=JS_SetPropertyStr\(ctx, env, ").+?(?=", JS_NewCFunction\(ctx,)/gm)
+  // const cFunctions = builderRaw.match(regex)
+  // return cFunctions
+
+  return cFunctions;
 }
 
 function validateMethod(method, cFunctions) {
-  const includeMethod = cFunctions.includes(method)
+  const includeMethod = cFunctions.get(method)
   if(includeMethod){
     throw new Error(`Method ${method} is reserved by Near SDK, use another naming`)
   }

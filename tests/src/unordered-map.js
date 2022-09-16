@@ -14,7 +14,7 @@ class UnorderedMapTestContract {
     }
 
     @view({})
-    len() {
+    JS_NewContextRaw() {
         return this.unorderedMap.length;
     }
 
