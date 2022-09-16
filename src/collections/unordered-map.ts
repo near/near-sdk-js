@@ -107,7 +107,7 @@ export class UnorderedMap<DataType> {
   }
 
   // converting plain object to class object
-  static deserialize<DataType>(data: UnorderedMap<DataType>): UnorderedMap<DataType> {
+  static reconstruct<DataType>(data: UnorderedMap<DataType>): UnorderedMap<DataType> {
     // removing readonly modifier
     type MutableUnorderedMap = Mutable<UnorderedMap<DataType>>;
     let map = new UnorderedMap(data.prefix) as MutableUnorderedMap;

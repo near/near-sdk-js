@@ -18,7 +18,7 @@ export declare class UnorderedMap<DataType> {
     [Symbol.iterator](): UnorderedMapIterator<DataType>;
     extend(kvs: [Bytes, DataType][]): void;
     serialize(): string;
-    static deserialize<DataType>(data: UnorderedMap<DataType>): UnorderedMap<DataType>;
+    static reconstruct<DataType>(data: UnorderedMap<DataType>): UnorderedMap<DataType>;
 }
 declare class UnorderedMapIterator<DataType> {
     private keys;

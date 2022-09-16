@@ -52,7 +52,7 @@ export class LookupMap<DataType> {
     }
 
     // converting plain object to class object
-    static deserialize<DataType>(data: LookupMap<DataType>): LookupMap<DataType> {
+    static reconstruct<DataType>(data: LookupMap<DataType>): LookupMap<DataType> {
         return new LookupMap(data.keyPrefix)
     }
 }

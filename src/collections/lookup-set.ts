@@ -39,7 +39,7 @@ export class LookupSet {
     }
 
     // converting plain object to class object
-    static deserialize(data: LookupSet): LookupSet {
+    static reconstruct(data: LookupSet): LookupSet {
         return new LookupSet(data.keyPrefix)
     }
 }

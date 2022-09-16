@@ -15,7 +15,7 @@ export declare class Vector<DataType> {
     clear(): void;
     toArray(): DataType[];
     serialize(): string;
-    static deserialize<DataType>(data: Vector<DataType>): Vector<DataType>;
+    static reconstruct<DataType>(data: Vector<DataType>): Vector<DataType>;
 }
 export declare class VectorIterator<DataType> {
     private current;

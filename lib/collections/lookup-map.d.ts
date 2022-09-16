@@ -9,5 +9,5 @@ export declare class LookupMap<DataType> {
     set(key: Bytes, value: DataType): DataType | null;
     extend(objects: [Bytes, DataType][]): void;
     serialize(): string;
-    static deserialize<DataType>(data: LookupMap<DataType>): LookupMap<DataType>;
+    static reconstruct<DataType>(data: LookupMap<DataType>): LookupMap<DataType>;
 }
