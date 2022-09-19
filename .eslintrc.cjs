@@ -19,6 +19,17 @@ module.exports = {
         project: ["./tsconfig.json", "./**/{t,j}sconfig.json"],
       },
       plugins: ["@typescript-eslint"],
+      rules: {
+        "@typescript-eslint/no-unused-vars": [
+          "warn",
+          {
+            varsIgnorePattern: "^_",
+            argsIgnorePattern: "^_",
+            destructuredArrayIgnorePattern: "^_",
+            caughtErrorsIgnorePattern: "^_",
+          },
+        ],
+      },
     },
   ],
   ignorePatterns: ["./**/node_modules", "node_modules", "./**/lib", "lib"],
