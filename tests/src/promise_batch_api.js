@@ -1,4 +1,4 @@
-import { near, bytes } from "near-sdk-js";
+import { near, bytes, includeBytes } from "near-sdk-js";
 
 export function test_promise_batch_stake() {
   let promiseId = near.promiseBatchCreate("caller2.test.near");
