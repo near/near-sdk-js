@@ -1,10 +1,18 @@
 import * as near from "./api";
 
-export function initialize({}) {
+type EmptyParameterObject = Record<never, never>;
+// type AnyObject = Record<string, unknown>;
+// type DecoratorFunction = (
+//   target: AnyObject,
+//   key: string | symbol,
+//   descriptor: TypedPropertyDescriptor<Function>
+// ) => void;
+
+export function initialize(_empty: EmptyParameterObject) {
   return function (
-    target: Object,
-    key: string | symbol,
-    descriptor: TypedPropertyDescriptor<Function>
+    _target: any,
+    _key: string | symbol,
+    _descriptor: TypedPropertyDescriptor<Function>
   ): void {};
 }
 
@@ -16,12 +24,13 @@ export function call({
   payableFunction?: boolean;
 }) {
   return function (
-    target: Object,
-    key: string | symbol,
+    _target: any,
+    _key: string | symbol,
     descriptor: TypedPropertyDescriptor<Function>
   ): void {
     const originalMethod = descriptor.value;
-    descriptor.value = function (...args: any[]) {
+
+    descriptor.value = function (...args: unknown[]) {
       if (
         privateFunction &&
         near.predecessorAccountId() !== near.currentAccountId()
@@ -36,11 +45,11 @@ export function call({
   };
 }
 
-export function view({}) {
+export function view(_empty: EmptyParameterObject) {
   return function (
-    target: Object,
-    key: string | symbol,
-    descriptor: TypedPropertyDescriptor<Function>
+    _target: any,
+    _key: string | symbol,
+    _descriptor: TypedPropertyDescriptor<Function>
   ): void {};
 }
 
@@ -49,13 +58,13 @@ export function NearBindgen({
 }: {
   requireInit?: boolean;
 }) {
-  return <T extends { new (...args: any[]): {} }>(target: T) => {
+  return <T extends { new (...args: any[]): any }>(target: T) => {
     return class extends target {
       static _create() {
         return new target();
       }
 
-      static _getState(): Object {
+      static _getState(): any {
         const rawState = near.storageRead("STATE");
         return rawState ? this._deserialize(rawState) : null;
       }
@@ -94,4 +103,8 @@ export function NearBindgen({
       }
     };
   };
+}
+
+declare module "./" {
+  export function includeBytes(pathToWasm: string): string;
 }
