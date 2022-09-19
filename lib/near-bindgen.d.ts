@@ -1,10 +1,10 @@
 export declare function initialize({}: {}): (target: Object, key: string | symbol, descriptor: TypedPropertyDescriptor<Function>) => void;
-export declare function call({ privateFunction, payableFunction }: {
+export declare function call({ privateFunction, payableFunction, }: {
     privateFunction?: boolean;
     payableFunction?: boolean;
 }): (target: Object, key: string | symbol, descriptor: TypedPropertyDescriptor<Function>) => void;
 export declare function view({}: {}): (target: Object, key: string | symbol, descriptor: TypedPropertyDescriptor<Function>) => void;
-export declare function NearBindgen({ requireInit }: {
+export declare function NearBindgen({ requireInit, }: {
     requireInit?: boolean;
 }): <T extends new (...args: any[]) => {}>(target: T) => {
     new (...args: any[]): {};

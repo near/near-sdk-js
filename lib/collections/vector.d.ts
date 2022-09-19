@@ -1,5 +1,5 @@
 import { Bytes } from "../utils";
-import { GetOptions } from '../types/collections';
+import { GetOptions } from "../types/collections";
 export declare class Vector<DataType> {
     length: number;
     readonly prefix: Bytes;

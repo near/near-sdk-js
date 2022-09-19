@@ -1,14 +1,14 @@
 import * as near from "../api";
 import { Bytes, u8ArrayToBytes } from "../utils";
-import {GetOptions} from '../types/collections'
+import { GetOptions } from "../types/collections";
 const ERR_INDEX_OUT_OF_BOUNDS = "Index out of bounds";
 const ERR_INCONSISTENT_STATE =
   "The collection is an inconsistent state. Did previous smart contract execution terminate unexpectedly?";
 
 function indexToKey(prefix: Bytes, index: number): Bytes {
-  let data = new Uint32Array([index]);
-  let array = new Uint8Array(data.buffer);
-  let key = u8ArrayToBytes(array);
+  const data = new Uint32Array([index]);
+  const array = new Uint8Array(data.buffer);
+  const key = u8ArrayToBytes(array);
   return prefix + key;
 }
 
@@ -31,9 +31,11 @@ export class Vector<DataType> {
     if (index >= this.length) {
       return null;
     }
-    let storageKey = indexToKey(this.prefix, index);
-    const value = JSON.parse(near.storageRead(storageKey))
-    return !!options?.reconstructor ? options.reconstructor(value) : value as DataType
+    const storageKey = indexToKey(this.prefix, index);
+    const value = JSON.parse(near.storageRead(storageKey));
+    return options?.reconstructor
+      ? options.reconstructor(value)
+      : (value as DataType);
   }
 
   /// Removes an element from the vector and returns it in serialized form.
@@ -45,8 +47,8 @@ export class Vector<DataType> {
     } else if (index + 1 == this.length) {
       return this.pop();
     } else {
-      let key = indexToKey(this.prefix, index);
-      let last = this.pop();
+      const key = indexToKey(this.prefix, index);
+      const last = this.pop();
       if (near.storageWrite(key, JSON.stringify(last))) {
         return JSON.parse(near.storageGetEvicted());
       } else {
@@ -56,7 +58,7 @@ export class Vector<DataType> {
   }
 
   push(element: DataType) {
-    let key = indexToKey(this.prefix, this.length);
+    const key = indexToKey(this.prefix, this.length);
     this.length += 1;
     near.storageWrite(key, JSON.stringify(element));
   }
@@ -65,8 +67,8 @@ export class Vector<DataType> {
     if (this.isEmpty()) {
       return null;
     } else {
-      let lastIndex = this.length - 1;
-      let lastKey = indexToKey(this.prefix, lastIndex);
+      const lastIndex = this.length - 1;
+      const lastKey = indexToKey(this.prefix, lastIndex);
       this.length -= 1;
       if (near.storageRemove(lastKey)) {
         return JSON.parse(near.storageGetEvicted());
@@ -80,7 +82,7 @@ export class Vector<DataType> {
     if (index >= this.length) {
       throw new Error(ERR_INDEX_OUT_OF_BOUNDS);
     } else {
-      let key = indexToKey(this.prefix, index);
+      const key = indexToKey(this.prefix, index);
       if (near.storageWrite(key, JSON.stringify(element))) {
         return JSON.parse(near.storageGetEvicted());
       } else {
@@ -90,7 +92,7 @@ export class Vector<DataType> {
   }
 
   extend(elements: DataType[]) {
-    for (let element of elements) {
+    for (const element of elements) {
       this.push(element);
     }
   }
@@ -101,15 +103,15 @@ export class Vector<DataType> {
 
   clear() {
     for (let i = 0; i < this.length; i++) {
-      let key = indexToKey(this.prefix, i);
+      const key = indexToKey(this.prefix, i);
       near.storageRemove(key);
     }
     this.length = 0;
   }
 
   toArray(): DataType[] {
-    let ret = [];
-    for (let v of this) {
+    const ret = [];
+    for (const v of this) {
       ret.push(v);
     }
     return ret;
@@ -121,7 +123,7 @@ export class Vector<DataType> {
 
   // converting plain object to class object
   static reconstruct<DataType>(data: Vector<DataType>): Vector<DataType> {
-    let vector = new Vector<DataType>(data.prefix);
+    const vector = new Vector<DataType>(data.prefix);
     vector.length = data.length;
     return vector;
   }
@@ -137,7 +139,7 @@ export class VectorIterator<DataType> {
 
   next(): { value: unknown | null; done: boolean } {
     if (this.current < this.vector.length) {
-      let value = this.vector.get(this.current);
+      const value = this.vector.get(this.current);
       this.current += 1;
       return { value, done: false };
     }

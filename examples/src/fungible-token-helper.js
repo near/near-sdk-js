@@ -2,18 +2,18 @@ import { NearBindgen, call, view } from "near-sdk-js";
 
 @NearBindgen({})
 class FungibleTokenHelper {
-    constructor() {
-        this.data = "";
-    }
+  constructor() {
+    this.data = "";
+  }
 
-    @call({})
-    ftOnTransfer({ senderId, amount, msg, receiverId }) {
-        const concatString = `[${amount} from ${senderId} to ${receiverId}] ${msg} `;
-        this.data = this.data.concat("", concatString);
-    }
+  @call({})
+  ftOnTransfer({ senderId, amount, msg, receiverId }) {
+    const concatString = `[${amount} from ${senderId} to ${receiverId}] ${msg} `;
+    this.data = this.data.concat("", concatString);
+  }
 
-    @view({})
-    getContractData() {
-        return this.data;
-    }
+  @view({})
+  getContractData() {
+    return this.data;
+  }
 }

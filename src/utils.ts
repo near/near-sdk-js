@@ -2,7 +2,7 @@ export type Bytes = string;
 
 export function u8ArrayToBytes(array: Uint8Array) {
   let ret = "";
-  for (let e of array) {
+  for (const e of array) {
     ret += String.fromCharCode(e);
   }
   return ret;
@@ -11,7 +11,7 @@ export function u8ArrayToBytes(array: Uint8Array) {
 // TODO this function is a bit broken and the type can't be string
 // TODO for more info: https://github.com/near/near-sdk-js/issues/78
 export function bytesToU8Array(bytes: Bytes): Uint8Array {
-  let ret = new Uint8Array(bytes.length);
+  const ret = new Uint8Array(bytes.length);
   for (let i = 0; i < bytes.length; i++) {
     ret[i] = bytes.charCodeAt(i);
   }
@@ -40,9 +40,9 @@ function checkStringIsBytes(str: string) {
 
 export function assert(b: boolean, str: string) {
   if (b) {
-      return
+    return;
   } else {
-      throw Error("assertion failed: " + str)
+    throw Error("assertion failed: " + str);
   }
 }
 

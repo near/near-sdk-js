@@ -13,11 +13,12 @@ interface Env {
 declare let env: Env;
 
 export function log(...params: any[]) {
-  env.log(`${params
-    .map(x => x === undefined ? 'undefined' : x)                // Stringify undefined
-    .map(x => typeof (x) === 'object' ? JSON.stringify(x) : x)  // Convert Objects to strings
-    .join(' ')}`                                                // Convert to string
-  )
+  env.log(
+    `${params
+      .map((x) => (x === undefined ? "undefined" : x)) // Stringify undefined
+      .map((x) => (typeof x === "object" ? JSON.stringify(x) : x)) // Convert Objects to strings
+      .join(" ")}` // Convert to string
+  );
 }
 
 export function signerAccountId(): string {
@@ -94,7 +95,7 @@ export function ecrecover(
   v: number,
   malleabilityFlag: number
 ): Bytes | null {
-  let ret = env.ecrecover(hash, sig, v, malleabilityFlag, 0);
+  const ret = env.ecrecover(hash, sig, v, malleabilityFlag, 0);
   if (ret === 0n) {
     return null;
   }
@@ -116,7 +117,7 @@ export function logUtf16(msg: Bytes) {
 }
 
 export function storageRead(key: Bytes): Bytes | null {
-  let ret = env.storage_read(key, 0);
+  const ret = env.storage_read(key, 0);
   if (ret === 1n) {
     return env.read_register(0);
   } else {
@@ -125,7 +126,7 @@ export function storageRead(key: Bytes): Bytes | null {
 }
 
 export function storageHasKey(key: Bytes): boolean {
-  let ret = env.storage_has_key(key);
+  const ret = env.storage_has_key(key);
   if (ret === 1n) {
     return true;
   } else {
@@ -152,7 +153,7 @@ export function altBn128G1Sum(value: Bytes): Bytes {
 }
 
 export function altBn128PairingCheck(value: Bytes): boolean {
-  let ret = env.alt_bn128_pairing_check(value);
+  const ret = env.alt_bn128_pairing_check(value);
   if (ret === 1n) {
     return true;
   } else {
@@ -325,7 +326,7 @@ export function promiseBatchActionFunctionCallWeight(
   args: Bytes,
   amount: number | bigint,
   gas: number | bigint,
-  weight: number | bigint,
+  weight: number | bigint
 ) {
   env.promise_batch_action_function_call_weight(
     promiseIndex,
@@ -342,13 +343,18 @@ export function promiseResultsCount(): bigint {
 }
 
 export function promiseResult(resultIdx: number | bigint): Bytes {
-  let status: PromiseResult = env.promise_result(resultIdx, 0);
+  const status: PromiseResult = env.promise_result(resultIdx, 0);
   if (status == PromiseResult.Successful) {
     return env.read_register(0);
   } else {
     throw Error(
-      `Promise result ${status == PromiseResult.Failed ? "Failed" :
-        status == PromiseResult.NotReady ? "NotReady" : status}`
+      `Promise result ${
+        status == PromiseResult.Failed
+          ? "Failed"
+          : status == PromiseResult.NotReady
+          ? "NotReady"
+          : status
+      }`
     );
   }
 }
@@ -358,7 +364,7 @@ export function promiseReturn(promiseIdx: number | bigint) {
 }
 
 export function storageWrite(key: Bytes, value: Bytes): boolean {
-  let exist = env.storage_write(key, value, EVICTED_REGISTER);
+  const exist = env.storage_write(key, value, EVICTED_REGISTER);
   if (exist === 1n) {
     return true;
   }
@@ -366,7 +372,7 @@ export function storageWrite(key: Bytes, value: Bytes): boolean {
 }
 
 export function storageRemove(key: Bytes): boolean {
-  let exist = env.storage_remove(key, EVICTED_REGISTER);
+  const exist = env.storage_remove(key, EVICTED_REGISTER);
   if (exist === 1n) {
     return true;
   }

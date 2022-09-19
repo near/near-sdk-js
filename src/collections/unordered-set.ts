@@ -7,14 +7,14 @@ const ERR_INCONSISTENT_STATE =
   "The collection is an inconsistent state. Did previous smart contract execution terminate unexpectedly?";
 
 function serializeIndex(index: number) {
-  let data = new Uint32Array([index]);
-  let array = new Uint8Array(data.buffer);
+  const data = new Uint32Array([index]);
+  const array = new Uint8Array(data.buffer);
   return u8ArrayToBytes(array);
 }
 
 function deserializeIndex(rawIndex: Bytes): number {
-  let array = bytesToU8Array(rawIndex);
-  let data = new Uint32Array(array.buffer);
+  const array = bytesToU8Array(rawIndex);
+  const data = new Uint32Array(array.buffer);
   return data[0];
 }
 
@@ -26,7 +26,7 @@ export class UnorderedSet<DataType> {
   constructor(prefix: Bytes) {
     this.prefix = prefix;
     this.elementIndexPrefix = prefix + "i";
-    let elementsPrefix = prefix + "e";
+    const elementsPrefix = prefix + "e";
     this.elements = new Vector(elementsPrefix);
   }
 
@@ -39,17 +39,17 @@ export class UnorderedSet<DataType> {
   }
 
   contains(element: DataType): boolean {
-    let indexLookup = this.elementIndexPrefix + JSON.stringify(element);
+    const indexLookup = this.elementIndexPrefix + JSON.stringify(element);
     return near.storageHasKey(indexLookup);
   }
 
   set(element: DataType): boolean {
-    let indexLookup = this.elementIndexPrefix + JSON.stringify(element);
+    const indexLookup = this.elementIndexPrefix + JSON.stringify(element);
     if (near.storageRead(indexLookup)) {
       return false;
     } else {
-      let nextIndex = this.length;
-      let nextIndexRaw = serializeIndex(nextIndex);
+      const nextIndex = this.length;
+      const nextIndexRaw = serializeIndex(nextIndex);
       near.storageWrite(indexLookup, nextIndexRaw);
       this.elements.push(element);
       return true;
@@ -57,8 +57,8 @@ export class UnorderedSet<DataType> {
   }
 
   remove(element: DataType): boolean {
-    let indexLookup = this.elementIndexPrefix + JSON.stringify(element);
-    let indexRaw = near.storageRead(indexLookup);
+    const indexLookup = this.elementIndexPrefix + JSON.stringify(element);
+    const indexRaw = near.storageRead(indexLookup);
     if (indexRaw) {
       if (this.length == 1) {
         // If there is only one element then swap remove simply removes it without
@@ -67,7 +67,7 @@ export class UnorderedSet<DataType> {
       } else {
         // If there is more than one element then swap remove swaps it with the last
         // element.
-        let lastElement = this.elements.get(this.length - 1);
+        const lastElement = this.elements.get(this.length - 1);
         if (!lastElement) {
           throw new Error(ERR_INCONSISTENT_STATE);
         }
@@ -75,12 +75,12 @@ export class UnorderedSet<DataType> {
         // If the removed element was the last element from keys, then we don't need to
         // reinsert the lookup back.
         if (lastElement != element) {
-          let lastLookupElement =
+          const lastLookupElement =
             this.elementIndexPrefix + JSON.stringify(lastElement);
           near.storageWrite(lastLookupElement, indexRaw);
         }
       }
-      let index = deserializeIndex(indexRaw);
+      const index = deserializeIndex(indexRaw);
       this.elements.swapRemove(index);
       return true;
     }
@@ -88,16 +88,16 @@ export class UnorderedSet<DataType> {
   }
 
   clear() {
-    for (let element of this.elements) {
-      let indexLookup = this.elementIndexPrefix + JSON.stringify(element);
+    for (const element of this.elements) {
+      const indexLookup = this.elementIndexPrefix + JSON.stringify(element);
       near.storageRemove(indexLookup);
     }
     this.elements.clear();
   }
 
   toArray(): Bytes[] {
-    let ret = [];
-    for (let v of this) {
+    const ret = [];
+    for (const v of this) {
       ret.push(v);
     }
     return ret;
@@ -108,7 +108,7 @@ export class UnorderedSet<DataType> {
   }
 
   extend(elements: DataType[]) {
-    for (let element of elements) {
+    for (const element of elements) {
       this.set(element);
     }
   }
@@ -118,12 +118,14 @@ export class UnorderedSet<DataType> {
   }
 
   // converting plain object to class object
-  static reconstruct<DataType>(data: UnorderedSet<DataType>): UnorderedSet<DataType> {
+  static reconstruct<DataType>(
+    data: UnorderedSet<DataType>
+  ): UnorderedSet<DataType> {
     // removing readonly modifier
     type MutableUnorderedSet = Mutable<UnorderedSet<DataType>>;
-    let set = new UnorderedSet(data.prefix) as MutableUnorderedSet;
+    const set = new UnorderedSet(data.prefix) as MutableUnorderedSet;
     // reconstruct Vector
-    let elementsPrefix = data.prefix + "e";
+    const elementsPrefix = data.prefix + "e";
     set.elements = new Vector(elementsPrefix);
     set.elements.length = data.elements.length;
     return set as UnorderedSet<DataType>;
