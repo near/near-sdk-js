@@ -5,9 +5,9 @@ export declare class LookupMap<DataType> {
     constructor(keyPrefix: Bytes);
     containsKey(key: Bytes): boolean;
     get(key: Bytes, options?: GetOptions<DataType>): DataType | null;
-    remove(key: Bytes): DataType | null;
-    set(key: Bytes, value: DataType): DataType | null;
-    extend(objects: [Bytes, DataType][]): void;
+    remove(key: Bytes, options?: GetOptions<DataType>): DataType | null;
+    set(key: Bytes, newValue: DataType, options?: GetOptions<DataType>): DataType | null;
+    extend(keyValuePairs: [Bytes, DataType][], options?: GetOptions<DataType>): void;
     serialize(): string;
-    static reconstruct<DataType>(data: LookupMap<DataType>): LookupMap<DataType>;
+    static reconstruct<DataType>(data: LookupMap<unknown>): LookupMap<DataType>;
 }

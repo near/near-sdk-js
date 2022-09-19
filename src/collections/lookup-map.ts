@@ -1,51 +1,57 @@
 import * as near from "../api";
 import { GetOptions } from "../types/collections";
-import { Bytes } from "../utils";
+import { Bytes, getValueWithOptions } from "../utils";
 
 export class LookupMap<DataType> {
-  readonly keyPrefix: Bytes;
-
-  constructor(keyPrefix: Bytes) {
-    this.keyPrefix = keyPrefix;
-  }
+  constructor(readonly keyPrefix: Bytes) {}
 
   containsKey(key: Bytes): boolean {
-    const storageKey = this.keyPrefix + JSON.stringify(key);
+    const storageKey = this.keyPrefix + key;
     return near.storageHasKey(storageKey);
   }
 
   get(key: Bytes, options?: GetOptions<DataType>): DataType | null {
-    const storageKey = this.keyPrefix + JSON.stringify(key);
-    const raw = near.storageRead(storageKey);
-    if (raw !== null) {
-      const value = JSON.parse(raw);
-      return options?.reconstructor
-        ? options.reconstructor(value)
-        : (value as DataType);
-    }
-    return null;
+    const storageKey = this.keyPrefix + key;
+    const value = JSON.parse(near.storageRead(storageKey));
+
+    return getValueWithOptions(value, options);
   }
 
-  remove(key: Bytes): DataType | null {
-    const storageKey = this.keyPrefix + JSON.stringify(key);
-    if (near.storageRemove(storageKey)) {
-      return JSON.parse(near.storageGetEvicted());
+  remove(key: Bytes, options?: GetOptions<DataType>): DataType | null {
+    const storageKey = this.keyPrefix + key;
+
+    if (!near.storageRemove(storageKey)) {
+      return options?.defaultValue ?? null;
     }
-    return null;
+
+    const value = JSON.parse(near.storageGetEvicted());
+
+    return getValueWithOptions(value, options);
   }
 
-  set(key: Bytes, value: DataType): DataType | null {
-    const storageKey = this.keyPrefix + JSON.stringify(key);
-    const storageValue = JSON.stringify(value);
-    if (near.storageWrite(storageKey, storageValue)) {
-      return JSON.parse(near.storageGetEvicted());
+  set(
+    key: Bytes,
+    newValue: DataType,
+    options?: GetOptions<DataType>
+  ): DataType | null {
+    const storageKey = this.keyPrefix + key;
+    const storageValue = JSON.stringify(newValue);
+
+    if (!near.storageWrite(storageKey, storageValue)) {
+      return options?.defaultValue ?? null;
     }
-    return null;
+
+    const value = JSON.parse(near.storageGetEvicted());
+
+    return getValueWithOptions(value, options);
   }
 
-  extend(objects: [Bytes, DataType][]) {
-    for (const kv of objects) {
-      this.set(kv[0], kv[1]);
+  extend(
+    keyValuePairs: [Bytes, DataType][],
+    options?: GetOptions<DataType>
+  ): void {
+    for (const [key, value] of keyValuePairs) {
+      this.set(key, value, options);
     }
   }
 
@@ -54,7 +60,7 @@ export class LookupMap<DataType> {
   }
 
   // converting plain object to class object
-  static reconstruct<DataType>(data: LookupMap<DataType>): LookupMap<DataType> {
+  static reconstruct<DataType>(data: LookupMap<unknown>): LookupMap<DataType> {
     return new LookupMap(data.keyPrefix);
   }
 }
