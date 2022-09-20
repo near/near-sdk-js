@@ -1,9 +1,4 @@
-import {
-  call,
-  view,
-  initialize,
-  NearBindgen
-} from "./near-bindgen";
+import { call, view, initialize, NearBindgen } from "./near-bindgen";
 
 import * as near from "./api";
 import {
@@ -33,5 +28,5 @@ export {
   Bytes,
   assert,
   NearPromise,
-  PromiseOrValue
+  PromiseOrValue,
 };

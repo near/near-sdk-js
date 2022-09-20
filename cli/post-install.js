@@ -1,8 +1,8 @@
-import { executeCommand } from './utils.js';
-import os from 'os';
+import { executeCommand } from "./utils.js";
+import os from "os";
 
 async function download(url) {
-    await executeCommand(`curl -LOf ${url}`);
+  await executeCommand(`curl -LOf ${url}`);
 }
 
 const PLATFORM = os.platform();
@@ -10,67 +10,113 @@ const ARCH = os.arch();
 
 console.log(`Current platform: ${PLATFORM}, current architecture: ${ARCH}`);
 
-const SUPPORTED_PLATFORMS = ['linux', 'darwin', 'win32']; // Unsaported platforms: 'aix', 'freebsd', 'openbsd', 'sunos', 'android'
-const SUPPORTED_ARCH = ['x64', 'arm64']; // Unsaported arch: 'arm', 'ia32', 'mips','mipsel', 'ppc', 'ppc64', 's390', 's390x', 'x32'
+const SUPPORTED_PLATFORMS = ["linux", "darwin", "win32"]; // Unsaported platforms: 'aix', 'freebsd', 'openbsd', 'sunos', 'android'
+const SUPPORTED_ARCH = ["x64", "arm64"]; // Unsaported arch: 'arm', 'ia32', 'mips','mipsel', 'ppc', 'ppc64', 's390', 's390x', 'x32'
 
 if (!SUPPORTED_PLATFORMS.includes(PLATFORM)) {
-    console.error(`Platform ${PLATFORM} is not supported at the moment`);
-    process.exit(1);
+  console.error(`Platform ${PLATFORM} is not supported at the moment`);
+  process.exit(1);
 }
 
 if (!SUPPORTED_ARCH.includes(ARCH)) {
-    console.error(`Architecture ${ARCH} is not supported at the moment`);
-    process.exit(1);
+  console.error(`Architecture ${ARCH} is not supported at the moment`);
+  process.exit(1);
 }
 
-console.log('Installing wasi-stub...');
+console.log("Installing wasi-stub...");
+
 const BINARYEN_VERSION = `0.1.10`;
 const BINARYEN_VERSION_TAG = `v${BINARYEN_VERSION}`;
-const BINARYEN_SYSTEM_NAME = PLATFORM === 'linux' ? 'Linux' : PLATFORM === 'darwin' ? 'macOS' : PLATFORM === 'win32' ? 'windows' : 'other';
-const BINARYEN_ARCH_NAME = ARCH === 'x64' ? 'X64' : ARCH === 'arm64' ? 'arm64' : 'other';
+const BINARYEN_SYSTEM_NAME =
+  PLATFORM === "linux"
+    ? "Linux"
+    : PLATFORM === "darwin"
+    ? "macOS"
+    : PLATFORM === "win32"
+    ? "windows"
+    : "other";
+const BINARYEN_ARCH_NAME =
+  ARCH === "x64" ? "X64" : ARCH === "arm64" ? "arm64" : "other";
+
 const BINARYEN_TAR_NAME = `binaryen-${BINARYEN_SYSTEM_NAME}-${BINARYEN_ARCH_NAME}.tar.gz`;
 
-await download(`https://github.com/near/binaryen/releases/download/${BINARYEN_VERSION_TAG}/${BINARYEN_TAR_NAME}`);
-await executeCommand(`mkdir -p binaryen && tar xvf ${BINARYEN_TAR_NAME} --directory binaryen`);
+await download(
+  `https://github.com/near/binaryen/releases/download/${BINARYEN_VERSION_TAG}/${BINARYEN_TAR_NAME}`
+);
+await executeCommand(
+  `mkdir -p binaryen && tar xvf ${BINARYEN_TAR_NAME} --directory binaryen`
+);
 await executeCommand(`rm ${BINARYEN_TAR_NAME}`);
 
-console.log('Installing QuickJS...');
+console.log("Installing QuickJS...");
+
 const QUICK_JS_VERSION = `0.1.1`;
 const QUICK_JS_VERSION_TAG = `v${QUICK_JS_VERSION}`;
-const QUICK_JS_SYSTEM_NAME = PLATFORM === 'linux' ? 'Linux' : PLATFORM === 'darwin' ? 'macOS' : PLATFORM === 'win32' ? 'windows' : 'other';
-const QUICK_JS_ARCH_NAME = ARCH === 'x64' ? 'X64' : ARCH === 'arm64' ? 'arm64' : 'other';
-const QUICK_JS_TAR_NAME = `${QUICK_JS_VERSION_TAG}.tar.gz`
-const QUICK_JS_DOWNLOADED_FOLDER_NAME = `quickjs-${QUICK_JS_VERSION}`
-const QUICK_JS_TARGET_FOLDER_NAME = 'quickjs';
-const QUICK_JS_DOWNLOADED_NAME = `qjsc-${QUICK_JS_SYSTEM_NAME}-${QUICK_JS_ARCH_NAME}`
-const QUICK_JS_TARGET_NAME = 'qjsc';
+const QUICK_JS_SYSTEM_NAME =
+  PLATFORM === "linux"
+    ? "Linux"
+    : PLATFORM === "darwin"
+    ? "macOS"
+    : PLATFORM === "win32"
+    ? "windows"
+    : "other";
+const QUICK_JS_ARCH_NAME =
+  ARCH === "x64" ? "X64" : ARCH === "arm64" ? "arm64" : "other";
+const QUICK_JS_TAR_NAME = `${QUICK_JS_VERSION_TAG}.tar.gz`;
+const QUICK_JS_DOWNLOADED_FOLDER_NAME = `quickjs-${QUICK_JS_VERSION}`;
+const QUICK_JS_TARGET_FOLDER_NAME = "quickjs";
+const QUICK_JS_DOWNLOADED_NAME = `qjsc-${QUICK_JS_SYSTEM_NAME}-${QUICK_JS_ARCH_NAME}`;
+const QUICK_JS_TARGET_NAME = "qjsc";
 // Download QuickJS
-await download(`https://github.com/near/quickjs/releases/download/${QUICK_JS_VERSION_TAG}/qjsc-${QUICK_JS_SYSTEM_NAME}-${QUICK_JS_ARCH_NAME}`);
-await download(`https://github.com/near/quickjs/archive/refs/tags/${QUICK_JS_VERSION_TAG}.tar.gz`);
+await download(
+  `https://github.com/near/quickjs/releases/download/${QUICK_JS_VERSION_TAG}/qjsc-${QUICK_JS_SYSTEM_NAME}-${QUICK_JS_ARCH_NAME}`
+);
+await download(
+  `https://github.com/near/quickjs/archive/refs/tags/${QUICK_JS_VERSION_TAG}.tar.gz`
+);
+
 // Extract QuickJS
 await executeCommand(`tar xvf ${QUICK_JS_TAR_NAME}`);
+
 // Delete .tar file
 await executeCommand(`rm ${QUICK_JS_TAR_NAME}`);
+
 // Delete version from folder name
-await executeCommand(`mv ${QUICK_JS_DOWNLOADED_FOLDER_NAME} ${QUICK_JS_TARGET_FOLDER_NAME}`);
+await executeCommand(
+  `mv ${QUICK_JS_DOWNLOADED_FOLDER_NAME} ${QUICK_JS_TARGET_FOLDER_NAME}`
+);
+
 // Rename qjsc file
 await executeCommand(`mv ${QUICK_JS_DOWNLOADED_NAME} ${QUICK_JS_TARGET_NAME}`);
+
 // chmod qjsc
 await executeCommand(`chmod 777 ${QUICK_JS_TARGET_NAME}`);
 
-console.log('Installing wasi-sdk...');
+console.log("Installing wasi-sdk...");
+
 const WASI_SDK_MAJOR_VER = 11;
 const WASI_SDK_MINOR_VER = 0;
-const WASI_SDK_DOWNLOADED_FOLDER_NAME = `wasi-sdk-${WASI_SDK_MAJOR_VER}.${WASI_SDK_MINOR_VER}`
-const WASI_SDK_SYSTEM_NAME = PLATFORM === 'linux' ? 'linux' : PLATFORM === 'darwin' ? 'macos' :  PLATFORM === 'win32' ? 'windows' : 'other';
-const WASI_SDK_TAR_NAME = `${WASI_SDK_DOWNLOADED_FOLDER_NAME}-${WASI_SDK_SYSTEM_NAME}.tar.gz`
+const WASI_SDK_DOWNLOADED_FOLDER_NAME = `wasi-sdk-${WASI_SDK_MAJOR_VER}.${WASI_SDK_MINOR_VER}`;
+const WASI_SDK_SYSTEM_NAME =
+  PLATFORM === "linux"
+    ? "linux"
+    : PLATFORM === "darwin"
+    ? "macos"
+    : PLATFORM === "win32"
+    ? "windows"
+    : "other";
+const WASI_SDK_TAR_NAME = `${WASI_SDK_DOWNLOADED_FOLDER_NAME}-${WASI_SDK_SYSTEM_NAME}.tar.gz`;
 
 // Download WASI SDK
-await download(`https://github.com/WebAssembly/wasi-sdk/releases/download/wasi-sdk-${WASI_SDK_MAJOR_VER}/${WASI_SDK_TAR_NAME}`);
+await download(
+  `https://github.com/WebAssembly/wasi-sdk/releases/download/wasi-sdk-${WASI_SDK_MAJOR_VER}/${WASI_SDK_TAR_NAME}`
+);
+
 // Extract WASI SDK
 await executeCommand(`tar xvf ${WASI_SDK_TAR_NAME}`);
+
 // Delete .tar file
 await executeCommand(`rm ${WASI_SDK_TAR_NAME}`);
+
 // Delete version from folder name
 await executeCommand(`mv ${WASI_SDK_DOWNLOADED_FOLDER_NAME} wasi-sdk`);
-

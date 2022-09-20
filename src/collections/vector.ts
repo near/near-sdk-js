@@ -1,145 +1,175 @@
 import * as near from "../api";
-import { Bytes, u8ArrayToBytes } from "../utils";
-
+import { assert, Bytes, getValueWithOptions, u8ArrayToBytes } from "../utils";
+import { GetOptions } from "../types/collections";
 const ERR_INDEX_OUT_OF_BOUNDS = "Index out of bounds";
 const ERR_INCONSISTENT_STATE =
   "The collection is an inconsistent state. Did previous smart contract execution terminate unexpectedly?";
 
 function indexToKey(prefix: Bytes, index: number): Bytes {
-  let data = new Uint32Array([index]);
-  let array = new Uint8Array(data.buffer);
-  let key = u8ArrayToBytes(array);
+  const data = new Uint32Array([index]);
+  const array = new Uint8Array(data.buffer);
+  const key = u8ArrayToBytes(array);
+
   return prefix + key;
 }
 
 /// An iterable implementation of vector that stores its content on the trie.
 /// Uses the following map: index -> element
-export class Vector {
-  length: number;
-  readonly prefix: Bytes;
+export class Vector<DataType> {
+  length = 0;
 
-  constructor(prefix: Bytes) {
-    this.length = 0;
-    this.prefix = prefix;
-  }
+  constructor(readonly prefix: Bytes) {}
 
   isEmpty(): boolean {
-    return this.length == 0;
+    return this.length === 0;
   }
 
-  get(index: number): unknown | null {
+  get(index: number, options?: GetOptions<DataType>): DataType | null {
     if (index >= this.length) {
       return null;
     }
-    let storageKey = indexToKey(this.prefix, index);
-    return JSON.parse(near.storageRead(storageKey));
+    const storageKey = indexToKey(this.prefix, index);
+    const value = JSON.parse(near.storageRead(storageKey));
+
+    return getValueWithOptions(value, options);
   }
 
   /// Removes an element from the vector and returns it in serialized form.
   /// The removed element is replaced by the last element of the vector.
   /// Does not preserve ordering, but is `O(1)`.
-  swapRemove(index: number): unknown | null {
-    if (index >= this.length) {
-      throw new Error(ERR_INDEX_OUT_OF_BOUNDS);
-    } else if (index + 1 == this.length) {
-      return this.pop();
-    } else {
-      let key = indexToKey(this.prefix, index);
-      let last = this.pop();
-      if (near.storageWrite(key, JSON.stringify(last))) {
-        return JSON.parse(near.storageGetEvicted());
-      } else {
-        throw new Error(ERR_INCONSISTENT_STATE);
-      }
+  swapRemove(index: number, options?: GetOptions<DataType>): DataType | null {
+    assert(index < this.length, ERR_INDEX_OUT_OF_BOUNDS);
+
+    if (index + 1 === this.length) {
+      return this.pop(options);
     }
+
+    const key = indexToKey(this.prefix, index);
+    const last = this.pop();
+
+    assert(
+      near.storageWrite(key, JSON.stringify(last)),
+      ERR_INCONSISTENT_STATE
+    );
+
+    const value = JSON.parse(near.storageGetEvicted());
+
+    return getValueWithOptions(value, options);
   }
 
-  push(element: unknown) {
-    let key = indexToKey(this.prefix, this.length);
+  push(element: DataType) {
+    const key = indexToKey(this.prefix, this.length);
     this.length += 1;
     near.storageWrite(key, JSON.stringify(element));
   }
 
-  pop(): unknown | null {
+  pop(options?: GetOptions<DataType>): DataType | null {
     if (this.isEmpty()) {
-      return null;
-    } else {
-      let lastIndex = this.length - 1;
-      let lastKey = indexToKey(this.prefix, lastIndex);
-      this.length -= 1;
-      if (near.storageRemove(lastKey)) {
-        return JSON.parse(near.storageGetEvicted());
-      } else {
-        throw new Error(ERR_INCONSISTENT_STATE);
-      }
+      return options?.defaultValue ?? null;
     }
+
+    const lastIndex = this.length - 1;
+    const lastKey = indexToKey(this.prefix, lastIndex);
+    this.length -= 1;
+
+    assert(near.storageRemove(lastKey), ERR_INCONSISTENT_STATE);
+
+    const value = JSON.parse(near.storageGetEvicted());
+
+    return getValueWithOptions(value, options);
   }
 
-  replace(index: number, element: unknown): unknown {
-    if (index >= this.length) {
-      throw new Error(ERR_INDEX_OUT_OF_BOUNDS);
-    } else {
-      let key = indexToKey(this.prefix, index);
-      if (near.storageWrite(key, JSON.stringify(element))) {
-        return JSON.parse(near.storageGetEvicted());
-      } else {
-        throw new Error(ERR_INCONSISTENT_STATE);
-      }
-    }
+  replace(
+    index: number,
+    element: DataType,
+    options?: GetOptions<DataType>
+  ): DataType {
+    assert(index < this.length, ERR_INDEX_OUT_OF_BOUNDS);
+    const key = indexToKey(this.prefix, index);
+
+    assert(
+      near.storageWrite(key, JSON.stringify(element)),
+      ERR_INCONSISTENT_STATE
+    );
+
+    const value = JSON.parse(near.storageGetEvicted());
+
+    return getValueWithOptions(value, options);
   }
 
-  extend(elements: unknown[]) {
-    for (let element of elements) {
+  extend(elements: DataType[]): void {
+    for (const element of elements) {
       this.push(element);
     }
   }
 
-  [Symbol.iterator](): VectorIterator {
+  [Symbol.iterator](): VectorIterator<DataType> {
     return new VectorIterator(this);
   }
 
-  clear() {
-    for (let i = 0; i < this.length; i++) {
-      let key = indexToKey(this.prefix, i);
+  private createIteratorWithOptions(options?: GetOptions<DataType>): {
+    [Symbol.iterator](): VectorIterator<DataType>;
+  } {
+    return {
+      [Symbol.iterator]: () => new VectorIterator(this, options),
+    };
+  }
+
+  toArray(options?: GetOptions<DataType>): DataType[] {
+    const array = [];
+
+    const iterator = options ? this.createIteratorWithOptions(options) : this;
+
+    for (const v of iterator) {
+      array.push(v);
+    }
+
+    return array;
+  }
+
+  clear(): void {
+    for (let index = 0; index < this.length; index++) {
+      const key = indexToKey(this.prefix, index);
       near.storageRemove(key);
     }
+
     this.length = 0;
   }
 
-  toArray(): unknown[] {
-    let ret = [];
-    for (let v of this) {
-      ret.push(v);
-    }
-    return ret;
-  }
-
   serialize(): string {
-    return JSON.stringify(this)
+    return JSON.stringify(this);
   }
 
   // converting plain object to class object
-  static reconstruct(data: Vector): Vector {
-    let vector = new Vector(data.prefix);
+  static reconstruct<DataType>(data: Vector<DataType>): Vector<DataType> {
+    const vector = new Vector<DataType>(data.prefix);
     vector.length = data.length;
+
     return vector;
   }
 }
 
-export class VectorIterator {
+export class VectorIterator<DataType> {
   private current: number;
-  private vector: Vector;
-  constructor(vector: Vector) {
+
+  constructor(
+    private vector: Vector<DataType>,
+    private readonly options?: GetOptions<DataType>
+  ) {
     this.current = 0;
-    this.vector = vector;
   }
 
-  next(): { value: unknown | null; done: boolean } {
-    if (this.current < this.vector.length) {
-      let value = this.vector.get(this.current);
-      this.current += 1;
-      return { value, done: false };
+  next(): {
+    value: DataType | null;
+    done: boolean;
+  } {
+    if (this.current >= this.vector.length) {
+      return { value: null, done: true };
     }
-    return { value: null, done: true };
+
+    const value = this.vector.get(this.current, this.options);
+    this.current += 1;
+
+    return { value, done: false };
   }
 }

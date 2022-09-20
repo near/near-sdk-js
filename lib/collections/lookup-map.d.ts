@@ -1,12 +1,13 @@
-import { Bytes } from '../utils';
-export declare class LookupMap {
+import { GetOptions } from "../types/collections";
+import { Bytes } from "../utils";
+export declare class LookupMap<DataType> {
     readonly keyPrefix: Bytes;
     constructor(keyPrefix: Bytes);
     containsKey(key: Bytes): boolean;
-    get(key: Bytes): unknown | null;
-    remove(key: Bytes): unknown | null;
-    set(key: Bytes, value: unknown): unknown | null;
-    extend(objects: [Bytes, unknown][]): void;
+    get(key: Bytes, options?: GetOptions<DataType>): DataType | null;
+    remove(key: Bytes, options?: GetOptions<DataType>): DataType | null;
+    set(key: Bytes, newValue: DataType, options?: GetOptions<DataType>): DataType | null;
+    extend(keyValuePairs: [Bytes, DataType][], options?: GetOptions<DataType>): void;
     serialize(): string;
-    static reconstruct(data: LookupMap): LookupMap;
+    static reconstruct<DataType>(data: LookupMap<unknown>): LookupMap<DataType>;
 }
