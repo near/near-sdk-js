@@ -22,6 +22,8 @@ jobs:
         run: yarn
       - name: Run lint
         run: yarn lint
+      - name: Format code
+        run: yarn format
       - name: Run git status
         run: git status
       - name: Check that lints where commited
