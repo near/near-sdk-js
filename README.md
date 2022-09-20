@@ -40,7 +40,12 @@ If you want to indicate an error happened and fail the transaction, just throw a
 
 When your JS code or library throws an error, uncaught, the transaction will also fail with GuestPanic error, with the error message and stacktrace.
 
-When call host function with inappropriate type, means incorrect number of arguments or arg is not expected type: - if arguments less than params, remaining argument are set as 'undefined' - if arguments more than params, remaining argument are ignored - if argument is different than the required type, it'll be coerced to required type - if argument is different than the required type but cannot be coerced, will throw runtime type error, also with message and stacktrace
+When call host function with inappropriate type, means incorrect number of arguments or arg is not expected type:
+
+- if arguments less than params, remaining argument are set as 'undefined'
+- if arguments more than params, remaining argument are ignored
+- if argument is different than the required type, it'll be coerced to required type
+- if argument is different than the required type but cannot be coerced, will throw runtime type error, also with message and stacktrace
 
 ## NEAR-SDK-JS API Reference
 
@@ -462,7 +467,7 @@ Usage:
 
 ```js
 // create new promise
-import { NearPromise, near } from "near-sdk-js";
+import { NearPromise, near, includeBytes } from "near-sdk-js";
 import { PublicKey } from "near-sdk-js/lib/types";
 
 let promise = NearPromise.new("account-to-run-promise");
