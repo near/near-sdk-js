@@ -6,30 +6,54 @@ const EVICTED_REGISTER = U64_MAX - 1n;
 
 // Interface available in QuickJS
 interface Env {
-  panic_utf8(msg: string): never;
-  log(message: string): void;
-  log_utf8(message: string): void;
-  log_utf16(message: string): void;
+  // Panic
+  panic_utf8(message: Bytes): never;
+
+  // Logging
+  log(message: Bytes): void;
+  log_utf8(message: Bytes): void;
+  log_utf16(message: Bytes): void;
+
+  // Read from register
   read_register(register: Register): string;
-  storage_read(key: string, register: Register): bigint;
-  storage_has_key(key: string): bigint;
-  storage_write(key: string, value: string, register: Register): bigint;
-  storage_remove(key: string, register: Register): bigint;
+
+  // Storage
+  storage_read(key: Bytes, register: Register): bigint;
+  storage_has_key(key: Bytes): bigint;
+  storage_write(key: Bytes, value: Bytes, register: Register): bigint;
+  storage_remove(key: Bytes, register: Register): bigint;
+  storage_usage(): bigint;
+
+  // Caller methods
   signer_account_id(register: Register): void;
   signer_account_pk(register: Register): void;
+  attached_deposit(): bigint;
   predecessor_account_id(register: Register): void;
+  input(register: Register): void;
+
+  // Account data
+  account_balance(): bigint;
+  account_locked_balance(): bigint;
   current_account_id(register: Register): void;
-  random_seed(register: Register): void;
+  validator_stake(accountId: Bytes): bigint;
+  validator_total_stake(): bigint;
+
+  // Blockchain info
   block_index(): bigint;
   block_timestamp(): bigint;
   epoch_height(): bigint;
-  attached_deposit(): bigint;
+
+  // Gas
   prepaid_gas(): bigint;
   used_gas(): bigint;
-  sha256(value: string, register: Register): void;
-  keccak256(value: string, register: Register): void;
-  keccak512(value: string, register: Register): void;
-  ripemd160(value: string, register: Register): void;
+
+  // Helper methods and cryptography
+  value_return(value: Bytes): void;
+  random_seed(register: Register): void;
+  sha256(value: Bytes, register: Register): void;
+  keccak256(value: Bytes, register: Register): void;
+  keccak512(value: Bytes, register: Register): void;
+  ripemd160(value: Bytes, register: Register): void;
   ecrecover(
     hash: Bytes,
     sig: Bytes,
@@ -37,42 +61,37 @@ interface Env {
     malleabilityFlag: number,
     register: Register
   ): bigint;
-  validator_stake(accountId: string): bigint;
-  validator_total_stake(): bigint;
-  alt_bn128_g1_multiexp(value: string, register: Register): void;
-  alt_bn128_g1_sum(value: string, register: Register): void;
-  alt_bn128_pairing_check(value: string): bigint;
-  input(register: Register): void;
-  storage_usage(): bigint;
-  account_balance(): bigint;
-  account_locked_balance(): bigint;
-  value_return(value: string): void;
+  alt_bn128_g1_multiexp(value: Bytes, register: Register): void;
+  alt_bn128_g1_sum(value: Bytes, register: Register): void;
+  alt_bn128_pairing_check(value: Bytes): bigint;
+
+  // Promises
   promise_create(
-    accountId: string,
-    methodName: string,
+    accountId: Bytes,
+    methodName: Bytes,
     args: Bytes,
     amount: NearAmount,
     gas: NearAmount
   ): bigint;
   promise_then(
     promiseIndex: PromiseIndex,
-    accountId: string,
-    methodName: string,
+    accountId: Bytes,
+    methodName: Bytes,
     args: Bytes,
     amount: NearAmount,
     gas: NearAmount
   ): bigint;
   promise_and(...promiseIndexes: PromiseIndex[]): bigint;
-  promise_batch_create(accountId: string): bigint;
-  promise_batch_then(promiseIndex: PromiseIndex, accountId: string): bigint;
+  promise_batch_create(accountId: Bytes): bigint;
+  promise_batch_then(promiseIndex: PromiseIndex, accountId: Bytes): bigint;
   promise_batch_action_create_account(promiseIndex: PromiseIndex): void;
   promise_batch_action_deploy_contract(
     promiseIndex: PromiseIndex,
-    code: string
+    code: Bytes
   ): void;
   promise_batch_action_function_call(
     promiseIndex: PromiseIndex,
-    methodName: string,
+    methodName: Bytes,
     args: Bytes,
     amount: NearAmount,
     gas: NearAmount
@@ -96,8 +115,8 @@ interface Env {
     publicKey: Bytes,
     nonce: number | bigint,
     allowance: NearAmount,
-    receiverId: string,
-    methodNames: string
+    receiverId: Bytes,
+    methodNames: Bytes
   ): void;
   promise_batch_action_delete_key(
     promiseIndex: PromiseIndex,
@@ -105,11 +124,11 @@ interface Env {
   ): void;
   promise_batch_action_delete_account(
     promiseIndex: PromiseIndex,
-    beneficiaryId: string
+    beneficiaryId: Bytes
   ): void;
   promise_batch_action_function_call_weight(
     promiseIndex: PromiseIndex,
-    methodName: string,
+    methodName: Bytes,
     args: Bytes,
     amount: NearAmount,
     gas: NearAmount,
@@ -131,7 +150,7 @@ export function log(...params: unknown[]) {
   );
 }
 
-export function signerAccountId(): string {
+export function signerAccountId(): Bytes {
   env.signer_account_id(0);
   return env.read_register(0);
 }
@@ -141,7 +160,7 @@ export function signerAccountPk(): Bytes {
   return env.read_register(0);
 }
 
-export function predecessorAccountId(): string {
+export function predecessorAccountId(): Bytes {
   env.predecessor_account_id(0);
   return env.read_register(0);
 }
@@ -242,7 +261,7 @@ export function storageHasKey(key: Bytes): boolean {
   return env.storage_has_key(key) === 1n;
 }
 
-export function validatorStake(accountId: string): bigint {
+export function validatorStake(accountId: Bytes): bigint {
   return env.validator_stake(accountId);
 }
 
@@ -268,7 +287,7 @@ export function storageGetEvicted(): Bytes {
   return env.read_register(EVICTED_REGISTER);
 }
 
-export function currentAccountId(): string {
+export function currentAccountId(): Bytes {
   env.current_account_id(0);
   return env.read_register(0);
 }
@@ -295,8 +314,8 @@ export function valueReturn(value: Bytes): void {
 }
 
 export function promiseCreate(
-  accountId: string,
-  methodName: string,
+  accountId: Bytes,
+  methodName: Bytes,
   args: Bytes,
   amount: NearAmount,
   gas: NearAmount
@@ -306,8 +325,8 @@ export function promiseCreate(
 
 export function promiseThen(
   promiseIndex: PromiseIndex,
-  accountId: string,
-  methodName: string,
+  accountId: Bytes,
+  methodName: Bytes,
   args: Bytes,
   amount: NearAmount,
   gas: NearAmount
@@ -326,13 +345,13 @@ export function promiseAnd(...promiseIndexes: PromiseIndex[]): bigint {
   return env.promise_and(...promiseIndexes);
 }
 
-export function promiseBatchCreate(accountId: string): bigint {
+export function promiseBatchCreate(accountId: Bytes): bigint {
   return env.promise_batch_create(accountId);
 }
 
 export function promiseBatchThen(
   promiseIndex: PromiseIndex,
-  accountId: string
+  accountId: Bytes
 ): bigint {
   return env.promise_batch_then(promiseIndex, accountId);
 }
@@ -352,7 +371,7 @@ export function promiseBatchActionDeployContract(
 
 export function promiseBatchActionFunctionCall(
   promiseIndex: PromiseIndex,
-  methodName: string,
+  methodName: Bytes,
   args: Bytes,
   amount: NearAmount,
   gas: NearAmount
@@ -398,8 +417,8 @@ export function promiseBatchActionAddKeyWithFunctionCall(
   publicKey: Bytes,
   nonce: number | bigint,
   allowance: NearAmount,
-  receiverId: string,
-  methodNames: string
+  receiverId: Bytes,
+  methodNames: Bytes
 ): void {
   env.promise_batch_action_add_key_with_function_call(
     promiseIndex,
@@ -420,14 +439,14 @@ export function promiseBatchActionDeleteKey(
 
 export function promiseBatchActionDeleteAccount(
   promiseIndex: PromiseIndex,
-  beneficiaryId: string
+  beneficiaryId: Bytes
 ): void {
   env.promise_batch_action_delete_account(promiseIndex, beneficiaryId);
 }
 
 export function promiseBatchActionFunctionCallWeight(
   promiseIndex: PromiseIndex,
-  methodName: string,
+  methodName: Bytes,
   args: Bytes,
   amount: NearAmount,
   gas: NearAmount,
