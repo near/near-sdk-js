@@ -49,7 +49,7 @@ async function build(argv) {
   const TARGET_EXT = argv.target.split(".").pop();
   const TARGET_FILE_NAME = path.basename(argv.target, `.${TARGET_EXT}`);
 
-  if (!["wasm"].includes(TARGET_EXT)) {
+  if ("wasm" !== TARGET_EXT) {
     throw new Error(
       `Unsupported target ${TARGET_EXT}, make sure target ends with .wasm`
     );
@@ -118,15 +118,19 @@ async function createHeaderFileWithQjsc(rollupTarget, qjscTarget) {
 
 async function createMethodsHeaderFile(rollupTarget) {
   console.log(`Genereting methods.h file`);
-  let source = rollupTarget;
+
+  const source = rollupTarget;
   const buildPath = path.dirname(source);
+
   console.log(rollupTarget);
-  let mod = await import(`${PROJECT_DIR}/${rollupTarget}`);
-  let exportNames = Object.keys(mod);
-  let methods = "";
-  for (let name of exportNames) {
-    methods += `DEFINE_NEAR_METHOD(${name})\n`;
-  }
+
+  const mod = await import(`${PROJECT_DIR}/${rollupTarget}`);
+  const exportNames = Object.keys(mod);
+  const methods = exportNames.reduce(
+    (result, key) => `${result}DEFINE_NEAR_METHOD(${key})\n`,
+    ""
+  );
+
   await fs.writeFile(`${buildPath}/methods.h`, methods);
 }
 
@@ -136,9 +140,11 @@ async function createWasmContract(qjscTarget, contractTarget) {
 
   const CC = `${WASI_SDK_PATH}/bin/clang --sysroot=${WASI_SDK_PATH}/share/wasi-sysroot`;
   let DEFS = `-D_GNU_SOURCE '-DCONFIG_VERSION="2021-03-27"' -DCONFIG_BIGNUM`;
+
   if (process.env.NEAR_NIGHTLY) {
     DEFS = DEFS + " -DNIGHTLY";
   }
+
   const INCLUDES = `-I${QJSC_DIR} -I.`;
   const ORIGINAL_BUILDER_PATH = `${NEAR_SDK_JS}/cli/builder/builder.c`;
   const NEW_BUILDER_PATH = `${path.dirname(contractTarget)}/builder.c`;

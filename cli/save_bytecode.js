@@ -3,19 +3,26 @@ import path from "path";
 
 //TODO: execute it in js env
 async function main() {
-  let source = path.resolve(process.argv[process.argv.length - 2]);
-  let target = path.resolve(process.argv[process.argv.length - 1]);
-  let code = await fs.readFile(source, "utf-8");
-  let lines = code.split("\n");
-  let codes = [];
-  for (let line of lines) {
-    if (line.indexOf("0x") >= 0) {
-      let nums = line.trim();
-      nums = nums.slice(0, nums.length - 1).split(", ");
-      codes.push(nums.map(Number));
-    }
-  }
-  let bytecode = Buffer.concat(codes.map(Buffer.from));
+  const source = path.resolve(process.argv[process.argv.length - 2]);
+  const target = path.resolve(process.argv[process.argv.length - 1]);
+  const code = await fs.readFile(source, "utf-8");
+
+  const codes = code
+    .split("\n")
+    .map((line) => {
+      if (line.indexOf("0x") < 0) {
+        return [];
+      }
+
+      const trimmedLine = line.trim();
+      const numbers = trimmedLine.slice(0, trimmedLine.length - 1).split(", ");
+
+      return numbers.map(Number);
+    })
+    .filter((numbers) => numbers.length);
+
+  const bytecode = Buffer.concat(codes.map(Buffer.from));
+
   await fs.writeFile(target, bytecode.toString("base64"));
 }
 

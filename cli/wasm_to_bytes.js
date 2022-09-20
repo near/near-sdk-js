@@ -8,13 +8,16 @@ import path from "path";
 // near.promiseBatchActionDeployContract(promsieId, '<content of contract.jsbytes>')
 // Note, do not use `bytes()` type check here, which is too expensive for this long bytes and will exceed gas limit.
 async function main() {
-  let source = path.resolve(process.argv[process.argv.length - 2]);
-  let target = path.resolve(process.argv[process.argv.length - 1]);
-  let code = await fs.readFile(source);
-  let result = "";
-  for (let e of code) {
-    result += "\\x" + e.toString(16).padStart(2, "0");
-  }
+  const source = path.resolve(process.argv[process.argv.length - 2]);
+  const target = path.resolve(process.argv[process.argv.length - 1]);
+  const code = await fs.readFile(source);
+
+  const result = code.reduce(
+    (result, character) =>
+      `${result}\\x${character.toString(16).padStart(2, "0")}`,
+    ""
+  );
+
   await fs.writeFile(target, result);
 }
 

@@ -11,13 +11,14 @@ export async function executeCommand(command, silent = false) {
     console.log(error);
     process.exit(1);
   }
+
   if (stderr && !silent) {
     console.error(stderr);
   }
 
   if (silent) {
     return stdout.trim();
-  } else {
-    console.log(stdout);
   }
+
+  console.log(stdout);
 }
