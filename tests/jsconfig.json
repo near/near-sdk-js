@@ -1,8 +1,6 @@
 {
-    "compilerOptions": {
-        "experimentalDecorators": true
-    },
-    "exclude": [
-        "node_modules"
-    ]
+  "compilerOptions": {
+    "experimentalDecorators": true
+  },
+  "exclude": ["node_modules"]
 }

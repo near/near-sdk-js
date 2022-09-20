@@ -11,19 +11,21 @@ export declare class UnorderedMap<DataType> {
     get length(): number;
     isEmpty(): boolean;
     get(key: Bytes, options?: GetOptions<DataType>): DataType | null;
-    set(key: Bytes, value: DataType): DataType | null;
-    remove(key: Bytes): DataType | null;
+    set(key: Bytes, value: DataType, options?: GetOptions<DataType>): DataType | null;
+    remove(key: Bytes, options?: GetOptions<DataType>): DataType | null;
     clear(): void;
-    toArray(): [Bytes, DataType][];
     [Symbol.iterator](): UnorderedMapIterator<DataType>;
-    extend(kvs: [Bytes, DataType][]): void;
+    private createIteratorWithOptions;
+    toArray(options?: GetOptions<DataType>): [Bytes, DataType][];
+    extend(keyValuePairs: [Bytes, DataType][]): void;
     serialize(): string;
     static reconstruct<DataType>(data: UnorderedMap<DataType>): UnorderedMap<DataType>;
 }
 declare class UnorderedMapIterator<DataType> {
+    private options?;
     private keys;
     private map;
-    constructor(unorderedMap: UnorderedMap<DataType>);
+    constructor(unorderedMap: UnorderedMap<DataType>, options?: GetOptions<DataType>);
     next(): {
         value: [unknown | null, unknown | null];
         done: boolean;

@@ -1,6 +1,4 @@
-export default function _default({ types: t }: {
-    types: any;
-}): {
+export default function _default(): {
     visitor: {
         CallExpression(p: any, state: any): void;
     };

@@ -1,11 +1,11 @@
-import { Bytes } from '../utils';
-export declare class LookupSet {
+import { Bytes } from "../utils";
+export declare class LookupSet<DataType> {
     readonly keyPrefix: Bytes;
     constructor(keyPrefix: Bytes);
-    contains(key: Bytes): boolean;
-    remove(key: Bytes): boolean;
-    set(key: Bytes): boolean;
-    extend(keys: Bytes[]): void;
+    contains(key: DataType): boolean;
+    remove(key: DataType): boolean;
+    set(key: DataType): boolean;
+    extend(keys: DataType[]): void;
     serialize(): string;
-    static reconstruct(data: LookupSet): LookupSet;
+    static reconstruct<DataType>(data: LookupSet<unknown>): LookupSet<DataType>;
 }
