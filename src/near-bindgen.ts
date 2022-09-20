@@ -9,11 +9,13 @@ type EmptyParameterObject = Record<never, never>;
 // ) => void;
 
 export function initialize(_empty: EmptyParameterObject) {
+  /* eslint-disable @typescript-eslint/no-empty-function, @typescript-eslint/ban-types */
   return function (
     _target: any,
     _key: string | symbol,
     _descriptor: TypedPropertyDescriptor<Function>
   ): void {};
+  /* eslint-enable @typescript-eslint/no-empty-function, @typescript-eslint/ban-types */
 }
 
 export function call({
@@ -23,11 +25,13 @@ export function call({
   privateFunction?: boolean;
   payableFunction?: boolean;
 }) {
+  /* eslint-disable @typescript-eslint/ban-types */
   return function (
     _target: any,
     _key: string | symbol,
     descriptor: TypedPropertyDescriptor<Function>
   ): void {
+    /* eslint-enable @typescript-eslint/ban-types */
     const originalMethod = descriptor.value;
 
     descriptor.value = function (...args: unknown[]) {
@@ -46,11 +50,13 @@ export function call({
 }
 
 export function view(_empty: EmptyParameterObject) {
+  /* eslint-disable @typescript-eslint/no-empty-function, @typescript-eslint/ban-types */
   return function (
     _target: any,
     _key: string | symbol,
     _descriptor: TypedPropertyDescriptor<Function>
   ): void {};
+  /* eslint-enable @typescript-eslint/no-empty-function, @typescript-eslint/ban-types */
 }
 
 export function NearBindgen({
@@ -69,6 +75,7 @@ export function NearBindgen({
         return rawState ? this._deserialize(rawState) : null;
       }
 
+      /* eslint-disable-next-line @typescript-eslint/ban-types */
       static _saveToStorage(obj: Object): void {
         near.storageWrite("STATE", this._serialize(obj));
       }
@@ -77,10 +84,12 @@ export function NearBindgen({
         return JSON.parse(near.input() || "{}");
       }
 
+      /* eslint-disable-next-line @typescript-eslint/ban-types */
       static _serialize(value: Object): string {
         return JSON.stringify(value);
       }
 
+      /* eslint-disable-next-line @typescript-eslint/ban-types */
       static _deserialize(value: string): Object {
         return JSON.parse(value);
       }

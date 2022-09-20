@@ -16,7 +16,7 @@ module.exports = {
       parserOptions: {
         ecmaVersion: "latest",
         sourceType: "module",
-        project: ["./tsconfig.json", "./**/{t,j}sconfig.json"],
+        project: ["./{t,j}sconfig.json", "./**/{t,j}sconfig.json"],
       },
       plugins: ["@typescript-eslint"],
       rules: {
@@ -32,6 +32,15 @@ module.exports = {
       },
     },
   ],
-  ignorePatterns: ["./**/node_modules", "node_modules", "./**/lib", "lib"],
+  ignorePatterns: [
+    "./**/node_modules",
+    "node_modules",
+    "./**/lib",
+    "lib",
+    "./**/build",
+    "build",
+    "./**/deps",
+    "deps",
+  ],
   rules: {},
 };
