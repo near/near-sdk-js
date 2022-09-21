@@ -156,7 +156,7 @@ function executePromise(classId) {
           [
             t.callExpression(
               t.memberExpression(classId, t.identifier("_serialize")),
-              [t.identifier("_result")]
+              [t.identifier("_result"), t.booleanLiteral(true)]
             ),
           ]
         )

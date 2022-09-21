@@ -1,5 +1,12 @@
 import * as near from "../api";
-import { assert, Bytes, getValueWithOptions, u8ArrayToBytes } from "../utils";
+import {
+  assert,
+  Bytes,
+  deserialize,
+  getValueWithOptions,
+  serialize,
+  u8ArrayToBytes,
+} from "../utils";
 import { GetOptions } from "../types/collections";
 const ERR_INDEX_OUT_OF_BOUNDS = "Index out of bounds";
 const ERR_INCONSISTENT_STATE =
@@ -29,7 +36,7 @@ export class Vector<DataType> {
       return null;
     }
     const storageKey = indexToKey(this.prefix, index);
-    const value = JSON.parse(near.storageRead(storageKey));
+    const value = deserialize(near.storageRead(storageKey));
 
     return getValueWithOptions(value, options);
   }
@@ -47,12 +54,9 @@ export class Vector<DataType> {
     const key = indexToKey(this.prefix, index);
     const last = this.pop();
 
-    assert(
-      near.storageWrite(key, JSON.stringify(last)),
-      ERR_INCONSISTENT_STATE
-    );
+    assert(near.storageWrite(key, serialize(last)), ERR_INCONSISTENT_STATE);
 
-    const value = JSON.parse(near.storageGetEvicted());
+    const value = deserialize(near.storageGetEvicted());
 
     return getValueWithOptions(value, options);
   }
@@ -60,7 +64,7 @@ export class Vector<DataType> {
   push(element: DataType) {
     const key = indexToKey(this.prefix, this.length);
     this.length += 1;
-    near.storageWrite(key, JSON.stringify(element));
+    near.storageWrite(key, serialize(element));
   }
 
   pop(options?: GetOptions<DataType>): DataType | null {
@@ -74,7 +78,7 @@ export class Vector<DataType> {
 
     assert(near.storageRemove(lastKey), ERR_INCONSISTENT_STATE);
 
-    const value = JSON.parse(near.storageGetEvicted());
+    const value = deserialize(near.storageGetEvicted());
 
     return getValueWithOptions(value, options);
   }
@@ -87,12 +91,9 @@ export class Vector<DataType> {
     assert(index < this.length, ERR_INDEX_OUT_OF_BOUNDS);
     const key = indexToKey(this.prefix, index);
 
-    assert(
-      near.storageWrite(key, JSON.stringify(element)),
-      ERR_INCONSISTENT_STATE
-    );
+    assert(near.storageWrite(key, serialize(element)), ERR_INCONSISTENT_STATE);
 
-    const value = JSON.parse(near.storageGetEvicted());
+    const value = deserialize(near.storageGetEvicted());
 
     return getValueWithOptions(value, options);
   }

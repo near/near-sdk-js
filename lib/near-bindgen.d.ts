@@ -1,10 +1,12 @@
 declare type EmptyParameterObject = Record<never, never>;
-export declare function initialize(_empty: EmptyParameterObject): (_target: any, _key: string | symbol, _descriptor: TypedPropertyDescriptor<Function>) => void;
+declare type AnyObject = Record<string, unknown>;
+declare type AnyFunction = (...args: unknown[]) => unknown;
+export declare function initialize(_empty: EmptyParameterObject): (_target: unknown, _key: string | symbol, _descriptor: TypedPropertyDescriptor<AnyFunction>) => void;
 export declare function call({ privateFunction, payableFunction, }: {
     privateFunction?: boolean;
     payableFunction?: boolean;
-}): (_target: any, _key: string | symbol, descriptor: TypedPropertyDescriptor<Function>) => void;
-export declare function view(_empty: EmptyParameterObject): (_target: any, _key: string | symbol, _descriptor: TypedPropertyDescriptor<Function>) => void;
+}): (_target: unknown, _key: string | symbol, descriptor: TypedPropertyDescriptor<AnyFunction>) => void;
+export declare function view(_empty: EmptyParameterObject): (_target: unknown, _key: string | symbol, _descriptor: TypedPropertyDescriptor<AnyFunction>) => void;
 export declare function NearBindgen({ requireInit, }: {
     requireInit?: boolean;
 }): <T extends new (...args: any[]) => any>(target: T) => {
@@ -12,12 +14,12 @@ export declare function NearBindgen({ requireInit, }: {
         [x: string]: any;
     };
     _create(): any;
-    _getState(): any;
-    _saveToStorage(obj: Object): void;
-    _getArgs(): JSON;
-    _serialize(value: Object): string;
-    _deserialize(value: string): Object;
-    _reconstruct(classObject: any, plainObject: JSON): any;
+    _getState(): unknown | null;
+    _saveToStorage(objectToSave: unknown): void;
+    _getArgs(): unknown;
+    _serialize(value: unknown, forReturn?: boolean): string;
+    _deserialize(value: string): unknown;
+    _reconstruct(classObject: object, plainObject: AnyObject): object;
     _requireInit(): boolean;
 } & T;
 declare module "./" {

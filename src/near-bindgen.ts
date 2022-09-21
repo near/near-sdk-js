@@ -1,7 +1,9 @@
 import * as near from "./api";
+import { deserialize, serialize } from "./utils";
 
 type EmptyParameterObject = Record<never, never>;
-// type AnyObject = Record<string, unknown>;
+type AnyObject = Record<string, unknown>;
+type AnyFunction = (...args: unknown[]) => unknown;
 // type DecoratorFunction = (
 //   target: AnyObject,
 //   key: string | symbol,
@@ -9,13 +11,13 @@ type EmptyParameterObject = Record<never, never>;
 // ) => void;
 
 export function initialize(_empty: EmptyParameterObject) {
-  /* eslint-disable @typescript-eslint/no-empty-function, @typescript-eslint/ban-types */
+  /* eslint-disable @typescript-eslint/no-empty-function */
   return function (
-    _target: any,
+    _target: unknown,
     _key: string | symbol,
-    _descriptor: TypedPropertyDescriptor<Function>
+    _descriptor: TypedPropertyDescriptor<AnyFunction>
   ): void {};
-  /* eslint-enable @typescript-eslint/no-empty-function, @typescript-eslint/ban-types */
+  /* eslint-enable @typescript-eslint/no-empty-function */
 }
 
 export function call({
@@ -25,13 +27,11 @@ export function call({
   privateFunction?: boolean;
   payableFunction?: boolean;
 }) {
-  /* eslint-disable @typescript-eslint/ban-types */
   return function (
-    _target: any,
+    _target: unknown,
     _key: string | symbol,
-    descriptor: TypedPropertyDescriptor<Function>
+    descriptor: TypedPropertyDescriptor<AnyFunction>
   ): void {
-    /* eslint-enable @typescript-eslint/ban-types */
     const originalMethod = descriptor.value;
 
     descriptor.value = function (...args: unknown[]) {
@@ -50,13 +50,13 @@ export function call({
 }
 
 export function view(_empty: EmptyParameterObject) {
-  /* eslint-disable @typescript-eslint/no-empty-function, @typescript-eslint/ban-types */
+  /* eslint-disable @typescript-eslint/no-empty-function */
   return function (
-    _target: any,
+    _target: unknown,
     _key: string | symbol,
-    _descriptor: TypedPropertyDescriptor<Function>
+    _descriptor: TypedPropertyDescriptor<AnyFunction>
   ): void {};
-  /* eslint-enable @typescript-eslint/no-empty-function, @typescript-eslint/ban-types */
+  /* eslint-enable @typescript-eslint/no-empty-function */
 }
 
 export function NearBindgen({
@@ -64,46 +64,49 @@ export function NearBindgen({
 }: {
   requireInit?: boolean;
 }) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return <T extends { new (...args: any[]): any }>(target: T) => {
     return class extends target {
       static _create() {
         return new target();
       }
 
-      static _getState(): any {
+      static _getState(): unknown | null {
         const rawState = near.storageRead("STATE");
         return rawState ? this._deserialize(rawState) : null;
       }
 
-      /* eslint-disable-next-line @typescript-eslint/ban-types */
-      static _saveToStorage(obj: Object): void {
-        near.storageWrite("STATE", this._serialize(obj));
+      static _saveToStorage(objectToSave: unknown): void {
+        near.storageWrite("STATE", this._serialize(objectToSave));
       }
 
-      static _getArgs(): JSON {
+      static _getArgs(): unknown {
         return JSON.parse(near.input() || "{}");
       }
 
-      /* eslint-disable-next-line @typescript-eslint/ban-types */
-      static _serialize(value: Object): string {
-        return JSON.stringify(value);
-      }
-
-      /* eslint-disable-next-line @typescript-eslint/ban-types */
-      static _deserialize(value: string): Object {
-        return JSON.parse(value);
-      }
-
-      static _reconstruct(classObject: any, plainObject: JSON) {
-        for (const item in classObject) {
-          if (classObject[item].constructor?.reconstruct !== undefined) {
-            classObject[item] = classObject[item].constructor.reconstruct(
-              plainObject[item]
-            );
-          } else {
-            classObject[item] = plainObject[item];
-          }
+      static _serialize(value: unknown, forReturn = false): string {
+        if (forReturn) {
+          return JSON.stringify(value, (_, value) =>
+            typeof value === "bigint" ? `${value}` : value
+          );
         }
+
+        return serialize(value);
+      }
+
+      static _deserialize(value: string): unknown {
+        return deserialize(value);
+      }
+
+      static _reconstruct(classObject: object, plainObject: AnyObject): object {
+        for (const item in classObject) {
+          const reconstructor = classObject[item].constructor?.reconstruct;
+
+          classObject[item] = reconstructor
+            ? reconstructor(plainObject[item])
+            : plainObject[item];
+        }
+
         return classObject;
       }
 

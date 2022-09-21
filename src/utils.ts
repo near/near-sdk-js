@@ -5,6 +5,9 @@ export type PromiseIndex = number | bigint;
 export type NearAmount = number | bigint;
 export type Register = number | bigint;
 
+const BIGINT_KEY = "bigint";
+const BIGINT_BRAND = "tnigib";
+
 export function u8ArrayToBytes(array: Uint8Array): Bytes {
   return array.reduce(
     (result, value) => `${result}${String.fromCharCode(value)}`,
@@ -62,4 +65,32 @@ export function getValueWithOptions<DataType>(
   }
 
   return value as DataType;
+}
+
+export function serialize(valueToSerialize: unknown): string {
+  return JSON.stringify(valueToSerialize, (_, value) => {
+    if (typeof value === "bigint") {
+      return {
+        value: value.toString(),
+        [BIGINT_KEY]: BIGINT_BRAND,
+      };
+    }
+
+    return value;
+  });
+}
+
+export function deserialize(valueToDeserialize: string): unknown {
+  return JSON.parse(valueToDeserialize, (_, value) => {
+    if (
+      value !== null &&
+      typeof value === "object" &&
+      Object.keys(value).length === 2 &&
+      Object.keys(value).every((key) => ["value", BIGINT_KEY].includes(key))
+    ) {
+      return BigInt(value["value"]);
+    }
+
+    return value;
+  });
 }

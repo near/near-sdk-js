@@ -1,4 +1,10 @@
-import { assert, Bytes, getValueWithOptions, Mutable } from "../utils";
+import {
+  assert,
+  Bytes,
+  getValueWithOptions,
+  Mutable,
+  serialize,
+} from "../utils";
 import { Vector, VectorIterator } from "./vector";
 import { LookupMap } from "./lookup-map";
 import { GetOptions } from "../types/collections";
@@ -128,7 +134,7 @@ export class UnorderedMap<DataType> {
   }
 
   serialize(): string {
-    return JSON.stringify(this);
+    return serialize(this);
   }
 
   // converting plain object to class object

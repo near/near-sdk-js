@@ -1,5 +1,11 @@
 import * as near from "../api";
-import { u8ArrayToBytes, bytesToU8Array, Bytes, assert } from "../utils";
+import {
+  u8ArrayToBytes,
+  bytesToU8Array,
+  Bytes,
+  assert,
+  serialize,
+} from "../utils";
 import { Vector, VectorIterator } from "./vector";
 import { Mutable } from "../utils";
 import { GetOptions } from "../types/collections";
@@ -39,12 +45,12 @@ export class UnorderedSet<DataType> {
   }
 
   contains(element: DataType): boolean {
-    const indexLookup = this.elementIndexPrefix + JSON.stringify(element);
+    const indexLookup = this.elementIndexPrefix + serialize(element);
     return near.storageHasKey(indexLookup);
   }
 
   set(element: DataType): boolean {
-    const indexLookup = this.elementIndexPrefix + JSON.stringify(element);
+    const indexLookup = this.elementIndexPrefix + serialize(element);
 
     if (!near.storageRead(indexLookup)) {
       const nextIndex = this.length;
@@ -59,7 +65,7 @@ export class UnorderedSet<DataType> {
   }
 
   remove(element: DataType): boolean {
-    const indexLookup = this.elementIndexPrefix + JSON.stringify(element);
+    const indexLookup = this.elementIndexPrefix + serialize(element);
     const indexRaw = near.storageRead(indexLookup);
 
     if (!indexRaw) {
@@ -89,7 +95,7 @@ export class UnorderedSet<DataType> {
     // reinsert the lookup back.
     if (lastElement !== element) {
       const lastLookupElement =
-        this.elementIndexPrefix + JSON.stringify(lastElement);
+        this.elementIndexPrefix + serialize(lastElement);
       near.storageWrite(lastLookupElement, indexRaw);
     }
 
@@ -101,7 +107,7 @@ export class UnorderedSet<DataType> {
 
   clear(): void {
     for (const element of this.elements) {
-      const indexLookup = this.elementIndexPrefix + JSON.stringify(element);
+      const indexLookup = this.elementIndexPrefix + serialize(element);
       near.storageRemove(indexLookup);
     }
 
@@ -139,7 +145,7 @@ export class UnorderedSet<DataType> {
   }
 
   serialize(): string {
-    return JSON.stringify(this);
+    return serialize(this);
   }
 
   // converting plain object to class object

@@ -11,3 +11,5 @@ export declare type Mutable<T> = {
     -readonly [P in keyof T]: T[P];
 };
 export declare function getValueWithOptions<DataType>(value: unknown, options?: GetOptions<DataType>): DataType | null;
+export declare function serialize(valueToSerialize: unknown): string;
+export declare function deserialize(valueToDeserialize: string): unknown;
