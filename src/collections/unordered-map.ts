@@ -1,26 +1,24 @@
 import {
   assert,
   Bytes,
+  ERR_INCONSISTENT_STATE,
   getValueWithOptions,
   Mutable,
-  serialize,
+  serializeValueWithOptions,
 } from "../utils";
 import { Vector, VectorIterator } from "./vector";
 import { LookupMap } from "./lookup-map";
 import { GetOptions } from "../types/collections";
 
-const ERR_INCONSISTENT_STATE =
-  "The collection is an inconsistent state. Did previous smart contract execution terminate unexpectedly?";
-
-type ValueAndIndex<DataType> = [value: DataType, index: number];
+type ValueAndIndex = [value: string, index: number];
 
 export class UnorderedMap<DataType> {
   readonly keys: Vector<Bytes>;
-  readonly values: LookupMap<ValueAndIndex<DataType>>;
+  readonly values: LookupMap<ValueAndIndex>;
 
   constructor(readonly prefix: Bytes) {
     this.keys = new Vector<Bytes>(`${prefix}u`); // intentional different prefix with old UnorderedMap
-    this.values = new LookupMap<ValueAndIndex<DataType>>(`${prefix}m`);
+    this.values = new LookupMap<ValueAndIndex>(`${prefix}m`);
   }
 
   get length() {
@@ -49,19 +47,19 @@ export class UnorderedMap<DataType> {
     options?: GetOptions<DataType>
   ): DataType | null {
     const valueAndIndex = this.values.get(key);
+    const serialized = serializeValueWithOptions(value, options);
 
     if (valueAndIndex === null) {
-      const nextIndex = this.length;
+      const newElementIndex = this.length;
 
       this.keys.push(key);
-      this.values.set(key, [value, nextIndex]);
+      this.values.set(key, [serialized, newElementIndex]);
 
       return null;
     }
 
-    const [oldValue] = valueAndIndex;
-    valueAndIndex[0] = value;
-    this.values.set(key, valueAndIndex);
+    const [oldValue, oldIndex] = valueAndIndex;
+    this.values.set(key, [serialized, oldIndex]);
 
     return getValueWithOptions(oldValue, options);
   }
@@ -85,10 +83,7 @@ export class UnorderedMap<DataType> {
 
       assert(swappedValueAndIndex !== null, ERR_INCONSISTENT_STATE);
 
-      this.values.set(swappedKey, [
-        getValueWithOptions(swappedValueAndIndex[0], options),
-        index,
-      ]);
+      this.values.set(swappedKey, [swappedValueAndIndex[0], index]);
     }
 
     return getValueWithOptions(value, options);
@@ -133,8 +128,8 @@ export class UnorderedMap<DataType> {
     }
   }
 
-  serialize(): string {
-    return serialize(this);
+  serialize(options?: Pick<GetOptions<DataType>, "serializer">): string {
+    return serializeValueWithOptions(this, options);
   }
 
   // converting plain object to class object
@@ -157,7 +152,7 @@ export class UnorderedMap<DataType> {
 
 class UnorderedMapIterator<DataType> {
   private keys: VectorIterator<Bytes>;
-  private map: LookupMap<ValueAndIndex<DataType>>;
+  private map: LookupMap<ValueAndIndex>;
 
   constructor(
     unorderedMap: UnorderedMap<DataType>,
@@ -167,20 +162,20 @@ class UnorderedMapIterator<DataType> {
     this.map = unorderedMap.values;
   }
 
-  next(): { value: [unknown | null, unknown | null]; done: boolean } {
+  next(): { value: [Bytes | null, DataType | null]; done: boolean } {
     const key = this.keys.next();
 
     if (key.done) {
       return { value: [key.value, null], done: key.done };
     }
 
-    const [value] = this.map.get(key.value);
+    const valueAndIndex = this.map.get(key.value);
 
-    assert(value !== null, ERR_INCONSISTENT_STATE);
+    assert(valueAndIndex !== null, ERR_INCONSISTENT_STATE);
 
     return {
       done: key.done,
-      value: [key.value, getValueWithOptions(value, this.options)],
+      value: [key.value, getValueWithOptions(valueAndIndex[0], this.options)],
     };
   }
 }

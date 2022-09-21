@@ -8,6 +8,6 @@ export declare class LookupMap<DataType> {
     remove(key: Bytes, options?: GetOptions<DataType>): DataType | null;
     set(key: Bytes, newValue: DataType, options?: GetOptions<DataType>): DataType | null;
     extend(keyValuePairs: [Bytes, DataType][], options?: GetOptions<DataType>): void;
-    serialize(): string;
+    serialize(options?: Pick<GetOptions<DataType>, "serializer">): string;
     static reconstruct<DataType>(data: LookupMap<unknown>): LookupMap<DataType>;
 }

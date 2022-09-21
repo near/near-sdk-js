@@ -61,8 +61,12 @@ export function view(_empty: EmptyParameterObject) {
 
 export function NearBindgen({
   requireInit = false,
+  serializer = serialize,
+  deserializer = deserialize,
 }: {
   requireInit?: boolean;
+  serializer?(value: unknown): string;
+  deserializer?(value: string): unknown;
 }) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return <T extends { new (...args: any[]): any }>(target: T) => {
@@ -91,11 +95,11 @@ export function NearBindgen({
           );
         }
 
-        return serialize(value);
+        return serializer(value);
       }
 
       static _deserialize(value: string): unknown {
-        return deserialize(value);
+        return deserializer(value);
       }
 
       static _reconstruct(classObject: object, plainObject: AnyObject): object {

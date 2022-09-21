@@ -2,15 +2,13 @@ import * as near from "../api";
 import {
   assert,
   Bytes,
-  deserialize,
   getValueWithOptions,
-  serialize,
   u8ArrayToBytes,
+  serializeValueWithOptions,
+  ERR_INCONSISTENT_STATE,
+  ERR_INDEX_OUT_OF_BOUNDS,
 } from "../utils";
 import { GetOptions } from "../types/collections";
-const ERR_INDEX_OUT_OF_BOUNDS = "Index out of bounds";
-const ERR_INCONSISTENT_STATE =
-  "The collection is an inconsistent state. Did previous smart contract execution terminate unexpectedly?";
 
 function indexToKey(prefix: Bytes, index: number): Bytes {
   const data = new Uint32Array([index]);
@@ -23,20 +21,22 @@ function indexToKey(prefix: Bytes, index: number): Bytes {
 /// An iterable implementation of vector that stores its content on the trie.
 /// Uses the following map: index -> element
 export class Vector<DataType> {
-  length = 0;
-
-  constructor(readonly prefix: Bytes) {}
+  constructor(readonly prefix: Bytes, public length = 0) {}
 
   isEmpty(): boolean {
     return this.length === 0;
   }
 
-  get(index: number, options?: GetOptions<DataType>): DataType | null {
+  get(
+    index: number,
+    options?: Omit<GetOptions<DataType>, "serializer">
+  ): DataType | null {
     if (index >= this.length) {
-      return null;
+      return options?.defaultValue ?? null;
     }
+
     const storageKey = indexToKey(this.prefix, index);
-    const value = deserialize(near.storageRead(storageKey));
+    const value = near.storageRead(storageKey);
 
     return getValueWithOptions(value, options);
   }
@@ -52,22 +52,29 @@ export class Vector<DataType> {
     }
 
     const key = indexToKey(this.prefix, index);
-    const last = this.pop();
+    const last = this.pop(options);
 
-    assert(near.storageWrite(key, serialize(last)), ERR_INCONSISTENT_STATE);
+    assert(
+      near.storageWrite(key, serializeValueWithOptions(last, options)),
+      ERR_INCONSISTENT_STATE
+    );
 
-    const value = deserialize(near.storageGetEvicted());
+    const value = near.storageGetEvicted();
 
     return getValueWithOptions(value, options);
   }
 
-  push(element: DataType) {
+  push(
+    element: DataType,
+    options?: Pick<GetOptions<DataType>, "serializer">
+  ): void {
     const key = indexToKey(this.prefix, this.length);
     this.length += 1;
-    near.storageWrite(key, serialize(element));
+
+    near.storageWrite(key, serializeValueWithOptions(element, options));
   }
 
-  pop(options?: GetOptions<DataType>): DataType | null {
+  pop(options?: Omit<GetOptions<DataType>, "serializer">): DataType | null {
     if (this.isEmpty()) {
       return options?.defaultValue ?? null;
     }
@@ -78,7 +85,7 @@ export class Vector<DataType> {
 
     assert(near.storageRemove(lastKey), ERR_INCONSISTENT_STATE);
 
-    const value = deserialize(near.storageGetEvicted());
+    const value = near.storageGetEvicted();
 
     return getValueWithOptions(value, options);
   }
@@ -91,9 +98,12 @@ export class Vector<DataType> {
     assert(index < this.length, ERR_INDEX_OUT_OF_BOUNDS);
     const key = indexToKey(this.prefix, index);
 
-    assert(near.storageWrite(key, serialize(element)), ERR_INCONSISTENT_STATE);
+    assert(
+      near.storageWrite(key, serializeValueWithOptions(element, options)),
+      ERR_INCONSISTENT_STATE
+    );
 
-    const value = deserialize(near.storageGetEvicted());
+    const value = near.storageGetEvicted();
 
     return getValueWithOptions(value, options);
   }
@@ -121,8 +131,8 @@ export class Vector<DataType> {
 
     const iterator = options ? this.createIteratorWithOptions(options) : this;
 
-    for (const v of iterator) {
-      array.push(v);
+    for (const value of iterator) {
+      array.push(value);
     }
 
     return array;
@@ -137,28 +147,25 @@ export class Vector<DataType> {
     this.length = 0;
   }
 
-  serialize(): string {
-    return JSON.stringify(this);
+  serialize(options?: Pick<GetOptions<DataType>, "serializer">): string {
+    return serializeValueWithOptions(this, options);
   }
 
   // converting plain object to class object
   static reconstruct<DataType>(data: Vector<DataType>): Vector<DataType> {
-    const vector = new Vector<DataType>(data.prefix);
-    vector.length = data.length;
+    const vector = new Vector<DataType>(data.prefix, data.length);
 
     return vector;
   }
 }
 
 export class VectorIterator<DataType> {
-  private current: number;
+  private current = 0;
 
   constructor(
     private vector: Vector<DataType>,
     private readonly options?: GetOptions<DataType>
-  ) {
-    this.current = 0;
-  }
+  ) {}
 
   next(): {
     value: DataType | null;

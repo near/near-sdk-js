@@ -7,8 +7,10 @@ export declare function call({ privateFunction, payableFunction, }: {
     payableFunction?: boolean;
 }): (_target: unknown, _key: string | symbol, descriptor: TypedPropertyDescriptor<AnyFunction>) => void;
 export declare function view(_empty: EmptyParameterObject): (_target: unknown, _key: string | symbol, _descriptor: TypedPropertyDescriptor<AnyFunction>) => void;
-export declare function NearBindgen({ requireInit, }: {
+export declare function NearBindgen({ requireInit, serializer, deserializer, }: {
     requireInit?: boolean;
+    serializer?(value: unknown): string;
+    deserializer?(value: string): unknown;
 }): <T extends new (...args: any[]) => any>(target: T) => {
     new (...args: any[]): {
         [x: string]: any;

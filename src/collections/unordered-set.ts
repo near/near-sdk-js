@@ -4,14 +4,12 @@ import {
   bytesToU8Array,
   Bytes,
   assert,
-  serialize,
+  serializeValueWithOptions,
+  ERR_INCONSISTENT_STATE,
 } from "../utils";
 import { Vector, VectorIterator } from "./vector";
 import { Mutable } from "../utils";
 import { GetOptions } from "../types/collections";
-
-const ERR_INCONSISTENT_STATE =
-  "The collection is an inconsistent state. Did previous smart contract execution terminate unexpectedly?";
 
 function serializeIndex(index: number) {
   const data = new Uint32Array([index]);
@@ -44,28 +42,37 @@ export class UnorderedSet<DataType> {
     return this.elements.isEmpty();
   }
 
-  contains(element: DataType): boolean {
-    const indexLookup = this.elementIndexPrefix + serialize(element);
+  contains(
+    element: DataType,
+    options?: Pick<GetOptions<DataType>, "serializer">
+  ): boolean {
+    const indexLookup =
+      this.elementIndexPrefix + serializeValueWithOptions(element, options);
     return near.storageHasKey(indexLookup);
   }
 
-  set(element: DataType): boolean {
-    const indexLookup = this.elementIndexPrefix + serialize(element);
+  set(
+    element: DataType,
+    options?: Pick<GetOptions<DataType>, "serializer">
+  ): boolean {
+    const indexLookup =
+      this.elementIndexPrefix + serializeValueWithOptions(element, options);
 
-    if (!near.storageRead(indexLookup)) {
-      const nextIndex = this.length;
-      const nextIndexRaw = serializeIndex(nextIndex);
-      near.storageWrite(indexLookup, nextIndexRaw);
-      this.elements.push(element);
-
-      return true;
+    if (near.storageRead(indexLookup)) {
+      return false;
     }
 
-    return false;
+    const nextIndex = this.length;
+    const nextIndexRaw = serializeIndex(nextIndex);
+    near.storageWrite(indexLookup, nextIndexRaw);
+    this.elements.push(element, options);
+
+    return true;
   }
 
-  remove(element: DataType): boolean {
-    const indexLookup = this.elementIndexPrefix + serialize(element);
+  remove(element: DataType, options?: GetOptions<DataType>): boolean {
+    const indexLookup =
+      this.elementIndexPrefix + serializeValueWithOptions(element, options);
     const indexRaw = near.storageRead(indexLookup);
 
     if (!indexRaw) {
@@ -85,7 +92,7 @@ export class UnorderedSet<DataType> {
 
     // If there is more than one element then swap remove swaps it with the last
     // element.
-    const lastElement = this.elements.get(this.length - 1);
+    const lastElement = this.elements.get(this.length - 1, options);
 
     assert(!!lastElement, ERR_INCONSISTENT_STATE);
 
@@ -95,7 +102,8 @@ export class UnorderedSet<DataType> {
     // reinsert the lookup back.
     if (lastElement !== element) {
       const lastLookupElement =
-        this.elementIndexPrefix + serialize(lastElement);
+        this.elementIndexPrefix +
+        serializeValueWithOptions(lastElement, options);
       near.storageWrite(lastLookupElement, indexRaw);
     }
 
@@ -105,9 +113,10 @@ export class UnorderedSet<DataType> {
     return true;
   }
 
-  clear(): void {
+  clear(options?: Pick<GetOptions<DataType>, "serializer">): void {
     for (const element of this.elements) {
-      const indexLookup = this.elementIndexPrefix + serialize(element);
+      const indexLookup =
+        this.elementIndexPrefix + serializeValueWithOptions(element, options);
       near.storageRemove(indexLookup);
     }
 
@@ -144,8 +153,8 @@ export class UnorderedSet<DataType> {
     }
   }
 
-  serialize(): string {
-    return serialize(this);
+  serialize(options?: Pick<GetOptions<DataType>, "serializer">): string {
+    return serializeValueWithOptions(this, options);
   }
 
   // converting plain object to class object

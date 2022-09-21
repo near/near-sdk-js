@@ -7,6 +7,9 @@ export type Register = number | bigint;
 
 const BIGINT_KEY = "bigint";
 const BIGINT_BRAND = "tnigib";
+export const ERR_INCONSISTENT_STATE =
+  "The collection is an inconsistent state. Did previous smart contract execution terminate unexpectedly?";
+export const ERR_INDEX_OUT_OF_BOUNDS = "Index out of bounds";
 
 export function u8ArrayToBytes(array: Uint8Array): Bytes {
   return array.reduce(
@@ -53,18 +56,31 @@ export function assert(expression: boolean, message: string): void {
 export type Mutable<T> = { -readonly [P in keyof T]: T[P] };
 
 export function getValueWithOptions<DataType>(
-  value: unknown,
-  options?: GetOptions<DataType>
+  value: string,
+  options: Omit<GetOptions<DataType>, "serializer"> = {
+    deserializer: deserialize,
+  }
 ): DataType | null {
-  if (value === undefined || value === null) {
+  const deserialized = deserialize(value);
+
+  if (deserialized === undefined || deserialized === null) {
     return options?.defaultValue ?? null;
   }
 
   if (options?.reconstructor) {
-    return options.reconstructor(value);
+    return options.reconstructor(deserialized);
   }
 
-  return value as DataType;
+  return deserialized as DataType;
+}
+
+export function serializeValueWithOptions<DataType>(
+  value: DataType,
+  { serializer }: Pick<GetOptions<DataType>, "serializer"> = {
+    serializer: serialize,
+  }
+): string {
+  return serializer(value);
 }
 
 export function serialize(valueToSerialize: unknown): string {
