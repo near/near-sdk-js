@@ -86,7 +86,8 @@ export function deserialize(valueToDeserialize: string): unknown {
       value !== null &&
       typeof value === "object" &&
       Object.keys(value).length === 2 &&
-      Object.keys(value).every((key) => ["value", BIGINT_KEY].includes(key))
+      Object.keys(value).every((key) => ["value", BIGINT_KEY].includes(key)) &&
+      value[BIGINT_KEY] === BIGINT_BRAND
     ) {
       return BigInt(value["value"]);
     }
