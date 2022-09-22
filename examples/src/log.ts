@@ -1,5 +1,5 @@
 import { near } from "near-sdk-js";
 
-export function log(msg: any) {
+export function log(msg: unknown) {
   near.log(msg);
 }

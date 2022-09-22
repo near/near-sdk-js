@@ -1,4 +1,4 @@
-import { near, bytes, types } from "near-sdk-js";
+import { near, bytes } from "near-sdk-js";
 import { CurveType, PublicKey } from "near-sdk-js/lib/types";
 import { assert } from "near-sdk-js/lib/utils";
 

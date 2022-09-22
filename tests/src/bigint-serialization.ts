@@ -1,7 +1,7 @@
-import { near, NearBindgen, call, view, initialize } from "near-sdk-js";
+import { near, NearBindgen, call, view } from "near-sdk-js";
 
 @NearBindgen({})
-class BigIntSerializationTest {
+export class BigIntSerializationTest {
   bigintField: bigint;
 
   constructor() {

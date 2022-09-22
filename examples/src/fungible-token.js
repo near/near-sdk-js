@@ -9,7 +9,7 @@ import {
 } from "near-sdk-js";
 
 @NearBindgen({ initRequired: true })
-class FungibleToken {
+export class FungibleToken {
   constructor() {
     this.accounts = new LookupMap("a");
     this.totalSupply = 0;
@@ -40,7 +40,7 @@ class FungibleToken {
     this.totalSupply = newSupply.toString();
   }
 
-  internalTransfer({ senderId, receiverId, amount, memo }) {
+  internalTransfer({ senderId, receiverId, amount, memo: _ }) {
     assert(senderId != receiverId, "Sender and receiver should be different");
     let amountInt = BigInt(amount);
     assert(amountInt > 0n, "The amount should be a positive number");

@@ -1,8 +1,8 @@
-import { NearBindgen, call, view, UnorderedMap, near } from "near-sdk-js";
+import { NearBindgen, call, view, UnorderedMap } from "near-sdk-js";
 import { House, Room } from "./model.js";
 
 @NearBindgen({})
-class UnorderedMapTestContract {
+export class UnorderedMapTestContract {
   constructor() {
     this.unorderedMap = new UnorderedMap("a");
   }

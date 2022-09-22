@@ -4,7 +4,7 @@ import { NearBindgen, call, view, near } from "near-sdk-js";
  * Simple contract to test function parameters
  */
 @NearBindgen({})
-class FunctionParamsTestContract {
+export class FunctionParamsTestContract {
   constructor() {
     this.val1 = "default1";
     this.val2 = "default2";

@@ -287,7 +287,7 @@ test("promise delete account", async (t) => {
 });
 
 test("promise batch function call weight", async (t) => {
-  const { ali, caller2Contract, calleeContract } = t.context.accounts;
+  const { ali, caller2Contract } = t.context.accounts;
   let r = await ali.callRaw(
     caller2Contract,
     "test_promise_batch_call_weight",

@@ -1,7 +1,7 @@
 import { NearBindgen, call, near, assert, initialize } from "near-sdk-js";
 
 @NearBindgen({ requireInit: true })
-class NftContract {
+export class NftContract {
   constructor() {
     this.nonFungibleTokenAccountId = "";
   }
