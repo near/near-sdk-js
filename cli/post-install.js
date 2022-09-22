@@ -2,6 +2,19 @@ import { executeCommand, download } from "./utils.js";
 import os from "os";
 import fs from "fs";
 
+console.log("Changing dir to /cli");
+process.chdir("./cli");
+
+console.log("Cleaning deps...");
+if (fs.existsSync("deps")) {
+  fs.rmdirSync("deps", { recursive: true });
+}
+fs.mkdirSync("deps");
+
+console.log("Changing dir to /deps");
+process.chdir("./deps");
+
+console.log("Checking platform and architecture...");
 const PLATFORM = os.platform();
 const ARCH = os.arch();
 
@@ -21,7 +34,6 @@ if (!SUPPORTED_ARCH.includes(ARCH)) {
 }
 
 console.log("Installing wasi-stub...");
-
 const BINARYEN_VERSION = `0.1.10`;
 const BINARYEN_VERSION_TAG = `v${BINARYEN_VERSION}`;
 const BINARYEN_SYSTEM_NAME =
