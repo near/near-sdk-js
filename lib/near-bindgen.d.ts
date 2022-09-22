@@ -1,6 +1,6 @@
 declare type EmptyParameterObject = Record<never, never>;
 declare type AnyObject = Record<string, unknown>;
-declare type DecoratorFunction = <Function extends (...args: any) => any>(target: object, key: string | symbol, descriptor: TypedPropertyDescriptor<Function>) => void;
+declare type DecoratorFunction = <AnyFunction extends (...args: any) => any>(target: object, key: string | symbol, descriptor: TypedPropertyDescriptor<AnyFunction>) => void;
 export declare function initialize(_empty: EmptyParameterObject): DecoratorFunction;
 export declare function view(_empty: EmptyParameterObject): DecoratorFunction;
 export declare function call({ privateFunction, payableFunction, }: {

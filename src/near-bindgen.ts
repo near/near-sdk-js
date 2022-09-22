@@ -3,26 +3,29 @@ import { deserialize, serialize } from "./utils";
 
 type EmptyParameterObject = Record<never, never>;
 type AnyObject = Record<string, unknown>;
-type DecoratorFunction = <Function extends (...args: any) => any>(
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type DecoratorFunction = <AnyFunction extends (...args: any) => any>(
   target: object,
   key: string | symbol,
-  descriptor: TypedPropertyDescriptor<Function>
+  descriptor: TypedPropertyDescriptor<AnyFunction>
 ) => void;
 
 export function initialize(_empty: EmptyParameterObject): DecoratorFunction {
-  return function <Function extends (...args: any) => any>(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return function <AnyFunction extends (...args: any) => any>(
     _target: object,
     _key: string | symbol,
-    _descriptor: TypedPropertyDescriptor<Function>
+    _descriptor: TypedPropertyDescriptor<AnyFunction>
     // eslint-disable-next-line @typescript-eslint/no-empty-function
   ): void {};
 }
 
 export function view(_empty: EmptyParameterObject): DecoratorFunction {
-  return function <Function extends (...args: any) => any>(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return function <AnyFunction extends (...args: any) => any>(
     _target: object,
     _key: string | symbol,
-    _descriptor: TypedPropertyDescriptor<Function>
+    _descriptor: TypedPropertyDescriptor<AnyFunction>
     // eslint-disable-next-line @typescript-eslint/no-empty-function
   ): void {};
 }
@@ -34,17 +37,19 @@ export function call({
   privateFunction?: boolean;
   payableFunction?: boolean;
 }): DecoratorFunction {
-  return function <Function extends (...args: any) => any>(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return function <AnyFunction extends (...args: any) => any>(
     _target: object,
     _key: string | symbol,
-    descriptor: TypedPropertyDescriptor<Function>
+    descriptor: TypedPropertyDescriptor<AnyFunction>
   ): void {
     const originalMethod = descriptor.value;
 
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     descriptor.value = function (
-      ...args: Parameters<Function>
-    ): ReturnType<Function> {
+      ...args: Parameters<AnyFunction>
+    ): ReturnType<AnyFunction> {
       if (
         privateFunction &&
         near.predecessorAccountId() !== near.currentAccountId()
