@@ -1,3 +1,4 @@
+"use strict";
 import * as t from "@babel/types";
 
 const methodTypes = ["call", "view", "initialize"];
@@ -165,8 +166,51 @@ function executePromise(classId) {
   );
 }
 
+function createDeclaration(classId, methodName, methodType) {
+  return t.exportNamedDeclaration(
+    t.functionDeclaration(
+      t.identifier(methodName),
+      [],
+      t.blockStatement([
+        // Read the state of the contract from storage.
+        // const _state = Counter._getState();
+        readState(classId),
+        // Throw if initialized on any subsequent init function calls.
+        // if (_state) { throw new Error('Contract already initialized'); }
+        preventDoubleInit(methodType),
+        // Throw if NOT initialized on any non init function calls.
+        // if (!_state) { throw new Error('Contract must be initialized'); }
+        ensureInitBeforeCall(classId, methodType),
+        // Create instance of contract by calling _create function.
+        // let _contract = Counter._create();
+        initializeContractClass(classId),
+        // Reconstruct the contract with the state if the state is valid.
+        // if (_state) { Counter._reconstruct(_contract, _state); }
+        reconstructState(classId, methodType),
+        // Collect the arguments sent to the function.
+        // const _args = Counter._getArgs();
+        collectArguments(classId),
+        // Perform the actual function call to the appropriate contract method.
+        // const _result = _contract.method(args);
+        callContractMethod(methodName),
+        // If the method called is either an initialize or call method type, save the changes to storage.
+        // Counter._saveToStorage(_contract);
+        saveToStorage(classId, methodType),
+        // If a NearPromise is returned from the function call the onReturn method to execute the promise.
+        // if (_result !== undefined)
+        //   if (_result && _result.constructor && _result.constructor.name === 'NearPromise')
+        //     _result.onReturn();
+        //   else
+        //     near.valueReturn(_contract._serialize(result));
+        executePromise(classId),
+      ])
+    )
+  );
+}
+
 export default function () {
   return {
+    /** @type {import('@babel/traverse').Visitor} */
     visitor: {
       ClassDeclaration(path) {
         const classNode = path.node;
@@ -175,10 +219,7 @@ export default function () {
           classNode.decorators &&
           classNode.decorators[0].expression.callee.name === "NearBindgen"
         ) {
-          const classId = classNode.id;
-          const contractMethods = {};
-
-          for (let child of classNode.body.body) {
+          classNode.body.body.forEach((child) => {
             if (
               child.type === "ClassMethod" &&
               child.kind === "method" &&
@@ -187,55 +228,14 @@ export default function () {
               const methodType = child.decorators[0].expression.callee.name;
 
               if (methodTypes.includes(methodType)) {
-                contractMethods[child.key.name] = methodType;
+                path.insertAfter(
+                  createDeclaration(classNode.id, child.key.name, methodType)
+                );
+
+                console.log(`Babel ${child.key.name} method export done`);
               }
             }
-          }
-
-          for (let methodName of Object.keys(contractMethods)) {
-            path.insertAfter(
-              t.exportNamedDeclaration(
-                t.functionDeclaration(
-                  t.identifier(methodName),
-                  [],
-                  t.blockStatement([
-                    // Read the state of the contract from storage.
-                    // const _state = Counter._getState();
-                    readState(classId),
-                    // Throw if initialized on any subsequent init function calls.
-                    // if (_state) { throw new Error('Contract already initialized'); }
-                    preventDoubleInit(contractMethods[methodName]),
-                    // Throw if NOT initialized on any non init function calls.
-                    // if (!_state) { throw new Error('Contract must be initialized'); }
-                    ensureInitBeforeCall(classId, contractMethods[methodName]),
-                    // Create instance of contract by calling _create function.
-                    // let _contract = Counter._create();
-                    initializeContractClass(classId),
-                    // Reconstruct the contract with the state if the state is valid.
-                    // if (_state) { Counter._reconstruct(_contract, _state); }
-                    reconstructState(classId, contractMethods[methodName]),
-                    // Collect the arguments sent to the function.
-                    // const _args = Counter._getArgs();
-                    collectArguments(classId),
-                    // Perform the actual function call to the appropriate contract method.
-                    // const _result = _contract.method(args);
-                    callContractMethod(methodName),
-                    // If the method called is either an initialize or call method type, save the changes to storage.
-                    // Counter._saveToStorage(_contract);
-                    saveToStorage(classId, contractMethods[methodName]),
-                    // If a NearPromise is returned from the function call the onReturn method to execute the promise.
-                    // if (_result !== undefined)
-                    //   if (_result && _result.constructor && _result.constructor.name === 'NearPromise')
-                    //     _result.onReturn();
-                    //   else
-                    //     near.valueReturn(_contract._serialize(result));
-                    executePromise(classId),
-                  ])
-                )
-              )
-            );
-            console.log(`Babel ${methodName} method export done`);
-          }
+          });
         }
       },
     },

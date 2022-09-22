@@ -1,12 +1,12 @@
 declare type EmptyParameterObject = Record<never, never>;
 declare type AnyObject = Record<string, unknown>;
-declare type AnyFunction = (...args: unknown[]) => unknown;
-export declare function initialize(_empty: EmptyParameterObject): (_target: unknown, _key: string | symbol, _descriptor: TypedPropertyDescriptor<AnyFunction>) => void;
+declare type DecoratorFunction = <Function extends (...args: any) => any>(target: object, key: string | symbol, descriptor: TypedPropertyDescriptor<Function>) => void;
+export declare function initialize(_empty: EmptyParameterObject): DecoratorFunction;
+export declare function view(_empty: EmptyParameterObject): DecoratorFunction;
 export declare function call({ privateFunction, payableFunction, }: {
     privateFunction?: boolean;
     payableFunction?: boolean;
-}): (_target: unknown, _key: string | symbol, descriptor: TypedPropertyDescriptor<AnyFunction>) => void;
-export declare function view(_empty: EmptyParameterObject): (_target: unknown, _key: string | symbol, _descriptor: TypedPropertyDescriptor<AnyFunction>) => void;
+}): DecoratorFunction;
 export declare function NearBindgen({ requireInit, serializer, deserializer, }: {
     requireInit?: boolean;
     serializer?(value: unknown): string;

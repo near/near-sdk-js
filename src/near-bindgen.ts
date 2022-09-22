@@ -3,21 +3,28 @@ import { deserialize, serialize } from "./utils";
 
 type EmptyParameterObject = Record<never, never>;
 type AnyObject = Record<string, unknown>;
-type AnyFunction = (...args: unknown[]) => unknown;
-// type DecoratorFunction = (
-//   target: AnyObject,
-//   key: string | symbol,
-//   descriptor: TypedPropertyDescriptor<Function>
-// ) => void;
+type DecoratorFunction = <Function extends (...args: any) => any>(
+  target: object,
+  key: string | symbol,
+  descriptor: TypedPropertyDescriptor<Function>
+) => void;
 
-export function initialize(_empty: EmptyParameterObject) {
-  /* eslint-disable @typescript-eslint/no-empty-function */
-  return function (
-    _target: unknown,
+export function initialize(_empty: EmptyParameterObject): DecoratorFunction {
+  return function <Function extends (...args: any) => any>(
+    _target: object,
     _key: string | symbol,
-    _descriptor: TypedPropertyDescriptor<AnyFunction>
+    _descriptor: TypedPropertyDescriptor<Function>
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
   ): void {};
-  /* eslint-enable @typescript-eslint/no-empty-function */
+}
+
+export function view(_empty: EmptyParameterObject): DecoratorFunction {
+  return function <Function extends (...args: any) => any>(
+    _target: object,
+    _key: string | symbol,
+    _descriptor: TypedPropertyDescriptor<Function>
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+  ): void {};
 }
 
 export function call({
@@ -26,37 +33,32 @@ export function call({
 }: {
   privateFunction?: boolean;
   payableFunction?: boolean;
-}) {
-  return function (
-    _target: unknown,
+}): DecoratorFunction {
+  return function <Function extends (...args: any) => any>(
+    _target: object,
     _key: string | symbol,
-    descriptor: TypedPropertyDescriptor<AnyFunction>
+    descriptor: TypedPropertyDescriptor<Function>
   ): void {
     const originalMethod = descriptor.value;
 
-    descriptor.value = function (...args: unknown[]) {
+    // @ts-ignore
+    descriptor.value = function (
+      ...args: Parameters<Function>
+    ): ReturnType<Function> {
       if (
         privateFunction &&
         near.predecessorAccountId() !== near.currentAccountId()
       ) {
-        throw Error("Function is private");
+        throw new Error("Function is private");
       }
-      if (!payableFunction && near.attachedDeposit() > BigInt(0)) {
-        throw Error("Function is not payable");
+
+      if (!payableFunction && near.attachedDeposit() > 0n) {
+        throw new Error("Function is not payable");
       }
+
       return originalMethod.apply(this, args);
     };
   };
-}
-
-export function view(_empty: EmptyParameterObject) {
-  /* eslint-disable @typescript-eslint/no-empty-function */
-  return function (
-    _target: unknown,
-    _key: string | symbol,
-    _descriptor: TypedPropertyDescriptor<AnyFunction>
-  ): void {};
-  /* eslint-enable @typescript-eslint/no-empty-function */
 }
 
 export function NearBindgen({
