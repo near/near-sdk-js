@@ -22,3 +22,7 @@ export async function executeCommand(command, silent = false) {
 
   console.log(stdout);
 }
+
+export async function download(url) {
+  await executeCommand(`curl -LOf ${url}`);
+}

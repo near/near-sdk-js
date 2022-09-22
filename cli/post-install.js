@@ -1,9 +1,6 @@
-import { executeCommand } from "./utils.js";
+import { executeCommand, download } from "./utils.js";
 import os from "os";
-
-async function download(url) {
-  await executeCommand(`curl -LOf ${url}`);
-}
+import fs from "fs";
 
 const PLATFORM = os.platform();
 const ARCH = os.arch();
@@ -43,10 +40,14 @@ const BINARYEN_TAR_NAME = `binaryen-${BINARYEN_SYSTEM_NAME}-${BINARYEN_ARCH_NAME
 await download(
   `https://github.com/near/binaryen/releases/download/${BINARYEN_VERSION_TAG}/${BINARYEN_TAR_NAME}`
 );
+
+fs.mkdirSync("binaryen");
+
 await executeCommand(
-  `mkdir -p binaryen && tar xvf ${BINARYEN_TAR_NAME} --directory binaryen`
+  `tar xvf ${BINARYEN_TAR_NAME} --directory binaryen`
 );
-await executeCommand(`rm ${BINARYEN_TAR_NAME}`);
+
+fs.rmSync(BINARYEN_TAR_NAME);
 
 console.log("Installing QuickJS...");
 
@@ -79,18 +80,16 @@ await download(
 await executeCommand(`tar xvf ${QUICK_JS_TAR_NAME}`);
 
 // Delete .tar file
-await executeCommand(`rm ${QUICK_JS_TAR_NAME}`);
+fs.rmSync(QUICK_JS_TAR_NAME);
 
 // Delete version from folder name
-await executeCommand(
-  `mv ${QUICK_JS_DOWNLOADED_FOLDER_NAME} ${QUICK_JS_TARGET_FOLDER_NAME}`
-);
+fs.renameSync(QUICK_JS_DOWNLOADED_FOLDER_NAME, QUICK_JS_TARGET_FOLDER_NAME);
 
 // Rename qjsc file
-await executeCommand(`mv ${QUICK_JS_DOWNLOADED_NAME} ${QUICK_JS_TARGET_NAME}`);
+fs.renameSync(QUICK_JS_DOWNLOADED_NAME, QUICK_JS_TARGET_NAME);
 
 // chmod qjsc
-await executeCommand(`chmod 777 ${QUICK_JS_TARGET_NAME}`);
+fs.chmodSync(QUICK_JS_TARGET_NAME, 0o755);
 
 console.log("Installing wasi-sdk...");
 
@@ -116,7 +115,7 @@ await download(
 await executeCommand(`tar xvf ${WASI_SDK_TAR_NAME}`);
 
 // Delete .tar file
-await executeCommand(`rm ${WASI_SDK_TAR_NAME}`);
+fs.rmSync(WASI_SDK_TAR_NAME);
 
 // Delete version from folder name
-await executeCommand(`mv ${WASI_SDK_DOWNLOADED_FOLDER_NAME} wasi-sdk`);
+fs.renameSync(WASI_SDK_DOWNLOADED_FOLDER_NAME, 'wasi-sdk');
