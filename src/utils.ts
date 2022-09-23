@@ -5,8 +5,12 @@ export type PromiseIndex = number | bigint;
 export type NearAmount = number | bigint;
 export type Register = number | bigint;
 
-const BIGINT_KEY = "bigint";
-const BIGINT_BRAND = "tnigib";
+const TYPE_KEY = "typeInfo";
+enum TypeBrand {
+  BIGINT = "bigint",
+  DATE = "date",
+}
+
 export const ERR_INCONSISTENT_STATE =
   "The collection is an inconsistent state. Did previous smart contract execution terminate unexpectedly?";
 export const ERR_INDEX_OUT_OF_BOUNDS = "Index out of bounds";
@@ -84,11 +88,20 @@ export function serializeValueWithOptions<DataType>(
 }
 
 export function serialize(valueToSerialize: unknown): string {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  Date.prototype.toJSON = function () {
+    return {
+      value: this.toISOString(),
+      [TYPE_KEY]: TypeBrand.DATE,
+    };
+  };
+
   return JSON.stringify(valueToSerialize, (_, value) => {
     if (typeof value === "bigint") {
       return {
         value: value.toString(),
-        [BIGINT_KEY]: BIGINT_BRAND,
+        [TYPE_KEY]: TypeBrand.BIGINT,
       };
     }
 
@@ -102,10 +115,14 @@ export function deserialize(valueToDeserialize: string): unknown {
       value !== null &&
       typeof value === "object" &&
       Object.keys(value).length === 2 &&
-      Object.keys(value).every((key) => ["value", BIGINT_KEY].includes(key)) &&
-      value[BIGINT_KEY] === BIGINT_BRAND
+      Object.keys(value).every((key) => ["value", TYPE_KEY].includes(key))
     ) {
-      return BigInt(value["value"]);
+      switch (value[TYPE_KEY]) {
+        case TypeBrand.BIGINT:
+          return BigInt(value["value"]);
+        case TypeBrand.DATE:
+          return new Date(value["value"]);
+      }
     }
 
     return value;

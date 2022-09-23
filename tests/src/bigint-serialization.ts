@@ -10,7 +10,7 @@ export class BigIntSerializationTest {
 
   @view({})
   getBigintField(): bigint {
-    near.log(`getStatus: ${this.bigintField}`);
+    near.log(`getBigintField: ${this.bigintField}`);
     return this.bigintField;
   }
 
