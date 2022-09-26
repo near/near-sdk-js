@@ -7,8 +7,8 @@ export function bytes_for_approved_account_id(account_id: string): number {
 }
 
 export function refund_approved_account_ids_iter(account_id: string, approved_account_ids: string[]): void {
-  let storage_released = approved_account_ids.map(bytes_for_approved_account_id).reduce((a, b) => a + b)
-  let promise_id = near.promiseBatchCreate(account_id)
+  const storage_released = approved_account_ids.map(bytes_for_approved_account_id).reduce((a, b) => a + b)
+  const promise_id = near.promiseBatchCreate(account_id)
   near.promiseBatchActionTransfer(promise_id, BigInt(storage_released) * near.storageByteCost())
   near.promiseReturn(promise_id)
 }
@@ -18,14 +18,14 @@ export function refund_approved_account_ids(account_id: AccountId, approved_acco
 }
 
 export function refund_deposit_to_account(storage_used: bigint, account_id: string): void {
-  let required_cost = near.storageByteCost() * storage_used
-  let attached_deposit = near.attachedDeposit()
+  const required_cost = near.storageByteCost() * storage_used
+  const attached_deposit = near.attachedDeposit()
 
   assert(required_cost <= attached_deposit, `Must attach ${required_cost} yoctoNEAR to cover storage`)
 
-  let refund = attached_deposit - required_cost
+  const refund = attached_deposit - required_cost
   if (refund > 1n) {
-    let promise_id = near.promiseBatchCreate(account_id)
+    const promise_id = near.promiseBatchCreate(account_id)
     near.promiseBatchActionTransfer(promise_id, refund)
     near.promiseReturn(promise_id)
   }

@@ -35,7 +35,7 @@ export class NonFungibleToken implements NonFungibleTokenCore, NonFungibleTokenR
     let approvals_by_id: Option<LookupMap>
     let next_approval_id_by_id: Option<LookupMap>
     if (approval_prefix) {
-      let prefix = approval_prefix.into_storage_key()
+      const prefix = approval_prefix.into_storage_key()
       approvals_by_id = new LookupMap(prefix)
       next_approval_id_by_id = new LookupMap(prefix)
     } else {
@@ -56,10 +56,10 @@ export class NonFungibleToken implements NonFungibleTokenCore, NonFungibleTokenR
   }
 
   measure_min_token_storage_cost() {
-    let initial_storage_usage = near.storageUsage()
+    const initial_storage_usage = near.storageUsage()
     // 64 Length because this is the max account id length
-    let tmp_token_id = repeat('a', 64)
-    let tmp_owner_id = repeat('a', 64)
+    const tmp_token_id = repeat('a', 64)
+    const tmp_owner_id = repeat('a', 64)
 
     // 1. set some dummy data
     this.owner_by_id.set(tmp_token_id, tmp_owner_id)
@@ -83,19 +83,19 @@ export class NonFungibleToken implements NonFungibleTokenCore, NonFungibleTokenR
       )
     }
     if (this.tokens_per_owner) {
-      let u = new UnorderedSet(new TokensPerOwner(near.sha256(tmp_owner_id)).into_storage_key())
+      const u = new UnorderedSet(new TokensPerOwner(near.sha256(tmp_owner_id)).into_storage_key())
       u.set(tmp_token_id)
       this.tokens_per_owner.set(tmp_owner_id, u)
     }
     if (this.approvals_by_id) {
-      let approvals = {}
+      const approvals = {}
       approvals[tmp_owner_id] = 1n
       this.approvals_by_id.set(tmp_token_id, approvals)
     }
     if (this.next_approval_id_by_id) {
       this.next_approval_id_by_id.set(tmp_token_id, 1n)
     }
-    let u = new UnorderedSet(new TokenPerOwnerInner(hash_account_id(tmp_owner_id)).into_storage_key())
+    const u = new UnorderedSet(new TokenPerOwnerInner(hash_account_id(tmp_owner_id)).into_storage_key())
     if (this.tokens_per_owner) {
       this.tokens_per_owner.set(tmp_owner_id, u)
     }
@@ -125,11 +125,11 @@ export class NonFungibleToken implements NonFungibleTokenCore, NonFungibleTokenR
     this.owner_by_id.set(token_id, to)
 
     if (this.tokens_per_owner) {
-      let owner_tokens = this.tokens_per_owner.get(from)
+      const owner_tokens = this.tokens_per_owner.get(from)
       if (owner_tokens == null) {
         throw new Error('Unable to access tokens per owner in unguarded call.')
       }
-      let owner_tokens_set = UnorderedSet.deserialize(owner_tokens as UnorderedSet)
+      const owner_tokens_set = UnorderedSet.deserialize(owner_tokens as UnorderedSet)
       if (owner_tokens_set.isEmpty()) {
         this.tokens_per_owner.remove(from)
       } else {
@@ -154,12 +154,12 @@ export class NonFungibleToken implements NonFungibleTokenCore, NonFungibleTokenR
     approval_id: Option<bigint>,
     memo: Option<string>
   ): [string, Map<string, bigint> | null] {
-    let owner_id = this.owner_by_id.get(token_id)
+    const owner_id = this.owner_by_id.get(token_id)
     if (owner_id == null) {
       throw new Error('Token not found')
     }
 
-    let approved_account_ids = this.approvals_by_id?.remove(token_id)
+    const approved_account_ids = this.approvals_by_id?.remove(token_id)
 
     let sender_id_authorized: Option<string>
     if (sender_id != owner_id) {
@@ -167,7 +167,7 @@ export class NonFungibleToken implements NonFungibleTokenCore, NonFungibleTokenR
         throw new Error('Unauthorized')
       }
 
-      let actual_approval_id = (approved_account_ids as any)[sender_id]
+      const actual_approval_id = (approved_account_ids as any)[sender_id]
       if (!actual_approval_id) {
         throw new Error('Sender not approved')
       }
@@ -203,7 +203,7 @@ export class NonFungibleToken implements NonFungibleTokenCore, NonFungibleTokenR
   }
 
   internal_mint(token_id: string, token_owner_id: string, token_metadata: Option<TokenMetadata>): Token {
-    let token = this.internal_mint_with_refund(token_id, token_owner_id, token_metadata, near.predecessorAccountId())
+    const token = this.internal_mint_with_refund(token_id, token_owner_id, token_metadata, near.predecessorAccountId())
     new NftMint(token.owner_id, [token.token_id], null).emit()
     return token
   }
@@ -225,7 +225,7 @@ export class NonFungibleToken implements NonFungibleTokenCore, NonFungibleTokenR
       throw new Error('token_id must be unique')
     }
 
-    let owner_id = token_owner_id
+    const owner_id = token_owner_id
     this.owner_by_id.set(token_id, owner_id)
     this.token_metadata_by_id?.set(token_id, token_metadata)
     if (this.tokens_per_owner) {
@@ -235,9 +235,9 @@ export class NonFungibleToken implements NonFungibleTokenCore, NonFungibleTokenR
       this.tokens_per_owner.set(owner_id, token_ids)
     }
 
-    let approved_account_ids = this.approvals_by_id ? new Map<AccountId, bigint>() : null
+    const approved_account_ids = this.approvals_by_id ? new Map<AccountId, bigint>() : null
     if (initial_storage_usage) {
-      let [id, storage_usage] = initial_storage_usage
+      const [id, storage_usage] = initial_storage_usage
       refund_deposit_to_account(near.storageUsage() - storage_usage, id)
     }
     return new Token(token_id, owner_id, token_metadata, approved_account_ids)
@@ -245,7 +245,7 @@ export class NonFungibleToken implements NonFungibleTokenCore, NonFungibleTokenR
 
   nft_transfer(receiver_id: string, token_id: string, approval_id: Option<bigint>, memo: Option<string>) {
     assertOneYocto()
-    let sender_id = near.predecessorAccountId()
+    const sender_id = near.predecessorAccountId()
     this.internal_transfer(sender_id, receiver_id, token_id, approval_id, memo)
   }
 
@@ -257,18 +257,18 @@ export class NonFungibleToken implements NonFungibleTokenCore, NonFungibleTokenR
     msg: string
   ) {
     assertOneYocto()
-    let sender_id = near.predecessorAccountId()
-    let [old_owner, old_approvals] = this.internal_transfer(sender_id, receiver_id, token_id, approval_id, memo)
+    const sender_id = near.predecessorAccountId()
+    const [old_owner, old_approvals] = this.internal_transfer(sender_id, receiver_id, token_id, approval_id, memo)
     // TODO: ext_nft_receiver
   }
 
   nft_token(token_id: string): Option<Token> {
-    let owner_id = this.owner_by_id.get(token_id) as Option<AccountId>
+    const owner_id = this.owner_by_id.get(token_id) as Option<AccountId>
     if (owner_id == null) {
       return null
     }
-    let metadata = this.token_metadata_by_id?.get(token_id) as Option<TokenMetadata>
-    let approved_account_ids =
+    const metadata = this.token_metadata_by_id?.get(token_id) as Option<TokenMetadata>
+    const approved_account_ids =
       (this.approvals_by_id?.get(token_id) as Option<Map<AccountId, bigint>>) || new Map<AccountId, bigint>()
     return new Token(token_id, owner_id, metadata, approved_account_ids)
   }
@@ -280,14 +280,14 @@ export class NonFungibleToken implements NonFungibleTokenCore, NonFungibleTokenR
     approved_account_ids: Option<Map<string, bigint>>
   ): boolean {
     let must_revert: boolean
-    let p = near.promiseResult(0)
+    const p = near.promiseResult(0)
     if (p === PromiseResult.NotReady) {
       throw new Error()
     } else if (p === PromiseResult.Failed) {
       must_revert = true
     } else {
       try {
-        let yes_or_no = JSON.parse(p as Bytes)
+        const yes_or_no = JSON.parse(p as Bytes)
         if (typeof yes_or_no == 'boolean') {
           must_revert = yes_or_no
         } else {
@@ -302,7 +302,7 @@ export class NonFungibleToken implements NonFungibleTokenCore, NonFungibleTokenR
       return true
     }
 
-    let current_owner = this.owner_by_id.get(token_id) as Option<AccountId>
+    const current_owner = this.owner_by_id.get(token_id) as Option<AccountId>
     if (current_owner) {
       if (current_owner != receiver_id) {
         return true
