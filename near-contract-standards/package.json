@@ -1,26 +1,25 @@
 {
-    "name": "near-contract-standards",
-    "version": "1.0.0",
-    "description": "Compatible near-contract-standards implementation in JS",
-    "main": "index.js",
-    "type": "module",
-    "scripts": {
-      "build": "yarn build:non-fungible-token",
-      "rebuild": "cd .. && yarn build && cd near-contract-standards && rm -rf node_modules && rm -rf build && yarn && yarn build",
-      "build:non-fungible-token": "near-sdk build src/non-fungible-token-receiver.js build/non-fungible-token-receiver.wasm && near-sdk build src/non-fungible-token.js build/non-fungible-token.wasm",
-      "test": "ava",
-      "test:non-fungible-token": "ava __tests__/test-non-fungible-token.ava.js"
-    },
-    "author": "Near Inc <hello@nearprotocol.com>",
-    "license": "Apache-2.0",
-    "dependencies": {
-      "lodash-es": "^4.17.21",
-      "near-sdk-js": "file:../"
-    },
-    "devDependencies": {
-      "ava": "^4.2.0",
-      "typescript": "^4.7.4",
-      "near-workspaces": "2.0.0"
-    }
+  "name": "near-contract-standards",
+  "version": "1.0.0",
+  "description": "Compatible near-contract-standards implementation in JS",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "build": "yarn build:non-fungible-token",
+    "rebuild": "cd .. && yarn build && cd near-contract-standards && rm -rf node_modules && rm -rf build && yarn && yarn build",
+    "build:non-fungible-token": "near-sdk build src/non-fungible-token-receiver.js build/non-fungible-token-receiver.wasm && near-sdk build src/non-fungible-token.js build/non-fungible-token.wasm",
+    "test": "ava",
+    "test:non-fungible-token": "ava __tests__/test-non-fungible-token.ava.js"
+  },
+  "author": "Near Inc <hello@nearprotocol.com>",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "lodash-es": "^4.17.21",
+    "near-sdk-js": "file:../"
+  },
+  "devDependencies": {
+    "ava": "^4.2.0",
+    "typescript": "^4.7.4",
+    "near-workspaces": "2.0.0"
   }
-  
+}

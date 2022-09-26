@@ -1,5 +1,5 @@
 name: Examples
-on: 
+on:
   pull_request:
   push:
     branches:
@@ -15,7 +15,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
-          node-version: "16"
+          node-version: '16'
       - name: Install dependencies
         run: yarn && cd examples && yarn
       - name: clean-state

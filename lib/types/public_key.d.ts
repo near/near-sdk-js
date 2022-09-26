@@ -1,4 +1,4 @@
-import { Bytes } from "../utils";
+import { Bytes } from '../utils';
 export declare enum CurveType {
     ED25519 = 0,
     SECP256K1 = 1
