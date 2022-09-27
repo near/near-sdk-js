@@ -16,7 +16,7 @@ export const ERR_INCONSISTENT_STATE =
 export const ERR_INDEX_OUT_OF_BOUNDS = "Index out of bounds";
 
 const ACCOUNT_ID_REGEX =
-  /^(([a-z\d]+[\-_])*[a-z\d]+\.)*([a-z\d]+[\-_])*[a-z\d]+$/;
+  /^(([a-z\d]+[-_])*[a-z\d]+\.)*([a-z\d]+[-_])*[a-z\d]+$/;
 
 export function u8ArrayToBytes(array: Uint8Array): Bytes {
   return array.reduce(
