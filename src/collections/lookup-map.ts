@@ -1,6 +1,10 @@
 import * as near from "../api";
 import { GetOptions } from "../types/collections";
-import { Bytes, getValueWithOptions } from "../utils";
+import {
+  Bytes,
+  getValueWithOptions,
+  serializeValueWithOptions,
+} from "../utils";
 
 export class LookupMap<DataType> {
   constructor(readonly keyPrefix: Bytes) {}
@@ -12,7 +16,7 @@ export class LookupMap<DataType> {
 
   get(key: Bytes, options?: GetOptions<DataType>): DataType | null {
     const storageKey = this.keyPrefix + key;
-    const value = JSON.parse(near.storageRead(storageKey));
+    const value = near.storageRead(storageKey);
 
     return getValueWithOptions(value, options);
   }
@@ -24,7 +28,7 @@ export class LookupMap<DataType> {
       return options?.defaultValue ?? null;
     }
 
-    const value = JSON.parse(near.storageGetEvicted());
+    const value = near.storageGetEvicted();
 
     return getValueWithOptions(value, options);
   }
@@ -35,13 +39,13 @@ export class LookupMap<DataType> {
     options?: GetOptions<DataType>
   ): DataType | null {
     const storageKey = this.keyPrefix + key;
-    const storageValue = JSON.stringify(newValue);
+    const storageValue = serializeValueWithOptions(newValue, options);
 
     if (!near.storageWrite(storageKey, storageValue)) {
       return options?.defaultValue ?? null;
     }
 
-    const value = JSON.parse(near.storageGetEvicted());
+    const value = near.storageGetEvicted();
 
     return getValueWithOptions(value, options);
   }
@@ -55,8 +59,8 @@ export class LookupMap<DataType> {
     }
   }
 
-  serialize(): string {
-    return JSON.stringify(this);
+  serialize(options?: Pick<GetOptions<DataType>, "serializer">): string {
+    return serializeValueWithOptions(this, options);
   }
 
   // converting plain object to class object

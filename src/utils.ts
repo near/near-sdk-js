@@ -5,6 +5,19 @@ export type PromiseIndex = number | bigint;
 export type NearAmount = number | bigint;
 export type Register = number | bigint;
 
+const TYPE_KEY = "typeInfo";
+enum TypeBrand {
+  BIGINT = "bigint",
+  DATE = "date",
+}
+
+export const ERR_INCONSISTENT_STATE =
+  "The collection is an inconsistent state. Did previous smart contract execution terminate unexpectedly?";
+export const ERR_INDEX_OUT_OF_BOUNDS = "Index out of bounds";
+
+const ACCOUNT_ID_REGEX =
+  /^(([a-z\d]+[-_])*[a-z\d]+\.)*([a-z\d]+[-_])*[a-z\d]+$/;
+
 export function u8ArrayToBytes(array: Uint8Array): Bytes {
   return array.reduce(
     (result, value) => `${result}${String.fromCharCode(value)}`,
@@ -50,16 +63,88 @@ export function assert(expression: boolean, message: string): void {
 export type Mutable<T> = { -readonly [P in keyof T]: T[P] };
 
 export function getValueWithOptions<DataType>(
-  value: unknown,
-  options?: GetOptions<DataType>
+  value: string,
+  options: Omit<GetOptions<DataType>, "serializer"> = {
+    deserializer: deserialize,
+  }
 ): DataType | null {
-  if (value === undefined || value === null) {
+  const deserialized = deserialize(value);
+
+  if (deserialized === undefined || deserialized === null) {
     return options?.defaultValue ?? null;
   }
 
   if (options?.reconstructor) {
-    return options.reconstructor(value);
+    return options.reconstructor(deserialized);
   }
 
-  return value as DataType;
+  return deserialized as DataType;
+}
+
+export function serializeValueWithOptions<DataType>(
+  value: DataType,
+  { serializer }: Pick<GetOptions<DataType>, "serializer"> = {
+    serializer: serialize,
+  }
+): string {
+  return serializer(value);
+}
+
+export function serialize(valueToSerialize: unknown): string {
+  return JSON.stringify(valueToSerialize, function (key, value) {
+    if (typeof value === "bigint") {
+      return {
+        value: value.toString(),
+        [TYPE_KEY]: TypeBrand.BIGINT,
+      };
+    }
+
+    if (
+      typeof this[key] === "object" &&
+      this[key] !== null &&
+      this[key] instanceof Date
+    ) {
+      return {
+        value: this[key].toISOString(),
+        [TYPE_KEY]: TypeBrand.DATE,
+      };
+    }
+
+    return value;
+  });
+}
+
+export function deserialize(valueToDeserialize: string): unknown {
+  return JSON.parse(valueToDeserialize, (_, value) => {
+    if (
+      value !== null &&
+      typeof value === "object" &&
+      Object.keys(value).length === 2 &&
+      Object.keys(value).every((key) => ["value", TYPE_KEY].includes(key))
+    ) {
+      switch (value[TYPE_KEY]) {
+        case TypeBrand.BIGINT:
+          return BigInt(value["value"]);
+        case TypeBrand.DATE:
+          return new Date(value["value"]);
+      }
+    }
+
+    return value;
+  });
+}
+
+/**
+ * Validates the Account ID according to the NEAR protocol
+ * [Account ID rules](https://nomicon.io/DataStructures/Account#account-id-rules).
+ *
+ * @param accountId - The Account ID string you want to validate.
+ * @returns boolean
+ */
+export function validateAccountId(accountId: string): boolean {
+  return (
+    accountId.length >= 2 &&
+    accountId.length <= 64 &&
+    ACCOUNT_ID_REGEX.test(accountId)
+  );
 }

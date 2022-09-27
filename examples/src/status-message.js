@@ -1,7 +1,7 @@
 import { NearBindgen, call, view, near } from "near-sdk-js";
 
 @NearBindgen({})
-class StatusMessage {
+export class StatusMessage {
   constructor() {
     this.records = {};
   }

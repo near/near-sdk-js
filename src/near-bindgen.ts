@@ -1,21 +1,33 @@
 import * as near from "./api";
+import { deserialize, serialize } from "./utils";
 
 type EmptyParameterObject = Record<never, never>;
-// type AnyObject = Record<string, unknown>;
-// type DecoratorFunction = (
-//   target: AnyObject,
-//   key: string | symbol,
-//   descriptor: TypedPropertyDescriptor<Function>
-// ) => void;
+type AnyObject = Record<string, unknown>;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type DecoratorFunction = <AnyFunction extends (...args: any) => any>(
+  target: object,
+  key: string | symbol,
+  descriptor: TypedPropertyDescriptor<AnyFunction>
+) => void;
 
-export function initialize(_empty: EmptyParameterObject) {
-  /* eslint-disable @typescript-eslint/no-empty-function, @typescript-eslint/ban-types */
-  return function (
-    _target: any,
+export function initialize(_empty: EmptyParameterObject): DecoratorFunction {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return function <AnyFunction extends (...args: any) => any>(
+    _target: object,
     _key: string | symbol,
-    _descriptor: TypedPropertyDescriptor<Function>
+    _descriptor: TypedPropertyDescriptor<AnyFunction>
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
   ): void {};
-  /* eslint-enable @typescript-eslint/no-empty-function, @typescript-eslint/ban-types */
+}
+
+export function view(_empty: EmptyParameterObject): DecoratorFunction {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return function <AnyFunction extends (...args: any) => any>(
+    _target: object,
+    _key: string | symbol,
+    _descriptor: TypedPropertyDescriptor<AnyFunction>
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+  ): void {};
 }
 
 export function call({
@@ -24,86 +36,88 @@ export function call({
 }: {
   privateFunction?: boolean;
   payableFunction?: boolean;
-}) {
-  /* eslint-disable @typescript-eslint/ban-types */
-  return function (
-    _target: any,
+}): DecoratorFunction {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return function <AnyFunction extends (...args: any) => any>(
+    _target: object,
     _key: string | symbol,
-    descriptor: TypedPropertyDescriptor<Function>
+    descriptor: TypedPropertyDescriptor<AnyFunction>
   ): void {
-    /* eslint-enable @typescript-eslint/ban-types */
     const originalMethod = descriptor.value;
 
-    descriptor.value = function (...args: unknown[]) {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    descriptor.value = function (
+      ...args: Parameters<AnyFunction>
+    ): ReturnType<AnyFunction> {
       if (
         privateFunction &&
         near.predecessorAccountId() !== near.currentAccountId()
       ) {
-        throw Error("Function is private");
+        throw new Error("Function is private");
       }
-      if (!payableFunction && near.attachedDeposit() > BigInt(0)) {
-        throw Error("Function is not payable");
+
+      if (!payableFunction && near.attachedDeposit() > 0n) {
+        throw new Error("Function is not payable");
       }
+
       return originalMethod.apply(this, args);
     };
   };
 }
 
-export function view(_empty: EmptyParameterObject) {
-  /* eslint-disable @typescript-eslint/no-empty-function, @typescript-eslint/ban-types */
-  return function (
-    _target: any,
-    _key: string | symbol,
-    _descriptor: TypedPropertyDescriptor<Function>
-  ): void {};
-  /* eslint-enable @typescript-eslint/no-empty-function, @typescript-eslint/ban-types */
-}
-
 export function NearBindgen({
   requireInit = false,
+  serializer = serialize,
+  deserializer = deserialize,
 }: {
   requireInit?: boolean;
+  serializer?(value: unknown): string;
+  deserializer?(value: string): unknown;
 }) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return <T extends { new (...args: any[]): any }>(target: T) => {
     return class extends target {
       static _create() {
         return new target();
       }
 
-      static _getState(): any {
+      static _getState(): unknown | null {
         const rawState = near.storageRead("STATE");
         return rawState ? this._deserialize(rawState) : null;
       }
 
-      /* eslint-disable-next-line @typescript-eslint/ban-types */
-      static _saveToStorage(obj: Object): void {
-        near.storageWrite("STATE", this._serialize(obj));
+      static _saveToStorage(objectToSave: unknown): void {
+        near.storageWrite("STATE", this._serialize(objectToSave));
       }
 
-      static _getArgs(): JSON {
+      static _getArgs(): unknown {
         return JSON.parse(near.input() || "{}");
       }
 
-      /* eslint-disable-next-line @typescript-eslint/ban-types */
-      static _serialize(value: Object): string {
-        return JSON.stringify(value);
-      }
-
-      /* eslint-disable-next-line @typescript-eslint/ban-types */
-      static _deserialize(value: string): Object {
-        return JSON.parse(value);
-      }
-
-      static _reconstruct(classObject: any, plainObject: JSON) {
-        for (const item in classObject) {
-          if (classObject[item].constructor?.reconstruct !== undefined) {
-            classObject[item] = classObject[item].constructor.reconstruct(
-              plainObject[item]
-            );
-          } else {
-            classObject[item] = plainObject[item];
-          }
+      static _serialize(value: unknown, forReturn = false): string {
+        if (forReturn) {
+          return JSON.stringify(value, (_, value) =>
+            typeof value === "bigint" ? `${value}` : value
+          );
         }
+
+        return serializer(value);
+      }
+
+      static _deserialize(value: string): unknown {
+        return deserializer(value);
+      }
+
+      static _reconstruct(classObject: object, plainObject: AnyObject): object {
+        for (const item in classObject) {
+          const reconstructor = classObject[item].constructor?.reconstruct;
+
+          classObject[item] = reconstructor
+            ? reconstructor(plainObject[item])
+            : plainObject[item];
+        }
+
         return classObject;
       }
 

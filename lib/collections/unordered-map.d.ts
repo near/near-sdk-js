@@ -2,11 +2,11 @@ import { Bytes } from "../utils";
 import { Vector } from "./vector";
 import { LookupMap } from "./lookup-map";
 import { GetOptions } from "../types/collections";
-declare type ValueAndIndex<DataType> = [value: DataType, index: number];
+declare type ValueAndIndex = [value: string, index: number];
 export declare class UnorderedMap<DataType> {
     readonly prefix: Bytes;
     readonly keys: Vector<Bytes>;
-    readonly values: LookupMap<ValueAndIndex<DataType>>;
+    readonly values: LookupMap<ValueAndIndex>;
     constructor(prefix: Bytes);
     get length(): number;
     isEmpty(): boolean;
@@ -18,7 +18,7 @@ export declare class UnorderedMap<DataType> {
     private createIteratorWithOptions;
     toArray(options?: GetOptions<DataType>): [Bytes, DataType][];
     extend(keyValuePairs: [Bytes, DataType][]): void;
-    serialize(): string;
+    serialize(options?: Pick<GetOptions<DataType>, "serializer">): string;
     static reconstruct<DataType>(data: UnorderedMap<DataType>): UnorderedMap<DataType>;
 }
 declare class UnorderedMapIterator<DataType> {
@@ -27,7 +27,7 @@ declare class UnorderedMapIterator<DataType> {
     private map;
     constructor(unorderedMap: UnorderedMap<DataType>, options?: GetOptions<DataType>);
     next(): {
-        value: [unknown | null, unknown | null];
+        value: [Bytes | null, DataType | null];
         done: boolean;
     };
 }

@@ -8,7 +8,7 @@ import {
 } from "near-sdk-js";
 
 @NearBindgen({})
-class StatusMessage {
+export class StatusMessage {
   constructor() {
     this.records = new UnorderedMap("a");
     this.uniqueValues = new LookupSet("b");

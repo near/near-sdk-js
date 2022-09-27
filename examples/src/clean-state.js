@@ -1,7 +1,7 @@
 import { NearBindgen, call, view, near } from "near-sdk-js";
 
 @NearBindgen({})
-class CleanState {
+export class CleanState {
   @call({})
   clean({ keys }) {
     keys.forEach((key) => near.storageRemove(key));

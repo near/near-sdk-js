@@ -2,7 +2,7 @@ import { NearBindgen, call, view, LookupSet } from "near-sdk-js";
 import { House, Room } from "./model.js";
 
 @NearBindgen({})
-class LookupSetTestContract {
+export class LookupSetTestContract {
   constructor() {
     this.lookupSet = new LookupSet("a");
   }

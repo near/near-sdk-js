@@ -28,7 +28,7 @@ test.afterEach.always(async (t) => {
 });
 
 test("Vector is empty by default", async (t) => {
-  const { root, vectorContract } = t.context.accounts;
+  const { vectorContract } = t.context.accounts;
   let result = await vectorContract.view("len", {});
   t.is(result, 0);
   t.is(await vectorContract.view("isEmpty", {}), true);
