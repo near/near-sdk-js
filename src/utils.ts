@@ -15,6 +15,9 @@ export const ERR_INCONSISTENT_STATE =
   "The collection is an inconsistent state. Did previous smart contract execution terminate unexpectedly?";
 export const ERR_INDEX_OUT_OF_BOUNDS = "Index out of bounds";
 
+const ACCOUNT_ID_REGEX =
+  /^(([a-z\d]+[\-_])*[a-z\d]+\.)*([a-z\d]+[\-_])*[a-z\d]+$/;
+
 export function u8ArrayToBytes(array: Uint8Array): Bytes {
   return array.reduce(
     (result, value) => `${result}${String.fromCharCode(value)}`,
@@ -88,20 +91,22 @@ export function serializeValueWithOptions<DataType>(
 }
 
 export function serialize(valueToSerialize: unknown): string {
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  Date.prototype.toJSON = function () {
-    return {
-      value: this.toISOString(),
-      [TYPE_KEY]: TypeBrand.DATE,
-    };
-  };
-
-  return JSON.stringify(valueToSerialize, (_, value) => {
+  return JSON.stringify(valueToSerialize, function (key, value) {
     if (typeof value === "bigint") {
       return {
         value: value.toString(),
         [TYPE_KEY]: TypeBrand.BIGINT,
+      };
+    }
+
+    if (
+      typeof this[key] === "object" &&
+      this[key] !== null &&
+      this[key] instanceof Date
+    ) {
+      return {
+        value: this[key].toISOString(),
+        [TYPE_KEY]: TypeBrand.DATE,
       };
     }
 
@@ -127,4 +132,19 @@ export function deserialize(valueToDeserialize: string): unknown {
 
     return value;
   });
+}
+
+/**
+ * Validates the Account ID according to the NEAR protocol
+ * [Account ID rules](https://nomicon.io/DataStructures/Account#account-id-rules).
+ *
+ * @param accountId - The Account ID string you want to validate.
+ * @returns boolean
+ */
+export function validateAccountId(accountId: string): boolean {
+  return (
+    accountId.length >= 2 &&
+    accountId.length <= 64 &&
+    ACCOUNT_ID_REGEX.test(accountId)
+  );
 }

@@ -16,3 +16,11 @@ export declare function getValueWithOptions<DataType>(value: string, options?: O
 export declare function serializeValueWithOptions<DataType>(value: DataType, { serializer }?: Pick<GetOptions<DataType>, "serializer">): string;
 export declare function serialize(valueToSerialize: unknown): string;
 export declare function deserialize(valueToDeserialize: string): unknown;
+/**
+ * Validates the Account ID according to the NEAR protocol
+ * [Account ID rules](https://nomicon.io/DataStructures/Account#account-id-rules).
+ *
+ * @param accountId - The Account ID string you want to validate.
+ * @returns boolean
+ */
+export declare function validateAccountId(accountId: string): boolean;
