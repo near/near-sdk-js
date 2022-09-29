@@ -37,7 +37,7 @@ export function get_epoch_height() {
 }
 
 export function get_attached_deposit() {
-  near.valueReturn(near.attachedDeposit());
+  near.valueReturn(JSON.stringify(near.attachedDeposit().toString()));
 }
 
 export function get_prepaid_gas() {

@@ -103,7 +103,13 @@ test("get attached deposit", async (t) => {
   let r = await carl.call(contextApiContract, "get_attached_deposit", "", {
     attachedDeposit: 3,
   });
-  t.is(r, 3);
+  t.is(r, "3");
+
+  for (let i = 1; i < 10; i++) {
+    // 1 NEAR, 2 NEAR, ..., 10 NEAR
+    let r = await carl.call(contextApiContract, 'get_attached_deposit', {}, {attachedDeposit: i.toString()+'000000000000000000000000'});
+    t.is(r, i.toString()+'000000000000000000000000')
+  }
 });
 
 test("get prepaid gas", async (t) => {
