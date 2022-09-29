@@ -1,13 +1,24 @@
-import { UnorderedMap, LookupMap, Bytes, near, UnorderedSet, assert } from 'near-sdk-js'
+import { UnorderedMap, LookupMap, Bytes, near, UnorderedSet, assert } from 'near-sdk-js/lib/index'
+import { PromiseResult } from 'near-sdk-js/lib/types/index'
 import { assertOneYocto, IntoStorageKey, Option } from 'near-sdk-js/lib/utils'
 import { TokenMetadata } from '../metadata'
 import { hash_account_id, refund_approved_account_ids, refund_deposit, refund_deposit_to_account } from '../utils'
 import { NftMint, NftTransfer } from '../events'
-import { Token } from '../token'
-import { NonFungibleTokenCore } from '.'
-import { AccountId } from 'near-sdk-js/lib/types'
 import { NonFungibleTokenResolver } from './resolver'
-import { PromiseResult } from '../../../../lib/api'
+import { AccountId } from 'near-sdk-js/lib/types/index'
+import { Token, TokenId } from '../token'
+
+export interface NonFungibleTokenCore {
+  nft_transfer(receiver_id: AccountId, token_id: TokenId, approval_id: Option<bigint>, memo: Option<string>)
+  nft_transfer_call(
+    receiver_id: AccountId,
+    token_id: TokenId,
+    approval_id: Option<bigint>,
+    memo: Option<string>,
+    msg: string
+  )
+  nft_token(token_id: TokenId): Option<Token>
+}
 
 const GAS_FOR_RESOLVE_TRANSFER = 5_000_000_000_000n
 const GAS_FOR_NFT_TRANSFER_CALL = 25_000_000_000_000n + GAS_FOR_RESOLVE_TRANSFER
@@ -19,11 +30,11 @@ function repeat(str: string, n: number) {
 export class NonFungibleToken implements NonFungibleTokenCore, NonFungibleTokenResolver {
   public owner_id: string
   public extra_storage_in_bytes_per_token: bigint
-  public owner_by_id: UnorderedMap
-  public token_metadata_by_id: Option<LookupMap>
-  public tokens_per_owner: Option<LookupMap>
-  public approvals_by_id: Option<LookupMap>
-  public next_approval_id_by_id: Option<LookupMap>
+  public owner_by_id: UnorderedMap<AccountId>
+  public token_metadata_by_id: Option<LookupMap<TokenMetadata>>
+  public tokens_per_owner: Option<LookupMap<UnorderedSet<string>>>
+  public approvals_by_id: Option<LookupMap<{[approvals: string]: bigint}>>
+  public next_approval_id_by_id: Option<LookupMap<bigint>>
 
   constructor(
     owner_by_id_prefix: IntoStorageKey,
@@ -32,8 +43,8 @@ export class NonFungibleToken implements NonFungibleTokenCore, NonFungibleTokenR
     enumeration_prefix: Option<IntoStorageKey>,
     approval_prefix: Option<IntoStorageKey>
   ) {
-    let approvals_by_id: Option<LookupMap>
-    let next_approval_id_by_id: Option<LookupMap>
+    let approvals_by_id: Option<LookupMap<{[approvals: string]: bigint}>>
+    let next_approval_id_by_id: Option<LookupMap<bigint>>
     if (approval_prefix) {
       const prefix = approval_prefix.into_storage_key()
       approvals_by_id = new LookupMap(prefix)
@@ -83,7 +94,7 @@ export class NonFungibleToken implements NonFungibleTokenCore, NonFungibleTokenR
       )
     }
     if (this.tokens_per_owner) {
-      const u = new UnorderedSet(new TokensPerOwner(near.sha256(tmp_owner_id)).into_storage_key())
+      const u = new UnorderedSet<string>(new TokensPerOwner(near.sha256(tmp_owner_id)).into_storage_key())
       u.set(tmp_token_id)
       this.tokens_per_owner.set(tmp_owner_id, u)
     }
@@ -95,7 +106,7 @@ export class NonFungibleToken implements NonFungibleTokenCore, NonFungibleTokenR
     if (this.next_approval_id_by_id) {
       this.next_approval_id_by_id.set(tmp_token_id, 1n)
     }
-    const u = new UnorderedSet(new TokenPerOwnerInner(hash_account_id(tmp_owner_id)).into_storage_key())
+    const u = new UnorderedSet<string>(new TokenPerOwnerInner(hash_account_id(tmp_owner_id)).into_storage_key())
     if (this.tokens_per_owner) {
       this.tokens_per_owner.set(tmp_owner_id, u)
     }
