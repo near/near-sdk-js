@@ -1,10 +1,8 @@
-"use strict";
+import { Node, Visitor } from "@babel/traverse";
 import * as t from "@babel/types";
 
 /**
  * A list of supported method types/decorators.
- *
- * @type {string[]}
  */
 const methodTypes = ["call", "view", "initialize"];
 
@@ -12,11 +10,9 @@ const methodTypes = ["call", "view", "initialize"];
  * A helper function that inserts a new throw Error statement with
  * the passed message.
  *
- * @param message {string} - The message to throw inside the error
- *
- * @returns {t.BlockStatement}
+ * @param message - The message to throw inside the error
  */
-function throwError(message) {
+function throwError(message: string): t.BlockStatement {
   return t.blockStatement([
     t.throwStatement(
       t.newExpression(t.identifier("Error"), [t.stringLiteral(message)])
@@ -32,11 +28,9 @@ function throwError(message) {
  * const _state = Contract._getState();
  * ```
  *
- * @param classId {string} - The class ID of the class which we are extending.
- *
- * @returns {t.VariableDeclaration}
+ * @param classId - The class ID of the class which we are extending.
  */
-function readState(classId) {
+function readState(classId: t.Identifier): t.VariableDeclaration {
   return t.variableDeclaration("const", [
     t.variableDeclarator(
       t.identifier("_state"),
@@ -57,11 +51,11 @@ function readState(classId) {
  * }
  * ```
  *
- * @param methodType {string} - The type of the method being called.
- *
- * @returns {t.EmptyStatement | t.IfStatement}
+ * @param methodType - The type of the method being called.
  */
-function preventDoubleInit(methodType) {
+function preventDoubleInit(
+  methodType: string
+): t.EmptyStatement | t.IfStatement {
   if (methodType !== "initialize") {
     return t.emptyStatement();
   }
@@ -81,12 +75,15 @@ function preventDoubleInit(methodType) {
  * }
  * ```
  *
- * @param classId {string} - The class ID of the class being extended.
- * @param methodType {string} - The type of the method being called.
+ * @param classId - The class ID of the class being extended.
+ * @param methodType - The type of the method being called.
  *
  * @returns {t.EmptyStatement | t.IfStatement}
  */
-function ensureInitBeforeCall(classId, methodType) {
+function ensureInitBeforeCall(
+  classId: t.Identifier,
+  methodType: string
+): t.EmptyStatement | t.IfStatement {
   if (!["call", "view"].includes(methodType)) {
     return t.emptyStatement();
   }
@@ -113,11 +110,9 @@ function ensureInitBeforeCall(classId, methodType) {
  * let _contract = Contract._create();
  * ```
  *
- * @param classId {string} - The class ID of the class being extended.
- *
- * @returns {t.VariableDeclaration}
+ * @param classId - The class ID of the class being extended.
  */
-function initializeContractClass(classId) {
+function initializeContractClass(classId: t.Identifier): t.VariableDeclaration {
   return t.variableDeclaration("const", [
     t.variableDeclarator(
       t.identifier("_contract"),
@@ -135,12 +130,13 @@ function initializeContractClass(classId) {
  *   Contract._reconstruct(_contract, _state);
  * }
  * ```
- * @param classId {string} - The class ID of the class being extended.
- * @param methodType {string} - The type of the method being called.
- *
- * @returns {t.EmptyStatement | t.IfStatement}
+ * @param classId - The class ID of the class being extended.
+ * @param methodType - The type of the method being called.
  */
-function reconstructState(classId, methodType) {
+function reconstructState(
+  classId: t.Identifier,
+  methodType: string
+): t.EmptyStatement | t.IfStatement {
   if (!["call", "view"].includes(methodType)) {
     return t.emptyStatement();
   }
@@ -165,11 +161,9 @@ function reconstructState(classId, methodType) {
  * ```typescript
  * const _args = Contract._getArgs();
  * ```
- * @param classId {string} - The class ID of the class being extended.
- *
- * @returns {t.VariableDeclaration}
+ * @param classId - The class ID of the class being extended.
  */
-function collectArguments(classId) {
+function collectArguments(classId: t.Identifier): t.VariableDeclaration {
   return t.variableDeclaration("const", [
     t.variableDeclarator(
       t.identifier("_args"),
@@ -189,11 +183,9 @@ function collectArguments(classId) {
  * const _result = _contract.method(args);
  * ```
  *
- * @param methodType {string} - The type of the method being called.
- *
- * @returns {t.VariableDeclaration}
+ * @param methodName - The name of the method being called.
  */
-function callContractMethod(methodName) {
+function callContractMethod(methodName: string): t.VariableDeclaration {
   return t.variableDeclaration("const", [
     t.variableDeclarator(
       t.identifier("_result"),
@@ -213,12 +205,13 @@ function callContractMethod(methodName) {
  * Contract._saveToStorage(_contract);
  * ```
  *
- * @param classId {string} - The class ID of the class being extended.
- * @param methodType {string} - The type of the method being called.
- *
- * @returns {t.EmptyStatement | t.ExpressionStatement}
+ * @param classId - The class ID of the class being extended.
+ * @param methodType - The type of the method being called.
  */
-function saveToStorage(classId, methodType) {
+function saveToStorage(
+  classId: t.Identifier,
+  methodType: string
+): t.EmptyStatement | t.ExpressionStatement {
   if (!["initialize", "call"].includes(methodType)) {
     return t.emptyStatement();
   }
@@ -246,11 +239,9 @@ function saveToStorage(classId, methodType) {
  * }
  * ```
  *
- * @param classId {string} - The class ID of the class being extended.
- *
- * @returns {t.EmptyStatement | t.ExpressionStatement}
+ * @param classId - The class ID of the class being extended.
  */
-function executePromise(classId) {
+function executePromise(classId: t.Identifier): t.IfStatement {
   return t.ifStatement(
     t.binaryExpression(
       "!==",
@@ -304,13 +295,15 @@ function executePromise(classId) {
 /**
  * A helper function that inserts the overriden function declaration into the class.
  *
- * @param classId {string} - The class ID of the class being extended.
- * @param methodName {string} - The name of the method being called.
- * @param methodType {string} - The type of the method being called.
- *
- * @returns {t.ExportNamedDeclaration}
+ * @param classId - The class ID of the class being extended.
+ * @param methodName - The name of the method being called.
+ * @param methodType - The type of the method being called.
  */
-function createDeclaration(classId, methodName, methodType) {
+function createDeclaration(
+  classId: t.Identifier,
+  methodName: string,
+  methodType: string
+): t.ExportNamedDeclaration {
   return t.exportNamedDeclaration(
     t.functionDeclaration(
       t.identifier(methodName),
@@ -352,9 +345,8 @@ function createDeclaration(classId, methodName, methodType) {
   );
 }
 
-export default function () {
+export default function (): { visitor: Visitor } {
   return {
-    /** @type {import('@babel/traverse').Visitor} */
     visitor: {
       ClassDeclaration(path) {
         // Capture the node of the current path.
@@ -363,6 +355,8 @@ export default function () {
         // Check that the class is decorated with NearBindgen otherwise do nothing.
         if (
           classNode.decorators &&
+          "callee" in classNode.decorators[0].expression &&
+          "name" in classNode.decorators[0].expression.callee &&
           classNode.decorators[0].expression.callee.name === "NearBindgen"
         ) {
           // Iterate over the children of the class node.
@@ -371,16 +365,22 @@ export default function () {
             if (
               child.type === "ClassMethod" &&
               child.kind === "method" &&
-              child.decorators
+              child.decorators &&
+              "callee" in child.decorators[0].expression &&
+              "name" in child.decorators[0].expression.callee
             ) {
               // Capture the decorator name.
               const methodType = child.decorators[0].expression.callee.name;
 
               // Check that the decorator is one of the supported method types.
-              if (methodTypes.includes(methodType)) {
+              if (methodTypes.includes(methodType) && "name" in child.key) {
                 // Insert the method override into the class declaration.
                 path.insertAfter(
-                  createDeclaration(classNode.id, child.key.name, methodType)
+                  createDeclaration(
+                    classNode.id as t.Identifier,
+                    child.key.name,
+                    methodType
+                  ) as Node
                 );
 
                 console.log(`Babel ${child.key.name} method export done`);
