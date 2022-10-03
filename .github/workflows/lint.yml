@@ -1,0 +1,30 @@
+name: Lint
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+      - develop
+jobs:
+  lint:
+    strategy:
+      matrix:
+        platform: [ubuntu-latest]
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "16"
+      - name: Install modules
+        run: yarn
+      - name: Run lint
+        run: yarn lint
+      - name: Format code
+        run: yarn format
+      - name: Run git status
+        run: git status
+      - name: Check that lints where commited
+        run: test -z "$(git status --porcelain)"

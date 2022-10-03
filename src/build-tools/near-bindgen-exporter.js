@@ -1,69 +1,243 @@
+"use strict";
 import * as t from "@babel/types";
+
+const methodTypes = ["call", "view", "initialize"];
+
+function throwError(message) {
+  return t.blockStatement([
+    t.throwStatement(
+      t.newExpression(t.identifier("Error"), [t.stringLiteral(message)])
+    ),
+  ]);
+}
+
+function readState(classId) {
+  return t.variableDeclaration("const", [
+    t.variableDeclarator(
+      t.identifier("_state"),
+      t.callExpression(
+        t.memberExpression(classId, t.identifier("_getState")),
+        []
+      )
+    ),
+  ]);
+}
+
+function preventDoubleInit(methodType) {
+  if (methodType !== "initialize") {
+    return t.emptyStatement();
+  }
+
+  return t.ifStatement(
+    t.identifier("_state"),
+    throwError("Contract already initialized")
+  );
+}
+
+function ensureInitBeforeCall(classId, methodType) {
+  if (!["call", "view"].includes(methodType)) {
+    return t.emptyStatement();
+  }
+  return t.ifStatement(
+    t.logicalExpression(
+      "&&",
+      t.unaryExpression("!", t.identifier("_state")),
+      t.callExpression(
+        t.memberExpression(classId, t.identifier("_requireInit")),
+        []
+      )
+    ),
+    throwError("Contract must be initialized")
+  );
+}
+
+function initializeContractClass(classId) {
+  return t.variableDeclaration("const", [
+    t.variableDeclarator(
+      t.identifier("_contract"),
+      t.callExpression(t.memberExpression(classId, t.identifier("_create")), [])
+    ),
+  ]);
+}
+
+function reconstructState(classId, methodType) {
+  if (!["call", "view"].includes(methodType)) {
+    return t.emptyStatement();
+  }
+
+  return t.ifStatement(
+    t.identifier("_state"),
+    t.blockStatement([
+      t.expressionStatement(
+        t.callExpression(
+          t.memberExpression(classId, t.identifier("_reconstruct")),
+          [t.identifier("_contract"), t.identifier("_state")]
+        )
+      ),
+    ])
+  );
+}
+
+function collectArguments(classId) {
+  return t.variableDeclaration("const", [
+    t.variableDeclarator(
+      t.identifier("_args"),
+      t.callExpression(
+        t.memberExpression(classId, t.identifier("_getArgs")),
+        []
+      )
+    ),
+  ]);
+}
+
+function callContractMethod(methodName) {
+  return t.variableDeclaration("const", [
+    t.variableDeclarator(
+      t.identifier("_result"),
+      t.callExpression(
+        t.memberExpression(t.identifier("_contract"), t.identifier(methodName)),
+        [t.identifier("_args")]
+      )
+    ),
+  ]);
+}
+
+function saveToStorage(classId, methodType) {
+  if (!["initialize", "call"].includes(methodType)) {
+    return t.emptyStatement();
+  }
+
+  return t.expressionStatement(
+    t.callExpression(
+      t.memberExpression(classId, t.identifier("_saveToStorage")),
+      [t.identifier("_contract")]
+    )
+  );
+}
+
+function executePromise(classId) {
+  return t.ifStatement(
+    t.binaryExpression(
+      "!==",
+      t.identifier("_result"),
+      t.identifier("undefined")
+    ),
+    t.ifStatement(
+      t.logicalExpression(
+        "&&",
+        t.logicalExpression(
+          "&&",
+          t.identifier("_result"),
+          t.memberExpression(
+            t.identifier("_result"),
+            t.identifier("constructor")
+          )
+        ),
+        t.binaryExpression(
+          "===",
+          t.memberExpression(
+            t.memberExpression(
+              t.identifier("_result"),
+              t.identifier("constructor")
+            ),
+            t.identifier("name")
+          ),
+          t.stringLiteral("NearPromise")
+        )
+      ),
+      t.expressionStatement(
+        t.callExpression(
+          t.memberExpression(t.identifier("_result"), t.identifier("onReturn")),
+          []
+        )
+      ),
+      t.expressionStatement(
+        t.callExpression(
+          t.memberExpression(t.identifier("env"), t.identifier("value_return")),
+          [
+            t.callExpression(
+              t.memberExpression(classId, t.identifier("_serialize")),
+              [t.identifier("_result"), t.booleanLiteral(true)]
+            ),
+          ]
+        )
+      )
+    )
+  );
+}
+
+function createDeclaration(classId, methodName, methodType) {
+  return t.exportNamedDeclaration(
+    t.functionDeclaration(
+      t.identifier(methodName),
+      [],
+      t.blockStatement([
+        // Read the state of the contract from storage.
+        // const _state = Counter._getState();
+        readState(classId),
+        // Throw if initialized on any subsequent init function calls.
+        // if (_state) { throw new Error('Contract already initialized'); }
+        preventDoubleInit(methodType),
+        // Throw if NOT initialized on any non init function calls.
+        // if (!_state) { throw new Error('Contract must be initialized'); }
+        ensureInitBeforeCall(classId, methodType),
+        // Create instance of contract by calling _create function.
+        // let _contract = Counter._create();
+        initializeContractClass(classId),
+        // Reconstruct the contract with the state if the state is valid.
+        // if (_state) { Counter._reconstruct(_contract, _state); }
+        reconstructState(classId, methodType),
+        // Collect the arguments sent to the function.
+        // const _args = Counter._getArgs();
+        collectArguments(classId),
+        // Perform the actual function call to the appropriate contract method.
+        // const _result = _contract.method(args);
+        callContractMethod(methodName),
+        // If the method called is either an initialize or call method type, save the changes to storage.
+        // Counter._saveToStorage(_contract);
+        saveToStorage(classId, methodType),
+        // If a NearPromise is returned from the function call the onReturn method to execute the promise.
+        // if (_result !== undefined)
+        //   if (_result && _result.constructor && _result.constructor.name === 'NearPromise')
+        //     _result.onReturn();
+        //   else
+        //     near.valueReturn(_contract._serialize(result));
+        executePromise(classId),
+      ])
+    )
+  );
+}
 
 export default function () {
   return {
+    /** @type {import('@babel/traverse').Visitor} */
     visitor: {
       ClassDeclaration(path) {
-        let classNode = path.node;
-        if (classNode.decorators && classNode.decorators[0].expression.callee.name == 'NearBindgen') {
-          let classId = classNode.id;
-          let contractMethods = {};
-          for (let child of classNode.body.body) {
-            if (child.type == 'ClassMethod' && child.kind == 'method' && child.decorators) {
-              if (child.decorators[0].expression.callee.name == 'call') {
-                let callMethod = child.key.name;
-                contractMethods[callMethod] = 'call';
-              }
-              else if (child.decorators[0].expression.callee.name == 'view') {
-                let viewMethod = child.key.name;
-                contractMethods[viewMethod] = 'view';
-              }
-              else if (child.decorators[0].expression.callee.name == 'initialize') {
-                let initMethod = child.key.name;
-                contractMethods[initMethod] = 'initialize';
+        const classNode = path.node;
+
+        if (
+          classNode.decorators &&
+          classNode.decorators[0].expression.callee.name === "NearBindgen"
+        ) {
+          classNode.body.body.forEach((child) => {
+            if (
+              child.type === "ClassMethod" &&
+              child.kind === "method" &&
+              child.decorators
+            ) {
+              const methodType = child.decorators[0].expression.callee.name;
+
+              if (methodTypes.includes(methodType)) {
+                path.insertAfter(
+                  createDeclaration(classNode.id, child.key.name, methodType)
+                );
+
+                console.log(`Babel ${child.key.name} method export done`);
               }
             }
-          }
-          for (let method of Object.keys(contractMethods)) {
-            path.insertAfter(t.exportNamedDeclaration(t.functionDeclaration(t.identifier(method), [], t.blockStatement([
-              // const _state = Counter._getState();
-              t.variableDeclaration('let', [t.variableDeclarator(t.identifier('_state'), t.callExpression(t.memberExpression(classId, t.identifier('_getState')), []))]),
-              contractMethods[method] === 'initialize' ?
-                // if (_state) { throw new Error('Contract already initialized'); }
-                t.ifStatement(t.identifier('_state'), t.throwStatement(t.newExpression(t.identifier('Error'), [t.stringLiteral('Contract already initialized')])))
-                : t.emptyStatement(),
-              contractMethods[method] === 'call' || contractMethods[method] === 'view' ?
-                // if (!_state) { throw new Error('Contract must be initialized'); }
-                t.ifStatement(t.logicalExpression('&&', t.unaryExpression('!', t.identifier('_state')), t.callExpression(t.memberExpression(classId, t.identifier('_requireInit')), [])), t.blockStatement([t.throwStatement(t.newExpression(t.identifier('Error'), [t.stringLiteral('Contract must be initialized')]))]))
-                : t.emptyStatement(),
-              // let _contract = Counter._create();
-              t.variableDeclaration('let', [t.variableDeclarator(t.identifier('_contract'), t.callExpression(t.memberExpression(classId, t.identifier('_create')), []))]),
-              contractMethods[method] === 'call' || contractMethods[method] === 'view' ?
-                // if (_state) { Object.assign(_contract, state); }
-                t.ifStatement(t.identifier('_state'), t.blockStatement([t.expressionStatement(
-                  t.callExpression(t.memberExpression(classId, t.identifier('_reconstruct')), [t.identifier('_contract'), t.identifier('_state')]))])) : t.emptyStatement(),
-              // let _args = Counter._getArgs();
-              t.variableDeclaration('let', [t.variableDeclarator(t.identifier('_args'), t.callExpression(t.memberExpression(classId, t.identifier('_getArgs')), []))]),
-              // let _result = _contract.method(args);
-              t.variableDeclaration('let', [t.variableDeclarator(t.identifier('_result'), t.callExpression(t.memberExpression(t.identifier('_contract'), t.identifier(method)), [t.identifier('_args')]))]),
-              contractMethods[method] === 'initialize' || contractMethods[method] === 'call' ?
-                // Counter._saveToStorage(_contract);
-                t.expressionStatement(t.callExpression(t.memberExpression(classId, t.identifier('_saveToStorage')), [t.identifier('_contract')]))
-                : t.emptyStatement(),
-              // if (_result !== undefined) 
-              //   if (_result && _result.constructor && _result.constructor.name === 'NearPromise')
-              //     _result.onReturn();
-              //   else
-              //     near.valueReturn(_contract._serialize(result));
-              t.ifStatement(t.binaryExpression('!==', t.identifier('_result'), t.identifier('undefined')), 
-                t.ifStatement(t.logicalExpression('&&', t.logicalExpression('&&', t.identifier('_result'), t.memberExpression(t.identifier('_result'), t.identifier('constructor'))), 
-                                                        t.binaryExpression('===', t.memberExpression(t.memberExpression(t.identifier('_result'), t.identifier('constructor')), t.identifier('name')), t.stringLiteral('NearPromise'))),
-                  t.expressionStatement(t.callExpression(t.memberExpression(t.identifier('_result'), t.identifier('onReturn')), [])),
-                  t.expressionStatement(t.callExpression(t.memberExpression(t.identifier('env'), t.identifier('value_return')), [t.callExpression(t.memberExpression(classId, t.identifier('_serialize')), [t.identifier('_result')])]))))]))));
-            console.log(`Babel ${method} method export done`);
-          }
+          });
         }
-      }
-    }
+      },
+    },
   };
 }

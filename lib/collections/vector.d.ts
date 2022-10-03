@@ -1,27 +1,30 @@
 import { Bytes } from "../utils";
-export declare class Vector {
-    length: number;
+import { GetOptions } from "../types/collections";
+export declare class Vector<DataType> {
     readonly prefix: Bytes;
-    constructor(prefix: Bytes);
+    length: number;
+    constructor(prefix: Bytes, length?: number);
     isEmpty(): boolean;
-    get(index: number): unknown | null;
-    swapRemove(index: number): unknown | null;
-    push(element: unknown): void;
-    pop(): unknown | null;
-    replace(index: number, element: unknown): unknown;
-    extend(elements: unknown[]): void;
-    [Symbol.iterator](): VectorIterator;
+    get(index: number, options?: Omit<GetOptions<DataType>, "serializer">): DataType | null;
+    swapRemove(index: number, options?: GetOptions<DataType>): DataType | null;
+    push(element: DataType, options?: Pick<GetOptions<DataType>, "serializer">): void;
+    pop(options?: Omit<GetOptions<DataType>, "serializer">): DataType | null;
+    replace(index: number, element: DataType, options?: GetOptions<DataType>): DataType;
+    extend(elements: DataType[]): void;
+    [Symbol.iterator](): VectorIterator<DataType>;
+    private createIteratorWithOptions;
+    toArray(options?: GetOptions<DataType>): DataType[];
     clear(): void;
-    toArray(): unknown[];
-    serialize(): string;
-    static deserialize(data: Vector): Vector;
+    serialize(options?: Pick<GetOptions<DataType>, "serializer">): string;
+    static reconstruct<DataType>(data: Vector<DataType>): Vector<DataType>;
 }
-export declare class VectorIterator {
-    private current;
+export declare class VectorIterator<DataType> {
     private vector;
-    constructor(vector: Vector);
+    private readonly options?;
+    private current;
+    constructor(vector: Vector<DataType>, options?: GetOptions<DataType>);
     next(): {
-        value: unknown | null;
+        value: DataType | null;
         done: boolean;
     };
 }

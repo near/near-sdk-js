@@ -1,9 +1,4 @@
-import {
-  call,
-  view,
-  initialize,
-  NearBindgen
-} from "./near-bindgen";
+import { call, view, initialize, NearBindgen } from "./near-bindgen";
 
 import * as near from "./api";
 import {
@@ -14,7 +9,7 @@ import {
   UnorderedSet,
 } from "./collections";
 
-import { bytes, Bytes, assert } from "./utils";
+import { bytes, Bytes, assert, validateAccountId } from "./utils";
 
 import { NearPromise, PromiseOrValue } from "./promise";
 
@@ -32,6 +27,7 @@ export {
   bytes,
   Bytes,
   assert,
+  validateAccountId,
   NearPromise,
-  PromiseOrValue
+  PromiseOrValue,
 };
