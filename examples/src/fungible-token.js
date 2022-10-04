@@ -1,7 +1,5 @@
 import { NearBindgen, call, view, initialize, near, LookupMap, assert } from "near-sdk-js";
 
-// TODO: assert one yocto implementation
-
 @NearBindgen({ initRequired: true })
 export class FungibleToken {
   accounts = new LookupMap("a");
