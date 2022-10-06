@@ -37,7 +37,7 @@ await executeCommand(`rm ${BINARYEN_TAR_NAME}`);
 
 console.log("Installing QuickJS...");
 
-const QUICK_JS_VERSION = `0.1.1`;
+const QUICK_JS_VERSION = `0.1.2`;
 const QUICK_JS_VERSION_TAG = `v${QUICK_JS_VERSION}`;
 const QUICK_JS_SYSTEM_NAME =
   OS === "Linux" ? "Linux" : OS === "Darwin" ? "macOS" : "other";
