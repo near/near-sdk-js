@@ -3,6 +3,9 @@ import * as t from "@babel/types";
 import fs from "fs";
 import path from "path";
 
+const assertStringLiteral: typeof t["assertStringLiteral"] =
+  t.assertStringLiteral;
+
 export default function (): { visitor: Visitor } {
   return {
     visitor: {
@@ -32,24 +35,24 @@ export default function (): { visitor: Visitor } {
           // Read binary file into bytes, so encoding is 'latin1' (each byte is 0-255, become one character)
           const encoding = "latin1";
 
-          // Require first arg to be string
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
-          t.assertStringLiteral(args[0]);
+          const [firstArg] = args;
+
+          // Require first arg to be a string literal
+          assertStringLiteral(firstArg);
 
           // Error if filename is not found
           if (filename === undefined || filename === "unknown") {
             throw new Error("`includeBytes` function called outside of file");
           }
 
-          if (!("value" in args[0] && typeof args[0].value === "string")) {
+          if (!("value" in firstArg && typeof firstArg.value === "string")) {
             throw new Error(
               `\`includeBytes\` function called with invalid argument: ${args[0]}`
             );
           }
 
           // Generate and locate the file
-          const fileRelPath = args[0].value; // Get literal string value
+          const fileRelPath = firstArg.value; // Get literal string value
           const filePath = path.join(root, fileRelPath);
           const fileSrc = fs.readFileSync(filePath, { encoding }).toString();
 
