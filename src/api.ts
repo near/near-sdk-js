@@ -139,14 +139,23 @@ interface Env {
   promise_return(promiseIndex: PromiseIndex): void;
 }
 
-declare let env: Env;
+declare const env: Env;
 
-export function log(...params: unknown[]) {
+export function log(...params: unknown[]): void {
   env.log(
-    params
-      .map((x) => (x === undefined ? "undefined" : x)) // Stringify undefined
-      .map((x) => (typeof x === "object" ? JSON.stringify(x) : x)) // Convert Objects to strings
-      .join(" ") // Convert to string
+    params.reduce<string>((accumulated, parameter, index) => {
+      // Stringify undefined
+      const param = parameter === undefined ? "undefined" : parameter;
+      // Convert Objects to strings and convert to string
+      const stringified =
+        typeof param === "object" ? JSON.stringify(param) : `${param}`;
+
+      if (index === 0) {
+        return stringified;
+      }
+
+      return `${accumulated} ${stringified}`;
+    }, "")
   );
 }
 
