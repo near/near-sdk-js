@@ -18,15 +18,30 @@ function indexToKey(prefix: Bytes, index: number): Bytes {
   return prefix + key;
 }
 
-/// An iterable implementation of vector that stores its content on the trie.
-/// Uses the following map: index -> element
+/**
+ * An iterable implementation of vector that stores its content on the trie.
+ * Uses the following map: index -> element
+ */
 export class Vector<DataType> {
+  /**
+   * @param prefix - The byte prefix to use when storing elements inside this collection.
+   * @param length - The initial length of the collection. By default 0.
+   */
   constructor(readonly prefix: Bytes, public length = 0) {}
 
+  /**
+   * Checks whether the collection is empty.
+   */
   isEmpty(): boolean {
     return this.length === 0;
   }
 
+  /**
+   * Get the data stored at the provided index.
+   *
+   * @param index - The index at which to look for the data.
+   * @param options - Options for retrieving the data.
+   */
   get(
     index: number,
     options?: Omit<GetOptions<DataType>, "serializer">
@@ -41,9 +56,14 @@ export class Vector<DataType> {
     return getValueWithOptions(value, options);
   }
 
-  /// Removes an element from the vector and returns it in serialized form.
-  /// The removed element is replaced by the last element of the vector.
-  /// Does not preserve ordering, but is `O(1)`.
+  /**
+   * Removes an element from the vector and returns it in serialized form.
+   * The removed element is replaced by the last element of the vector.
+   * Does not preserve ordering, but is `O(1)`.
+   *
+   * @param index - The index at which to remove the element.
+   * @param options - Options for retrieving and storing the data.
+   */
   swapRemove(index: number, options?: GetOptions<DataType>): DataType | null {
     assert(index < this.length, ERR_INDEX_OUT_OF_BOUNDS);
 
@@ -64,6 +84,12 @@ export class Vector<DataType> {
     return getValueWithOptions(value, options);
   }
 
+  /**
+   * Adds data to the collection.
+   *
+   * @param element - The data to store.
+   * @param options - Options for storing the data.
+   */
   push(
     element: DataType,
     options?: Pick<GetOptions<DataType>, "serializer">
@@ -74,6 +100,11 @@ export class Vector<DataType> {
     near.storageWrite(key, serializeValueWithOptions(element, options));
   }
 
+  /**
+   * Removes and retrieves the element with the highest index.
+   *
+   * @param options - Options for retrieving the data.
+   */
   pop(options?: Omit<GetOptions<DataType>, "serializer">): DataType | null {
     if (this.isEmpty()) {
       return options?.defaultValue ?? null;
@@ -90,6 +121,13 @@ export class Vector<DataType> {
     return getValueWithOptions(value, options);
   }
 
+  /**
+   * Replaces the data stored at the provided index with the provided data and returns the previously stored data.
+   *
+   * @param index - The index at which to replace the data.
+   * @param element - The data to replace with.
+   * @param options - Options for retrieving and storing the data.
+   */
   replace(
     index: number,
     element: DataType,
@@ -108,6 +146,11 @@ export class Vector<DataType> {
     return getValueWithOptions(value, options);
   }
 
+  /**
+   * Extends the current collection with the passed in array of elements.
+   *
+   * @param elements - The elements to extend the collection with.
+   */
   extend(elements: DataType[]): void {
     for (const element of elements) {
       this.push(element);
@@ -118,6 +161,11 @@ export class Vector<DataType> {
     return new VectorIterator(this);
   }
 
+  /**
+   * Create a iterator on top of the default collection iterator using custom options.
+   *
+   * @param options - Options for retrieving and storing the data.
+   */
   private createIteratorWithOptions(options?: GetOptions<DataType>): {
     [Symbol.iterator](): VectorIterator<DataType>;
   } {
@@ -126,6 +174,11 @@ export class Vector<DataType> {
     };
   }
 
+  /**
+   * Return a JavaScript array of the data stored within the collection.
+   *
+   * @param options - Options for retrieving and storing the data.
+   */
   toArray(options?: GetOptions<DataType>): DataType[] {
     const array = [];
 
@@ -138,6 +191,9 @@ export class Vector<DataType> {
     return array;
   }
 
+  /**
+   * Remove all of the elements stored within the collection.
+   */
   clear(): void {
     for (let index = 0; index < this.length; index++) {
       const key = indexToKey(this.prefix, index);
@@ -147,11 +203,20 @@ export class Vector<DataType> {
     this.length = 0;
   }
 
+  /**
+   * Serialize the collection.
+   *
+   * @param options - Options for storing the data.
+   */
   serialize(options?: Pick<GetOptions<DataType>, "serializer">): string {
     return serializeValueWithOptions(this, options);
   }
 
-  // converting plain object to class object
+  /**
+   * Converts the deserialized data from storage to a JavaScript instance of the collection.
+   *
+   * @param data - The deserialized data to create an instance from.
+   */
   static reconstruct<DataType>(data: Vector<DataType>): Vector<DataType> {
     const vector = new Vector<DataType>(data.prefix, data.length);
 
@@ -159,9 +224,16 @@ export class Vector<DataType> {
   }
 }
 
+/**
+ * An iterator for the Vector collection.
+ */
 export class VectorIterator<DataType> {
   private current = 0;
 
+  /**
+   * @param vector - The vector collection to create an iterator for.
+   * @param options - Options for retrieving and storing data.
+   */
   constructor(
     private vector: Vector<DataType>,
     private readonly options?: GetOptions<DataType>
