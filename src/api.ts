@@ -308,7 +308,7 @@ export function storageUsage(): bigint {
  * @param value - The value to store.
  */
 export function storageWrite(key: Bytes, value: Bytes): boolean {
-  return env.storage_write(key, value, EVICTED_REGISTER) === 0n;
+  return env.storage_write(key, value, EVICTED_REGISTER) === 1n;
 }
 
 /**
@@ -317,14 +317,14 @@ export function storageWrite(key: Bytes, value: Bytes): boolean {
  * @param key - The key to be removed.
  */
 export function storageRemove(key: Bytes): boolean {
-  return env.storage_remove(key, EVICTED_REGISTER) === 0n;
+  return env.storage_remove(key, EVICTED_REGISTER) === 1n;
 }
 
 /**
  * Returns the cost of storing 0 Byte on NEAR storage.
  */
 export function storageByteCost(): bigint {
-  return 9_000_000_000_000_000_000n;
+  return 10_000_000_000_000_000_000n;
 }
 
 /**

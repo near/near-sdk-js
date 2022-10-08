@@ -102,7 +102,7 @@ export class PublicKey {
   /**
    * The curve type of the public key.
    */
-  get curveType(): CurveType {
+  curveType(): CurveType {
     return this.type;
   }
 

@@ -34,7 +34,7 @@ export declare class PublicKey {
     /**
      * The curve type of the public key.
      */
-    get curveType(): CurveType;
+    curveType(): CurveType;
     /**
      * Create a public key from a public key string.
      *
