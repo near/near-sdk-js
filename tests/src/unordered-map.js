@@ -15,9 +15,9 @@ class Test {
 class UnorderedMapTestContract {
 
 
-    // constructor() {
-    //     this.unorderedMap = new UnorderedMap('a');
-    // }
+    constructor() {
+       this.unorderedMap = new UnorderedMap('a');
+    }
 
     @view({})
     len() {
