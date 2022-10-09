@@ -1,16 +1,4 @@
 {
-<<<<<<< HEAD
-    "include": ["../cli/validator.js"],
-    "compilerOptions": {
-        "experimentalDecorators": true,
-        "target": "es2020",
-        "noEmit": true
-    },
-    "exclude": [
-        "node_modules"
-    ],
-}
-=======
   "compilerOptions": {
     "moduleResolution": "node",
     "experimentalDecorators": true,
@@ -19,4 +7,3 @@
   },
   "exclude": ["node_modules"]
 }
->>>>>>> 71f8b4fc2c0a3a5095611b71a67eb1b29584d495

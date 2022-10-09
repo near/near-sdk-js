@@ -66,14 +66,8 @@ async function build(argv) {
     await checkTsBuildWithTsc(SOURCE_FILE_WITH_PATH);
   }
 
-<<<<<<< HEAD
-    console.log(`Creating ${TARGET_DIR} directory...`);
-
-    await executeCommand(`mkdir -p ${TARGET_DIR}`);
-=======
   console.log(`Creating ${TARGET_DIR} directory...`);
   await executeCommand(`mkdir -p ${TARGET_DIR}`);
->>>>>>> 71f8b4fc2c0a3a5095611b71a67eb1b29584d495
 
   await createJsFileWithRullup(SOURCE_FILE_WITH_PATH, ROLLUP_TARGET);
 
@@ -93,28 +87,7 @@ async function checkTsBuildWithTsc(sourceFileWithPath) {
 
 // Common build function
 async function createJsFileWithRullup(sourceFileWithPath, rollupTarget) {
-<<<<<<< HEAD
-
-    await validateContract(sourceFileWithPath)
-    console.log(`Creating ${rollupTarget} file with Rollup...`);
-    const bundle = await rollup({
-        input: sourceFileWithPath,
-        plugins: [
-            nodeResolve({
-                extensions: ['.js', '.ts']
-            }),
-            sourcemaps(),
-            // commonjs(),
-            babel({ babelHelpers: 'bundled', extensions: ['.ts', '.js', '.jsx', '.es6', '.es', '.mjs'] })
-        ],
-    });
-
-    await bundle.write({
-        sourcemap: true,
-        file: rollupTarget,
-        format: 'es'
-    });
-=======
+  await validateContract(sourceFileWithPath)
   console.log(`Creating ${rollupTarget} file with Rollup...`);
   const bundle = await rollup({
     input: sourceFileWithPath,
@@ -136,7 +109,6 @@ async function createJsFileWithRullup(sourceFileWithPath, rollupTarget) {
     file: rollupTarget,
     format: "es",
   });
->>>>>>> 71f8b4fc2c0a3a5095611b71a67eb1b29584d495
 }
 
 async function createHeaderFileWithQjsc(rollupTarget, qjscTarget) {
