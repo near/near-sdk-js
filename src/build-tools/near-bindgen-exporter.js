@@ -235,50 +235,7 @@ export default function () {
                 console.log(`Babel ${child.key.name} method export done`);
               }
             }
-<<<<<<< HEAD
-          }
-
-          for (let method of Object.keys(contractMethods)) {
-            path.insertAfter(t.exportNamedDeclaration(t.functionDeclaration(t.identifier(method), [], t.blockStatement([
-              // const _state = Counter._getState();
-              t.variableDeclaration('let', [t.variableDeclarator(t.identifier('_state'), t.callExpression(t.memberExpression(classId, t.identifier('_getState')), []))]),
-              contractMethods[method] === 'initialize' ?
-                // if (_state) { throw new Error('Contract already initialized'); }
-                t.ifStatement(t.identifier('_state'), t.throwStatement(t.newExpression(t.identifier('Error'), [t.stringLiteral('Contract already initialized')])))
-                : t.emptyStatement(),
-              contractMethods[method] === 'call' || contractMethods[method] === 'view' ?
-                // if (!_state) { throw new Error('Contract must be initialized'); }
-                t.ifStatement(t.logicalExpression('&&', t.unaryExpression('!', t.identifier('_state')), t.callExpression(t.memberExpression(classId, t.identifier('_requireInit')), [])), t.blockStatement([t.throwStatement(t.newExpression(t.identifier('Error'), [t.stringLiteral('Contract must be initialized')]))]))
-                : t.emptyStatement(),
-              // let _contract = Counter._create();
-              t.variableDeclaration('let', [t.variableDeclarator(t.identifier('_contract'), t.callExpression(t.memberExpression(classId, t.identifier('_create')), []))]),
-              contractMethods[method] === 'call' || contractMethods[method] === 'view' ?
-                // if (_state) { Object.assign(_contract, state); }
-                t.ifStatement(t.identifier('_state'), t.blockStatement([t.expressionStatement(
-                  t.callExpression(t.memberExpression(classId, t.identifier('_reconstruct')), [t.identifier('_contract'), t.identifier('_state')]))])) : t.emptyStatement(),
-              // let _args = Counter._getArgs();
-              t.variableDeclaration('let', [t.variableDeclarator(t.identifier('_args'), t.callExpression(t.memberExpression(classId, t.identifier('_getArgs')), []))]),
-              // let _result = _contract.method(args);
-              t.variableDeclaration('let', [t.variableDeclarator(t.identifier('_result'), t.callExpression(t.memberExpression(t.identifier('_contract'), t.identifier(method)), [t.identifier('_args')]))]),
-              contractMethods[method] === 'initialize' || contractMethods[method] === 'call' ?
-                // Counter._saveToStorage(_contract);
-                t.expressionStatement(t.callExpression(t.memberExpression(classId, t.identifier('_saveToStorage')), [t.identifier('_contract')]))
-                : t.emptyStatement(),
-              // if (_result !== undefined) 
-              //   if (_result && _result.constructor && _result.constructor.name === 'NearPromise')
-              //     _result.onReturn();
-              //   else
-              //     near.valueReturn(_contract._serialize(result));
-              t.ifStatement(t.binaryExpression('!==', t.identifier('_result'), t.identifier('undefined')), 
-                t.ifStatement(t.logicalExpression('&&', t.logicalExpression('&&', t.identifier('_result'), t.memberExpression(t.identifier('_result'), t.identifier('constructor'))), 
-                                                        t.binaryExpression('===', t.memberExpression(t.memberExpression(t.identifier('_result'), t.identifier('constructor')), t.identifier('name')), t.stringLiteral('NearPromise'))),
-                  t.expressionStatement(t.callExpression(t.memberExpression(t.identifier('_result'), t.identifier('onReturn')), [])),
-                  t.expressionStatement(t.callExpression(t.memberExpression(t.identifier('env'), t.identifier('value_return')), [t.callExpression(t.memberExpression(classId, t.identifier('_serialize')), [t.identifier('_result')])]))))]))));
-            console.log(`Babel ${method} method export done`);
-          }
-=======
           });
->>>>>>> 71f8b4fc2c0a3a5095611b71a67eb1b29584d495
         }
       },
     },
