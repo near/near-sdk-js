@@ -1,45 +1,50 @@
+import * as near from "../api";
+import { GetOptions } from "../types/collections";
+import { Bytes, serializeValueWithOptions } from "../utils";
 
+export class LookupSet<DataType> {
+  constructor(readonly keyPrefix: Bytes) {}
 
-import * as near from '../api'
-import { Bytes } from '../utils';
+  contains(
+    key: DataType,
+    options?: Pick<GetOptions<DataType>, "serializer">
+  ): boolean {
+    const storageKey = this.keyPrefix + serializeValueWithOptions(key, options);
+    return near.storageHasKey(storageKey);
+  }
 
-export class LookupSet {
-    readonly keyPrefix: Bytes;
+  // Returns true if the element was present in the set.
+  remove(
+    key: DataType,
+    options?: Pick<GetOptions<DataType>, "serializer">
+  ): boolean {
+    const storageKey = this.keyPrefix + serializeValueWithOptions(key, options);
+    return near.storageRemove(storageKey);
+  }
 
-    constructor(keyPrefix: Bytes) {
-        this.keyPrefix = keyPrefix
-    }
+  // If the set did not have this value present, `true` is returned.
+  // If the set did have this value present, `false` is returned.
+  set(
+    key: DataType,
+    options?: Pick<GetOptions<DataType>, "serializer">
+  ): boolean {
+    const storageKey = this.keyPrefix + serializeValueWithOptions(key, options);
+    return !near.storageWrite(storageKey, "");
+  }
 
-    contains(key: Bytes): boolean {
-        let storageKey = this.keyPrefix + JSON.stringify(key)
-        return near.storageHasKey(storageKey)
-    }
+  extend(
+    keys: DataType[],
+    options?: Pick<GetOptions<DataType>, "serializer">
+  ): void {
+    keys.forEach((key) => this.set(key, options));
+  }
 
-    // Returns true if the element was present in the set.
-    remove(key: Bytes): boolean {
-        let storageKey = this.keyPrefix + JSON.stringify(key)
-        return near.storageRemove(storageKey)
-    }
+  serialize(options?: Pick<GetOptions<DataType>, "serializer">): string {
+    return serializeValueWithOptions(this, options);
+  }
 
-    // If the set did not have this value present, `true` is returned.
-    // If the set did have this value present, `false` is returned.
-    set(key: Bytes): boolean {
-        let storageKey = this.keyPrefix + JSON.stringify(key)
-        return !near.storageWrite(storageKey, '')
-    }
-
-    extend(keys: Bytes[]) {
-        for (let key of keys) {
-            this.set(key)
-        }
-    }
-
-    serialize(): string {
-        return JSON.stringify(this)
-    }
-
-    // converting plain object to class object
-    static reconstruct(data: LookupSet): LookupSet {
-        return new LookupSet(data.keyPrefix)
-    }
+  // converting plain object to class object
+  static reconstruct<DataType>(data: LookupSet<unknown>): LookupSet<DataType> {
+    return new LookupSet(data.keyPrefix);
+  }
 }

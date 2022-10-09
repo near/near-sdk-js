@@ -11,6 +11,7 @@ This will scaffold a basic template for you 😎
 Learn more in our [Quick Start guide](https://docs.near.org/develop/quickstart-guide).
 
 ## Running Examples
+
 There are a couple of contract examples in the project:
 
 - [Clean contract state](https://github.com/near/near-sdk-js/tree/develop/examples/src/clean-state.js)
@@ -30,6 +31,7 @@ To build all examples, run `yarn build` in `examples/`. To test all examples, ru
 To deploy and call a contract on a NEAR node, use near-cli's `near deploy` and `near call`.
 
 ## Test
+
 We recommend to use near-workspaces to write tests for your smart contracts. See any of the examples for how tests are setup and written.
 
 ## Error Handling in NEAR-SDK-JS
@@ -39,22 +41,25 @@ If you want to indicate an error happened and fail the transaction, just throw a
 When your JS code or library throws an error, uncaught, the transaction will also fail with GuestPanic error, with the error message and stacktrace.
 
 When call host function with inappropriate type, means incorrect number of arguments or arg is not expected type:
-    - if arguments less than params, remaining argument are set as 'undefined'
-    - if arguments more than params, remaining argument are ignored
-    - if argument is different than the required type, it'll be coerced to required type
-    - if argument is different than the required type but cannot be coerced, will throw runtime type error, also with message and stacktrace
+
+- if arguments less than params, remaining argument are set as 'undefined'
+- if arguments more than params, remaining argument are ignored
+- if argument is different than the required type, it'll be coerced to required type
+- if argument is different than the required type but cannot be coerced, will throw runtime type error, also with message and stacktrace
 
 ## NEAR-SDK-JS API Reference
 
 All NEAR blockchain provided functionality (host functions) are defined in `src/api.ts` and exported as `near`. You can use them by:
+
 ```js
-import {near} from 'near-sdk-js'
+import { near } from "near-sdk-js";
 
 // near.<api doucmented below>. e.g.:
-let signer = near.signerAccountId()
+let signer = near.signerAccountId();
 ```
 
 To use nightly host functions, such as `altBn128G1Sum`, your contract need to be built with nightly enabled. Use:
+
 ```
 export NEAR_NIGHTLY=1
 yarn build
@@ -63,10 +68,11 @@ yarn build
 ### About Type
 
 NEAR-SDK-JS is written in TypeScript, so every API function has a type specified by signature that looks familiar to JavaScript/TypeScript Developers. Two types in the signature need a special attention:
+
 - Most of the API take `bigint` instead of Number as type. This because JavaScript Number cannot hold 64 bit and 128 bit integer without losing precision.
 - `Bytes` in both arguments and return represent a byte buffer, internally it's a JavaScript String Object. Any binary data `0x00-0xff` is stored as the char '\x00-\xff'. This is because QuickJS doesn't have Uint8Array in C API.
-    - To ensure correctness, every `Bytes` argument need to be pass in with the `bytes()` function to runtime type check it's indeed a `Bytes`.
-    - If `Bytes` is too long that `bytes()` can cause gas limit problem, such as in factory contract, represents the content of contract to be deployed. In this case you can precheck and guarantee the correctness of the content and use without `bytes()`.
+  - To ensure correctness, every `Bytes` argument need to be pass in with the `bytes()` function to runtime type check it's indeed a `Bytes`.
+  - If `Bytes` is too long that `bytes()` can cause gas limit problem, such as in factory contract, represents the content of contract to be deployed. In this case you can precheck and guarantee the correctness of the content and use without `bytes()`.
 
 ### Context API
 
@@ -84,6 +90,7 @@ function storageUsage(): bigint
 ```
 
 ### Economics API
+
 ```
 function accountBalance(): bigint;
 function accountLockedBalance(): bigint;
@@ -93,7 +100,6 @@ function usedGas(): bigint;
 ```
 
 ### Math API
-
 
 ```
 function randomSeed(): Bytes;
@@ -105,7 +111,6 @@ function ecrecover(hash: Bytes, sign: Bytes, v: bigint, malleability_flag: bigin
 ```
 
 ### Miscellaneous API
-
 
 ```
 function valueReturn(value: Bytes);
@@ -175,6 +180,7 @@ function altBn128PairingCheck(value: Bytes): bigint;
 ```
 
 ### NearBindgen and other decorators
+
 You can write a simple smart contract by only using low-level APIs, such as `near.input()`, `near.storageRead()`, etc. In this case, the API of your contract will consist of all the exported JS functions. You can find an example of such a contract [here](https://github.com/near/near-sdk-js/blob/develop/examples/src/counter-lowlevel.js).
 
 But if you want to build a more complex contracts with ease, you can use decorators from this SDK that will handle serialization, deserialization, and other boilerplate operations for you.
@@ -186,6 +192,7 @@ Your class must have a `constructor()`. You will not be able to call it, which i
 The simplest example of the contract that follows all these rules can be found [here](https://github.com/near/near-sdk-js/blob/develop/examples/src/status-message.js)
 
 `NearBindgen` decorator can accept `requireInit parameter`.
+
 ```JS
 @NearBindgen({ requireInit: true })
 class YourContract {
@@ -201,13 +208,14 @@ In order to initialize the contract, you need to add functions flagged with `@in
 
 `privateFunction: true` can restrict access to this function to the contract itself.
 
-`payableFunction: true` will allow the function to accept payments (deposit). Without this flag, it will panic if any deposit was provided. 
-
+`payableFunction: true` will allow the function to accept payments (deposit). Without this flag, it will panic if any deposit was provided.
 
 ### Collections
+
 A few useful on-chain persistent collections are provided. All keys, values and elements are of type `Bytes`.
 
 #### Vector
+
 Vector is an iterable implementation of vector that stores its content on the trie. Usage:
 
 ```js
@@ -238,7 +246,7 @@ someMethod() {
     let first = this.v.get(0)
 
     // remove, move the last element to the given index
-    this.v.swapRemove(0) 
+    this.v.swapRemove(0)
 
     // replace
     this.v.replace(1, 'jkl')
@@ -264,7 +272,9 @@ someMethod() {
 ```
 
 #### LookupMap
+
 LookupMap is an non-iterable implementation of a map that stores its content directly on the trie. It's like a big hash map, but on trie. Usage:
+
 ```js
 import {LookupMap} from 'near-sdk-js'
 
@@ -296,7 +306,7 @@ someMethod() {
     let value = this.m.get('abc')
 
     // remove
-    this.m.remove('def') 
+    this.m.remove('def')
 
     // replace
     this.m.set('ghi', 'ddd')
@@ -304,7 +314,9 @@ someMethod() {
 ```
 
 #### LookupSet
+
 LookupSet is an non-iterable implementation of a set that stores its content directly on the trie. It's like LookupMap, but it only stores whether the value presents. Usage:
+
 ```js
 import {LookupSet} from 'near-sdk-js'
 
@@ -338,7 +350,9 @@ someMethod() {
 ```
 
 #### UnorderedMap
+
 UnorderedMap is an iterable implementation of a map that stores its content directly on the trie. Usage:
+
 ```js
 import {UnorderedMap} from 'near-sdk-js'
 
@@ -369,7 +383,7 @@ someMethod() {
     let value = this.m.get('abc')
 
     // remove
-    this.m.remove('def') 
+    this.m.remove('def')
 
     // replace
     this.m.set('ghi', 'ddd')
@@ -392,7 +406,9 @@ someMethod() {
 ```
 
 #### UnorderedSet
+
 UnorderedSet is an iterable implementation of a set that stores its content directly on the trie. It's like UnorderedMap but it only stores whether the value presents. Usage:
+
 ```js
 import {UnorderedSet} from 'near-sdk-js'
 
@@ -442,40 +458,50 @@ someMethod() {
 ```
 
 ### Highlevel Promise APIs
-Within a contract class that decorated by `@Nearbindgen`, you can work a high level JavaScript class, called `NearPromise`. It's equivalently expressive as promise batch APIs but much shorter to write and can be chained like a JavaScript Promise. 
+
+Within a contract class that decorated by `@Nearbindgen`, you can work a high level JavaScript class, called `NearPromise`. It's equivalently expressive as promise batch APIs but much shorter to write and can be chained like a JavaScript Promise.
 
 In a `@call` method, you can return either a JavaScript value or a `NearPromise` object. In the later case, `@NearBindgen` will automatically `promiseReturn` it for you.
 
 Usage:
+
 ```js
 // create new promise
-import {NearPromise, near} from 'near-sdk-js'
-import { PublicKey } from 'near-sdk-js/lib/types'
+import { NearPromise, near, includeBytes } from "near-sdk-js";
+import { PublicKey } from "near-sdk-js/lib/types";
 
-let promise = NearPromise.new('account-to-run-promise')
+let promise = NearPromise.new("account-to-run-promise");
 
 // possible promise actions, choose and chain what you need:
-promise.createAccount()
-    .transfer(1_000_000_000_000_000_000_000_000_000_000_000_000n)
-    .addFullAccessKey(new PublicKey(near.signerAccountPk()))
-    .addAccessKey(new PublicKey(near.signerAccountPk()), 250000000000000000000000n, // allowance
-        'receiver_account_id', 'allowed_function_names')
-    .stake(100000000000000000000000000000n, new PublicKey(near.signerAccountPk()))
-    .deployContract(includeBytes('path/to/contract.wasm'))
-    .functionCall('callee_contract_account_id', inputArgs, 
-        0, // amount
-        2 * Math.pow(10, 13), // gas
-    )
-    .functionCallWeight(
-        'callee_contract_account_id', inputArgs, 
-        0, // amount
-        2 * Math.pow(10, 13), // gas
-        1, // weight
-    )
-    .deleteKey(new PublicKey(near.signerAccountPk()))
-    .deleteAccount('beneficial_account_id')
+promise
+  .createAccount()
+  .transfer(1_000_000_000_000_000_000_000_000_000_000_000_000n)
+  .addFullAccessKey(new PublicKey(near.signerAccountPk()))
+  .addAccessKey(
+    new PublicKey(near.signerAccountPk()),
+    250000000000000000000000n, // allowance
+    "receiver_account_id",
+    "allowed_function_names"
+  )
+  .stake(100000000000000000000000000000n, new PublicKey(near.signerAccountPk()))
+  .deployContract(includeBytes("path/to/contract.wasm"))
+  .functionCall(
+    "callee_contract_account_id",
+    inputArgs,
+    0, // amount
+    2 * Math.pow(10, 13) // gas
+  )
+  .functionCallWeight(
+    "callee_contract_account_id",
+    inputArgs,
+    0, // amount
+    2 * Math.pow(10, 13), // gas
+    1 // weight
+  )
+  .deleteKey(new PublicKey(near.signerAccountPk()))
+  .deleteAccount("beneficial_account_id");
 
-return promise
+return promise;
 ```
 
 In the case of deploy contract, `includeBytes` is a helpful build-time util. You can include the content of a wasm contract, by using `includeBytes('path/to/contract.wasm')`.
@@ -483,11 +509,12 @@ In the case of deploy contract, `includeBytes` is a helpful build-time util. You
 In the case of `addFullAccessKey`, `addAccessKey` and `stake`, it takes a `PublicKey` object, you can find more details about it in the Types sections below.
 
 Besides above APIs to build something on top of an API, you can also chain promises with `.then` and `.and`, they're equivalent to promiseThen, promiseAnd:
+
 ```js
 // assume promise, promise2 and promise3 are create with above APIs, with several actions added like above.
-promise.and(promise2).then(promise3) // promiseAnd of [promise_id, promise2_id], then promiseThen(promise_and_id, promise3_id)
+promise.and(promise2).then(promise3); // promiseAnd of [promise_id, promise2_id], then promiseThen(promise_and_id, promise3_id)
 
-return promise
+return promise;
 ```
 
 ### Types
@@ -495,14 +522,19 @@ return promise
 NEAR-SDK-JS also includes type defintions that are equivalent to that in Rust SDK / nearcore. You can browse them in near-sdk-js/src/types. Most of them are just type alias to Bytes and bigint.
 
 #### Public Key
-Public Key is representing a NEAR account's public key in a JavaScript class. You can either initiate a Public Key from binary data, or from a human readable string. 
+
+Public Key is representing a NEAR account's public key in a JavaScript class. You can either initiate a Public Key from binary data, or from a human readable string.
 
 The binary data is in the same format as nearcore, but encoded in bytes. That's one byte to represent the curve type of the public key, either ed25519 (`\x00`), or secp256k1 ('\x01'), follows by the curve-specific public key data in bytes. Examples:
 
 ```js
-new PublicKey(near.signerAccountPk())
-new PublicKey("\x00\xeb\x7f\x5f\x11\xd1\x08\x1f\xe0\xd2\x24\xc5\x67\x36\x21\xad\xcb\x97\xd5\x13\xff\xa8\x5e\x55\xbc\x2b\x74\x4f\x0d\xb1\xe9\xf8\x1f")
-new PublicKey("\x01\xf2\x56\xc6\xe6\xc8\x0b\x21\x3f\x2a\xa0\xb0\x17\x44\x23\x5d\x51\x5c\x59\x44\x35\xbe\x65\x1b\x15\x88\x3a\x10\xdd\x47\x2f\xa6\x46\xce\x62\xea\xf3\x67\x0d\xc5\xcb\x91\x00\xa0\xca\x2a\x55\xb2\xc1\x47\xc1\xe9\xa3\x8c\xe4\x28\x87\x8e\x7d\x46\xe1\xfb\x71\x4a\x99")
+new PublicKey(near.signerAccountPk());
+new PublicKey(
+  "\x00\xeb\x7f\x5f\x11\xd1\x08\x1f\xe0\xd2\x24\xc5\x67\x36\x21\xad\xcb\x97\xd5\x13\xff\xa8\x5e\x55\xbc\x2b\x74\x4f\x0d\xb1\xe9\xf8\x1f"
+);
+new PublicKey(
+  "\x01\xf2\x56\xc6\xe6\xc8\x0b\x21\x3f\x2a\xa0\xb0\x17\x44\x23\x5d\x51\x5c\x59\x44\x35\xbe\x65\x1b\x15\x88\x3a\x10\xdd\x47\x2f\xa6\x46\xce\x62\xea\xf3\x67\x0d\xc5\xcb\x91\x00\xa0\xca\x2a\x55\xb2\xc1\x47\xc1\xe9\xa3\x8c\xe4\x28\x87\x8e\x7d\x46\xe1\xfb\x71\x4a\x99"
+);
 ```
 
 The human readable form is `ed25519:` or `secp256k1:` following base58-encoded public key. And initialize the Public Key with `PublicKey.fromString`:

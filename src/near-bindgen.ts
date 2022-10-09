@@ -1,72 +1,133 @@
 import * as near from "./api";
+import { deserialize, serialize } from "./utils";
 
-export function initialize({ }) {
-    return function (target: Object, key: string | symbol, descriptor: TypedPropertyDescriptor<Function>): void {
-    }
+type EmptyParameterObject = Record<never, never>;
+type AnyObject = Record<string, unknown>;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type DecoratorFunction = <AnyFunction extends (...args: any) => any>(
+  target: object,
+  key: string | symbol,
+  descriptor: TypedPropertyDescriptor<AnyFunction>
+) => void;
+
+export function initialize(_empty: EmptyParameterObject): DecoratorFunction {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return function <AnyFunction extends (...args: any) => any>(
+    _target: object,
+    _key: string | symbol,
+    _descriptor: TypedPropertyDescriptor<AnyFunction>
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+  ): void {};
 }
 
-export function call({ privateFunction = false, payableFunction = false }: { privateFunction?: boolean, payableFunction?: boolean }) {
-    return function (target: Object, key: string | symbol, descriptor: TypedPropertyDescriptor<Function>): void {
-        const originalMethod = descriptor.value;
-        descriptor.value = function (...args: any[]) {
-            if (privateFunction && near.predecessorAccountId() !== near.currentAccountId()) {
-                throw Error("Function is private");
-            }
-            if (!payableFunction && near.attachedDeposit() > BigInt(0)) {
-                throw Error("Function is not payable");
-            }
-            return originalMethod.apply(this, args);
+export function view(_empty: EmptyParameterObject): DecoratorFunction {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return function <AnyFunction extends (...args: any) => any>(
+    _target: object,
+    _key: string | symbol,
+    _descriptor: TypedPropertyDescriptor<AnyFunction>
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+  ): void {};
+}
+
+export function call({
+  privateFunction = false,
+  payableFunction = false,
+}: {
+  privateFunction?: boolean;
+  payableFunction?: boolean;
+}): DecoratorFunction {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return function <AnyFunction extends (...args: any) => any>(
+    _target: object,
+    _key: string | symbol,
+    descriptor: TypedPropertyDescriptor<AnyFunction>
+  ): void {
+    const originalMethod = descriptor.value;
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    descriptor.value = function (
+      ...args: Parameters<AnyFunction>
+    ): ReturnType<AnyFunction> {
+      if (
+        privateFunction &&
+        near.predecessorAccountId() !== near.currentAccountId()
+      ) {
+        throw new Error("Function is private");
+      }
+
+      if (!payableFunction && near.attachedDeposit() > 0n) {
+        throw new Error("Function is not payable");
+      }
+
+      return originalMethod.apply(this, args);
+    };
+  };
+}
+
+export function NearBindgen({
+  requireInit = false,
+  serializer = serialize,
+  deserializer = deserialize,
+}: {
+  requireInit?: boolean;
+  serializer?(value: unknown): string;
+  deserializer?(value: string): unknown;
+}) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return <T extends { new (...args: any[]): any }>(target: T) => {
+    return class extends target {
+      static _create() {
+        return new target();
+      }
+
+      static _getState(): unknown | null {
+        const rawState = near.storageRead("STATE");
+        return rawState ? this._deserialize(rawState) : null;
+      }
+
+      static _saveToStorage(objectToSave: unknown): void {
+        near.storageWrite("STATE", this._serialize(objectToSave));
+      }
+
+      static _getArgs(): unknown {
+        return JSON.parse(near.input() || "{}");
+      }
+
+      static _serialize(value: unknown, forReturn = false): string {
+        if (forReturn) {
+          return JSON.stringify(value, (_, value) =>
+            typeof value === "bigint" ? `${value}` : value
+          );
         }
-    }
-}
 
-export function view({ }) {
-    return function (target: Object, key: string | symbol, descriptor: TypedPropertyDescriptor<Function>): void {
-    }
-}
+        return serializer(value);
+      }
 
-export function NearBindgen({ requireInit = false }: { requireInit?: boolean }) {
-    return <T extends { new(...args: any[]): {} }>(target: T) => {
-        return class extends target {
-            static _create() {
-                return new target();
-            }
+      static _deserialize(value: string): unknown {
+        return deserializer(value);
+      }
 
-            static _getState(): Object {
-                const rawState = near.storageRead("STATE");
-                return rawState ? this._deserialize(rawState) : null;
-            }
+      static _reconstruct(classObject: object, plainObject: AnyObject): object {
+        for (const item in classObject) {
+          const reconstructor = classObject[item].constructor?.reconstruct;
 
-            static _saveToStorage(obj: Object): void {
-                near.storageWrite("STATE", this._serialize(obj));
-            }
-
-            static _getArgs(): JSON {
-                return JSON.parse(near.input() || "{}");
-            }
-
-            static _serialize(value: Object): string {
-                return JSON.stringify(value);
-            }
-
-            static _deserialize(value: string): Object {
-                return JSON.parse(value);
-            }
-
-            static _reconstruct(classObject: any, plainObject: JSON) {
-                for (const item in classObject) {
-                    if (classObject[item].constructor?.reconstruct !== undefined) {
-                        classObject[item] = classObject[item].constructor.reconstruct(plainObject[item])
-                    } else {
-                        classObject[item] = plainObject[item]
-                    }
-                }
-                return classObject
-            }
-
-            static _requireInit(): boolean {
-                return requireInit;
-            }
+          classObject[item] = reconstructor
+            ? reconstructor(plainObject[item])
+            : plainObject[item];
         }
-    }
+
+        return classObject;
+      }
+
+      static _requireInit(): boolean {
+        return requireInit;
+      }
+    };
+  };
+}
+
+declare module "./" {
+  export function includeBytes(pathToWasm: string): string;
 }

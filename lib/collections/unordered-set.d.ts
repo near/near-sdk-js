@@ -1,5 +1,6 @@
 import { Bytes } from "../utils";
-import { Vector } from "./vector";
+import { Vector, VectorIterator } from "./vector";
+import { GetOptions } from "../types/collections";
 export declare class UnorderedSet<DataType> {
     readonly prefix: Bytes;
     readonly elementIndexPrefix: Bytes;
@@ -7,13 +8,14 @@ export declare class UnorderedSet<DataType> {
     constructor(prefix: Bytes);
     get length(): number;
     isEmpty(): boolean;
-    contains(element: DataType): boolean;
-    set(element: DataType): boolean;
-    remove(element: DataType): boolean;
-    clear(): void;
-    toArray(): Bytes[];
-    [Symbol.iterator](): import("./vector").VectorIterator<DataType>;
+    contains(element: DataType, options?: Pick<GetOptions<DataType>, "serializer">): boolean;
+    set(element: DataType, options?: Pick<GetOptions<DataType>, "serializer">): boolean;
+    remove(element: DataType, options?: GetOptions<DataType>): boolean;
+    clear(options?: Pick<GetOptions<DataType>, "serializer">): void;
+    [Symbol.iterator](): VectorIterator<DataType>;
+    private createIteratorWithOptions;
+    toArray(options?: GetOptions<DataType>): DataType[];
     extend(elements: DataType[]): void;
-    serialize(): string;
+    serialize(options?: Pick<GetOptions<DataType>, "serializer">): string;
     static reconstruct<DataType>(data: UnorderedSet<DataType>): UnorderedSet<DataType>;
 }
