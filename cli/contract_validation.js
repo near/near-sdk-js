@@ -17,7 +17,7 @@ const validateContract = async (contractPath) => {
             const constructors = contractClass.getConstructors();
             const hasConstructor = constructors.length > 0;
             const propertiesToBeInited = properties.filter(p => !p.initializer);
-            if(!hasConstructor){
+            if(!hasConstructor && propertiesToBeInited.length > 0){
                 console.log(chalk.redBright(`Ops, constructor isnt initialized, after initialization include ${propertiesToBeInited.map(p => p.name).join(', ')} in constructor`))
                 process.exit(2)
             }
