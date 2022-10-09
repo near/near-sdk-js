@@ -2,7 +2,7 @@ import { NearBindgen, LookupMap, call } from 'near-sdk-js'
 
 
 @NearBindgen({})
-class ConstructorValidation {
+export class ConstructorValidation {
     map: LookupMap<string>;
     name: string;
     constructor(){
