@@ -10,8 +10,7 @@ import { nodeResolve } from "@rollup/plugin-node-resolve";
 import sourcemaps from "rollup-plugin-sourcemaps";
 import { babel } from "@rollup/plugin-babel";
 import { rollup } from "rollup";
-import validateContract from './contract_validation';
-
+import validateContract from "./contract_validation.js";
 import { executeCommand } from "./utils.js";
 
 const PROJECT_DIR = process.cwd();
