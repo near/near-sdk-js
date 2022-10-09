@@ -10,7 +10,7 @@ import { nodeResolve } from '@rollup/plugin-node-resolve';
 import sourcemaps from 'rollup-plugin-sourcemaps';
 import { babel } from '@rollup/plugin-babel';
 import { rollup } from 'rollup';
-
+import validateContract from './contract_validation';
 import { executeCommand } from './utils.js';
 
 const PROJECT_DIR = process.cwd();
@@ -60,6 +60,7 @@ async function build(argv) {
     }
 
     console.log(`Creating ${TARGET_DIR} directory...`);
+
     await executeCommand(`mkdir -p ${TARGET_DIR}`);
 
     await createJsFileWithRullup(SOURCE_FILE_WITH_PATH, ROLLUP_TARGET);
@@ -78,6 +79,8 @@ async function checkTsBuildWithTsc(sourceFileWithPath) {
 
 // Common build function
 async function createJsFileWithRullup(sourceFileWithPath, rollupTarget) {
+
+    await validateContract(sourceFileWithPath)
     console.log(`Creating ${rollupTarget} file with Rollup...`);
     const bundle = await rollup({
         input: sourceFileWithPath,

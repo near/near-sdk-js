@@ -33,10 +33,11 @@ class Engine {
 @NearBindgen({})
 class ParkingLot {
     cars: LookupMap<CarSpecs>;
-    constructor() {
-        this.cars = new LookupMap<CarSpecs>('a');
+    name: string;
+    constructor(){
+        this.cars = new LookupMap('a')
+        this.name = ""
     }
-
     @call({})
     addCar({ name, id, color, price, engineHp }: { name: string, id: number, color: string, price: number, engineHp: number }) {
         // args can be json arguments only, they cannot be of a JS/TS class like following, unless override NearContract.deserializeArgs method.

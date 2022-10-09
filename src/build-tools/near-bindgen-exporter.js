@@ -8,11 +8,7 @@ export default function () {
         if (classNode.decorators && classNode.decorators[0].expression.callee.name == 'NearBindgen') {
           let classId = classNode.id;
           let contractMethods = {};
-          let hasConstructor = null;
           for (let child of classNode.body.body) {
-            if(child.kind == 'constructor') {
-              hasConstructor = true;
-            }
             if (child.type == 'ClassMethod' && child.kind == 'method' && child.decorators) {
               if (child.decorators[0].expression.callee.name == 'call') {
                 let callMethod = child.key.name;
@@ -29,9 +25,6 @@ export default function () {
             }
           }
 
-          if(!hasConstructor){
-            throw new Error('Missing constructor')
-          }
           for (let method of Object.keys(contractMethods)) {
             path.insertAfter(t.exportNamedDeclaration(t.functionDeclaration(t.identifier(method), [], t.blockStatement([
               // const _state = Counter._getState();
