@@ -6,19 +6,10 @@ class Test {
 }
 
 @NearBindgen({})
-<<<<<<< HEAD
-class UnorderedMapTestContract {
-
-
-    constructor() {
-       this.unorderedMap = new UnorderedMap('a');
-    }
-=======
 export class UnorderedMapTestContract {
   constructor() {
     this.unorderedMap = new UnorderedMap("a");
   }
->>>>>>> 71f8b4fc2c0a3a5095611b71a67eb1b29584d495
 
   @view({})
   len() {
