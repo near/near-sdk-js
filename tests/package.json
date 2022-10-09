@@ -44,7 +44,8 @@
         "test:public-key": "ava __tests__/test-public-key.ava.js",
         "test:near-bindgen": "ava __tests__/decorators/near_bindgen.ava.js",
         "test:payable": "ava __tests__/decorators/payable.ava.js",
-        "test:private": "ava __tests__/decorators/private.ava.js"
+        "test:private": "ava __tests__/decorators/private.ava.js",
+        "test:constructor-validation": "ava __tests__/constructor_validation.ava.js"
     },
     "author": "Near Inc <hello@nearprotocol.com>",
     "license": "Apache-2.0",
