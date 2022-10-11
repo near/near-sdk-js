@@ -34,9 +34,9 @@ export class FungibleToken {
   internalSendNEAR(receivingAccountId, amountBigInt) {
     Assertions.isLeftGreaterThanRight(amountBigInt, 0);
     Assertions.isLeftGreaterThanRight(near.accountBalance(), amountBigInt, `Not enough balance ${near.accountBalance()} to send ${amountBigInt}`);
-    const transferPromiseId = near.promiseBatchCreate(receivingAccountId);
-    near.promiseBatchActionTransfer(transferPromiseId, amountBigInt);
-    near.promiseReturn(transferPromiseId);
+    const promise = near.promiseBatchCreate(receivingAccountId);
+    near.promiseBatchActionTransfer(promise, amountBigInt);
+    near.promiseReturn(promise);
   }
 
   internalGetBalance(accountId) {
