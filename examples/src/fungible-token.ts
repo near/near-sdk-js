@@ -1,21 +1,21 @@
 import { NearBindgen, call, view, initialize, near, LookupMap, assert, validateAccountId } from "near-sdk-js";
 
-@NearBindgen({ initRequired: true })
+@NearBindgen({ requireInit: true })
 export class FungibleToken {
-  accounts = new LookupMap("a");
-  accountRegistrants = new LookupMap("r");
-  accountDeposits = new LookupMap("c");
+  accounts: LookupMap<string> = new LookupMap("a");
+  accountRegistrants: LookupMap<string> = new LookupMap("r");
+  accountDeposits: LookupMap<string> = new LookupMap("c");
   totalSupply = "0";
 
   @initialize({})
-  init({ owner_id, total_supply }) {
+  init({ owner_id, total_supply }: { owner_id: string, total_supply: string }) {
     Assertions.isLeftGreaterThanRight(total_supply, 0);
     validateAccountId(owner_id);
     this.totalSupply = total_supply;
     this.accounts.set(owner_id, this.totalSupply);
   }
 
-  internalGetMaxAccountStorageUsage() {
+  internalGetMaxAccountStorageUsage(): bigint {
     const initialStorageUsage = near.storageUsage();
     const tempAccountId = "a".repeat(64);
     this.accounts.set(tempAccountId, "0");
@@ -24,14 +24,14 @@ export class FungibleToken {
     return maxAccountStorageUsage * BigInt(3); // we create an entry in 3 maps
   }
 
-  internalRegisterAccount({ registrantAccountId, accountId, amountStr }) {
+  internalRegisterAccount({ registrantAccountId, accountId, amountStr }: { registrantAccountId: string, accountId: string, amountStr: string }) {
     assert(!this.accounts.containsKey(accountId), "Account is already registered");
     this.accounts.set(accountId, "0");
     this.accountRegistrants.set(accountId, registrantAccountId);
     this.accountDeposits.set(accountId, amountStr);
   }
 
-  internalSendNEAR(receivingAccountId, amountBigInt) {
+  internalSendNEAR(receivingAccountId: string, amountBigInt: bigint) {
     Assertions.isLeftGreaterThanRight(amountBigInt, 0);
     Assertions.isLeftGreaterThanRight(near.accountBalance(), amountBigInt, `Not enough balance ${near.accountBalance()} to send ${amountBigInt}`);
     const promise = near.promiseBatchCreate(receivingAccountId);
@@ -39,12 +39,12 @@ export class FungibleToken {
     near.promiseReturn(promise);
   }
 
-  internalGetBalance(accountId) {
+  internalGetBalance(accountId: string): string {
     assert(this.accounts.containsKey(accountId), `Account ${accountId} is not registered`);
     return this.accounts.get(accountId);
   }
 
-  internalDeposit(accountId, amount) {
+  internalDeposit(accountId: string, amount: string) {
     let balance = this.internalGetBalance(accountId);
     let newBalance = BigInt(balance) + BigInt(amount);
     this.accounts.set(accountId, newBalance.toString());
@@ -52,7 +52,7 @@ export class FungibleToken {
     this.totalSupply = newSupply.toString();
   }
 
-  internalWithdraw(accountId, amount) {
+  internalWithdraw(accountId: string, amount: string) {
     let balance = this.internalGetBalance(accountId);
     let newBalance = BigInt(balance) - BigInt(amount);
     let newSupply = BigInt(this.totalSupply) - BigInt(amount);
@@ -62,7 +62,7 @@ export class FungibleToken {
     this.totalSupply = newSupply.toString();
   }
 
-  internalTransfer(senderId, receiverId, amount, memo = null) {
+  internalTransfer(senderId: string, receiverId: string, amount: string, _memo: string = null) {
     assert(senderId != receiverId, "Sender and receiver should be different");
     Assertions.isLeftGreaterThanRight(amount, 0);
     this.internalWithdraw(senderId, amount);
@@ -70,8 +70,9 @@ export class FungibleToken {
   }
 
   @call({ payableFunction: true })
-  storage_deposit({ account_id }) {
+  storage_deposit({ account_id }: { account_id: string }) {
     const accountId = account_id || near.predecessorAccountId();
+    validateAccountId(accountId);
     let attachedDeposit = near.attachedDeposit();
     if (this.accounts.containsKey(accountId)) {
       if (attachedDeposit > 0) {
@@ -99,7 +100,7 @@ export class FungibleToken {
   }
 
   @call({ payableFunction: true })
-  ft_transfer({ receiver_id, amount, memo }) {
+  ft_transfer({ receiver_id, amount, memo }: { receiver_id: string, amount: string, memo: string }) {
     Assertions.hasAtLeastOneAttachedYocto();
     let senderId = near.predecessorAccountId();
     near.log("Transfer " + amount + " token from " + senderId + " to " + receiver_id);
@@ -107,7 +108,7 @@ export class FungibleToken {
   }
 
   @call({ payableFunction: true })
-  ft_transfer_call({ receiver_id, amount, memo, msg }) {
+  ft_transfer_call({ receiver_id, amount, memo, msg }: { receiver_id: string, amount: string, memo: string, msg: string }) {
     Assertions.hasAtLeastOneAttachedYocto();
     let senderId = near.predecessorAccountId();
     this.internalTransfer(senderId, receiver_id, amount, memo);
@@ -120,7 +121,7 @@ export class FungibleToken {
     };
     near.log("Transfer call " + amount + " token from " + senderId + " to " + receiver_id + " with message " + msg);
     near.promiseBatchActionFunctionCall(promise, "ft_on_transfer", JSON.stringify(params), 0, 30000000000000);
-    return near.promiseReturn();
+    return near.promiseReturn(promise);
   }
 
   @view({})
@@ -129,7 +130,8 @@ export class FungibleToken {
   }
 
   @view({})
-  ft_balance_of({ account_id }) {
+  ft_balance_of({ account_id }: { account_id: string }) {
+    validateAccountId(account_id);
     return this.internalGetBalance(account_id);
   }
 }
@@ -139,7 +141,7 @@ class Assertions {
     assert(near.attachedDeposit() > BigInt(0), "Requires at least 1 yoctoNEAR to ensure signature");
   }
 
-  static isLeftGreaterThanRight(left, right, message=null) {
+  static isLeftGreaterThanRight(left, right, message = null) {
     const msg = message || `Provided amount ${left} should be greater than ${right}`;
     assert(BigInt(left) > BigInt(right), msg);
   }
