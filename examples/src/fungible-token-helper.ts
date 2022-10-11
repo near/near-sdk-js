@@ -1,7 +1,7 @@
 import { NearBindgen, call, view } from "near-sdk-js";
 
 @NearBindgen({})
-class FungibleTokenHelper {
+class _FungibleTokenHelper {
     data = "";
 
     @call({})
