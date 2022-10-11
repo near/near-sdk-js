@@ -45,17 +45,17 @@ export class FungibleToken {
   }
 
   internalDeposit(accountId: string, amount: string) {
-    let balance = this.internalGetBalance(accountId);
-    let newBalance = BigInt(balance) + BigInt(amount);
+    const balance = this.internalGetBalance(accountId);
+    const newBalance = BigInt(balance) + BigInt(amount);
     this.accounts.set(accountId, newBalance.toString());
-    let newSupply = BigInt(this.totalSupply) + BigInt(amount);
+    const newSupply = BigInt(this.totalSupply) + BigInt(amount);
     this.totalSupply = newSupply.toString();
   }
 
   internalWithdraw(accountId: string, amount: string) {
-    let balance = this.internalGetBalance(accountId);
-    let newBalance = BigInt(balance) - BigInt(amount);
-    let newSupply = BigInt(this.totalSupply) - BigInt(amount);
+    const balance = this.internalGetBalance(accountId);
+    const newBalance = BigInt(balance) - BigInt(amount);
+    const newSupply = BigInt(this.totalSupply) - BigInt(amount);
     Assertions.isLeftGreaterThanRight(newBalance, -1, "The account doesn't have enough balance");
     Assertions.isLeftGreaterThanRight(newSupply, -1, "Total supply overflow");
     this.accounts.set(accountId, newBalance.toString());
@@ -73,7 +73,7 @@ export class FungibleToken {
   storage_deposit({ account_id }: { account_id: string }) {
     const accountId = account_id || near.predecessorAccountId();
     validateAccountId(accountId);
-    let attachedDeposit = near.attachedDeposit();
+    const attachedDeposit = near.attachedDeposit();
     if (this.accounts.containsKey(accountId)) {
       if (attachedDeposit > 0) {
         this.internalSendNEAR(near.predecessorAccountId(), attachedDeposit);
@@ -81,7 +81,7 @@ export class FungibleToken {
       }
       return { message: "Account is already registered" };
     }
-    let storageCost = this.internalGetMaxAccountStorageUsage();
+    const storageCost = this.internalGetMaxAccountStorageUsage();
     if (attachedDeposit < storageCost) {
       this.internalSendNEAR(near.predecessorAccountId(), attachedDeposit);
       return { message: `Not enough attached deposit to cover storage cost. Required: ${storageCost.toString()}` };
@@ -91,7 +91,7 @@ export class FungibleToken {
       accountId: accountId,
       amount: storageCost.toString(),
     });
-    let refund = attachedDeposit - storageCost;
+    const refund = attachedDeposit - storageCost;
     if (refund > 0) {
       near.log("Storage registration refunding " + refund + " yoctoNEAR to " + near.predecessorAccountId());
       this.internalSendNEAR(near.predecessorAccountId(), refund);
@@ -102,7 +102,7 @@ export class FungibleToken {
   @call({ payableFunction: true })
   ft_transfer({ receiver_id, amount, memo }: { receiver_id: string, amount: string, memo: string }) {
     Assertions.hasAtLeastOneAttachedYocto();
-    let senderId = near.predecessorAccountId();
+    const senderId = near.predecessorAccountId();
     near.log("Transfer " + amount + " token from " + senderId + " to " + receiver_id);
     this.internalTransfer(senderId, receiver_id, amount, memo);
   }
@@ -110,7 +110,7 @@ export class FungibleToken {
   @call({ payableFunction: true })
   ft_transfer_call({ receiver_id, amount, memo, msg }: { receiver_id: string, amount: string, memo: string, msg: string }) {
     Assertions.hasAtLeastOneAttachedYocto();
-    let senderId = near.predecessorAccountId();
+    const senderId = near.predecessorAccountId();
     this.internalTransfer(senderId, receiver_id, amount, memo);
     const promise = near.promiseBatchCreate(receiver_id);
     const params = {
