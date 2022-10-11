@@ -1,8 +1,20 @@
 import { GetOptions } from "./types/collections";
 
+/**
+ * A string containing byte characters. Can be safely used in NEAR calls.
+ */
 export type Bytes = string;
+/**
+ * A PromiseIndex which represents the ID of a NEAR Promise.
+ */
 export type PromiseIndex = number | bigint;
+/**
+ * A number that specifies the amount of NEAR in yoctoNEAR.
+ */
 export type NearAmount = number | bigint;
+/**
+ * A number that specifies the ID of a register in the NEAR WASM virtual machine.
+ */
 export type Register = number | bigint;
 
 const TYPE_KEY = "typeInfo";
@@ -31,6 +43,12 @@ export function bytesToU8Array(bytes: Bytes): Uint8Array {
   return Uint8Array.from([...bytes].map((byte) => byte.charCodeAt(0)));
 }
 
+/**
+ * Accepts a string or Uint8Array and either checks for the validity of the string or converts the Uint8Array to Bytes.
+ *
+ * @param stringOrU8Array - The string or Uint8Array to be checked/transformed
+ * @returns Safe Bytes to be used in NEAR calls.
+ */
 export function bytes(stringOrU8Array: string | Uint8Array): Bytes {
   if (typeof stringOrU8Array === "string") {
     return checkStringIsBytes(stringOrU8Array);
@@ -54,9 +72,18 @@ function checkStringIsBytes(value: string): string {
   return value;
 }
 
-export function assert(expression: boolean, message: string): void {
+/**
+ * Asserts that the expression passed to the function is truthy, otherwise throws a new Error with the provided message.
+ *
+ * @param expression - The expression to be asserted.
+ * @param message - The error message to be printed.
+ */
+export function assert(
+  expression: unknown,
+  message: string
+): asserts expression {
   if (!expression) {
-    throw Error("assertion failed: " + message);
+    throw new Error("assertion failed: " + message);
   }
 }
 
@@ -139,7 +166,6 @@ export function deserialize(valueToDeserialize: string): unknown {
  * [Account ID rules](https://nomicon.io/DataStructures/Account#account-id-rules).
  *
  * @param accountId - The Account ID string you want to validate.
- * @returns boolean
  */
 export function validateAccountId(accountId: string): boolean {
   return (

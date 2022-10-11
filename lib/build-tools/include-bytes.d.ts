@@ -1,5 +1,4 @@
-export default function _default(): {
-    visitor: {
-        CallExpression(p: any, state: any): void;
-    };
+import { Visitor } from "@babel/traverse";
+export default function (): {
+    visitor: Visitor;
 };
