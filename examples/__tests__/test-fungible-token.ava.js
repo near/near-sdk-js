@@ -5,7 +5,7 @@ test.beforeEach(async (t) => {
   const worker = await Worker.init();
 
   const totalSupply = 1000;
-  const yoctoAccountStorage = "324";
+  const yoctoAccountStorage = "45";
 
   const root = worker.rootAccount;
   const xcc = await root.devDeploy("./build/fungible-token-helper.wasm");
@@ -110,7 +110,7 @@ test("should return message when trying to pay for storage with less than the re
     ft,
     "storage_deposit",
     { account_id: alice.accountId },
-    { attachedDeposit: NEAR.from("100").toJSON() }
+    { attachedDeposit: NEAR.from("40").toJSON() }
   );
   t.is(
     result.message,

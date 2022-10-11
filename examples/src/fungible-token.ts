@@ -24,13 +24,15 @@ export class FungibleToken {
     this.accounts.set(owner_id, this.totalSupply);
   }
 
-  internalGetMaxAccountStorageUsage(): bigint {
+  internalGetAccountStorageUsage(accountLength: number): bigint {
     const initialStorageUsage = near.storageUsage();
     const tempAccountId = "a".repeat(64);
     this.accounts.set(tempAccountId, "0");
-    const maxAccountStorageUsage = near.storageUsage() - initialStorageUsage;
+    const len64StorageUsage = near.storageUsage() - initialStorageUsage;
+    const len1StorageUsage = len64StorageUsage / BigInt(64);
+    const lenAccountStorageUsage = len1StorageUsage * BigInt(accountLength);
     this.accounts.remove(tempAccountId);
-    return maxAccountStorageUsage * BigInt(3); // we create an entry in 3 maps
+    return lenAccountStorageUsage * BigInt(3); // we create an entry in 3 maps
   }
 
   internalRegisterAccount({
@@ -120,7 +122,7 @@ export class FungibleToken {
       }
       return { message: "Account is already registered" };
     }
-    const storageCost = this.internalGetMaxAccountStorageUsage();
+    const storageCost = this.internalGetAccountStorageUsage(accountId.length);
     if (attachedDeposit < storageCost) {
       this.internalSendNEAR(near.predecessorAccountId(), attachedDeposit);
       return {
