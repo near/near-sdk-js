@@ -9,7 +9,7 @@ export class FungibleToken {
 
   @initialize({})
   init({ owner_id, total_supply }) {
-    assert(BigInt(total_supply) > BigInt(0), "Total supply should be a positive number");
+    Assertions.isLeftGreaterThanRight(total_supply, 0);
     validateAccountId(owner_id);
     this.totalSupply = total_supply;
     this.accounts.set(owner_id, this.totalSupply);
@@ -32,8 +32,8 @@ export class FungibleToken {
   }
 
   internalSendNEAR(receivingAccountId, amountBigInt) {
-    assert(amountBigInt > BigInt("0"), "The amount should be a positive number");
-    assert(amountBigInt < near.accountBalance(), `Not enough balance ${near.accountBalance()} to cover transfer of ${amountBigInt} yoctoNEAR`);
+    Assertions.isLeftGreaterThanRight(amountBigInt, 0);
+    Assertions.isLeftGreaterThanRight(near.accountBalance(), amountBigInt, `Not enough balance ${near.accountBalance()} to send ${amountBigInt}`);
     const transferPromiseId = near.promiseBatchCreate(receivingAccountId);
     near.promiseBatchActionTransfer(transferPromiseId, amountBigInt);
     near.promiseReturn(transferPromiseId);
@@ -55,16 +55,16 @@ export class FungibleToken {
   internalWithdraw(accountId, amount) {
     let balance = this.internalGetBalance(accountId);
     let newBalance = BigInt(balance) - BigInt(amount);
-    assert(newBalance >= BigInt(0), "The account doesn't have enough balance");
-    this.accounts.set(accountId, newBalance.toString());
     let newSupply = BigInt(this.totalSupply) - BigInt(amount);
-    assert(newSupply >= BigInt(0), "Total supply overflow");
+    Assertions.isLeftGreaterThanRight(newBalance, -1, "The account doesn't have enough balance");
+    Assertions.isLeftGreaterThanRight(newSupply, -1, "Total supply overflow");
+    this.accounts.set(accountId, newBalance.toString());
     this.totalSupply = newSupply.toString();
   }
 
   internalTransfer(senderId, receiverId, amount, memo = null) {
     assert(senderId != receiverId, "Sender and receiver should be different");
-    assert(BigInt(amount) > BigInt(0), "The amount should be a positive number");
+    Assertions.isLeftGreaterThanRight(amount, 0);
     this.internalWithdraw(senderId, amount);
     this.internalDeposit(receiverId, amount);
   }
@@ -100,7 +100,7 @@ export class FungibleToken {
 
   @call({ payableFunction: true })
   ft_transfer({ receiver_id, amount, memo }) {
-    assert(near.attachedDeposit() > BigInt(0), "Requires at least 1 yoctoNEAR to ensure signature");
+    Assertions.hasAtLeastOneAttachedYocto();
     let senderId = near.predecessorAccountId();
     near.log("Transfer " + amount + " token from " + senderId + " to " + receiver_id);
     this.internalTransfer(senderId, receiver_id, amount, memo);
@@ -108,7 +108,7 @@ export class FungibleToken {
 
   @call({ payableFunction: true })
   ft_transfer_call({ receiver_id, amount, memo, msg }) {
-    assert(near.attachedDeposit() > BigInt(0), "Requires at least 1 yoctoNEAR to ensure signature");
+    Assertions.hasAtLeastOneAttachedYocto();
     let senderId = near.predecessorAccountId();
     this.internalTransfer(senderId, receiver_id, amount, memo);
     const promise = near.promiseBatchCreate(receiver_id);
@@ -131,5 +131,16 @@ export class FungibleToken {
   @view({})
   ft_balance_of({ account_id }) {
     return this.internalGetBalance(account_id);
+  }
+}
+
+class Assertions {
+  static hasAtLeastOneAttachedYocto() {
+    assert(near.attachedDeposit() > BigInt(0), "Requires at least 1 yoctoNEAR to ensure signature");
+  }
+
+  static isLeftGreaterThanRight(left, right, message=null) {
+    const msg = message || `Provided amount ${left} should be greater than ${right}`;
+    assert(BigInt(left) > BigInt(right), msg);
   }
 }
