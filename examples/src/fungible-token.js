@@ -1,4 +1,4 @@
-import { NearBindgen, call, view, initialize, near, LookupMap, assert } from "near-sdk-js";
+import { NearBindgen, call, view, initialize, near, LookupMap, assert, validateAccountId } from "near-sdk-js";
 
 @NearBindgen({ initRequired: true })
 export class FungibleToken {
@@ -10,6 +10,7 @@ export class FungibleToken {
   @initialize({})
   init({ owner_id, total_supply }) {
     assert(BigInt(total_supply) > BigInt(0), "Total supply should be a positive number");
+    validateAccountId(owner_id);
     this.totalSupply = total_supply;
     this.accounts.set(owner_id, this.totalSupply);
   }
