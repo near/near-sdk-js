@@ -33,7 +33,6 @@ export class FungibleToken {
 
   internalSendNEAR(receivingAccountId, amountBigInt) {
     assert(amountBigInt > BigInt("0"), "The amount should be a positive number");
-    assert(receivingAccountId != near.currentAccountId(), "Can't transfer to the contract itself");
     assert(amountBigInt < near.accountBalance(), `Not enough balance ${near.accountBalance()} to cover transfer of ${amountBigInt} yoctoNEAR`);
     const transferPromiseId = near.promiseBatchCreate(receivingAccountId);
     near.promiseBatchActionTransfer(transferPromiseId, amountBigInt);
