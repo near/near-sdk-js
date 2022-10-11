@@ -103,6 +103,7 @@ export function NearBindgen(options: {
   requireInit?: boolean;
   serializer?(value: unknown): string;
   deserializer?(value: string): unknown;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
 }): any;
 export function NearBindgen({
   requireInit = false,

@@ -1,8 +1,7 @@
 import { NearBindgen, near, call, view, UnorderedMap } from "near-sdk-js";
-import { log } from "./log";
 
 @NearBindgen({})
-class Contract {
+export class Contract {
   outerMap: UnorderedMap<UnorderedMap<string>>;
   groups: UnorderedMap<UnorderedMap<UnorderedMap<string>>>;
 
