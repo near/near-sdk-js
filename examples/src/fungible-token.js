@@ -10,7 +10,6 @@ export class FungibleToken {
   @initialize({})
   init({ owner_id, total_supply }) {
     assert(BigInt(total_supply) > BigInt(0), "Total supply should be a positive number");
-    assert(this.totalSupply === "0", "Contract is already initialized");
     this.totalSupply = total_supply;
     this.accounts.set(owner_id, this.totalSupply);
   }
