@@ -24,18 +24,18 @@ export class FungibleToken {
     return maxAccountStorageUsage * BigInt(3); // we create an entry in 3 maps
   }
 
-  internalRegisterAccount({ registrantAccountId, accountId, amountStr }: { registrantAccountId: string, accountId: string, amountStr: string }) {
+  internalRegisterAccount({ registrantAccountId, accountId, amount }: { registrantAccountId: string, accountId: string, amount: string }) {
     assert(!this.accounts.containsKey(accountId), "Account is already registered");
     this.accounts.set(accountId, "0");
     this.accountRegistrants.set(accountId, registrantAccountId);
-    this.accountDeposits.set(accountId, amountStr);
+    this.accountDeposits.set(accountId, amount);
   }
 
-  internalSendNEAR(receivingAccountId: string, amountBigInt: bigint) {
-    Assertions.isLeftGreaterThanRight(amountBigInt, 0);
-    Assertions.isLeftGreaterThanRight(near.accountBalance(), amountBigInt, `Not enough balance ${near.accountBalance()} to send ${amountBigInt}`);
+  internalSendNEAR(receivingAccountId: string, amount: bigint) {
+    Assertions.isLeftGreaterThanRight(amount, 0);
+    Assertions.isLeftGreaterThanRight(near.accountBalance(), amount, `Not enough balance ${near.accountBalance()} to send ${amount}`);
     const promise = near.promiseBatchCreate(receivingAccountId);
-    near.promiseBatchActionTransfer(promise, amountBigInt);
+    near.promiseBatchActionTransfer(promise, amount);
     near.promiseReturn(promise);
   }
 
@@ -89,7 +89,7 @@ export class FungibleToken {
     this.internalRegisterAccount({
       registrantAccountId: near.predecessorAccountId(),
       accountId: accountId,
-      amountStr: storageCost.toString(),
+      amount: storageCost.toString(),
     });
     let refund = attachedDeposit - storageCost;
     if (refund > 0) {
@@ -141,7 +141,7 @@ class Assertions {
     assert(near.attachedDeposit() > BigInt(0), "Requires at least 1 yoctoNEAR to ensure signature");
   }
 
-  static isLeftGreaterThanRight(left, right, message = null) {
+  static isLeftGreaterThanRight(left: string | bigint | number | boolean, right: string | bigint | number | boolean, message: string = null) {
     const msg = message || `Provided amount ${left} should be greater than ${right}`;
     assert(BigInt(left) > BigInt(right), msg);
   }
