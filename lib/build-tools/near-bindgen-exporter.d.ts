@@ -1,4 +1,4 @@
-export default function _default(): {
-    /** @type {import('@babel/traverse').Visitor} */
-    visitor: import('@babel/traverse').Visitor;
+import { Visitor } from "@babel/traverse";
+export default function (): {
+    visitor: Visitor;
 };
