@@ -86,7 +86,7 @@ async function checkTsBuildWithTsc(sourceFileWithPath) {
 
 // Common build function
 async function createJsFileWithRullup(sourceFileWithPath, rollupTarget) {
-  await validateContract(sourceFileWithPath)
+  await validateContract(sourceFileWithPath);
   console.log(`Creating ${rollupTarget} file with Rollup...`);
   const bundle = await rollup({
     input: sourceFileWithPath,
