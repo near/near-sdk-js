@@ -367,8 +367,8 @@ export function promiseCreate(
   args: Bytes,
   amount: NearAmount,
   gas: NearAmount
-): bigint {
-  return env.promise_create(accountId, methodName, args, amount, gas);
+): PromiseIndex {
+  return env.promise_create(accountId, methodName, args, amount, gas) as PromiseIndex;
 }
 
 /**
@@ -388,7 +388,7 @@ export function promiseThen(
   args: Bytes,
   amount: NearAmount,
   gas: NearAmount
-): bigint {
+): PromiseIndex {
   return env.promise_then(
     promiseIndex,
     accountId,
@@ -396,7 +396,7 @@ export function promiseThen(
     args,
     amount,
     gas
-  );
+  ) as PromiseIndex;
 }
 
 /**
@@ -404,8 +404,8 @@ export function promiseThen(
  *
  * @param promiseIndexes - An arbitrary array of NEAR promise indexes to join.
  */
-export function promiseAnd(...promiseIndexes: PromiseIndex[]): bigint {
-  return env.promise_and(...promiseIndexes);
+export function promiseAnd(...promiseIndexes: PromiseIndex[]): PromiseIndex {
+  return env.promise_and(...promiseIndexes) as PromiseIndex;
 }
 
 /**
@@ -413,8 +413,8 @@ export function promiseAnd(...promiseIndexes: PromiseIndex[]): bigint {
  *
  * @param accountId - The account ID of the target contract.
  */
-export function promiseBatchCreate(accountId: Bytes): bigint {
-  return env.promise_batch_create(accountId);
+export function promiseBatchCreate(accountId: Bytes): PromiseIndex {
+  return env.promise_batch_create(accountId) as PromiseIndex;
 }
 
 /**
@@ -426,8 +426,8 @@ export function promiseBatchCreate(accountId: Bytes): bigint {
 export function promiseBatchThen(
   promiseIndex: PromiseIndex,
   accountId: Bytes
-): bigint {
-  return env.promise_batch_then(promiseIndex, accountId);
+): PromiseIndex {
+  return env.promise_batch_then(promiseIndex, accountId) as PromiseIndex;
 }
 
 /**

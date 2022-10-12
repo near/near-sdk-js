@@ -3,10 +3,13 @@ import { GetOptions } from "./types/collections";
  * A string containing byte characters. Can be safely used in NEAR calls.
  */
 export declare type Bytes = string;
+declare enum PromiseIndexBrand {
+    _ = ""
+}
 /**
  * A PromiseIndex which represents the ID of a NEAR Promise.
  */
-export declare type PromiseIndex = number | bigint;
+export declare type PromiseIndex = (number | bigint) & PromiseIndexBrand;
 /**
  * A number that specifies the amount of NEAR in yoctoNEAR.
  */
@@ -47,3 +50,4 @@ export declare function deserialize(valueToDeserialize: string): unknown;
  * @param accountId - The Account ID string you want to validate.
  */
 export declare function validateAccountId(accountId: string): boolean;
+export {};
