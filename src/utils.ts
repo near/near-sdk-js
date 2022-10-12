@@ -6,7 +6,9 @@ import { GetOptions } from "./types/collections";
 export type Bytes = string;
 
 // make PromiseIndex a nominal typing
-enum PromiseIndexBrand { _ = "" };
+enum PromiseIndexBrand {
+  _ = "",
+}
 /**
  * A PromiseIndex which represents the ID of a NEAR Promise.
  */

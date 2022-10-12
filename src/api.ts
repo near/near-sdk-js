@@ -368,7 +368,13 @@ export function promiseCreate(
   amount: NearAmount,
   gas: NearAmount
 ): PromiseIndex {
-  return env.promise_create(accountId, methodName, args, amount, gas) as PromiseIndex;
+  return env.promise_create(
+    accountId,
+    methodName,
+    args,
+    amount,
+    gas
+  ) as PromiseIndex;
 }
 
 /**
