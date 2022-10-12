@@ -21,19 +21,17 @@
   ],
   "license": "(MIT AND Apache-2.0)",
   "scripts": {
-    "build": "yarn build:lib && yarn build:cli",
-    "build:lib": "tsc -p ./tsconfig.json",
-    "build:cli": "tsc -p ./tsconfig.cli.json && chmod u+x cli/cli.js",
+    "build": "tsc -p ./tsconfig.json && chmod u+x lib/cli/cli.js",
     "pretest": "yarn build",
     "test": "yarn test:unit && yarn test:examples",
     "lint": "eslint --fix .",
     "format": "prettier --write .",
     "test:unit": "yarn && cd tests && yarn && yarn build && yarn test && cd ..",
     "test:examples": "yarn && cd examples && yarn && yarn build && yarn test && cd ..",
-    "postinstall": "cd cli && rm -rf deps && mkdir -p deps && cd deps && node ../post-install.js"
+    "postinstall": "cd lib/cli && rm -rf deps && mkdir -p deps && cd deps && node ../post-install.js"
   },
   "bin": {
-    "near-sdk-js": "cli/cli.js"
+    "near-sdk-js": "lib/cli/cli.js"
   },
   "engines": {
     "node": ">=14 <16.6.0 || >16.6.0"
@@ -53,7 +51,7 @@
     "signale": "^1.4.0"
   },
   "files": [
-    "cli",
+    "builder",
     "lib"
   ],
   "devDependencies": {

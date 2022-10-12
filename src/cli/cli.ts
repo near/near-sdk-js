@@ -16,8 +16,8 @@ const { Signale } = signal;
 const PROJECT_DIR = process.cwd();
 const NEAR_SDK_JS = "node_modules/near-sdk-js";
 const TSC = "node_modules/.bin/tsc";
-const QJSC_DIR = `${NEAR_SDK_JS}/cli/deps/quickjs`;
-const QJSC = `${NEAR_SDK_JS}/cli/deps/qjsc`;
+const QJSC_DIR = `${NEAR_SDK_JS}/lib/cli/deps/quickjs`;
+const QJSC = `${NEAR_SDK_JS}/lib/cli/deps/qjsc`;
 
 const program = new Command();
 
@@ -161,7 +161,7 @@ async function createWasmContract(
   contractTarget: string,
   verbose = false
 ) {
-  const WASI_SDK_PATH = `${NEAR_SDK_JS}/cli/deps/wasi-sdk`;
+  const WASI_SDK_PATH = `${NEAR_SDK_JS}/lib/cli/deps/wasi-sdk`;
 
   const CC = `${WASI_SDK_PATH}/bin/clang --sysroot=${WASI_SDK_PATH}/share/wasi-sysroot`;
   let DEFS = `-D_GNU_SOURCE '-DCONFIG_VERSION="2021-03-27"' -DCONFIG_BIGNUM`;
@@ -171,7 +171,7 @@ async function createWasmContract(
   }
 
   const INCLUDES = `-I${QJSC_DIR} -I.`;
-  const ORIGINAL_BUILDER_PATH = `${NEAR_SDK_JS}/cli/builder/builder.c`;
+  const ORIGINAL_BUILDER_PATH = `${NEAR_SDK_JS}/builder/builder.c`;
   const NEW_BUILDER_PATH = `${path.dirname(contractTarget)}/builder.c`;
   const SOURCES = `${NEW_BUILDER_PATH} ${QJSC_DIR}/quickjs.c ${QJSC_DIR}/libregexp.c ${QJSC_DIR}/libunicode.c ${QJSC_DIR}/cutils.c ${QJSC_DIR}/quickjs-libc-min.c ${QJSC_DIR}/libbf.c`;
   const LIBS = `-lm`;
@@ -192,6 +192,6 @@ async function createWasmContract(
 }
 
 async function wasiStubContract(contractTarget: string, verbose = false) {
-  const WASI_STUB = `${NEAR_SDK_JS}/cli/deps/binaryen/wasi-stub/run.sh`;
+  const WASI_STUB = `${NEAR_SDK_JS}/lib/cli/deps/binaryen/wasi-stub/run.sh`;
   await executeCommand(`${WASI_STUB} ${contractTarget} >/dev/null`, verbose);
 }
