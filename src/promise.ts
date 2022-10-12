@@ -255,7 +255,7 @@ class PromiseSingle {
 
   constructRecursively(): PromiseIndex {
     if (this.promiseIndex !== null) {
-      return this.promiseIndex as PromiseIndex;
+      return this.promiseIndex;
     }
 
     const promiseIndex = this.after
@@ -279,7 +279,7 @@ export class PromiseJoint {
 
   constructRecursively(): PromiseIndex {
     if (this.promiseIndex !== null) {
-      return this.promiseIndex as PromiseIndex;
+      return this.promiseIndex;
     }
 
     const result = near.promiseAnd(

@@ -7,7 +7,7 @@ export type Bytes = string;
 
 // make PromiseIndex a nominal typing
 enum PromiseIndexBrand {
-  _ = "",
+  _ = -1,
 }
 /**
  * A PromiseIndex which represents the ID of a NEAR Promise.
