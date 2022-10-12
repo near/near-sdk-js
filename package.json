@@ -33,6 +33,9 @@
   "bin": {
     "near-sdk-js": "cli/cli.js"
   },
+  "engines": {
+    "node": ">=14 <16.6.0 || >16.6.0"
+  },
   "author": "Near Inc <hello@nearprotocol.com>",
   "dependencies": {
     "@babel/core": "^7.17.5",

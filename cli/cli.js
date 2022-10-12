@@ -99,6 +99,12 @@ async function createJsFileWithRullup(sourceFileWithPath, rollupTarget) {
       babel({
         babelHelpers: "bundled",
         extensions: [".ts", ".js", ".jsx", ".es6", ".es", ".mjs"],
+        presets: ["@babel/preset-typescript"],
+        plugins: [
+          "near-sdk-js/lib/build-tools/include-bytes.js",
+          "near-sdk-js/lib/build-tools/near-bindgen-exporter.js",
+          ["@babel/plugin-proposal-decorators", { version: "legacy" }],
+        ],
       }),
     ],
   });
