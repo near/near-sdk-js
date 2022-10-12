@@ -1,8 +1,4 @@
 /**
- * The index for NEAR promises.
- */
-export type PromiseIndex = bigint;
-/**
  * The index for NEAR receipts.
  */
 export type ReceiptIndex = bigint;

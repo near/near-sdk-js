@@ -74,60 +74,51 @@ interface Env {
     gas: NearAmount
   ): bigint;
   promise_then(
-    promiseIndex: PromiseIndex,
+    promiseIndex: bigint,
     accountId: Bytes,
     methodName: Bytes,
     args: Bytes,
     amount: NearAmount,
     gas: NearAmount
   ): bigint;
-  promise_and(...promiseIndexes: PromiseIndex[]): bigint;
+  promise_and(...promiseIndexes: bigint[]): bigint;
   promise_batch_create(accountId: Bytes): bigint;
-  promise_batch_then(promiseIndex: PromiseIndex, accountId: Bytes): bigint;
-  promise_batch_action_create_account(promiseIndex: PromiseIndex): void;
-  promise_batch_action_deploy_contract(
-    promiseIndex: PromiseIndex,
-    code: Bytes
-  ): void;
+  promise_batch_then(promiseIndex: bigint, accountId: Bytes): bigint;
+  promise_batch_action_create_account(promiseIndex: bigint): void;
+  promise_batch_action_deploy_contract(promiseIndex: bigint, code: Bytes): void;
   promise_batch_action_function_call(
-    promiseIndex: PromiseIndex,
+    promiseIndex: bigint,
     methodName: Bytes,
     args: Bytes,
     amount: NearAmount,
     gas: NearAmount
   ): void;
-  promise_batch_action_transfer(
-    promiseIndex: PromiseIndex,
-    amount: NearAmount
-  ): void;
+  promise_batch_action_transfer(promiseIndex: bigint, amount: NearAmount): void;
   promise_batch_action_stake(
-    promiseIndex: PromiseIndex,
+    promiseIndex: bigint,
     amount: NearAmount,
     publicKey: Bytes
   ): void;
   promise_batch_action_add_key_with_full_access(
-    promiseIndex: PromiseIndex,
+    promiseIndex: bigint,
     publicKey: Bytes,
     nonce: number | bigint
   ): void;
   promise_batch_action_add_key_with_function_call(
-    promiseIndex: PromiseIndex,
+    promiseIndex: bigint,
     publicKey: Bytes,
     nonce: number | bigint,
     allowance: NearAmount,
     receiverId: Bytes,
     methodNames: Bytes
   ): void;
-  promise_batch_action_delete_key(
-    promiseIndex: PromiseIndex,
-    publicKey: Bytes
-  ): void;
+  promise_batch_action_delete_key(promiseIndex: bigint, publicKey: Bytes): void;
   promise_batch_action_delete_account(
-    promiseIndex: PromiseIndex,
+    promiseIndex: bigint,
     beneficiaryId: Bytes
   ): void;
   promise_batch_action_function_call_weight(
-    promiseIndex: PromiseIndex,
+    promiseIndex: bigint,
     methodName: Bytes,
     args: Bytes,
     amount: NearAmount,
@@ -135,8 +126,8 @@ interface Env {
     weight: GasWeight
   ): void;
   promise_results_count(): bigint;
-  promise_result(promiseIndex: PromiseIndex, register: Register): PromiseResult;
-  promise_return(promiseIndex: PromiseIndex): void;
+  promise_result(promiseIndex: bigint, register: Register): PromiseResult;
+  promise_return(promiseIndex: bigint): void;
 }
 
 declare const env: Env;
@@ -367,8 +358,14 @@ export function promiseCreate(
   args: Bytes,
   amount: NearAmount,
   gas: NearAmount
-): bigint {
-  return env.promise_create(accountId, methodName, args, amount, gas);
+): PromiseIndex {
+  return env.promise_create(
+    accountId,
+    methodName,
+    args,
+    amount,
+    gas
+  ) as unknown as PromiseIndex;
 }
 
 /**
@@ -388,15 +385,15 @@ export function promiseThen(
   args: Bytes,
   amount: NearAmount,
   gas: NearAmount
-): bigint {
+): PromiseIndex {
   return env.promise_then(
-    promiseIndex,
+    promiseIndex as unknown as bigint,
     accountId,
     methodName,
     args,
     amount,
     gas
-  );
+  ) as unknown as PromiseIndex;
 }
 
 /**
@@ -404,8 +401,10 @@ export function promiseThen(
  *
  * @param promiseIndexes - An arbitrary array of NEAR promise indexes to join.
  */
-export function promiseAnd(...promiseIndexes: PromiseIndex[]): bigint {
-  return env.promise_and(...promiseIndexes);
+export function promiseAnd(...promiseIndexes: PromiseIndex[]): PromiseIndex {
+  return env.promise_and(
+    ...(promiseIndexes as unknown as bigint[])
+  ) as unknown as PromiseIndex;
 }
 
 /**
@@ -413,8 +412,8 @@ export function promiseAnd(...promiseIndexes: PromiseIndex[]): bigint {
  *
  * @param accountId - The account ID of the target contract.
  */
-export function promiseBatchCreate(accountId: Bytes): bigint {
-  return env.promise_batch_create(accountId);
+export function promiseBatchCreate(accountId: Bytes): PromiseIndex {
+  return env.promise_batch_create(accountId) as unknown as PromiseIndex;
 }
 
 /**
@@ -426,8 +425,11 @@ export function promiseBatchCreate(accountId: Bytes): bigint {
 export function promiseBatchThen(
   promiseIndex: PromiseIndex,
   accountId: Bytes
-): bigint {
-  return env.promise_batch_then(promiseIndex, accountId);
+): PromiseIndex {
+  return env.promise_batch_then(
+    promiseIndex as unknown as bigint,
+    accountId
+  ) as unknown as PromiseIndex;
 }
 
 /**
@@ -438,7 +440,7 @@ export function promiseBatchThen(
 export function promiseBatchActionCreateAccount(
   promiseIndex: PromiseIndex
 ): void {
-  env.promise_batch_action_create_account(promiseIndex);
+  env.promise_batch_action_create_account(promiseIndex as unknown as bigint);
 }
 
 /**
@@ -451,7 +453,10 @@ export function promiseBatchActionDeployContract(
   promiseIndex: PromiseIndex,
   code: Bytes
 ): void {
-  env.promise_batch_action_deploy_contract(promiseIndex, code);
+  env.promise_batch_action_deploy_contract(
+    promiseIndex as unknown as bigint,
+    code
+  );
 }
 
 /**
@@ -471,7 +476,7 @@ export function promiseBatchActionFunctionCall(
   gas: NearAmount
 ): void {
   env.promise_batch_action_function_call(
-    promiseIndex,
+    promiseIndex as unknown as bigint,
     methodName,
     args,
     amount,
@@ -489,7 +494,7 @@ export function promiseBatchActionTransfer(
   promiseIndex: PromiseIndex,
   amount: NearAmount
 ): void {
-  env.promise_batch_action_transfer(promiseIndex, amount);
+  env.promise_batch_action_transfer(promiseIndex as unknown as bigint, amount);
 }
 
 /**
@@ -504,7 +509,11 @@ export function promiseBatchActionStake(
   amount: NearAmount,
   publicKey: Bytes
 ): void {
-  env.promise_batch_action_stake(promiseIndex, amount, publicKey);
+  env.promise_batch_action_stake(
+    promiseIndex as unknown as bigint,
+    amount,
+    publicKey
+  );
 }
 
 /**
@@ -520,7 +529,7 @@ export function promiseBatchActionAddKeyWithFullAccess(
   nonce: number | bigint
 ): void {
   env.promise_batch_action_add_key_with_full_access(
-    promiseIndex,
+    promiseIndex as unknown as bigint,
     publicKey,
     nonce
   );
@@ -545,7 +554,7 @@ export function promiseBatchActionAddKeyWithFunctionCall(
   methodNames: Bytes
 ): void {
   env.promise_batch_action_add_key_with_function_call(
-    promiseIndex,
+    promiseIndex as unknown as bigint,
     publicKey,
     nonce,
     allowance,
@@ -564,7 +573,10 @@ export function promiseBatchActionDeleteKey(
   promiseIndex: PromiseIndex,
   publicKey: Bytes
 ): void {
-  env.promise_batch_action_delete_key(promiseIndex, publicKey);
+  env.promise_batch_action_delete_key(
+    promiseIndex as unknown as bigint,
+    publicKey
+  );
 }
 
 /**
@@ -577,7 +589,10 @@ export function promiseBatchActionDeleteAccount(
   promiseIndex: PromiseIndex,
   beneficiaryId: Bytes
 ): void {
-  env.promise_batch_action_delete_account(promiseIndex, beneficiaryId);
+  env.promise_batch_action_delete_account(
+    promiseIndex as unknown as bigint,
+    beneficiaryId
+  );
 }
 
 /**
@@ -599,7 +614,7 @@ export function promiseBatchActionFunctionCallWeight(
   weight: GasWeight
 ): void {
   env.promise_batch_action_function_call_weight(
-    promiseIndex,
+    promiseIndex as unknown as bigint,
     methodName,
     args,
     amount,
@@ -621,7 +636,7 @@ export function promiseResultsCount(): bigint {
  * @param promiseIndex - The index of the promise to return the result for.
  */
 export function promiseResult(promiseIndex: PromiseIndex): Bytes {
-  const status = env.promise_result(promiseIndex, 0);
+  const status = env.promise_result(promiseIndex as unknown as bigint, 0);
 
   assert(
     Number(status) === PromiseResult.Successful,
@@ -643,7 +658,7 @@ export function promiseResult(promiseIndex: PromiseIndex): Bytes {
  * @param promiseIndex - The index of the promise to execute.
  */
 export function promiseReturn(promiseIndex: PromiseIndex): void {
-  env.promise_return(promiseIndex);
+  env.promise_return(promiseIndex as unknown as bigint);
 }
 
 export function sha256(value: Bytes): Bytes {

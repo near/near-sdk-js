@@ -122,7 +122,7 @@ export declare function randomSeed(): Bytes;
  * @param amount - The amount of NEAR attached to the call.
  * @param gas - The amount of Gas attached to the call.
  */
-export declare function promiseCreate(accountId: Bytes, methodName: Bytes, args: Bytes, amount: NearAmount, gas: NearAmount): bigint;
+export declare function promiseCreate(accountId: Bytes, methodName: Bytes, args: Bytes, amount: NearAmount, gas: NearAmount): PromiseIndex;
 /**
  * Attach a callback NEAR promise to be executed after a provided promise.
  *
@@ -133,26 +133,26 @@ export declare function promiseCreate(accountId: Bytes, methodName: Bytes, args:
  * @param amount - The amount of NEAR to attach to the call.
  * @param gas - The amount of Gas to attach to the call.
  */
-export declare function promiseThen(promiseIndex: PromiseIndex, accountId: Bytes, methodName: Bytes, args: Bytes, amount: NearAmount, gas: NearAmount): bigint;
+export declare function promiseThen(promiseIndex: PromiseIndex, accountId: Bytes, methodName: Bytes, args: Bytes, amount: NearAmount, gas: NearAmount): PromiseIndex;
 /**
  * Join an arbitrary array of NEAR promises.
  *
  * @param promiseIndexes - An arbitrary array of NEAR promise indexes to join.
  */
-export declare function promiseAnd(...promiseIndexes: PromiseIndex[]): bigint;
+export declare function promiseAnd(...promiseIndexes: PromiseIndex[]): PromiseIndex;
 /**
  * Create a NEAR promise which will have multiple promise actions inside.
  *
  * @param accountId - The account ID of the target contract.
  */
-export declare function promiseBatchCreate(accountId: Bytes): bigint;
+export declare function promiseBatchCreate(accountId: Bytes): PromiseIndex;
 /**
  * Attach a callback NEAR promise to a batch of NEAR promise actions.
  *
  * @param promiseIndex - The NEAR promise index of the batch.
  * @param accountId - The account ID of the target contract.
  */
-export declare function promiseBatchThen(promiseIndex: PromiseIndex, accountId: Bytes): bigint;
+export declare function promiseBatchThen(promiseIndex: PromiseIndex, accountId: Bytes): PromiseIndex;
 /**
  * Attach a create account promise action to the NEAR promise index with the provided promise index.
  *
