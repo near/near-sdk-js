@@ -1,16 +1,16 @@
 import childProcess from "child_process";
 import { promisify } from "util";
 const exec = promisify(childProcess.exec);
-export async function executeCommand(command, verbose = false) {
-    if (verbose) {
+export async function executeCommand(command, silent = false) {
+    if (!silent) {
         console.log(command);
     }
     try {
         const { stdout, stderr } = await exec(command);
-        if (stderr && verbose) {
+        if (stderr && !silent) {
             console.error(stderr);
         }
-        if (verbose) {
+        if (!silent) {
             console.log(stdout);
         }
         return stdout.trim();

@@ -1,7 +1,8 @@
+import { PluginPass } from "@babel/core";
 import { Node, Visitor } from "@babel/traverse";
 import * as t from "@babel/types";
-import fs from "fs";
-import path from "path";
+import { readFileSync } from "fs";
+import { join, dirname } from "path";
 
 const assertStringLiteral: typeof t["assertStringLiteral"] =
   t.assertStringLiteral;
@@ -9,28 +10,27 @@ const assertStringLiteral: typeof t["assertStringLiteral"] =
 export default function (): { visitor: Visitor } {
   return {
     visitor: {
-      CallExpression(p, state) {
-        if (!("name" in p.node.callee)) {
+      CallExpression(
+        path,
+        { opts, file }: PluginPass & { opts: { root?: string } }
+      ): void {
+        if (!("name" in path.node.callee)) {
           return;
         }
 
         // Extract the called method name.
-        const name = p.node.callee.name;
+        const name = path.node.callee.name;
 
         // If the method name is not "includeBytes" do nothing.
         if (name === "includeBytes") {
           // Extract the called method arguments.
-          const args = p.node.arguments;
+          const args = path.node.arguments;
 
           // Get the path of file
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
-          const filename = this.file.opts.filename;
+          const filename = file.opts.filename;
 
           // User settings
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
-          const root = state.opts.root || path.dirname(filename);
+          const root = opts.root || dirname(filename);
 
           // Read binary file into bytes, so encoding is 'latin1' (each byte is 0-255, become one character)
           const encoding = "latin1";
@@ -53,10 +53,10 @@ export default function (): { visitor: Visitor } {
 
           // Generate and locate the file
           const fileRelPath = firstArg.value; // Get literal string value
-          const filePath = path.join(root, fileRelPath);
-          const fileSrc = fs.readFileSync(filePath, { encoding }).toString();
+          const filePath = join(root, fileRelPath);
+          const fileSrc = readFileSync(filePath, { encoding }).toString();
 
-          p.replaceWith(t.stringLiteral(fileSrc) as Node);
+          path.replaceWith(t.stringLiteral(fileSrc) as Node);
         }
       },
     },

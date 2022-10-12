@@ -6,7 +6,7 @@
     "target": "es2020",
     "moduleResolution": "node",
     "alwaysStrict": true,
-    "outDir": "./lib",
+    "outDir": "./cli",
     "declaration": true,
     "preserveSymlinks": true,
     "preserveWatchOutput": true,
@@ -20,10 +20,5 @@
     "resolveJsonModule": true,
     "allowJs": true
   },
-  "files": [
-    "src/index.ts",
-    "src/build-tools/near-bindgen-exporter.ts",
-    "src/build-tools/include-bytes.ts"
-  ],
-  "exclude": ["src/cli/**/*"]
+  "include": ["src/cli/**/*"]
 }

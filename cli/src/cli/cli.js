@@ -17,22 +17,27 @@ const TSC = "node_modules/.bin/tsc";
 const QJSC_DIR = `${NEAR_SDK_JS}/cli/deps/quickjs`;
 const QJSC = `${NEAR_SDK_JS}/cli/deps/qjsc`;
 const program = new Command();
+function makeBuildCommand() {
+    return new Command("build")
+        .usage("[source] [target]")
+        .description("Build NEAR JS Smart-contract")
+        .argument("[source]", "Contract to build.", "src/index.js")
+        .argument("[target]", "Target file path and name.", "build/contract.wasm")
+        .option("--verbose", "Whether to print more verbose output.", false)
+        .action(console.log);
+}
 program
     .name("near-sdk-js")
-    .addCommand(new Command("build")
-    .usage("[source] [target]")
-    .description("Build NEAR JS Smart-contract")
-    .argument("[source]", "Contract to build.", "src/index.js")
-    .argument("[target]", "Target file path and name.", "build/contract.wasm")
-    .option("--verbose", "Whether to print more verbose output.", false)
-    .action(buildCom))
+    .version((await import("../../package.json", { assert: { type: "json" } })).version)
+    .addCommand(makeBuildCommand())
     .parse();
 export async function buildCom(source, target, { verbose = false }) {
+    console.log(source, target);
     const SOURCE_EXT = source.split(".").pop();
     const TARGET_DIR = dirname(target);
     const TARGET_EXT = target.split(".").pop();
     const TARGET_FILE_NAME = basename(target, `.${TARGET_EXT}`);
-    const signale = new Signale({ scope: "build", interactive: true });
+    const signale = new Signale({ scope: "near-sdk-js", interactive: true });
     if (TARGET_EXT !== "wasm") {
         signale.error(`Unsupported target ${TARGET_EXT}, make sure target ends with .wasm!`);
         process.exit(1);
@@ -57,13 +62,70 @@ export async function buildCom(source, target, { verbose = false }) {
     await createWasmContract(QJSC_TARGET, CONTRACT_TARGET, verbose);
     signale.await("Executing wasi-stub...");
     await wasiStubContract(CONTRACT_TARGET, verbose);
-    signale.success(`Generated ${CONTRACT_TARGET} contract successfully!`);
+    signale.success("Generated contract successfully!");
 }
+// yargs(hideBin(process.argv))
+//   .scriptName("near-sdk-js")
+//   .usage("$0 <cmd> [args]")
+//   .command(
+//     "build [source] [target]",
+//     "Build NEAR JS Smart-contract",
+//     (yargs) => {
+//       yargs
+//         .positional("source", {
+//           type: "string",
+//           default: "src/index.js",
+//           describe: "Contract to build",
+//         })
+//         .positional("target", {
+//           type: "string",
+//           default: "build/contract.wasm",
+//           describe: "Target file path and name",
+//         });
+//     },
+//     build
+//   )
+//   .help().argv;
+//
+// async function build(argv: yargs.ArgumentsCamelCase): Promise<void> {
+//   const SOURCE_FILE_WITH_PATH = argv.source;
+//   const SOURCE_EXT = argv.source.split(".").pop();
+//   const TARGET_DIR = path.dirname(argv.target);
+//   const TARGET_EXT = argv.target.split(".").pop();
+//   const TARGET_FILE_NAME = path.basename(argv.target, `.${TARGET_EXT}`);
+//
+//   if ("wasm" !== TARGET_EXT) {
+//     throw new Error(
+//       `Unsupported target ${TARGET_EXT}, make sure target ends with .wasm`
+//     );
+//   }
+//
+//   const ROLLUP_TARGET = `${TARGET_DIR}/${TARGET_FILE_NAME}.js`;
+//   const QJSC_TARGET = `${TARGET_DIR}/${TARGET_FILE_NAME}.h`;
+//   const CONTRACT_TARGET = `${TARGET_DIR}/${TARGET_FILE_NAME}.wasm`;
+//
+//   console.log(`Building ${SOURCE_FILE_WITH_PATH} contract...`);
+//
+//   if (SOURCE_EXT === "ts") {
+//     await checkTsBuildWithTsc(SOURCE_FILE_WITH_PATH);
+//   }
+//
+//   console.log(`Creating ${TARGET_DIR} directory...`);
+//   await executeCommand(`mkdir -p ${TARGET_DIR}`);
+//
+//   await createJsFileWithRullup(SOURCE_FILE_WITH_PATH, ROLLUP_TARGET);
+//
+//   await createHeaderFileWithQjsc(ROLLUP_TARGET, QJSC_TARGET);
+//
+//   await createMethodsHeaderFile(ROLLUP_TARGET);
+//   await createWasmContract(QJSC_TARGET, CONTRACT_TARGET);
+//   await wasiStubContract(CONTRACT_TARGET);
+// }
 async function checkTsBuildWithTsc(sourceFileWithPath, verbose = false) {
     await executeCommand(`${TSC} --noEmit --experimentalDecorators --target es2020 --moduleResolution node ${sourceFileWithPath}`, verbose);
 }
 // Common build function
-async function createJsFileWithRullup(sourceFileWithPath, rollupTarget, verbose = false) {
+async function createJsFileWithRullup(sourceFileWithPath, rollupTarget, _verbose = false) {
     const bundle = await rollup({
         input: sourceFileWithPath,
         plugins: [
@@ -78,7 +140,7 @@ async function createJsFileWithRullup(sourceFileWithPath, rollupTarget, verbose 
                 presets: ["@babel/preset-typescript"],
                 plugins: [
                     "near-sdk-js/lib/build-tools/include-bytes.js",
-                    ["near-sdk-js/lib/build-tools/near-bindgen-exporter.js", { verbose }],
+                    "near-sdk-js/lib/build-tools/near-bindgen-exporter.js",
                     ["@babel/plugin-proposal-decorators", { version: "legacy" }],
                 ],
             }),

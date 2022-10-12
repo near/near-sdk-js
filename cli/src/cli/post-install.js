@@ -1,7 +1,4 @@
 import { executeCommand } from "./utils.js";
-import signal from "signale";
-const { Signale } = signal;
-const signale = new Signale({ scope: "postinstall", interactive: true });
 async function download(url, verbose = false) {
     await executeCommand(`curl -LOf ${url}`, verbose);
 }
@@ -15,7 +12,7 @@ if (ARCH !== "x86_64" && ARCH !== "arm64") {
     console.error(` ${ARCH} architecture is unsapported at the moment`);
     process.exit(1);
 }
-signale.await("Installing wasi-stub...");
+console.log("Installing wasi-stub...");
 const BINARYEN_VERSION = `0.1.10`;
 const BINARYEN_VERSION_TAG = `v${BINARYEN_VERSION}`;
 const BINARYEN_SYSTEM_NAME = OS === "Linux" ? "Linux" : OS === "Darwin" ? "macOS" : "other";
@@ -24,7 +21,7 @@ const BINARYEN_TAR_NAME = `binaryen-${BINARYEN_SYSTEM_NAME}-${BINARYEN_ARCH_NAME
 await download(`https://github.com/near/binaryen/releases/download/${BINARYEN_VERSION_TAG}/${BINARYEN_TAR_NAME}`);
 await executeCommand(`mkdir -p binaryen && tar xvf ${BINARYEN_TAR_NAME} --directory binaryen`);
 await executeCommand(`rm ${BINARYEN_TAR_NAME}`);
-signale.await("Installing QuickJS...");
+console.log("Installing QuickJS...");
 const QUICK_JS_VERSION = `0.1.2`;
 const QUICK_JS_VERSION_TAG = `v${QUICK_JS_VERSION}`;
 const QUICK_JS_SYSTEM_NAME = OS === "Linux" ? "Linux" : OS === "Darwin" ? "macOS" : "other";
@@ -47,7 +44,7 @@ await executeCommand(`mv ${QUICK_JS_DOWNLOADED_FOLDER_NAME} ${QUICK_JS_TARGET_FO
 await executeCommand(`mv ${QUICK_JS_DOWNLOADED_NAME} ${QUICK_JS_TARGET_NAME}`);
 // chmod qjsc
 await executeCommand(`chmod 777 ${QUICK_JS_TARGET_NAME}`);
-signale.await("Installing wasi-sdk...");
+console.log("Installing wasi-sdk...");
 const WASI_SDK_MAJOR_VER = 11;
 const WASI_SDK_MINOR_VER = 0;
 const WASI_SDK_DOWNLOADED_FOLDER_NAME = `wasi-sdk-${WASI_SDK_MAJOR_VER}.${WASI_SDK_MINOR_VER}`;
@@ -61,4 +58,3 @@ await executeCommand(`tar xvf ${WASI_SDK_TAR_NAME}`);
 await executeCommand(`rm ${WASI_SDK_TAR_NAME}`);
 // Delete version from folder name
 await executeCommand(`mv ${WASI_SDK_DOWNLOADED_FOLDER_NAME} wasi-sdk`);
-signale.success("Successfully finished postinstall script!");

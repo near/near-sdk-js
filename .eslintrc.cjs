@@ -1,3 +1,4 @@
+/** @type {import('eslint').Linter.Config} */
 module.exports = {
   root: true,
   env: {
@@ -16,7 +17,11 @@ module.exports = {
       parserOptions: {
         ecmaVersion: "latest",
         sourceType: "module",
-        project: ["./{t,j}sconfig.json", "./**/{t,j}sconfig.json"],
+        project: [
+          "./{t,j}sconfig.json",
+          "./**/{t,j}sconfig.json",
+          "./tsconfig.cli.json",
+        ],
       },
       plugins: ["@typescript-eslint"],
       rules: {
@@ -41,6 +46,7 @@ module.exports = {
     "build",
     "./**/deps",
     "deps",
+    "cli",
   ],
   rules: {},
 };
