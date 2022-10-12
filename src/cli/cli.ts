@@ -3,19 +3,16 @@
 import fs from "fs/promises";
 import path, { basename, dirname } from "path";
 
-// import yargs from "yargs";
-// import { hideBin } from "yargs/helpers";
-
 import { nodeResolve } from "@rollup/plugin-node-resolve";
 import sourcemaps from "rollup-plugin-sourcemaps";
 import { babel } from "@rollup/plugin-babel";
 import { rollup } from "rollup";
 import { Command } from "commander";
 import signal from "signale";
-const { Signale } = signal;
 
 import { executeCommand } from "./utils.js";
 
+const { Signale } = signal;
 const PROJECT_DIR = process.cwd();
 const NEAR_SDK_JS = "node_modules/near-sdk-js";
 const TSC = "node_modules/.bin/tsc";
@@ -41,8 +38,7 @@ export async function buildCom(
   source: string,
   target: string,
   { verbose = false }: { verbose: boolean }
-): // command: Command
-Promise<void> {
+): Promise<void> {
   const SOURCE_EXT = source.split(".").pop();
   const TARGET_DIR = dirname(target);
   const TARGET_EXT = target.split(".").pop();

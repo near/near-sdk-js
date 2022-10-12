@@ -23,7 +23,7 @@
   "scripts": {
     "build": "yarn build:lib && yarn build:cli",
     "build:lib": "tsc -p ./tsconfig.json",
-    "build:cli": "tsc -p ./tsconfig.cli.json",
+    "build:cli": "tsc -p ./tsconfig.cli.json && chmod u+x cli/cli.js",
     "pretest": "yarn build",
     "test": "yarn test:unit && yarn test:examples",
     "lint": "eslint --fix .",
