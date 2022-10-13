@@ -6,7 +6,7 @@ on:
       - master
       - develop
 jobs:
-  unit-tests:
+  build:
     strategy:
       matrix:
         platform: [ubuntu-latest]
