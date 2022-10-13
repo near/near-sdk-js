@@ -5,7 +5,7 @@ test.beforeEach(async (t) => {
   const worker = await Worker.init();
 
   const totalSupply = 1000;
-  const yoctoAccountStorage = "45";
+  const yoctoAccountStorage = "90";
 
   const root = worker.rootAccount;
   const xcc = await root.devDeploy("./build/fungible-token-helper.wasm");

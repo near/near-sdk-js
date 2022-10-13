@@ -11,30 +11,30 @@ import {
 
 @NearBindgen({ requireInit: true })
 export class FungibleToken {
-  accounts: LookupMap<string>;
+  accounts: LookupMap<bigint>;
   accountRegistrants: LookupMap<string>;
-  accountDeposits: LookupMap<string>;
-  totalSupply: string;
+  accountDeposits: LookupMap<bigint>;
+  totalSupply: bigint;
 
   constructor() {
     this.accounts = new LookupMap("a");
     this.accountRegistrants = new LookupMap("r");
     this.accountDeposits = new LookupMap("d");
-    this.totalSupply = "0";
+    this.totalSupply = BigInt("0");
   }
 
   @initialize({})
   init({ owner_id, total_supply }: { owner_id: string; total_supply: string }) {
     Assertions.isLeftGreaterThanRight(total_supply, 0);
     validateAccountId(owner_id);
-    this.totalSupply = total_supply;
+    this.totalSupply = BigInt(total_supply);
     this.accounts.set(owner_id, this.totalSupply);
   }
 
   internalGetAccountStorageUsage(accountLength: number): bigint {
     const initialStorageUsage = near.storageUsage();
     const tempAccountId = "a".repeat(64);
-    this.accounts.set(tempAccountId, "0");
+    this.accounts.set(tempAccountId, BigInt("0"));
     const len64StorageUsage = near.storageUsage() - initialStorageUsage;
     const len1StorageUsage = len64StorageUsage / BigInt(64);
     const lenAccountStorageUsage = len1StorageUsage * BigInt(accountLength);
@@ -55,9 +55,9 @@ export class FungibleToken {
       !this.accounts.containsKey(accountId),
       "Account is already registered"
     );
-    this.accounts.set(accountId, "0");
+    this.accounts.set(accountId, BigInt("0"));
     this.accountRegistrants.set(accountId, registrantAccountId);
-    this.accountDeposits.set(accountId, amount);
+    this.accountDeposits.set(accountId, BigInt(amount));
   }
 
   internalSendNEAR(receivingAccountId: string, amount: bigint) {
@@ -77,15 +77,15 @@ export class FungibleToken {
       this.accounts.containsKey(accountId),
       `Account ${accountId} is not registered`
     );
-    return this.accounts.get(accountId);
+    return this.accounts.get(accountId).toString();
   }
 
   internalDeposit(accountId: string, amount: string) {
     const balance = this.internalGetBalance(accountId);
     const newBalance = BigInt(balance) + BigInt(amount);
-    this.accounts.set(accountId, newBalance.toString());
+    this.accounts.set(accountId, newBalance);
     const newSupply = BigInt(this.totalSupply) + BigInt(amount);
-    this.totalSupply = newSupply.toString();
+    this.totalSupply = newSupply;
   }
 
   internalWithdraw(accountId: string, amount: string) {
@@ -98,8 +98,8 @@ export class FungibleToken {
       "The account doesn't have enough balance"
     );
     Assertions.isLeftGreaterThanRight(newSupply, -1, "Total supply overflow");
-    this.accounts.set(accountId, newBalance.toString());
-    this.totalSupply = newSupply.toString();
+    this.accounts.set(accountId, newBalance);
+    this.totalSupply = newSupply;
   }
 
   internalTransfer(
