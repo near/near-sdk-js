@@ -14,7 +14,7 @@
     "build:counter-ts": "near-sdk-js build src/counter.ts build/counter-ts.wasm",
     "build:cross-contract-call": "near-sdk-js build src/status-message.js build/status-message.wasm && near-sdk-js build src/cross-contract-call.js build/cross-contract-call.wasm",
     "build:fungible-token-lockable": "near-sdk-js build src/fungible-token-lockable.js build/fungible-token-lockable.wasm",
-    "build:fungible-token": "near-sdk-js build src/fungible-token.js build/fungible-token.wasm && near-sdk-js build src/fungible-token-helper.js build/fungible-token-helper.wasm",
+    "build:fungible-token": "near-sdk-js build src/fungible-token.ts build/fungible-token.wasm && near-sdk-js build src/fungible-token-helper.ts build/fungible-token-helper.wasm",
     "build:non-fungible-token": "near-sdk-js build src/non-fungible-token-receiver.js build/non-fungible-token-receiver.wasm && near-sdk-js build src/non-fungible-token.js build/non-fungible-token.wasm",
     "build:status-message-collections": "near-sdk-js build src/status-message-collections.js build/status-message-collections.wasm",
     "build:parking-lot": "near-sdk-js build src/parking-lot.ts build/parking-lot.wasm",
