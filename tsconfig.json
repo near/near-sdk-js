@@ -20,5 +20,12 @@
     "resolveJsonModule": true,
     "allowJs": true
   },
-  "files": ["src/index.ts", "src/build-tools/near-bindgen-exporter.js", "src/build-tools/include-bytes.js"]
+  "files": [
+    "src/index.ts",
+    "src/build-tools/near-bindgen-exporter.ts",
+    "src/build-tools/include-bytes.ts",
+    "src/cli/cli.ts",
+    "src/cli/post-install.ts"
+  ],
+  "exclude": ["src/cli/**/*"]
 }

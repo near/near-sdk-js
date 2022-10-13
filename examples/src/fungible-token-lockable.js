@@ -42,7 +42,7 @@ class Account {
 }
 
 @NearBindgen({ initRequired: true })
-class LockableFungibleToken {
+export class LockableFungibleToken {
   constructor() {
     this.accounts = new LookupMap('a') // Account ID -> Account mapping
     this.totalSupply = 0 // Total supply of the all tokens

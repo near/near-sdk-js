@@ -1,5 +1,5 @@
-import { NearBindgen, call, view, NearPromise, near, bytes } from 'near-sdk-js'
-import { PublicKey } from 'near-sdk-js/lib/types'
+import { NearBindgen, call, NearPromise, near, bytes } from "near-sdk-js";
+import { PublicKey } from "near-sdk-js/lib/types";
 
 function callingData() {
   return {
@@ -15,7 +15,7 @@ function arrayN(n) {
 }
 
 @NearBindgen({})
-class HighlevelPromiseContract {
+export class HighlevelPromiseContract {
   @call({})
   test_promise_batch_stake() {
     let promise = NearPromise.new('highlevel-promise.test.near').stake(

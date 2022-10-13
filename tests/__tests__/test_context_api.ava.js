@@ -92,39 +92,56 @@ test('get attached deposit', async (t) => {
   const { carl, contextApiContract } = t.context.accounts
   let r = await carl.call(contextApiContract, 'get_attached_deposit', '', {
     attachedDeposit: 3,
-  })
-  t.is(r, 3)
-})
+  });
+  t.is(r, "3");
 
-test('get prepaid gas', async (t) => {
-  const { carl, contextApiContract } = t.context.accounts
-  let r = await carl.call(contextApiContract, 'get_prepaid_gas', '', {
-    gas: '10 TGas',
-  })
-  t.is(r, 10000000000000)
-})
+  for (let i = 1; i <= 10; i++) {
+    // 1 NEAR, 2 NEAR, ..., 10 NEAR
+    let r = await carl.call(
+      contextApiContract,
+      "get_attached_deposit",
+      {},
+      { attachedDeposit: i.toString() + "000000000000000000000000" }
+    );
+    t.is(r, i.toString() + "000000000000000000000000");
+  }
+});
 
-test('get used gas', async (t) => {
-  const { carl, contextApiContract } = t.context.accounts
-  let r = await carl.call(contextApiContract, 'get_used_gas', '', {
-    gas: '10 TGas',
-  })
-  t.is(r > 0, true)
-  t.is(r < 10000000000000, true)
-})
+test("get prepaid gas", async (t) => {
+  const { carl, contextApiContract } = t.context.accounts;
+  let r = await carl.call(contextApiContract, "get_prepaid_gas", "", {
+    gas: "10 TGas",
+  });
+  t.is(r, 10000000000000);
+});
 
-test('get random seed', async (t) => {
-  const { carl, contextApiContract } = t.context.accounts
-  let r = await carl.callRaw(contextApiContract, 'get_random_seed', '')
-  t.is(Buffer.from(r.result.status.SuccessValue, 'base64').length, 32)
-})
+test("get used gas", async (t) => {
+  const { carl, contextApiContract } = t.context.accounts;
+  let r = await carl.call(contextApiContract, "get_used_gas", "", {
+    gas: "10 TGas",
+  });
+  t.is(r > 0, true);
+  t.is(r < 10000000000000, true);
+});
 
-test('get validator stake test', async (t) => {
-  const { carl, contextApiContract, root } = t.context.accounts
-  let r = await carl.call(contextApiContract, 'get_validator_stake', '')
-  t.is(r, 0)
-  r = await root.callRaw(contextApiContract, 'get_validator_stake', '')
-  t.is(Buffer.from(r.result.status.SuccessValue, 'base64').toString('ascii'), '50000000000000000000000000000000')
-  r = await contextApiContract.viewRaw('get_total_stake', '')
-  t.is(Buffer.from(r.result).toString('ascii'), '50000000000000000000000000000000')
-})
+test("get random seed", async (t) => {
+  const { carl, contextApiContract } = t.context.accounts;
+  let r = await carl.callRaw(contextApiContract, "get_random_seed", "");
+  t.is(Buffer.from(r.result.status.SuccessValue, "base64").length, 32);
+});
+
+test("get validator stake test", async (t) => {
+  const { carl, contextApiContract, root } = t.context.accounts;
+  let r = await carl.call(contextApiContract, "get_validator_stake", "");
+  t.is(r, 0);
+  r = await root.callRaw(contextApiContract, "get_validator_stake", "");
+  t.is(
+    Buffer.from(r.result.status.SuccessValue, "base64").toString("ascii"),
+    "50000000000000000000000000000000"
+  );
+  r = await contextApiContract.viewRaw("get_total_stake", "");
+  t.is(
+    Buffer.from(r.result).toString("ascii"),
+    "50000000000000000000000000000000"
+  );
+});

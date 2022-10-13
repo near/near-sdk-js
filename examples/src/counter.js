@@ -1,8 +1,8 @@
-import { NearBindgen, near, call, view, initialize } from 'near-sdk-js'
-import { isUndefined } from 'lodash-es'
+import { NearBindgen, near, call, view } from "near-sdk-js";
+import { isUndefined } from "lodash-es";
 
 @NearBindgen({})
-class Counter {
+export class Counter {
   constructor() {
     this.count = 0
   }

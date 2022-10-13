@@ -8,7 +8,8 @@ export declare class ParsePublicKeyError extends Error {
 }
 export declare class InvalidLengthError extends ParsePublicKeyError {
     length: number;
-    constructor(length: number);
+    expectedLength: number;
+    constructor(length: number, expectedLength: number);
 }
 export declare class Base58Error extends ParsePublicKeyError {
     error: string;
@@ -17,9 +18,27 @@ export declare class Base58Error extends ParsePublicKeyError {
 export declare class UnknownCurve extends ParsePublicKeyError {
     constructor();
 }
+/**
+ * A abstraction on top of the NEAR public key string.
+ */
 export declare class PublicKey {
+    /**
+     * The actual value of the public key.
+     */
     data: Bytes;
+    private type;
+    /**
+     * @param data - The string you want to create a PublicKey from.
+     */
     constructor(data: Bytes);
+    /**
+     * The curve type of the public key.
+     */
     curveType(): CurveType;
-    static fromString(s: string): PublicKey;
+    /**
+     * Create a public key from a public key string.
+     *
+     * @param publicKeyString - The public key string you want to create a PublicKey from.
+     */
+    static fromString(publicKeyString: string): PublicKey;
 }

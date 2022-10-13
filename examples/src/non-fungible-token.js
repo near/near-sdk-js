@@ -8,7 +8,7 @@ class Token {
 }
 
 @NearBindgen({ requireInit: true })
-class NftContract {
+export class NftContract {
   constructor() {
     this.owner_id = ''
     this.owner_by_id = new LookupMap('a')
@@ -20,8 +20,14 @@ class NftContract {
     this.owner_by_id = new LookupMap(owner_by_id_prefix)
   }
 
-  internalTransfer({ sender_id, receiver_id, token_id, approval_id, memo }) {
-    let owner_id = this.owner_by_id.get(token_id)
+  internalTransfer({
+    sender_id,
+    receiver_id,
+    token_id,
+    approval_id: _ai,
+    memo: _m,
+  }) {
+    let owner_id = this.owner_by_id.get(token_id);
 
     assert(owner_id !== null, 'Token not found')
     assert(sender_id === owner_id, 'Sender must be the current owner')
@@ -106,10 +112,10 @@ class NftContract {
   }
 
   @call({})
-  nftMint({ token_id, token_owner_id, token_metadata }) {
-    let sender_id = near.predecessorAccountId()
-    assert(sender_id === this.owner_id, 'Unauthorized')
-    assert(this.owner_by_id.get(token_id) === null, 'Token ID must be unique')
+  nftMint({ token_id, token_owner_id, token_metadata: _ }) {
+    let sender_id = near.predecessorAccountId();
+    assert(sender_id === this.owner_id, "Unauthorized");
+    assert(this.owner_by_id.get(token_id) === null, "Token ID must be unique");
 
     this.owner_by_id.set(token_id, token_owner_id)
 

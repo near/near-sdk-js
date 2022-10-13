@@ -26,11 +26,11 @@ test.afterEach.always(async (t) => {
   })
 })
 
-test('UnorderedMap is empty by default', async (t) => {
-  const { root, unorderedMapContract } = t.context.accounts
-  const result = await unorderedMapContract.view('len', {})
-  t.is(result, 0)
-})
+test("UnorderedMap is empty by default", async (t) => {
+  const { unorderedMapContract } = t.context.accounts;
+  const result = await unorderedMapContract.view("len", {});
+  t.is(result, 0);
+});
 
 test('UnorderedMap set() get()', async (t) => {
   const { ali, unorderedMapContract } = t.context.accounts

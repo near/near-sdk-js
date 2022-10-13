@@ -2,7 +2,7 @@ import { NearBindgen, call, view, LookupMap } from 'near-sdk-js'
 import { House, Room } from './model.js'
 
 @NearBindgen({})
-class LookupMapTestContract {
+export class LookupMapTestContract {
   constructor() {
     this.lookupMap = new LookupMap('a')
   }

@@ -27,12 +27,12 @@ test.afterEach.always(async (t) => {
   })
 })
 
-test('UnorderedSet is empty by default', async (t) => {
-  const { root, unorderedSetContract } = t.context.accounts
-  const result = await unorderedSetContract.view('len', {})
-  t.is(result, 0)
-  t.is(await unorderedSetContract.view('isEmpty', {}), true)
-})
+test("UnorderedSet is empty by default", async (t) => {
+  const { unorderedSetContract } = t.context.accounts;
+  const result = await unorderedSetContract.view("len", {});
+  t.is(result, 0);
+  t.is(await unorderedSetContract.view("isEmpty", {}), true);
+});
 
 test('UnorderedSet set() contains()', async (t) => {
   const { ali, unorderedSetContract } = t.context.accounts

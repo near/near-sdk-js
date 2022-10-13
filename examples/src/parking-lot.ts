@@ -31,8 +31,9 @@ class Engine {
 }
 
 @NearBindgen({})
-class ParkingLot {
-  cars: LookupMap<CarSpecs>
+export class ParkingLot {
+  cars: LookupMap<CarSpecs>;
+
   constructor() {
     this.cars = new LookupMap<CarSpecs>('a')
   }

@@ -2,7 +2,7 @@ import { NearBindgen, call, view, UnorderedSet } from 'near-sdk-js'
 import { House, Room } from './model.js'
 
 @NearBindgen({})
-class UnorderedSetTestContract {
+export class UnorderedSetTestContract {
   constructor() {
     this.unorderedSet = new UnorderedSet('a')
   }

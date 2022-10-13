@@ -165,49 +165,69 @@ test('promise batch deploy contract and call', async (t) => {
     currentAccountId: deployed.accountId,
     signerAccountId: bob.accountId,
     predecessorAccountId: caller2Contract.accountId,
-    input: 'abc',
-  })
-})
+    input: "abc",
+  });
+});
 
-test('promise batch stake', async (t) => {
-  const { caller2Contract } = t.context.accounts
-  await caller2Contract.callRaw(caller2Contract, 'test_promise_batch_stake', '', { gas: '100 Tgas' })
-  let balance = await caller2Contract.balance()
-  t.is(balance.staked.toString(), '100000000000000000000000000000')
-})
+test("promise batch stake", async (t) => {
+  const { caller2Contract } = t.context.accounts;
+  await caller2Contract.callRaw(
+    caller2Contract,
+    "test_promise_batch_stake",
+    "",
+    { gas: "100 Tgas" }
+  );
+  let balance = await caller2Contract.balance();
+  t.is(balance.staked.toString(), "100000000000000000000000000000");
+});
 
-test('promise batch add full access key', async (t) => {
-  const { bob, caller2Contract } = t.context.accounts
-  let r = await bob.callRaw(caller2Contract, 'test_promise_add_full_access_key', '', { gas: '100 Tgas' })
-  t.is(r.result.status.SuccessValue, '')
-})
+test("promise batch add full access key", async (t) => {
+  const { bob, caller2Contract } = t.context.accounts;
+  let r = await bob.callRaw(
+    caller2Contract,
+    "test_promise_add_full_access_key",
+    "",
+    { gas: "100 Tgas" }
+  );
+  t.is(r.result.status.SuccessValue, "");
+});
 
-test('promise batch add function call key', async (t) => {
-  const { bob, caller2Contract } = t.context.accounts
-  let r = await bob.callRaw(caller2Contract, 'test_promise_add_function_call_access_key', '', { gas: '100 Tgas' })
-  t.is(r.result.status.SuccessValue, '')
-})
+test("promise batch add function call key", async (t) => {
+  const { bob, caller2Contract } = t.context.accounts;
+  let r = await bob.callRaw(
+    caller2Contract,
+    "test_promise_add_function_call_access_key",
+    "",
+    { gas: "100 Tgas" }
+  );
+  t.is(r.result.status.SuccessValue, "");
+});
 
-test('promise delete account', async (t) => {
-  const { bob, caller2Contract } = t.context.accounts
-  let r = await bob.callRaw(caller2Contract, 'test_delete_account', '', {
-    gas: '100 Tgas',
-  })
-  t.is(r.result.status.SuccessValue, '')
-  t.is(await caller2Contract.getSubAccount('e').exists(), false)
-})
+test("promise delete account", async (t) => {
+  const { bob, caller2Contract } = t.context.accounts;
+  let r = await bob.callRaw(caller2Contract, "test_delete_account", "", {
+    gas: "100 Tgas",
+  });
+  t.is(r.result.status.SuccessValue, "");
+  t.is(await caller2Contract.getSubAccount("e").exists(), false);
+});
 
-test('promise batch function call weight', async (t) => {
-  const { ali, caller2Contract, calleeContract } = t.context.accounts
-  let r = await ali.callRaw(caller2Contract, 'test_promise_batch_call_weight', '', { gas: '100 Tgas' })
-  t.assert(r.result.status.SuccessValue)
-})
+test("promise batch function call weight", async (t) => {
+  const { ali, caller2Contract } = t.context.accounts;
+  let r = await ali.callRaw(
+    caller2Contract,
+    "test_promise_batch_call_weight",
+    "",
+    { gas: "100 Tgas" }
+  );
+  t.assert(r.result.status.SuccessValue);
+});
 
-test('promise batch transfer overflow', async (t) => {
-  const { bob, caller2Contract } = t.context.accounts
-  let r = await bob.callRaw(caller2Contract, 'test_transfer_overflow', '', {
-    gas: '100 Tgas',
-  })
+test("promise batch transfer overflow", async (t) => {
+  const { bob, caller2Contract } = t.context.accounts;
+  let r = await bob.callRaw(caller2Contract, "test_transfer_overflow", "", {
+    gas: "100 Tgas",
+  });
   t.assert(
     r.result.status.Failure.ActionError.kind.FunctionCallError.ExecutionError.startsWith(
       'Smart contract panicked: Expect Uint128 for amount'

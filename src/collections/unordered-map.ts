@@ -1,32 +1,57 @@
-import { assert, Bytes, getValueWithOptions, Mutable } from '../utils'
-import { Vector, VectorIterator } from './vector'
-import { LookupMap } from './lookup-map'
-import { GetOptions } from '../types/collections'
+import {
+  assert,
+  Bytes,
+  ERR_INCONSISTENT_STATE,
+  getValueWithOptions,
+  Mutable,
+  serializeValueWithOptions,
+} from "../utils";
+import { Vector, VectorIterator } from "./vector";
+import { LookupMap } from "./lookup-map";
+import { GetOptions } from "../types/collections";
 
-const ERR_INCONSISTENT_STATE =
-  'The collection is an inconsistent state. Did previous smart contract execution terminate unexpectedly?'
+type ValueAndIndex = [value: string, index: number];
 
-type ValueAndIndex<DataType> = [value: DataType, index: number]
-
+/**
+ * An unordered map that stores data in NEAR storage.
+ */
 export class UnorderedMap<DataType> {
-  readonly keys: Vector<Bytes>
-  readonly values: LookupMap<ValueAndIndex<DataType>>
+  readonly keys: Vector<Bytes>;
+  readonly values: LookupMap<ValueAndIndex>;
 
+  /**
+   * @param prefix - The byte prefix to use when storing elements inside this collection.
+   */
   constructor(readonly prefix: Bytes) {
-    this.keys = new Vector<Bytes>(`${prefix}u`) // intentional different prefix with old UnorderedMap
-    this.values = new LookupMap<ValueAndIndex<DataType>>(`${prefix}m`)
+    this.keys = new Vector<Bytes>(`${prefix}u`); // intentional different prefix with old UnorderedMap
+    this.values = new LookupMap<ValueAndIndex>(`${prefix}m`);
   }
 
+  /**
+   * The number of elements stored in the collection.
+   */
   get length() {
     return this.keys.length
   }
 
+  /**
+   * Checks whether the collection is empty.
+   */
   isEmpty(): boolean {
     return this.keys.isEmpty()
   }
 
-  get(key: Bytes, options?: GetOptions<DataType>): DataType | null {
-    const valueAndIndex = this.values.get(key)
+  /**
+   * Get the data stored at the provided key.
+   *
+   * @param key - The key at which to look for the data.
+   * @param options - Options for retrieving the data.
+   */
+  get(
+    key: Bytes,
+    options?: Omit<GetOptions<DataType>, "serializer">
+  ): DataType | null {
+    const valueAndIndex = this.values.get(key);
 
     if (valueAndIndex === null) {
       return options?.defaultValue ?? null
@@ -37,27 +62,47 @@ export class UnorderedMap<DataType> {
     return getValueWithOptions(value, options)
   }
 
-  set(key: Bytes, value: DataType, options?: GetOptions<DataType>): DataType | null {
-    const valueAndIndex = this.values.get(key)
+  /**
+   * Store a new value at the provided key.
+   *
+   * @param key - The key at which to store in the collection.
+   * @param value - The value to store in the collection.
+   * @param options - Options for retrieving and storing the data.
+   */
+  set(
+    key: Bytes,
+    value: DataType,
+    options?: GetOptions<DataType>
+  ): DataType | null {
+    const valueAndIndex = this.values.get(key);
+    const serialized = serializeValueWithOptions(value, options);
 
     if (valueAndIndex === null) {
-      const nextIndex = this.length
+      const newElementIndex = this.length;
 
-      this.keys.push(key)
-      this.values.set(key, [value, nextIndex])
+      this.keys.push(key);
+      this.values.set(key, [serialized, newElementIndex]);
 
       return null
     }
 
-    const [oldValue] = valueAndIndex
-    valueAndIndex[0] = value
-    this.values.set(key, valueAndIndex)
+    const [oldValue, oldIndex] = valueAndIndex;
+    this.values.set(key, [serialized, oldIndex]);
 
     return getValueWithOptions(oldValue, options)
   }
 
-  remove(key: Bytes, options?: GetOptions<DataType>): DataType | null {
-    const oldValueAndIndex = this.values.remove(key)
+  /**
+   * Removes and retrieves the element with the provided key.
+   *
+   * @param key - The key at which to remove data.
+   * @param options - Options for retrieving the data.
+   */
+  remove(
+    key: Bytes,
+    options?: Omit<GetOptions<DataType>, "serializer">
+  ): DataType | null {
+    const oldValueAndIndex = this.values.remove(key);
 
     if (oldValueAndIndex === null) {
       return options?.defaultValue ?? null
@@ -75,12 +120,15 @@ export class UnorderedMap<DataType> {
 
       assert(swappedValueAndIndex !== null, ERR_INCONSISTENT_STATE)
 
-      this.values.set(swappedKey, [getValueWithOptions(swappedValueAndIndex[0], options), index])
+      this.values.set(swappedKey, [swappedValueAndIndex[0], index]);
     }
 
     return getValueWithOptions(value, options)
   }
 
+  /**
+   * Remove all of the elements stored within the collection.
+   */
   clear(): void {
     for (const key of this.keys) {
       // Set instead of remove to avoid loading the value from storage.
@@ -94,6 +142,11 @@ export class UnorderedMap<DataType> {
     return new UnorderedMapIterator<DataType>(this)
   }
 
+  /**
+   * Create a iterator on top of the default collection iterator using custom options.
+   *
+   * @param options - Options for retrieving and storing the data.
+   */
   private createIteratorWithOptions(options?: GetOptions<DataType>): {
     [Symbol.iterator](): UnorderedMapIterator<DataType>
   } {
@@ -102,6 +155,11 @@ export class UnorderedMap<DataType> {
     }
   }
 
+  /**
+   * Return a JavaScript array of the data stored within the collection.
+   *
+   * @param options - Options for retrieving and storing the data.
+   */
   toArray(options?: GetOptions<DataType>): [Bytes, DataType][] {
     const array = []
 
@@ -114,18 +172,34 @@ export class UnorderedMap<DataType> {
     return array
   }
 
+  /**
+   * Extends the current collection with the passed in array of key-value pairs.
+   *
+   * @param keyValuePairs - The key-value pairs to extend the collection with.
+   */
   extend(keyValuePairs: [Bytes, DataType][]) {
     for (const [key, value] of keyValuePairs) {
       this.set(key, value)
     }
   }
 
-  serialize(): string {
-    return JSON.stringify(this)
+  /**
+   * Serialize the collection.
+   *
+   * @param options - Options for storing the data.
+   */
+  serialize(options?: Pick<GetOptions<DataType>, "serializer">): string {
+    return serializeValueWithOptions(this, options);
   }
 
-  // converting plain object to class object
-  static reconstruct<DataType>(data: UnorderedMap<DataType>): UnorderedMap<DataType> {
+  /**
+   * Converts the deserialized data from storage to a JavaScript instance of the collection.
+   *
+   * @param data - The deserialized data to create an instance from.
+   */
+  static reconstruct<DataType>(
+    data: UnorderedMap<DataType>
+  ): UnorderedMap<DataType> {
     // removing readonly modifier
     type MutableUnorderedMap = Mutable<UnorderedMap<DataType>>
     const map = new UnorderedMap(data.prefix) as MutableUnorderedMap
@@ -140,29 +214,39 @@ export class UnorderedMap<DataType> {
   }
 }
 
+/**
+ * An iterator for the UnorderedMap collection.
+ */
 class UnorderedMapIterator<DataType> {
-  private keys: VectorIterator<Bytes>
-  private map: LookupMap<ValueAndIndex<DataType>>
+  private keys: VectorIterator<Bytes>;
+  private map: LookupMap<ValueAndIndex>;
 
-  constructor(unorderedMap: UnorderedMap<DataType>, private options?: GetOptions<DataType>) {
-    this.keys = new VectorIterator(unorderedMap.keys)
-    this.map = unorderedMap.values
+  /**
+   * @param unorderedMap - The unordered map collection to create an iterator for.
+   * @param options - Options for retrieving and storing data.
+   */
+  constructor(
+    unorderedMap: UnorderedMap<DataType>,
+    private options?: GetOptions<DataType>
+  ) {
+    this.keys = new VectorIterator(unorderedMap.keys);
+    this.map = unorderedMap.values;
   }
 
-  next(): { value: [unknown | null, unknown | null]; done: boolean } {
-    const key = this.keys.next()
+  next(): { value: [Bytes | null, DataType | null]; done: boolean } {
+    const key = this.keys.next();
 
     if (key.done) {
       return { value: [key.value, null], done: key.done }
     }
 
-    const [value] = this.map.get(key.value)
+    const valueAndIndex = this.map.get(key.value);
 
-    assert(value !== null, ERR_INCONSISTENT_STATE)
+    assert(valueAndIndex !== null, ERR_INCONSISTENT_STATE);
 
     return {
       done: key.done,
-      value: [key.value, getValueWithOptions(value, this.options)],
-    }
+      value: [key.value, getValueWithOptions(valueAndIndex[0], this.options)],
+    };
   }
 }

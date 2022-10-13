@@ -1,8 +1,8 @@
 import { near, NearBindgen, call, view } from 'near-sdk-js'
 
 @NearBindgen({})
-class PayableTest {
-  value: string
+export class PayableTest {
+  value: string;
 
   constructor() {
     this.value = ''

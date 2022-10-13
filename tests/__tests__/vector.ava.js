@@ -23,42 +23,46 @@ test.beforeEach(async (t) => {
 
 test.afterEach.always(async (t) => {
   await t.context.worker.tearDown().catch((error) => {
-    console.log('Failed to tear down the worker:', error)
-  })
-})
+    console.log("Failed to tear down the worker:", error);
+  });
+});
 
-test('Vector is empty by default', async (t) => {
-  const { root, vectorContract } = t.context.accounts
-  let result = await vectorContract.view('len', {})
-  t.is(result, 0)
-  t.is(await vectorContract.view('isEmpty', {}), true)
-})
+test("Vector is empty by default", async (t) => {
+  const { vectorContract } = t.context.accounts;
+  let result = await vectorContract.view("len", {});
+  t.is(result, 0);
+  t.is(await vectorContract.view("isEmpty", {}), true);
+});
 
-test('Vector push, get, pop, replace', async (t) => {
-  const { ali, vectorContract } = t.context.accounts
-  await ali.call(vectorContract, 'push', { value: 'hello' })
-  await ali.call(vectorContract, 'push', { value: 'world' })
-  await ali.call(vectorContract, 'push', { value: 'aaa' })
-  let result = await vectorContract.view('len', {})
-  t.is(result, 3)
-  t.is(await vectorContract.view('get', { index: 0 }), 'hello')
-  t.is(await vectorContract.view('get', { index: 2 }), 'aaa')
-  t.is(await vectorContract.view('get', { index: 3 }), null)
+test("Vector push, get, pop, replace", async (t) => {
+  const { ali, vectorContract } = t.context.accounts;
+  await ali.call(vectorContract, "push", { value: "hello" });
+  await ali.call(vectorContract, "push", { value: "world" });
+  await ali.call(vectorContract, "push", { value: "aaa" });
+  let result = await vectorContract.view("len", {});
+  t.is(result, 3);
+  t.is(await vectorContract.view("get", { index: 0 }), "hello");
+  t.is(await vectorContract.view("get", { index: 2 }), "aaa");
+  t.is(await vectorContract.view("get", { index: 3 }), null);
 
-  await ali.call(vectorContract, 'pop', {})
-  ;(result = await vectorContract.view('len', {})), t.is(result, 2)
-  t.is(await vectorContract.view('get', { index: 2 }), null)
-  t.is(await vectorContract.view('get', { index: 1 }), 'world')
-  await ali.call(vectorContract, 'replace', { index: 1, value: 'aaa' })
-  t.is(await vectorContract.view('get', { index: 1 }), 'aaa')
-})
+  await ali.call(vectorContract, "pop", {});
+  (result = await vectorContract.view("len", {})), t.is(result, 2);
+  t.is(await vectorContract.view("get", { index: 2 }), null);
+  t.is(await vectorContract.view("get", { index: 1 }), "world");
+  await ali.call(vectorContract, "replace", { index: 1, value: "aaa" });
+  t.is(await vectorContract.view("get", { index: 1 }), "aaa");
+});
 
-test('Vector extend, toArray, swapRemove, clear', async (t) => {
-  const { ali, vectorContract } = t.context.accounts
+test("Vector extend, toArray, swapRemove, clear", async (t) => {
+  const { ali, vectorContract } = t.context.accounts;
 
-  await ali.call(vectorContract, 'extend', { kvs: ['hello', 'world', 'aaa'] })
+  await ali.call(vectorContract, "extend", { kvs: ["hello", "world", "aaa"] });
 
-  t.deepEqual(await vectorContract.view('toArray', {}), ['hello', 'world', 'aaa'])
+  t.deepEqual(await vectorContract.view("toArray", {}), [
+    "hello",
+    "world",
+    "aaa",
+  ]);
 
   // swapRemove non existing element should error
   const error1 = await t.throwsAsync(() => ali.call(vectorContract, 'swapRemove', { index: 3 }))

@@ -1,3 +1,4 @@
+/** @type {import('eslint').Linter.Config} */
 module.exports = {
   root: true,
   env: {
@@ -28,6 +29,17 @@ module.exports = {
       },
     },
   ],
-  ignorePatterns: ['./**/node_modules', 'node_modules', './**/lib', 'lib', './**/build', 'build', './**/deps', 'deps'],
+  ignorePatterns: [
+    "./**/node_modules",
+    "node_modules",
+    "./**/lib",
+    "lib",
+    "./**/build",
+    "build",
+    "./**/deps",
+    "deps",
+    "cli/**/*.ts",
+    "cli/**/*.js",
+  ],
   rules: {},
 }

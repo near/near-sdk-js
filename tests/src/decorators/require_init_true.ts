@@ -1,8 +1,8 @@
 import { near, NearBindgen, call, view, initialize } from 'near-sdk-js'
 
 @NearBindgen({ requireInit: true })
-class NBTest {
-  status: string
+export class NBTest {
+  status: string;
 
   constructor() {
     this.status = ''

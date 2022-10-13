@@ -2,7 +2,7 @@ import { NearBindgen, call, view, Vector } from 'near-sdk-js'
 import { House, Room } from './model.js'
 
 @NearBindgen({})
-class VectorTestContract {
+export class VectorTestContract {
   constructor() {
     this.vector = new Vector('a')
   }
