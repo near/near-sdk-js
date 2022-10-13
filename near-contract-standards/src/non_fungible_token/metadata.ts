@@ -1,8 +1,8 @@
-import { Bytes } from 'near-sdk-js'
-import { near, assert } from 'near-sdk-js'
-import { Option } from 'near-sdk-js/lib/utils'
+import { Bytes } from "near-sdk-js";
+import { near, assert } from "near-sdk-js";
+import { Option } from "near-sdk-js/lib/utils";
 
-export const NFT_METADATA_SPEC = 'nft-1.0.0'
+export const NFT_METADATA_SPEC = "nft-1.0.0";
 
 export class NFTContractMetadata {
   constructor(
@@ -16,10 +16,13 @@ export class NFTContractMetadata {
   ) {}
 
   assert_valid() {
-    assert(this.spec == NFT_METADATA_SPEC, 'Spec is not NFT metadata')
-    assert((this.reference != null) == (this.reference_hash != null), 'Reference and reference hash must be present')
+    assert(this.spec == NFT_METADATA_SPEC, "Spec is not NFT metadata");
+    assert(
+      (this.reference != null) == (this.reference_hash != null),
+      "Reference and reference hash must be present"
+    );
     if (this.reference_hash != null) {
-      assert(this.reference_hash.length == 32, 'Hash has to be 32 bytes')
+      assert(this.reference_hash.length == 32, "Hash has to be 32 bytes");
     }
   }
 }
@@ -41,14 +44,23 @@ export class TokenMetadata {
   ) {}
 
   assert_valid() {
-    assert((this.media != null) == (this.media_hash != null), 'Media and media hash must be present')
+    assert(
+      (this.media != null) == (this.media_hash != null),
+      "Media and media hash must be present"
+    );
     if (this.media_hash != null) {
-      assert(this.media_hash.length == 32, 'Media hash has to be 32 bytes')
+      assert(this.media_hash.length == 32, "Media hash has to be 32 bytes");
     }
 
-    assert((this.reference != null) == (this.reference_hash != null), 'Reference and reference hash must be present')
+    assert(
+      (this.reference != null) == (this.reference_hash != null),
+      "Reference and reference hash must be present"
+    );
     if (this.reference_hash != null) {
-      assert(this.reference_hash.length == 32, 'Reference hash has to be 32 bytes')
+      assert(
+        this.reference_hash.length == 32,
+        "Reference hash has to be 32 bytes"
+      );
     }
   }
 }

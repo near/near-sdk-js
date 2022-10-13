@@ -11,11 +11,11 @@ import {
 import { GetOptions } from "../types/collections";
 
 function indexToKey(prefix: Bytes, index: number): Bytes {
-  const data = new Uint32Array([index])
-  const array = new Uint8Array(data.buffer)
-  const key = u8ArrayToBytes(array)
+  const data = new Uint32Array([index]);
+  const array = new Uint8Array(data.buffer);
+  const key = u8ArrayToBytes(array);
 
-  return prefix + key
+  return prefix + key;
 }
 
 /**
@@ -33,7 +33,7 @@ export class Vector<DataType> {
    * Checks whether the collection is empty.
    */
   isEmpty(): boolean {
-    return this.length === 0
+    return this.length === 0;
   }
 
   /**
@@ -53,7 +53,7 @@ export class Vector<DataType> {
     const storageKey = indexToKey(this.prefix, index);
     const value = near.storageRead(storageKey);
 
-    return getValueWithOptions(value, options)
+    return getValueWithOptions(value, options);
   }
 
   /**
@@ -65,10 +65,10 @@ export class Vector<DataType> {
    * @param options - Options for retrieving and storing the data.
    */
   swapRemove(index: number, options?: GetOptions<DataType>): DataType | null {
-    assert(index < this.length, ERR_INDEX_OUT_OF_BOUNDS)
+    assert(index < this.length, ERR_INDEX_OUT_OF_BOUNDS);
 
     if (index + 1 === this.length) {
-      return this.pop(options)
+      return this.pop(options);
     }
 
     const key = indexToKey(this.prefix, index);
@@ -81,7 +81,7 @@ export class Vector<DataType> {
 
     const value = near.storageGetEvicted();
 
-    return getValueWithOptions(value, options)
+    return getValueWithOptions(value, options);
   }
 
   /**
@@ -107,18 +107,18 @@ export class Vector<DataType> {
    */
   pop(options?: Omit<GetOptions<DataType>, "serializer">): DataType | null {
     if (this.isEmpty()) {
-      return options?.defaultValue ?? null
+      return options?.defaultValue ?? null;
     }
 
-    const lastIndex = this.length - 1
-    const lastKey = indexToKey(this.prefix, lastIndex)
-    this.length -= 1
+    const lastIndex = this.length - 1;
+    const lastKey = indexToKey(this.prefix, lastIndex);
+    this.length -= 1;
 
-    assert(near.storageRemove(lastKey), ERR_INCONSISTENT_STATE)
+    assert(near.storageRemove(lastKey), ERR_INCONSISTENT_STATE);
 
     const value = near.storageGetEvicted();
 
-    return getValueWithOptions(value, options)
+    return getValueWithOptions(value, options);
   }
 
   /**
@@ -143,7 +143,7 @@ export class Vector<DataType> {
 
     const value = near.storageGetEvicted();
 
-    return getValueWithOptions(value, options)
+    return getValueWithOptions(value, options);
   }
 
   /**
@@ -153,12 +153,12 @@ export class Vector<DataType> {
    */
   extend(elements: DataType[]): void {
     for (const element of elements) {
-      this.push(element)
+      this.push(element);
     }
   }
 
   [Symbol.iterator](): VectorIterator<DataType> {
-    return new VectorIterator(this)
+    return new VectorIterator(this);
   }
 
   /**
@@ -167,11 +167,11 @@ export class Vector<DataType> {
    * @param options - Options for retrieving and storing the data.
    */
   private createIteratorWithOptions(options?: GetOptions<DataType>): {
-    [Symbol.iterator](): VectorIterator<DataType>
+    [Symbol.iterator](): VectorIterator<DataType>;
   } {
     return {
       [Symbol.iterator]: () => new VectorIterator(this, options),
-    }
+    };
   }
 
   /**
@@ -180,15 +180,15 @@ export class Vector<DataType> {
    * @param options - Options for retrieving and storing the data.
    */
   toArray(options?: GetOptions<DataType>): DataType[] {
-    const array = []
+    const array = [];
 
-    const iterator = options ? this.createIteratorWithOptions(options) : this
+    const iterator = options ? this.createIteratorWithOptions(options) : this;
 
     for (const value of iterator) {
       array.push(value);
     }
 
-    return array
+    return array;
   }
 
   /**
@@ -196,11 +196,11 @@ export class Vector<DataType> {
    */
   clear(): void {
     for (let index = 0; index < this.length; index++) {
-      const key = indexToKey(this.prefix, index)
-      near.storageRemove(key)
+      const key = indexToKey(this.prefix, index);
+      near.storageRemove(key);
     }
 
-    this.length = 0
+    this.length = 0;
   }
 
   /**
@@ -220,7 +220,7 @@ export class Vector<DataType> {
   static reconstruct<DataType>(data: Vector<DataType>): Vector<DataType> {
     const vector = new Vector<DataType>(data.prefix, data.length);
 
-    return vector
+    return vector;
   }
 }
 
@@ -240,16 +240,16 @@ export class VectorIterator<DataType> {
   ) {}
 
   next(): {
-    value: DataType | null
-    done: boolean
+    value: DataType | null;
+    done: boolean;
   } {
     if (this.current >= this.vector.length) {
-      return { value: null, done: true }
+      return { value: null, done: true };
     }
 
-    const value = this.vector.get(this.current, this.options)
-    this.current += 1
+    const value = this.vector.get(this.current, this.options);
+    this.current += 1;
 
-    return { value, done: false }
+    return { value, done: false };
   }
 }

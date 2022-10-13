@@ -22,7 +22,7 @@ export abstract class PromiseAction {
  */
 export class CreateAccount extends PromiseAction {
   add(promiseIndex: PromiseIndex) {
-    near.promiseBatchActionCreateAccount(promiseIndex)
+    near.promiseBatchActionCreateAccount(promiseIndex);
   }
 }
 
@@ -36,11 +36,11 @@ export class DeployContract extends PromiseAction {
    * @param code - The code of the contract to be deployed.
    */
   constructor(public code: Bytes) {
-    super()
+    super();
   }
 
   add(promiseIndex: PromiseIndex) {
-    near.promiseBatchActionDeployContract(promiseIndex, this.code)
+    near.promiseBatchActionDeployContract(promiseIndex, this.code);
   }
 }
 
@@ -66,7 +66,13 @@ export class FunctionCall extends PromiseAction {
   }
 
   add(promiseIndex: PromiseIndex) {
-    near.promiseBatchActionFunctionCall(promiseIndex, this.functionName, this.args, this.amount, this.gas)
+    near.promiseBatchActionFunctionCall(
+      promiseIndex,
+      this.functionName,
+      this.args,
+      this.amount,
+      this.gas
+    );
   }
 }
 
@@ -90,7 +96,7 @@ export class FunctionCallWeight extends PromiseAction {
     public gas: Gas,
     public weight: GasWeight
   ) {
-    super()
+    super();
   }
 
   add(promiseIndex: PromiseIndex) {
@@ -101,7 +107,7 @@ export class FunctionCallWeight extends PromiseAction {
       this.amount,
       this.gas,
       this.weight
-    )
+    );
   }
 }
 
@@ -115,11 +121,11 @@ export class Transfer extends PromiseAction {
    * @param amount - The amount of NEAR to tranfer.
    */
   constructor(public amount: Balance) {
-    super()
+    super();
   }
 
   add(promiseIndex: PromiseIndex) {
-    near.promiseBatchActionTransfer(promiseIndex, this.amount)
+    near.promiseBatchActionTransfer(promiseIndex, this.amount);
   }
 }
 
@@ -134,11 +140,15 @@ export class Stake extends PromiseAction {
    * @param publicKey - The public key to use for staking.
    */
   constructor(public amount: Balance, public publicKey: PublicKey) {
-    super()
+    super();
   }
 
   add(promiseIndex: PromiseIndex) {
-    near.promiseBatchActionStake(promiseIndex, this.amount, this.publicKey.data)
+    near.promiseBatchActionStake(
+      promiseIndex,
+      this.amount,
+      this.publicKey.data
+    );
   }
 }
 
@@ -153,11 +163,15 @@ export class AddFullAccessKey extends PromiseAction {
    * @param nonce - The nonce to use.
    */
   constructor(public publicKey: PublicKey, public nonce: Nonce) {
-    super()
+    super();
   }
 
   add(promiseIndex: PromiseIndex) {
-    near.promiseBatchActionAddKeyWithFullAccess(promiseIndex, this.publicKey.data, this.nonce)
+    near.promiseBatchActionAddKeyWithFullAccess(
+      promiseIndex,
+      this.publicKey.data,
+      this.nonce
+    );
   }
 }
 
@@ -181,7 +195,7 @@ export class AddAccessKey extends PromiseAction {
     public functionNames: string,
     public nonce: Nonce
   ) {
-    super()
+    super();
   }
 
   add(promiseIndex: PromiseIndex) {
@@ -192,7 +206,7 @@ export class AddAccessKey extends PromiseAction {
       this.allowance,
       this.receiverId,
       this.functionNames
-    )
+    );
   }
 }
 
@@ -206,11 +220,11 @@ export class DeleteKey extends PromiseAction {
    * @param publicKey - The public key to delete from the account.
    */
   constructor(public publicKey: PublicKey) {
-    super()
+    super();
   }
 
   add(promiseIndex: PromiseIndex) {
-    near.promiseBatchActionDeleteKey(promiseIndex, this.publicKey.data)
+    near.promiseBatchActionDeleteKey(promiseIndex, this.publicKey.data);
   }
 }
 /**
@@ -223,11 +237,11 @@ export class DeleteAccount extends PromiseAction {
    * @param beneficiaryId - The beneficiary of the account deletion - the account to recieve all of the remaining funds of the deleted account.
    */
   constructor(public beneficiaryId: AccountId) {
-    super()
+    super();
   }
 
   add(promiseIndex: PromiseIndex) {
-    near.promiseBatchActionDeleteAccount(promiseIndex, this.beneficiaryId)
+    near.promiseBatchActionDeleteAccount(promiseIndex, this.beneficiaryId);
   }
 }
 
@@ -241,7 +255,7 @@ class PromiseSingle {
 
   constructRecursively(): PromiseIndex {
     if (this.promiseIndex !== null) {
-      return this.promiseIndex
+      return this.promiseIndex;
     }
 
     const promiseIndex = this.after
@@ -250,18 +264,22 @@ class PromiseSingle {
 
     this.actions.forEach((action) => action.add(promiseIndex));
 
-    this.promiseIndex = promiseIndex
+    this.promiseIndex = promiseIndex;
 
-    return promiseIndex
+    return promiseIndex;
   }
 }
 
 export class PromiseJoint {
-  constructor(public promiseA: NearPromise, public promiseB: NearPromise, public promiseIndex: PromiseIndex | null) {}
+  constructor(
+    public promiseA: NearPromise,
+    public promiseB: NearPromise,
+    public promiseIndex: PromiseIndex | null
+  ) {}
 
   constructRecursively(): PromiseIndex {
     if (this.promiseIndex !== null) {
-      return this.promiseIndex
+      return this.promiseIndex;
     }
 
     const result = near.promiseAnd(
@@ -270,11 +288,11 @@ export class PromiseJoint {
     );
     this.promiseIndex = result;
 
-    return result
+    return result;
   }
 }
 
-type PromiseSubtype = PromiseSingle | PromiseJoint
+type PromiseSubtype = PromiseSingle | PromiseJoint;
 
 /**
  * A high level class to construct and work with NEAR promises.
@@ -292,25 +310,25 @@ export class NearPromise {
    * @param accountId - The account ID on which to call the promise.
    */
   static new(accountId: AccountId): NearPromise {
-    const subtype = new PromiseSingle(accountId, [], null, null)
-    return new NearPromise(subtype, false)
+    const subtype = new PromiseSingle(accountId, [], null, null);
+    return new NearPromise(subtype, false);
   }
 
   private addAction(action: PromiseAction): NearPromise {
     if (this.subtype instanceof PromiseJoint) {
-      throw new Error('Cannot add action to a joint promise.')
+      throw new Error("Cannot add action to a joint promise.");
     }
 
-    this.subtype.actions.push(action)
+    this.subtype.actions.push(action);
 
-    return this
+    return this;
   }
 
   /**
    * Creates a create account promise action and adds it to the current promise.
    */
   createAccount(): NearPromise {
-    return this.addAction(new CreateAccount())
+    return this.addAction(new CreateAccount());
   }
 
   /**
@@ -319,7 +337,7 @@ export class NearPromise {
    * @param code - The code of the contract to be deployed.
    */
   deployContract(code: Bytes): NearPromise {
-    return this.addAction(new DeployContract(code))
+    return this.addAction(new DeployContract(code));
   }
 
   /**
@@ -366,7 +384,7 @@ export class NearPromise {
    * @param amount - The amount of NEAR to tranfer.
    */
   transfer(amount: Balance): NearPromise {
-    return this.addAction(new Transfer(amount))
+    return this.addAction(new Transfer(amount));
   }
 
   /**
@@ -376,7 +394,7 @@ export class NearPromise {
    * @param publicKey - The public key to use for staking.
    */
   stake(amount: Balance, publicKey: PublicKey): NearPromise {
-    return this.addAction(new Stake(amount, publicKey))
+    return this.addAction(new Stake(amount, publicKey));
   }
 
   /**
@@ -386,7 +404,7 @@ export class NearPromise {
    * @param publicKey - The public key to add as a full access key.
    */
   addFullAccessKey(publicKey: PublicKey): NearPromise {
-    return this.addFullAccessKeyWithNonce(publicKey, 0n)
+    return this.addFullAccessKeyWithNonce(publicKey, 0n);
   }
 
   /**
@@ -397,7 +415,7 @@ export class NearPromise {
    * @param nonce - The nonce to use.
    */
   addFullAccessKeyWithNonce(publicKey: PublicKey, nonce: Nonce): NearPromise {
-    return this.addAction(new AddFullAccessKey(publicKey, nonce))
+    return this.addAction(new AddFullAccessKey(publicKey, nonce));
   }
 
   /**
@@ -452,7 +470,7 @@ export class NearPromise {
    * @param publicKey - The public key to delete from the account.
    */
   deleteKey(publicKey: PublicKey): NearPromise {
-    return this.addAction(new DeleteKey(publicKey))
+    return this.addAction(new DeleteKey(publicKey));
   }
 
   /**
@@ -461,7 +479,7 @@ export class NearPromise {
    * @param beneficiaryId - The beneficiary of the account deletion - the account to recieve all of the remaining funds of the deleted account.
    */
   deleteAccount(beneficiaryId: AccountId): NearPromise {
-    return this.addAction(new DeleteAccount(beneficiaryId))
+    return this.addAction(new DeleteAccount(beneficiaryId));
   }
 
   /**
@@ -470,8 +488,8 @@ export class NearPromise {
    * @param other - The promise to join with the current promise.
    */
   and(other: NearPromise): NearPromise {
-    const subtype = new PromiseJoint(this, other, null)
-    return new NearPromise(subtype, false)
+    const subtype = new PromiseJoint(this, other, null);
+    return new NearPromise(subtype, false);
   }
 
   /**
@@ -490,38 +508,38 @@ export class NearPromise {
       "Cannot callback promise which is already scheduled after another"
     );
 
-    other.subtype.after = this
+    other.subtype.after = this;
 
-    return other
+    return other;
   }
 
   /**
    * Sets the shouldReturn field to true.
    */
   asReturn(): NearPromise {
-    this.shouldReturn = true
-    return this
+    this.shouldReturn = true;
+    return this;
   }
 
   /**
    * Recursively goes through the current promise to get the promise index.
    */
   constructRecursively(): PromiseIndex {
-    const result = this.subtype.constructRecursively()
+    const result = this.subtype.constructRecursively();
 
     if (this.shouldReturn) {
-      near.promiseReturn(result)
+      near.promiseReturn(result);
     }
 
-    return result
+    return result;
   }
 
   /**
    * Called by NearBindgen, when return object is a NearPromise instance.
    */
   onReturn() {
-    this.asReturn().constructRecursively()
+    this.asReturn().constructRecursively();
   }
 }
 
-export type PromiseOrValue<T> = NearPromise | T
+export type PromiseOrValue<T> = NearPromise | T;

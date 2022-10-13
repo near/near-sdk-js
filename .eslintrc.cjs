@@ -7,23 +7,27 @@ module.exports = {
   },
   overrides: [
     {
-      files: ['./**/*.ts', './**/*.js'],
-      extends: ['eslint:recommended', 'plugin:@typescript-eslint/recommended', 'prettier'],
-      parser: '@typescript-eslint/parser',
+      files: ["./**/*.ts", "./**/*.js"],
+      extends: [
+        "eslint:recommended",
+        "plugin:@typescript-eslint/recommended",
+        "prettier",
+      ],
+      parser: "@typescript-eslint/parser",
       parserOptions: {
-        ecmaVersion: 'latest',
-        sourceType: 'module',
-        project: ['./{t,j}sconfig.json', './**/{t,j}sconfig.json'],
+        ecmaVersion: "latest",
+        sourceType: "module",
+        project: ["./{t,j}sconfig.json", "./**/{t,j}sconfig.json"],
       },
-      plugins: ['@typescript-eslint'],
+      plugins: ["@typescript-eslint"],
       rules: {
-        '@typescript-eslint/no-unused-vars': [
-          'warn',
+        "@typescript-eslint/no-unused-vars": [
+          "warn",
           {
-            varsIgnorePattern: '^_',
-            argsIgnorePattern: '^_',
-            destructuredArrayIgnorePattern: '^_',
-            caughtErrorsIgnorePattern: '^_',
+            varsIgnorePattern: "^_",
+            argsIgnorePattern: "^_",
+            destructuredArrayIgnorePattern: "^_",
+            caughtErrorsIgnorePattern: "^_",
           },
         ],
       },
@@ -42,4 +46,4 @@ module.exports = {
     "cli/**/*.js",
   ],
   rules: {},
-}
+};

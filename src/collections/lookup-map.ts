@@ -21,8 +21,8 @@ export class LookupMap<DataType> {
    * @param key - The value for which to check the presence.
    */
   containsKey(key: Bytes): boolean {
-    const storageKey = this.keyPrefix + key
-    return near.storageHasKey(storageKey)
+    const storageKey = this.keyPrefix + key;
+    return near.storageHasKey(storageKey);
   }
 
   /**
@@ -38,7 +38,7 @@ export class LookupMap<DataType> {
     const storageKey = this.keyPrefix + key;
     const value = near.storageRead(storageKey);
 
-    return getValueWithOptions(value, options)
+    return getValueWithOptions(value, options);
   }
 
   /**
@@ -54,12 +54,12 @@ export class LookupMap<DataType> {
     const storageKey = this.keyPrefix + key;
 
     if (!near.storageRemove(storageKey)) {
-      return options?.defaultValue ?? null
+      return options?.defaultValue ?? null;
     }
 
     const value = near.storageGetEvicted();
 
-    return getValueWithOptions(value, options)
+    return getValueWithOptions(value, options);
   }
 
   /**
@@ -78,12 +78,12 @@ export class LookupMap<DataType> {
     const storageValue = serializeValueWithOptions(newValue, options);
 
     if (!near.storageWrite(storageKey, storageValue)) {
-      return options?.defaultValue ?? null
+      return options?.defaultValue ?? null;
     }
 
     const value = near.storageGetEvicted();
 
-    return getValueWithOptions(value, options)
+    return getValueWithOptions(value, options);
   }
 
   /**
@@ -97,7 +97,7 @@ export class LookupMap<DataType> {
     options?: GetOptions<DataType>
   ): void {
     for (const [key, value] of keyValuePairs) {
-      this.set(key, value, options)
+      this.set(key, value, options);
     }
   }
 
@@ -116,6 +116,6 @@ export class LookupMap<DataType> {
    * @param data - The deserialized data to create an instance from.
    */
   static reconstruct<DataType>(data: LookupMap<unknown>): LookupMap<DataType> {
-    return new LookupMap(data.keyPrefix)
+    return new LookupMap(data.keyPrefix);
   }
 }

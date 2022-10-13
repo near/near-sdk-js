@@ -4,13 +4,13 @@ import { isUndefined } from "lodash-es";
 @NearBindgen({})
 export class Counter {
   constructor() {
-    this.count = 0
+    this.count = 0;
   }
 
   @call({})
   increase({ n = 1 }) {
-    this.count += n
-    near.log(`Counter increased to ${this.count}`)
+    this.count += n;
+    near.log(`Counter increased to ${this.count}`);
   }
 
   @call({})
@@ -18,15 +18,15 @@ export class Counter {
     // you can use default argument `n=1` too
     // this is to illustrate a npm dependency: lodash can be used
     if (isUndefined(n)) {
-      this.count -= 1
+      this.count -= 1;
     } else {
-      this.count -= n
+      this.count -= n;
     }
-    near.log(`Counter decreased to ${this.count}`)
+    near.log(`Counter decreased to ${this.count}`);
   }
 
   @view({})
   getCount() {
-    return this.count
+    return this.count;
   }
 }

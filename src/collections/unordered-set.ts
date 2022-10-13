@@ -12,46 +12,46 @@ import { Mutable } from "../utils";
 import { GetOptions } from "../types/collections";
 
 function serializeIndex(index: number) {
-  const data = new Uint32Array([index])
-  const array = new Uint8Array(data.buffer)
+  const data = new Uint32Array([index]);
+  const array = new Uint8Array(data.buffer);
 
-  return u8ArrayToBytes(array)
+  return u8ArrayToBytes(array);
 }
 
 function deserializeIndex(rawIndex: Bytes): number {
-  const array = bytesToU8Array(rawIndex)
-  const [data] = new Uint32Array(array.buffer)
+  const array = bytesToU8Array(rawIndex);
+  const [data] = new Uint32Array(array.buffer);
 
-  return data
+  return data;
 }
 
 /**
  * An unordered set that stores data in NEAR storage.
  */
 export class UnorderedSet<DataType> {
-  readonly elementIndexPrefix: Bytes
-  readonly elements: Vector<DataType>
+  readonly elementIndexPrefix: Bytes;
+  readonly elements: Vector<DataType>;
 
   /**
    * @param prefix - The byte prefix to use when storing elements inside this collection.
    */
   constructor(readonly prefix: Bytes) {
-    this.elementIndexPrefix = `${prefix}i`
-    this.elements = new Vector(`${prefix}e`)
+    this.elementIndexPrefix = `${prefix}i`;
+    this.elements = new Vector(`${prefix}e`);
   }
 
   /**
    * The number of elements stored in the collection.
    */
   get length(): number {
-    return this.elements.length
+    return this.elements.length;
   }
 
   /**
    * Checks whether the collection is empty.
    */
   isEmpty(): boolean {
-    return this.elements.isEmpty()
+    return this.elements.isEmpty();
   }
 
   /**
@@ -107,27 +107,27 @@ export class UnorderedSet<DataType> {
     const indexRaw = near.storageRead(indexLookup);
 
     if (!indexRaw) {
-      return false
+      return false;
     }
 
     // If there is only one element then swap remove simply removes it without
     // swapping with the last element.
     if (this.length === 1) {
-      near.storageRemove(indexLookup)
+      near.storageRemove(indexLookup);
 
-      const index = deserializeIndex(indexRaw)
-      this.elements.swapRemove(index)
+      const index = deserializeIndex(indexRaw);
+      this.elements.swapRemove(index);
 
-      return true
+      return true;
     }
 
     // If there is more than one element then swap remove swaps it with the last
     // element.
     const lastElement = this.elements.get(this.length - 1, options);
 
-    assert(!!lastElement, ERR_INCONSISTENT_STATE)
+    assert(!!lastElement, ERR_INCONSISTENT_STATE);
 
-    near.storageRemove(indexLookup)
+    near.storageRemove(indexLookup);
 
     // If the removed element was the last element from keys, then we don't need to
     // reinsert the lookup back.
@@ -138,10 +138,10 @@ export class UnorderedSet<DataType> {
       near.storageWrite(lastLookupElement, indexRaw);
     }
 
-    const index = deserializeIndex(indexRaw)
-    this.elements.swapRemove(index)
+    const index = deserializeIndex(indexRaw);
+    this.elements.swapRemove(index);
 
-    return true
+    return true;
   }
 
   /**
@@ -154,11 +154,11 @@ export class UnorderedSet<DataType> {
       near.storageRemove(indexLookup);
     }
 
-    this.elements.clear()
+    this.elements.clear();
   }
 
   [Symbol.iterator](): VectorIterator<DataType> {
-    return this.elements[Symbol.iterator]()
+    return this.elements[Symbol.iterator]();
   }
 
   /**
@@ -167,11 +167,11 @@ export class UnorderedSet<DataType> {
    * @param options - Options for retrieving and storing the data.
    */
   private createIteratorWithOptions(options?: GetOptions<DataType>): {
-    [Symbol.iterator](): VectorIterator<DataType>
+    [Symbol.iterator](): VectorIterator<DataType>;
   } {
     return {
       [Symbol.iterator]: () => new VectorIterator(this.elements, options),
-    }
+    };
   }
 
   /**
@@ -180,15 +180,15 @@ export class UnorderedSet<DataType> {
    * @param options - Options for retrieving and storing the data.
    */
   toArray(options?: GetOptions<DataType>): DataType[] {
-    const array = []
+    const array = [];
 
-    const iterator = options ? this.createIteratorWithOptions(options) : this
+    const iterator = options ? this.createIteratorWithOptions(options) : this;
 
     for (const value of iterator) {
-      array.push(value)
+      array.push(value);
     }
 
-    return array
+    return array;
   }
 
   /**
@@ -198,7 +198,7 @@ export class UnorderedSet<DataType> {
    */
   extend(elements: DataType[]): void {
     for (const element of elements) {
-      this.set(element)
+      this.set(element);
     }
   }
 
@@ -220,13 +220,13 @@ export class UnorderedSet<DataType> {
     data: UnorderedSet<DataType>
   ): UnorderedSet<DataType> {
     // removing readonly modifier
-    type MutableUnorderedSet = Mutable<UnorderedSet<DataType>>
-    const set = new UnorderedSet(data.prefix) as MutableUnorderedSet
+    type MutableUnorderedSet = Mutable<UnorderedSet<DataType>>;
+    const set = new UnorderedSet(data.prefix) as MutableUnorderedSet;
     // reconstruct Vector
-    const elementsPrefix = data.prefix + 'e'
-    set.elements = new Vector(elementsPrefix)
-    set.elements.length = data.elements.length
+    const elementsPrefix = data.prefix + "e";
+    set.elements = new Vector(elementsPrefix);
+    set.elements.length = data.elements.length;
 
-    return set as UnorderedSet<DataType>
+    return set as UnorderedSet<DataType>;
   }
 }

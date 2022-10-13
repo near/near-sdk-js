@@ -118,7 +118,7 @@ export function NearBindgen({
   return <T extends { new (...args: any[]): any }>(target: T) => {
     return class extends target {
       static _create() {
-        return new target()
+        return new target();
       }
 
       static _getState(): unknown | null {
@@ -161,10 +161,10 @@ export function NearBindgen({
       }
 
       static _requireInit(): boolean {
-        return requireInit
+        return requireInit;
       }
-    }
-  }
+    };
+  };
 }
 
 declare module "./" {

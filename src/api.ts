@@ -1,66 +1,78 @@
-import { assert, Bytes, NearAmount, PromiseIndex, Register } from './utils'
-import { PromiseResult, GasWeight } from './types'
+import { assert, Bytes, NearAmount, PromiseIndex, Register } from "./utils";
+import { PromiseResult, GasWeight } from "./types";
 
-const U64_MAX = 2n ** 64n - 1n
-const EVICTED_REGISTER = U64_MAX - 1n
+const U64_MAX = 2n ** 64n - 1n;
+const EVICTED_REGISTER = U64_MAX - 1n;
 
 // Interface available in QuickJS
 interface Env {
   // Panic
-  panic_utf8(message: Bytes): never
+  panic_utf8(message: Bytes): never;
 
   // Logging
-  log(message: Bytes): void
-  log_utf8(message: Bytes): void
-  log_utf16(message: Bytes): void
+  log(message: Bytes): void;
+  log_utf8(message: Bytes): void;
+  log_utf16(message: Bytes): void;
 
   // Read from register
-  read_register(register: Register): string
+  read_register(register: Register): string;
 
   // Storage
-  storage_read(key: Bytes, register: Register): bigint
-  storage_has_key(key: Bytes): bigint
-  storage_write(key: Bytes, value: Bytes, register: Register): bigint
-  storage_remove(key: Bytes, register: Register): bigint
-  storage_usage(): bigint
+  storage_read(key: Bytes, register: Register): bigint;
+  storage_has_key(key: Bytes): bigint;
+  storage_write(key: Bytes, value: Bytes, register: Register): bigint;
+  storage_remove(key: Bytes, register: Register): bigint;
+  storage_usage(): bigint;
 
   // Caller methods
-  signer_account_id(register: Register): void
-  signer_account_pk(register: Register): void
-  attached_deposit(): bigint
-  predecessor_account_id(register: Register): void
-  input(register: Register): void
+  signer_account_id(register: Register): void;
+  signer_account_pk(register: Register): void;
+  attached_deposit(): bigint;
+  predecessor_account_id(register: Register): void;
+  input(register: Register): void;
 
   // Account data
-  account_balance(): bigint
-  account_locked_balance(): bigint
-  current_account_id(register: Register): void
-  validator_stake(accountId: Bytes): bigint
-  validator_total_stake(): bigint
+  account_balance(): bigint;
+  account_locked_balance(): bigint;
+  current_account_id(register: Register): void;
+  validator_stake(accountId: Bytes): bigint;
+  validator_total_stake(): bigint;
 
   // Blockchain info
-  block_index(): bigint
-  block_timestamp(): bigint
-  epoch_height(): bigint
+  block_index(): bigint;
+  block_timestamp(): bigint;
+  epoch_height(): bigint;
 
   // Gas
-  prepaid_gas(): bigint
-  used_gas(): bigint
+  prepaid_gas(): bigint;
+  used_gas(): bigint;
 
   // Helper methods and cryptography
-  value_return(value: Bytes): void
-  random_seed(register: Register): void
-  sha256(value: Bytes, register: Register): void
-  keccak256(value: Bytes, register: Register): void
-  keccak512(value: Bytes, register: Register): void
-  ripemd160(value: Bytes, register: Register): void
-  ecrecover(hash: Bytes, sig: Bytes, v: number, malleabilityFlag: number, register: Register): bigint
-  alt_bn128_g1_multiexp(value: Bytes, register: Register): void
-  alt_bn128_g1_sum(value: Bytes, register: Register): void
-  alt_bn128_pairing_check(value: Bytes): bigint
+  value_return(value: Bytes): void;
+  random_seed(register: Register): void;
+  sha256(value: Bytes, register: Register): void;
+  keccak256(value: Bytes, register: Register): void;
+  keccak512(value: Bytes, register: Register): void;
+  ripemd160(value: Bytes, register: Register): void;
+  ecrecover(
+    hash: Bytes,
+    sig: Bytes,
+    v: number,
+    malleabilityFlag: number,
+    register: Register
+  ): bigint;
+  alt_bn128_g1_multiexp(value: Bytes, register: Register): void;
+  alt_bn128_g1_sum(value: Bytes, register: Register): void;
+  alt_bn128_pairing_check(value: Bytes): bigint;
 
   // Promises
-  promise_create(accountId: Bytes, methodName: Bytes, args: Bytes, amount: NearAmount, gas: NearAmount): bigint
+  promise_create(
+    accountId: Bytes,
+    methodName: Bytes,
+    args: Bytes,
+    amount: NearAmount,
+    gas: NearAmount
+  ): bigint;
   promise_then(
     promiseIndex: bigint,
     accountId: Bytes,
@@ -91,7 +103,7 @@ interface Env {
     promiseIndex: bigint,
     publicKey: Bytes,
     nonce: number | bigint
-  ): void
+  ): void;
   promise_batch_action_add_key_with_function_call(
     promiseIndex: bigint,
     publicKey: Bytes,
@@ -148,8 +160,8 @@ export function log(...params: unknown[]): void {
  * Can only be called in a call or initialize function.
  */
 export function signerAccountId(): Bytes {
-  env.signer_account_id(0)
-  return env.read_register(0)
+  env.signer_account_id(0);
+  return env.read_register(0);
 }
 
 /**
@@ -157,8 +169,8 @@ export function signerAccountId(): Bytes {
  * Can only be called in a call or initialize function.
  */
 export function signerAccountPk(): Bytes {
-  env.signer_account_pk(0)
-  return env.read_register(0)
+  env.signer_account_pk(0);
+  return env.read_register(0);
 }
 
 /**
@@ -166,8 +178,8 @@ export function signerAccountPk(): Bytes {
  * Can only be called in a call or initialize function.
  */
 export function predecessorAccountId(): Bytes {
-  env.predecessor_account_id(0)
-  return env.read_register(0)
+  env.predecessor_account_id(0);
+  return env.read_register(0);
 }
 
 /**
@@ -182,28 +194,28 @@ export function currentAccountId(): Bytes {
  * Returns the current block index.
  */
 export function blockIndex(): bigint {
-  return env.block_index()
+  return env.block_index();
 }
 
 /**
  * Returns the current block height.
  */
 export function blockHeight(): bigint {
-  return blockIndex()
+  return blockIndex();
 }
 
 /**
  * Returns the current block timestamp.
  */
 export function blockTimestamp(): bigint {
-  return env.block_timestamp()
+  return env.block_timestamp();
 }
 
 /**
  * Returns the current epoch height.
  */
 export function epochHeight(): bigint {
-  return env.epoch_height()
+  return env.epoch_height();
 }
 
 /**
@@ -211,21 +223,21 @@ export function epochHeight(): bigint {
  * Can only be called in payable functions.
  */
 export function attachedDeposit(): bigint {
-  return env.attached_deposit()
+  return env.attached_deposit();
 }
 
 /**
  * Returns the amount of Gas that was attached to this function call.
  */
 export function prepaidGas(): bigint {
-  return env.prepaid_gas()
+  return env.prepaid_gas();
 }
 
 /**
  * Returns the amount of Gas that has been used by this function call until now.
  */
 export function usedGas(): bigint {
-  return env.used_gas()
+  return env.used_gas();
 }
 
 /**
@@ -248,13 +260,13 @@ export function accountLockedBalance(): bigint {
  * @param key - The key to read from storage.
  */
 export function storageRead(key: Bytes): Bytes | null {
-  const returnValue = env.storage_read(key, 0)
+  const returnValue = env.storage_read(key, 0);
 
   if (returnValue !== 1n) {
-    return null
+    return null;
   }
 
-  return env.read_register(0)
+  return env.read_register(0);
 }
 
 /**
@@ -263,7 +275,7 @@ export function storageRead(key: Bytes): Bytes | null {
  * @param key - The key to check for in storage.
  */
 export function storageHasKey(key: Bytes): boolean {
-  return env.storage_has_key(key) === 1n
+  return env.storage_has_key(key) === 1n;
 }
 
 /**
@@ -310,8 +322,8 @@ export function storageByteCost(): bigint {
  * Returns the arguments passed to the current smart contract call.
  */
 export function input(): Bytes {
-  env.input(0)
-  return env.read_register(0)
+  env.input(0);
+  return env.read_register(0);
 }
 
 /**
@@ -320,7 +332,7 @@ export function input(): Bytes {
  * @param value - The value to return.
  */
 export function valueReturn(value: Bytes): void {
-  env.value_return(value)
+  env.value_return(value);
 }
 
 /**
@@ -548,7 +560,7 @@ export function promiseBatchActionAddKeyWithFunctionCall(
     allowance,
     receiverId,
     methodNames
-  )
+  );
 }
 
 /**
@@ -615,7 +627,7 @@ export function promiseBatchActionFunctionCallWeight(
  * The number of promise results available.
  */
 export function promiseResultsCount(): bigint {
-  return env.promise_results_count()
+  return env.promise_results_count();
 }
 
 /**
@@ -629,11 +641,15 @@ export function promiseResult(promiseIndex: PromiseIndex): Bytes {
   assert(
     Number(status) === PromiseResult.Successful,
     `Promise result ${
-      status == PromiseResult.Failed ? 'Failed' : status == PromiseResult.NotReady ? 'NotReady' : status
+      status == PromiseResult.Failed
+        ? "Failed"
+        : status == PromiseResult.NotReady
+        ? "NotReady"
+        : status
     }`
-  )
+  );
 
-  return env.read_register(0)
+  return env.read_register(0);
 }
 
 /**

@@ -82,6 +82,6 @@ export class LookupSet<DataType> {
    * @param data - The deserialized data to create an instance from.
    */
   static reconstruct<DataType>(data: LookupSet<unknown>): LookupSet<DataType> {
-    return new LookupSet(data.keyPrefix)
+    return new LookupSet(data.keyPrefix);
   }
 }

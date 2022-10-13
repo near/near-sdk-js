@@ -1,4 +1,4 @@
-import { near } from 'near-sdk-js'
+import { near } from "near-sdk-js";
 
 export function log(msg: unknown) {
   near.log(msg);

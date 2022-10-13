@@ -1,4 +1,4 @@
-import { GetOptions } from './types/collections'
+import { GetOptions } from "./types/collections";
 
 /**
  * A string containing byte characters. Can be safely used in NEAR calls.
@@ -36,13 +36,16 @@ const ACCOUNT_ID_REGEX =
   /^(([a-z\d]+[-_])*[a-z\d]+\.)*([a-z\d]+[-_])*[a-z\d]+$/;
 
 export function u8ArrayToBytes(array: Uint8Array): Bytes {
-  return array.reduce((result, value) => `${result}${String.fromCharCode(value)}`, '')
+  return array.reduce(
+    (result, value) => `${result}${String.fromCharCode(value)}`,
+    ""
+  );
 }
 
 // TODO this function is a bit broken and the type can't be string
 // TODO for more info: https://github.com/near/near-sdk-js/issues/78
 export function bytesToU8Array(bytes: Bytes): Uint8Array {
-  return Uint8Array.from([...bytes].map((byte) => byte.charCodeAt(0)))
+  return Uint8Array.from([...bytes].map((byte) => byte.charCodeAt(0)));
 }
 
 /**
@@ -52,23 +55,26 @@ export function bytesToU8Array(bytes: Bytes): Uint8Array {
  * @returns Safe Bytes to be used in NEAR calls.
  */
 export function bytes(stringOrU8Array: string | Uint8Array): Bytes {
-  if (typeof stringOrU8Array === 'string') {
-    return checkStringIsBytes(stringOrU8Array)
+  if (typeof stringOrU8Array === "string") {
+    return checkStringIsBytes(stringOrU8Array);
   }
 
   if (stringOrU8Array instanceof Uint8Array) {
-    return u8ArrayToBytes(stringOrU8Array)
+    return u8ArrayToBytes(stringOrU8Array);
   }
 
-  throw new Error('bytes: expected string or Uint8Array')
+  throw new Error("bytes: expected string or Uint8Array");
 }
 
 function checkStringIsBytes(value: string): string {
-  ;[...value].forEach((character, index) => {
-    assert(character.charCodeAt(0) <= 255, `string ${value} at index ${index}: ${character} is not a valid byte`)
-  })
+  [...value].forEach((character, index) => {
+    assert(
+      character.charCodeAt(0) <= 255,
+      `string ${value} at index ${index}: ${character} is not a valid byte`
+    );
+  });
 
-  return value
+  return value;
 }
 
 /**
@@ -86,7 +92,7 @@ export function assert(
   }
 }
 
-export type Mutable<T> = { -readonly [P in keyof T]: T[P] }
+export type Mutable<T> = { -readonly [P in keyof T]: T[P] };
 
 export function getValueWithOptions<DataType>(
   value: string,

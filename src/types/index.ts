@@ -15,7 +15,7 @@ import {
   InvalidLengthError,
   Base58Error,
   UnknownCurve,
-} from './public_key'
+} from "./public_key";
 
 export {
   AccountId,
@@ -36,7 +36,7 @@ export {
   InvalidLengthError,
   Base58Error,
   UnknownCurve,
-}
+};
 
 /**
  * The amount of Gas Weight in integers - whole numbers.

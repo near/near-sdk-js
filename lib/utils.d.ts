@@ -1,4 +1,4 @@
-import { GetOptions } from './types/collections';
+import { GetOptions } from "./types/collections";
 /**
  * A string containing byte characters. Can be safely used in NEAR calls.
  */

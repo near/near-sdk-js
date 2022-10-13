@@ -1,5 +1,5 @@
-import { Bytes, NearAmount, PromiseIndex } from './utils';
-import { GasWeight } from './types';
+import { Bytes, NearAmount, PromiseIndex } from "./utils";
+import { GasWeight } from "./types";
 /**
  * Logs parameters in the NEAR WASM virtual machine.
  *

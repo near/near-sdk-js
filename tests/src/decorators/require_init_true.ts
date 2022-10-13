@@ -1,28 +1,28 @@
-import { near, NearBindgen, call, view, initialize } from 'near-sdk-js'
+import { near, NearBindgen, call, view, initialize } from "near-sdk-js";
 
 @NearBindgen({ requireInit: true })
 export class NBTest {
   status: string;
 
   constructor() {
-    this.status = ''
+    this.status = "";
   }
 
   @initialize({})
   init({ status }: { status: string }): void {
-    near.log(`init: ${status}`)
-    this.status = status
+    near.log(`init: ${status}`);
+    this.status = status;
   }
 
   @view({})
   getStatus(): string {
-    near.log(`getStatus: ${this.status}`)
-    return this.status
+    near.log(`getStatus: ${this.status}`);
+    return this.status;
   }
 
   @call({})
   setStatus({ status }: { status: string }): void {
-    near.log(`setStatus: ${status}`)
-    this.status = status
+    near.log(`setStatus: ${status}`);
+    this.status = status;
   }
 }

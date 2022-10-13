@@ -8,8 +8,8 @@ export class Counter {
 
   @call({})
   increase({ n = 1 }: { n: number }) {
-    this.count += n
-    near.log(`Counter increased to ${this.count}`)
+    this.count += n;
+    near.log(`Counter increased to ${this.count}`);
   }
 
   @call({})
@@ -17,16 +17,16 @@ export class Counter {
     // you can use default argument `n=1` too
     // this is to illustrate a npm dependency: lodash can be used
     if (isUndefined(n)) {
-      this.count -= 1
+      this.count -= 1;
     } else {
-      this.count -= n
+      this.count -= n;
     }
     // this is to illustrate import a local ts module
-    log(`Counter decreased to ${this.count}`)
+    log(`Counter decreased to ${this.count}`);
   }
 
   @view({})
   getCount(): number {
-    return this.count
+    return this.count;
   }
 }

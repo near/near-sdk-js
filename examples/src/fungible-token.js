@@ -1,4 +1,12 @@
-import { NearBindgen, call, view, initialize, near, LookupMap, assert } from 'near-sdk-js'
+import {
+  NearBindgen,
+  call,
+  view,
+  initialize,
+  near,
+  LookupMap,
+  assert,
+} from "near-sdk-js";
 
 @NearBindgen({ initRequired: true })
 export class FungibleToken {
@@ -42,28 +50,34 @@ export class FungibleToken {
 
   @call({})
   ftTransfer({ receiverId, amount, memo }) {
-    let senderId = near.predecessorAccountId()
-    this.internalTransfer({ senderId, receiverId, amount, memo })
+    let senderId = near.predecessorAccountId();
+    this.internalTransfer({ senderId, receiverId, amount, memo });
   }
 
   @call({})
   ftTransferCall({ receiverId, amount, memo, msg }) {
-    let senderId = near.predecessorAccountId()
-    this.internalTransfer({ senderId, receiverId, amount, memo })
-    const promise = near.promiseBatchCreate(receiverId)
+    let senderId = near.predecessorAccountId();
+    this.internalTransfer({ senderId, receiverId, amount, memo });
+    const promise = near.promiseBatchCreate(receiverId);
     const params = {
       senderId: senderId,
       amount: amount,
       msg: msg,
       receiverId: receiverId,
-    }
-    near.promiseBatchActionFunctionCall(promise, 'ftOnTransfer', JSON.stringify(params), 0, 30000000000000)
-    return near.promiseReturn()
+    };
+    near.promiseBatchActionFunctionCall(
+      promise,
+      "ftOnTransfer",
+      JSON.stringify(params),
+      0,
+      30000000000000
+    );
+    return near.promiseReturn();
   }
 
   @view({})
   ftTotalSupply() {
-    return this.totalSupply
+    return this.totalSupply;
   }
 
   @view({})

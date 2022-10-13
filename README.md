@@ -52,10 +52,10 @@ When call host function with inappropriate type, means incorrect number of argum
 All NEAR blockchain provided functionality (host functions) are defined in `src/api.ts` and exported as `near`. You can use them by:
 
 ```js
-import { near } from 'near-sdk-js'
+import { near } from "near-sdk-js";
 
 // near.<api doucmented below>. e.g.:
-let signer = near.signerAccountId()
+let signer = near.signerAccountId();
 ```
 
 To use nightly host functions, such as `altBn128G1Sum`, your contract need to be built with nightly enabled. Use:
@@ -467,10 +467,10 @@ Usage:
 
 ```js
 // create new promise
-import { NearPromise, near, includeBytes } from 'near-sdk-js'
-import { PublicKey } from 'near-sdk-js/lib/types'
+import { NearPromise, near, includeBytes } from "near-sdk-js";
+import { PublicKey } from "near-sdk-js/lib/types";
 
-let promise = NearPromise.new('account-to-run-promise')
+let promise = NearPromise.new("account-to-run-promise");
 
 // possible promise actions, choose and chain what you need:
 promise
@@ -480,28 +480,28 @@ promise
   .addAccessKey(
     new PublicKey(near.signerAccountPk()),
     250000000000000000000000n, // allowance
-    'receiver_account_id',
-    'allowed_function_names'
+    "receiver_account_id",
+    "allowed_function_names"
   )
   .stake(100000000000000000000000000000n, new PublicKey(near.signerAccountPk()))
-  .deployContract(includeBytes('path/to/contract.wasm'))
+  .deployContract(includeBytes("path/to/contract.wasm"))
   .functionCall(
-    'callee_contract_account_id',
+    "callee_contract_account_id",
     inputArgs,
     0, // amount
     2 * Math.pow(10, 13) // gas
   )
   .functionCallWeight(
-    'callee_contract_account_id',
+    "callee_contract_account_id",
     inputArgs,
     0, // amount
     2 * Math.pow(10, 13), // gas
     1 // weight
   )
   .deleteKey(new PublicKey(near.signerAccountPk()))
-  .deleteAccount('beneficial_account_id')
+  .deleteAccount("beneficial_account_id");
 
-return promise
+return promise;
 ```
 
 In the case of deploy contract, `includeBytes` is a helpful build-time util. You can include the content of a wasm contract, by using `includeBytes('path/to/contract.wasm')`.
@@ -512,9 +512,9 @@ Besides above APIs to build something on top of an API, you can also chain promi
 
 ```js
 // assume promise, promise2 and promise3 are create with above APIs, with several actions added like above.
-promise.and(promise2).then(promise3) // promiseAnd of [promise_id, promise2_id], then promiseThen(promise_and_id, promise3_id)
+promise.and(promise2).then(promise3); // promiseAnd of [promise_id, promise2_id], then promiseThen(promise_and_id, promise3_id)
 
-return promise
+return promise;
 ```
 
 ### Types
@@ -528,13 +528,13 @@ Public Key is representing a NEAR account's public key in a JavaScript class. Yo
 The binary data is in the same format as nearcore, but encoded in bytes. That's one byte to represent the curve type of the public key, either ed25519 (`\x00`), or secp256k1 ('\x01'), follows by the curve-specific public key data in bytes. Examples:
 
 ```js
-new PublicKey(near.signerAccountPk())
+new PublicKey(near.signerAccountPk());
 new PublicKey(
-  '\x00\xeb\x7f\x5f\x11\xd1\x08\x1f\xe0\xd2\x24\xc5\x67\x36\x21\xad\xcb\x97\xd5\x13\xff\xa8\x5e\x55\xbc\x2b\x74\x4f\x0d\xb1\xe9\xf8\x1f'
-)
+  "\x00\xeb\x7f\x5f\x11\xd1\x08\x1f\xe0\xd2\x24\xc5\x67\x36\x21\xad\xcb\x97\xd5\x13\xff\xa8\x5e\x55\xbc\x2b\x74\x4f\x0d\xb1\xe9\xf8\x1f"
+);
 new PublicKey(
-  '\x01\xf2\x56\xc6\xe6\xc8\x0b\x21\x3f\x2a\xa0\xb0\x17\x44\x23\x5d\x51\x5c\x59\x44\x35\xbe\x65\x1b\x15\x88\x3a\x10\xdd\x47\x2f\xa6\x46\xce\x62\xea\xf3\x67\x0d\xc5\xcb\x91\x00\xa0\xca\x2a\x55\xb2\xc1\x47\xc1\xe9\xa3\x8c\xe4\x28\x87\x8e\x7d\x46\xe1\xfb\x71\x4a\x99'
-)
+  "\x01\xf2\x56\xc6\xe6\xc8\x0b\x21\x3f\x2a\xa0\xb0\x17\x44\x23\x5d\x51\x5c\x59\x44\x35\xbe\x65\x1b\x15\x88\x3a\x10\xdd\x47\x2f\xa6\x46\xce\x62\xea\xf3\x67\x0d\xc5\xcb\x91\x00\xa0\xca\x2a\x55\xb2\xc1\x47\xc1\xe9\xa3\x8c\xe4\x28\x87\x8e\x7d\x46\xe1\xfb\x71\x4a\x99"
+);
 ```
 
 The human readable form is `ed25519:` or `secp256k1:` following base58-encoded public key. And initialize the Public Key with `PublicKey.fromString`:

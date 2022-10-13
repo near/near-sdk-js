@@ -1,5 +1,5 @@
-import { Bytes, bytes } from '../utils'
-import { base58 } from '@scure/base'
+import { Bytes, bytes } from "../utils";
+import { base58 } from "@scure/base";
 
 export enum CurveType {
   ED25519 = 0,
@@ -17,7 +17,7 @@ function getCurveType(curveType: CurveType | number): CurveType {
     case CurveType.SECP256K1:
       return curveType;
     default:
-      throw new UnknownCurve()
+      throw new UnknownCurve();
   }
 }
 
@@ -37,20 +37,23 @@ function dataLength(curveType: CurveType | number): DataLength {
 function splitKeyTypeData(value: string): [CurveType, string] {
   const idx = value.indexOf(":");
   if (idx >= 0) {
-    return [curveTypeFromStr(value.substring(0, idx)), value.substring(idx + 1)]
+    return [
+      curveTypeFromStr(value.substring(0, idx)),
+      value.substring(idx + 1),
+    ];
   } else {
-    return [CurveType.ED25519, value]
+    return [CurveType.ED25519, value];
   }
 }
 
 export function curveTypeFromStr(value: string): CurveType {
   switch (value) {
-    case 'ed25519':
-      return CurveType.ED25519
-    case 'secp256k1':
-      return CurveType.SECP256K1
+    case "ed25519":
+      return CurveType.ED25519;
+    case "secp256k1":
+      return CurveType.SECP256K1;
     default:
-      throw new UnknownCurve()
+      throw new UnknownCurve();
   }
 }
 
@@ -63,12 +66,12 @@ export class InvalidLengthError extends ParsePublicKeyError {
 }
 export class Base58Error extends ParsePublicKeyError {
   constructor(public error: string) {
-    super(`Base58 error: ${error}`)
+    super(`Base58 error: ${error}`);
   }
 }
 export class UnknownCurve extends ParsePublicKeyError {
   constructor() {
-    super('Unknown curve')
+    super("Unknown curve");
   }
 }
 
