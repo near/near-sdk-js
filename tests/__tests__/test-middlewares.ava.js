@@ -68,6 +68,21 @@ test("The middleware logs with view functions", async (t) => {
   t.deepEqual(logs, expectedLogs);
 });
 
+test("The middleware logs with two middleware functions", async (t) => {
+  const { ali, middlewares } = t.context.accounts;
+
+  // Create the arguments which will be passed to the function.
+  const args = JSON.stringify({ id: "1", accountId: "hello" });
+  // Call the function.
+  const result = await ali.callRaw(middlewares, "get_two", args);
+  // Extract the logs.
+  const { logs } = result.result.receipts_outcome[0].outcome;
+  // Create the expected logs.
+  const expectedLogs = [`Log from middleware: ${args}`, "Second log!"];
+
+  t.deepEqual(logs, expectedLogs);
+});
+
 test("The middleware logs with private functions", async (t) => {
   const { ali, middlewares } = t.context.accounts;
 

@@ -34,7 +34,7 @@ interface Middleware<Arguments extends Array<any>> {
      *
      * @param args - Arguments that will be passed to the function - immutable.
      */
-    call(...args: Arguments): void;
+    (...args: Arguments): void;
 }
 /**
  * Tells the SDK to apply an array of passed in middleware to the function execution.

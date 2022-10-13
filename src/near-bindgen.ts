@@ -99,7 +99,7 @@ interface Middleware<Arguments extends Array<any>> {
    *
    * @param args - Arguments that will be passed to the function - immutable.
    */
-  call(...args: Arguments): void;
+  (...args: Arguments): void;
 }
 
 /**
@@ -123,7 +123,7 @@ export function middleware<Arguments extends Array<any>>(
     // @ts-ignore
     descriptor.value = function (...args: Arguments): ReturnType<AnyFunction> {
       try {
-        middlewares.forEach((middleware) => middleware.call(...args));
+        middlewares.forEach((middleware) => middleware(...args));
       } catch (error) {
         throw new Error(error);
       }
