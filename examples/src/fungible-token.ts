@@ -11,10 +11,17 @@ import {
 
 @NearBindgen({ requireInit: true })
 export class FungibleToken {
-  accounts: LookupMap<string> = new LookupMap("a");
-  accountRegistrants: LookupMap<string> = new LookupMap("r");
-  accountDeposits: LookupMap<string> = new LookupMap("c");
-  totalSupply = "0";
+  accounts: LookupMap<string>;
+  accountRegistrants: LookupMap<string>;
+  accountDeposits: LookupMap<string>;
+  totalSupply: string;
+
+  constructor() {
+    this.accounts = new LookupMap("a");
+    this.accountRegistrants = new LookupMap("r");
+    this.accountDeposits = new LookupMap("d");
+    this.totalSupply = "0";
+  }
 
   @initialize({})
   init({ owner_id, total_supply }: { owner_id: string; total_supply: string }) {
