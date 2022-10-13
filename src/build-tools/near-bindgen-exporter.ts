@@ -1,3 +1,4 @@
+import { PluginPass } from "@babel/core";
 import { Node, Visitor } from "@babel/traverse";
 import * as t from "@babel/types";
 
@@ -348,7 +349,10 @@ function createDeclaration(
 export default function (): { visitor: Visitor } {
   return {
     visitor: {
-      ClassDeclaration(path) {
+      ClassDeclaration(
+        path,
+        { opts: { verbose } }: PluginPass & { opts: { verbose: boolean } }
+      ): void {
         // Capture the node of the current path.
         const classNode = path.node;
 
@@ -383,7 +387,9 @@ export default function (): { visitor: Visitor } {
                   ) as Node
                 );
 
-                console.log(`Babel ${child.key.name} method export done`);
+                if (verbose) {
+                  console.log(`Babel ${child.key.name} method export done`);
+                }
               }
             }
           });

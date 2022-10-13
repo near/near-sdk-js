@@ -3,7 +3,6 @@ import { BlockHeight, EpochHeight, Balance, StorageUsage } from "./primitives";
 import {
   PromiseResult,
   PromiseError,
-  PromiseIndex,
   ReceiptIndex,
   IteratorIndex,
 } from "./vm_types";
@@ -26,7 +25,6 @@ export {
   StorageUsage,
   PromiseResult,
   PromiseError,
-  PromiseIndex,
   ReceiptIndex,
   IteratorIndex,
   Gas,
