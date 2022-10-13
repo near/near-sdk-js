@@ -28,6 +28,7 @@
     "build:private": "near-sdk-js build src/decorators/private.ts build/private.wasm",
     "build:bigint-serialization": "near-sdk-js build src/bigint-serialization.ts build/bigint-serialization.wasm",
     "build:date-serialization": "near-sdk-js build src/date-serialization.ts build/date-serialization.wasm",
+    "build:middlewares": "near-sdk-js build src/middlewares.ts build/middlewares.wasm",
     "test": "ava",
     "test:context-api": "ava __tests__/test_context_api.ava.js",
     "test:math-api": "ava __tests__/test_math_api.ava.js",
@@ -49,7 +50,8 @@
     "test:private": "ava __tests__/decorators/private.ava.js",
     "test:bigint-serialization": "ava __tests__/test-bigint-serialization.ava.js",
     "test:date-serialization": "ava __tests__/test-date-serialization.ava.js",
-    "test:serialization": "ava __tests__/test-serialization.ava.js"
+    "test:serialization": "ava __tests__/test-serialization.ava.js",
+    "test:middlewares": "ava __tests__/test-middlewares.ava.js"
   },
   "author": "Near Inc <hello@nearprotocol.com>",
   "license": "Apache-2.0",
