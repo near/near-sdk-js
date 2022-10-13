@@ -63,4 +63,21 @@ export class TokenMetadata {
       );
     }
   }
+
+  static reconstruct(data: TokenMetadata): TokenMetadata {
+    return new TokenMetadata(
+      data.title,
+      data.description,
+      data.media,
+      data.media_hash,
+      data.copies,
+      data.issued_at,
+      data.expires_at,
+      data.starts_at,
+      data.updated_at,
+      data.extra,
+      data.reference,
+      data.reference_hash
+    );
+  }
 }

@@ -5,9 +5,10 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
+    "postinstall": "cd .. && yarn link && cd near-contract-standards && yarn link near-sdk-js",
     "build": "yarn build:non-fungible-token",
     "rebuild": "cd .. && yarn build && cd near-contract-standards && rm -rf node_modules && rm -rf build && yarn && yarn build",
-    "build:non-fungible-token": "near-sdk build example-contracts/my-nft.ts build/my-nft.wasm",
+    "build:non-fungible-token": "near-sdk-js build example-contracts/my-nft.ts build/my-nft.wasm",
     "test": "ava",
     "test:non-fungible-token": "ava __tests__/test-non-fungible-token.ava.js"
   },

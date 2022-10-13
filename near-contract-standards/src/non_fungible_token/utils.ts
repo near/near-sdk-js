@@ -23,11 +23,11 @@ export function refund_approved_account_ids_iter(
 
 export function refund_approved_account_ids(
   account_id: AccountId,
-  approved_account_ids: Map<AccountId, bigint>
+  approved_account_ids: { [approvals: string]: bigint }
 ) {
   refund_approved_account_ids_iter(
     account_id,
-    Array.from(approved_account_ids.keys())
+    Array.from(Object.keys(approved_account_ids))
   );
 }
 
@@ -64,4 +64,10 @@ export function assert_at_least_one_yocto(): void {
     near.attachedDeposit() >= 1n,
     "Requires attached deposit of at least 1 yoctoNEAR"
   );
+}
+
+export type Option<T> = T | null;
+
+export interface IntoStorageKey {
+  into_storage_key(): Bytes;
 }
