@@ -1,5 +1,5 @@
 import { assert, Bytes, NearAmount, PromiseIndex, Register } from "./utils";
-import { PromiseResult, GasWeight } from "./types";
+import { GasWeight, PromiseResult } from "./types";
 
 const U64_MAX = 2n ** 64n - 1n;
 const EVICTED_REGISTER = U64_MAX - 1n;

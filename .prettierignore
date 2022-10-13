@@ -2,5 +2,3 @@ deps
 build
 node_modules
 lib
-cli
-
