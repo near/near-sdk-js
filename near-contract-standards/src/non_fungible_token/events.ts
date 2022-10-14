@@ -1,5 +1,5 @@
 import { NearEvent } from "../event";
-import { Option } from "near-sdk-js/lib/utils";
+import { Option } from "./utils";
 
 export type Nep171EventKind = NftMint[] | NftTransfer[] | NftBurn[];
 

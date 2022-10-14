@@ -1,6 +1,6 @@
 import { Bytes } from "near-sdk-js";
 import { near, assert } from "near-sdk-js";
-import { Option } from "near-sdk-js/lib/utils";
+import { Option } from "./utils";
 
 export const NFT_METADATA_SPEC = "nft-1.0.0";
 

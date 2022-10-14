@@ -280,7 +280,7 @@ export class NonFungibleToken
     }
 
     const approved_account_ids = this.approvals_by_id
-      ? new Map<AccountId, bigint>()
+      ? {}
       : null;
     if (initial_storage_usage) {
       const [id, storage_usage] = initial_storage_usage;
