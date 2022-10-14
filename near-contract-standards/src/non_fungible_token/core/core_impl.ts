@@ -5,6 +5,8 @@ import {
   near,
   UnorderedSet,
   assert,
+  NearPromise,
+  bytes,
 } from "near-sdk-js/lib";
 import { PromiseResult } from "near-sdk-js/lib/types";
 import { TokenMetadata } from "../metadata";
@@ -308,6 +310,7 @@ export class NonFungibleToken
     msg: string
   ) {
     assert_at_least_one_yocto();
+    assert(near.prepaidGas() > GAS_FOR_NFT_TRANSFER_CALL, "Not enough prepaid gas");
     const sender_id = near.predecessorAccountId();
     const [old_owner, old_approvals] = this.internal_transfer(
       sender_id,
@@ -316,7 +319,19 @@ export class NonFungibleToken
       approval_id,
       memo
     );
-    // TODO: ext_nft_receiver
+    
+    let promise = NearPromise.new(receiver_id).functionCall(
+      "nft_on_transfer",
+      bytes(JSON.stringify({sender_id, previous_owner_id: old_owner, token_id, msg})),
+      0n,
+      near.prepaidGas() - GAS_FOR_NFT_TRANSFER_CALL,
+    ).then(NearPromise.new(near.currentAccountId()).functionCall(
+      "nft_resolve_transfer",
+      bytes(JSON.stringify({previous_owner_id: old_owner, receiver_id, token_id, approvals: old_approvals})),
+      0n,
+      GAS_FOR_RESOLVE_TRANSFER
+    ));
+    return promise;
   }
 
   nft_token(token_id: string): Option<Token> {
