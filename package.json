@@ -23,7 +23,7 @@
   "scripts": {
     "build": "tsc -p ./tsconfig.json && chmod u+x lib/cli/cli.js",
     "pretest": "yarn build",
-    "test": "yarn test:unit && yarn test:examples",
+    "test": "run-s test:*",
     "lint": "eslint --fix .",
     "format": "prettier --write .",
     "test:unit": "yarn && cd tests && yarn && yarn build && yarn test && cd ..",
@@ -66,6 +66,7 @@
     "@typescript-eslint/parser": "^5.37.0",
     "eslint": "^8.23.1",
     "eslint-config-prettier": "^8.5.0",
+    "npm-run-all": "^4.1.5",
     "prettier": "^2.7.1",
     "typescript": "^4.7.2"
   },
