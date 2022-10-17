@@ -43,7 +43,7 @@ export async function buildCom(
   const TARGET_DIR = dirname(target);
   const TARGET_EXT = target.split(".").pop();
   const TARGET_FILE_NAME = basename(target, `.${TARGET_EXT}`);
-  const signale = new Signale({ scope: "build", interactive: true });
+  const signale = new Signale({ scope: "build", interactive: !verbose });
 
   if (TARGET_EXT !== "wasm") {
     signale.error(
@@ -143,7 +143,9 @@ async function createMethodsHeaderFile(rollupTarget: string, verbose = false) {
   const buildPath = path.dirname(rollupTarget);
 
   if (verbose) {
-    console.log(rollupTarget);
+    new Signale({scope: "method-header"}).info(
+rollupTarget
+    )
   }
 
   const mod = await import(`${PROJECT_DIR}/${rollupTarget}`);
