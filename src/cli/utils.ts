@@ -1,5 +1,8 @@
 import childProcess from "child_process";
 import { promisify } from "util";
+import signal from "signale"
+
+const {Signale} = signal;
 
 const exec = promisify(childProcess.exec);
 
@@ -7,24 +10,26 @@ export async function executeCommand(
   command: string,
   verbose = false
 ): Promise<string> {
+  const signale = new Signale({scope: "exec", interactive: !verbose})
+
   if (verbose) {
-    console.log(command);
+    signale.info(`Running command: ${command}`);
   }
 
   try {
     const { stdout, stderr } = await exec(command);
 
     if (stderr && verbose) {
-      console.error(stderr);
+      signale.error(stderr);
     }
 
     if (verbose) {
-      console.log(stdout);
+      signale.info(`Command output: ${stdout}`);
     }
 
     return stdout.trim();
   } catch (error) {
-    console.log(error);
+    signale.error(error);
     process.exit(1);
   }
 }
