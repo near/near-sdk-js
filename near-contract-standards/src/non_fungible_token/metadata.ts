@@ -81,3 +81,7 @@ export class TokenMetadata {
     );
   }
 }
+
+export interface NonFungibleTokenMetadataProvider {
+  nft_metadata(): NFTContractMetadata;
+}

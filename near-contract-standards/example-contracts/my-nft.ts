@@ -1,8 +1,10 @@
 import { NonFungibleToken } from "../src/index";
-import { assert, Bytes, call, initialize, near, NearBindgen } from "near-sdk-js/lib/index";
-import { NFTContractMetadata, TokenMetadata } from "../src/non_fungible_token/metadata";
+import { assert, Bytes, call, initialize, near, NearBindgen, PromiseOrValue } from "near-sdk-js/lib/index";
+import { NFTContractMetadata, NonFungibleTokenMetadataProvider, TokenMetadata } from "../src/non_fungible_token/metadata";
 import { IntoStorageKey, Option } from "../src/non_fungible_token/utils";
 import { AccountId } from "../../lib/types";
+import { NonFungibleTokenCore } from "../src/non_fungible_token/core/core_impl";
+import { Token } from "../src/non_fungible_token/token";
 
 class StorageKey {}
 
@@ -31,11 +33,28 @@ class StorageKeyApproval extends StorageKey implements IntoStorageKey {
 }
 
 @NearBindgen({})
-class MyNFT {
+class MyNFT implements NonFungibleTokenCore, NonFungibleTokenMetadataProvider {
     tokens: NonFungibleToken;
     metadata: Option<NFTContractMetadata>;
 
     constructor() {
+    }
+
+    nft_metadata(): NFTContractMetadata {
+        assert(this.metadata !== null, "Metadata not initialized");
+        return this.metadata;
+    }
+
+    nft_transfer(receiver_id: string, token_id: string, approval_id: bigint, memo: string) {
+        this.tokens.nft_transfer(receiver_id, token_id, approval_id, memo);
+    }
+
+    nft_transfer_call(receiver_id: string, token_id: string, approval_id: bigint, memo: string, msg: string): PromiseOrValue<boolean> {
+        return this.tokens.nft_transfer_call(receiver_id, token_id, approval_id, memo, msg);
+    }
+
+    nft_token(token_id: string): Option<Token> {
+        return this.tokens.nft_token(token_id);
     }
 
     @initialize({requireInit: true})
