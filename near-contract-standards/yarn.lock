@@ -1653,10 +1653,10 @@ near-api-js@^0.44.1:
     text-encoding-utf-8 "^1.0.2"
     tweetnacl "^1.0.1"
 
-near-sandbox@^0.0.8:
-  version "0.0.8"
-  resolved "https://registry.yarnpkg.com/near-sandbox/-/near-sandbox-0.0.8.tgz#5496e300554e9e722fa200204dc8cd302e0074c7"
-  integrity sha512-3JrDcA9rI+wA9lWqfOtSovGxBE/TDZL011TLk+jz5wGezVbm7m3tDh/zCfq+++eFyJ3ZbGkG0KF6+trMQJFPQQ==
+near-sandbox@^0.0.13:
+  version "0.0.13"
+  resolved "https://registry.yarnpkg.com/near-sandbox/-/near-sandbox-0.0.13.tgz#139b70708ccefcdf2dd406710f6615590d1880e5"
+  integrity sha512-rtRn51BBD1oT9SeGAIInKVedfaS/i4VqKqznZIvFddWo0jcI4lMoK1yHuTVuEE7YfEE12NsspFG1GxN1SlPV2g==
   dependencies:
     got "^11.8.2"
     tar "^6.1.0"
@@ -1683,10 +1683,10 @@ near-units@^0.1.9:
   dependencies:
     bn.js "^5.2.0"
 
-near-workspaces@2.0.0:
-  version "2.0.0"
-  resolved "https://registry.yarnpkg.com/near-workspaces/-/near-workspaces-2.0.0.tgz#32f7c6999bca8209b7a173986c7ce08218506ebc"
-  integrity sha512-oxV9B/LBGKM1cQHfZI476GSiUFLRg/0t7PiPGDyUVVsFWpkBLbQEF9EVP2nxctO7HWopAe5SJJTGp0o0ct8B1A==
+near-workspaces@3.2.1:
+  version "3.2.1"
+  resolved "https://registry.yarnpkg.com/near-workspaces/-/near-workspaces-3.2.1.tgz#38c33474ece5898323f10cff7c75f771bb5a991a"
+  integrity sha512-761D8lsbSetS+Nu9C4IWdONn0gBSVpfjY8V09AOQt1Zb5XjtURFWpFTZun6vQJhvWv5+RsSNTF6uYsLyTLJBAA==
   dependencies:
     base64url "^3.0.1"
     bn.js "^5.2.0"
@@ -1696,7 +1696,7 @@ near-workspaces@2.0.0:
     fs-extra "^10.0.0"
     js-sha256 "^0.9.0"
     near-api-js "^0.44.1"
-    near-sandbox "^0.0.8"
+    near-sandbox "^0.0.13"
     near-units "^0.1.9"
     node-port-check "^2.0.1"
     promisify-child-process "^4.1.1"

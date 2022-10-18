@@ -10,17 +10,17 @@
     "rebuild": "cd .. && yarn build && cd near-contract-standards && rm -rf node_modules && rm -rf build && yarn && yarn build",
     "build:non-fungible-token": "near-sdk-js build example-contracts/my-nft.ts build/my-nft.wasm",
     "test": "ava",
-    "test:non-fungible-token": "ava __tests__/test-non-fungible-token.ava.js"
+    "test:non-fungible-token": "ava __tests__/my-nft/*"
   },
   "author": "Near Inc <hello@nearprotocol.com>",
   "license": "Apache-2.0",
   "dependencies": {
-    "lodash-es": "^4.17.21",
+    "lodash-es": "^4.17.21", 
     "near-sdk-js": "file:../"
   },
   "devDependencies": {
     "ava": "^4.2.0",
     "typescript": "^4.7.4",
-    "near-workspaces": "2.0.0"
+    "near-workspaces": "3.2.1"
   }
 }
