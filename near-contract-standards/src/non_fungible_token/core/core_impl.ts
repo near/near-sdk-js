@@ -17,7 +17,7 @@ import {
   refund_deposit_to_account,
   assert_at_least_one_yocto,
   IntoStorageKey,
-  Option
+  Option,
 } from "../utils";
 import { NftMint, NftTransfer } from "../events";
 import { NonFungibleTokenResolver } from "./resolver";
@@ -60,7 +60,17 @@ export class NonFungibleToken
   public approvals_by_id: Option<LookupMap<{ [approvals: string]: bigint }>>;
   public next_approval_id_by_id: Option<LookupMap<bigint>>;
 
-  constructor(
+  constructor() {
+    this.owner_id = "";
+    this.extra_storage_in_bytes_per_token = 0n;
+    this.owner_by_id = new UnorderedMap("");
+    this.token_metadata_by_id = null;
+    this.tokens_per_owner = new LookupMap("");
+    this.approvals_by_id = null;
+    this.next_approval_id_by_id = null;
+  }
+
+  init(
     owner_by_id_prefix: IntoStorageKey,
     owner_id: string,
     token_metadata_prefix: Option<IntoStorageKey>,
@@ -84,10 +94,18 @@ export class NonFungibleToken
     this.token_metadata_by_id = token_metadata_prefix
       ? new LookupMap(token_metadata_prefix.into_storage_key())
       : null;
-    this.tokens_per_owner = new LookupMap(enumeration_prefix.into_storage_key());
+    this.tokens_per_owner = new LookupMap(
+      enumeration_prefix.into_storage_key()
+    );
     this.approvals_by_id = approvals_by_id;
     this.next_approval_id_by_id = next_approval_id_by_id;
     this.measure_min_token_storage_cost();
+  }
+
+  static reconstruct(data: NonFungibleToken): NonFungibleToken {
+    let ret = new NonFungibleToken();
+    Object.assign(ret, data);
+    return ret;
   }
 
   measure_min_token_storage_cost() {
@@ -145,7 +163,9 @@ export class NonFungibleToken
       this.approvals_by_id.remove(tmp_token_id);
     }
     if (this.tokens_per_owner) {
-      let u = this.tokens_per_owner.remove(tmp_owner_id, {reconstructor: UnorderedSet.reconstruct});
+      let u = this.tokens_per_owner.remove(tmp_owner_id, {
+        reconstructor: UnorderedSet.reconstruct,
+      });
       u.remove(tmp_token_id);
     }
     if (this.token_metadata_by_id) {
@@ -158,7 +178,9 @@ export class NonFungibleToken
     this.owner_by_id.set(token_id, to);
 
     if (this.tokens_per_owner) {
-      const owner_tokens_set = this.tokens_per_owner.get(from, {reconstructor: UnorderedSet.reconstruct});
+      const owner_tokens_set = this.tokens_per_owner.get(from, {
+        reconstructor: UnorderedSet.reconstruct,
+      });
       if (owner_tokens_set == null) {
         throw new Error("Unable to access tokens per owner in unguarded call.");
       }
@@ -168,7 +190,9 @@ export class NonFungibleToken
         this.tokens_per_owner.set(from, owner_tokens_set);
       }
 
-      let receiver_tokens_set = this.tokens_per_owner.get(to, {reconstructor: UnorderedSet.reconstruct});
+      let receiver_tokens_set = this.tokens_per_owner.get(to, {
+        reconstructor: UnorderedSet.reconstruct,
+      });
       receiver_tokens_set.set(token_id);
       this.tokens_per_owner.set(to, receiver_tokens_set);
     }
@@ -216,10 +240,7 @@ export class NonFungibleToken
       sender_id_authorized,
       memo
     );
-    return [
-      owner_id as string,
-      approved_account_ids
-    ];
+    return [owner_id as string, approved_account_ids];
   }
 
   static emit_transfer(
@@ -274,14 +295,14 @@ export class NonFungibleToken
     this.owner_by_id.set(token_id, owner_id);
     this.token_metadata_by_id?.set(token_id, token_metadata);
     if (this.tokens_per_owner) {
-      let token_ids = this.tokens_per_owner.get(owner_id, {reconstructor: UnorderedSet.reconstruct})
+      let token_ids = this.tokens_per_owner.get(owner_id, {
+        reconstructor: UnorderedSet.reconstruct,
+      });
       token_ids.set(token_id);
       this.tokens_per_owner.set(owner_id, token_ids);
     }
 
-    const approved_account_ids = this.approvals_by_id
-      ? {}
-      : null;
+    const approved_account_ids = this.approvals_by_id ? {} : null;
     if (initial_storage_usage) {
       const [id, storage_usage] = initial_storage_usage;
       refund_deposit_to_account(near.storageUsage() - storage_usage, id);
@@ -308,7 +329,10 @@ export class NonFungibleToken
     msg: string
   ) {
     assert_at_least_one_yocto();
-    assert(near.prepaidGas() > GAS_FOR_NFT_TRANSFER_CALL, "Not enough prepaid gas");
+    assert(
+      near.prepaidGas() > GAS_FOR_NFT_TRANSFER_CALL,
+      "Not enough prepaid gas"
+    );
     const sender_id = near.predecessorAccountId();
     const [old_owner, old_approvals] = this.internal_transfer(
       sender_id,
@@ -317,18 +341,36 @@ export class NonFungibleToken
       approval_id,
       memo
     );
-    
-    let promise = NearPromise.new(receiver_id).functionCall(
-      "nft_on_transfer",
-      bytes(JSON.stringify({sender_id, previous_owner_id: old_owner, token_id, msg})),
-      0n,
-      near.prepaidGas() - GAS_FOR_NFT_TRANSFER_CALL,
-    ).then(NearPromise.new(near.currentAccountId()).functionCall(
-      "nft_resolve_transfer",
-      bytes(JSON.stringify({previous_owner_id: old_owner, receiver_id, token_id, approvals: old_approvals})),
-      0n,
-      GAS_FOR_RESOLVE_TRANSFER
-    ));
+
+    let promise = NearPromise.new(receiver_id)
+      .functionCall(
+        "nft_on_transfer",
+        bytes(
+          JSON.stringify({
+            sender_id,
+            previous_owner_id: old_owner,
+            token_id,
+            msg,
+          })
+        ),
+        0n,
+        near.prepaidGas() - GAS_FOR_NFT_TRANSFER_CALL
+      )
+      .then(
+        NearPromise.new(near.currentAccountId()).functionCall(
+          "nft_resolve_transfer",
+          bytes(
+            JSON.stringify({
+              previous_owner_id: old_owner,
+              receiver_id,
+              token_id,
+              approvals: old_approvals,
+            })
+          ),
+          0n,
+          GAS_FOR_RESOLVE_TRANSFER
+        )
+      );
     return promise;
   }
 
@@ -337,11 +379,12 @@ export class NonFungibleToken
     if (owner_id == null) {
       return null;
     }
-    const metadata = this.token_metadata_by_id?.get(
-      token_id, {reconstructor: TokenMetadata.reconstruct}
-    );
-    const approved_account_ids =
-      (this.approvals_by_id?.get(token_id) as Option<{ [approvals: string]: bigint }>);
+    const metadata = this.token_metadata_by_id?.get(token_id, {
+      reconstructor: TokenMetadata.reconstruct,
+    });
+    const approved_account_ids = this.approvals_by_id?.get(token_id) as Option<{
+      [approvals: string]: bigint;
+    }>;
     return new Token(token_id, owner_id, metadata, approved_account_ids);
   }
 

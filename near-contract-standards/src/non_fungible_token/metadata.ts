@@ -5,15 +5,41 @@ import { Option } from "./utils";
 export const NFT_METADATA_SPEC = "nft-1.0.0";
 
 export class NFTContractMetadata {
-  constructor(
-    public spec: string, // required, essentially a version like "nft-1.0.0"
-    public name: string, // required, ex. "Mosaics"
-    public symbol: string, // required, ex. "MOSIAC"
-    public icon: Option<string>, // Data URL
-    public base_uri: Option<string>, // Centralized gateway known to have reliable access to decentralized storage assets referenced by `reference` or `media` URLs
-    public reference: Option<string>, // URL to a JSON file with more info
-    public reference_hash: Option<Bytes> // Base64-encoded sha256 hash of JSON from reference field. Required if `reference` is included.
-  ) {}
+  public spec: string; // required, essentially a version like "nft-1.0.0"
+  public name: string; // required, ex. "Mosaics"
+  public symbol: string; // required, ex. "MOSIAC"
+  public icon: Option<string>; // Data URL
+  public base_uri: Option<string>; // Centralized gateway known to have reliable access to decentralized storage assets referenced by `reference` or `media` URLs
+  public reference: Option<string>; // URL to a JSON file with more info
+  public reference_hash: Option<Bytes>; // Base64-encoded sha256 hash of JSON from reference field. Required if `reference` is included.
+
+  constructor() {
+    this.spec = NFT_METADATA_SPEC;
+    this.name = "";
+    this.symbol = "";
+    this.icon = null;
+    this.base_uri = null;
+    this.reference = null;
+    this.reference_hash = null;
+  }
+
+  init(
+    spec: string,
+    name: string,
+    symbol: string, // required, ex. "MOSIAC"
+    icon: Option<string>, // Data URL
+    base_uri: Option<string>, // Centralized gateway known to have reliable access to decentralized storage assets referenced by `reference` or `media` URLs
+    reference: Option<string>, // URL to a JSON file with more info
+    reference_hash: Option<Bytes> // Base64-encoded sha256 hash of JSON from reference field. Required if `reference` is included.
+  ) {
+    this.spec = spec;
+    this.name = name;
+    this.symbol = symbol;
+    this.icon = icon;
+    this.base_uri = base_uri;
+    this.reference = reference;
+    this.reference_hash = reference_hash;
+  }
 
   assert_valid() {
     assert(this.spec == NFT_METADATA_SPEC, "Spec is not NFT metadata");
@@ -24,6 +50,12 @@ export class NFTContractMetadata {
     if (this.reference_hash != null) {
       assert(this.reference_hash.length == 32, "Hash has to be 32 bytes");
     }
+  }
+
+  static reconstruct(data: NFTContractMetadata): NFTContractMetadata {
+    let metadata = new NFTContractMetadata();
+    Object.assign(metadata, data);
+    return metadata;
   }
 }
 
@@ -65,6 +97,7 @@ export class TokenMetadata {
   }
 
   static reconstruct(data: TokenMetadata): TokenMetadata {
+    throw new Error("abc");
     return new TokenMetadata(
       data.title,
       data.description,

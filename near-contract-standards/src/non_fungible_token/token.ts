@@ -8,6 +8,8 @@ export class Token {
     public token_id: TokenId,
     public owner_id: AccountId,
     public metadata: Option<TokenMetadata>,
-    public approved_account_ids: Option<{ [approved_account_id: string]: bigint }>
+    public approved_account_ids: Option<{
+      [approved_account_id: string]: bigint;
+    }>
   ) {}
 }

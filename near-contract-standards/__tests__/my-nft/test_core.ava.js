@@ -16,7 +16,10 @@ test.before(async (t) => {
   const bob = await root.createSubAccount("bob");
   const nftOwner = await root.createSubAccount("owner");
 
-  await nft.call("init", {owner_id: nftOwner.accountId, metadata: {spec: "nft-1.0.0", name: "My NFT", symbol: "NFT"}});
+  await nft.call(nft, "init", {
+    owner_id: nftOwner.accountId,
+    metadata: { spec: "nft-1.0.0", name: "My NFT", symbol: "NFT" },
+  });
 
   // Save state for test runs, it is unique for each test
   t.context.worker = worker;
@@ -37,6 +40,6 @@ test.after(async (t) => {
 test("Simple transfer", async (t) => {
   const { ali, bob, nft } = t.context.accounts;
 
-  let token = await nft.view('nft_token', "0");
-  t.is(token.owner_id, nft.accountId);
+  let token = await nft.view("nft_token", "0");
+  t.is(token, nft.accountId);
 });
