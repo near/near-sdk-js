@@ -65,7 +65,7 @@ export class NonFungibleToken
     this.extra_storage_in_bytes_per_token = 0n;
     this.owner_by_id = new UnorderedMap("");
     this.token_metadata_by_id = null;
-    this.tokens_per_owner = new LookupMap("");
+    this.tokens_per_owner = null;
     this.approvals_by_id = null;
     this.next_approval_id_by_id = null;
   }
@@ -105,6 +105,21 @@ export class NonFungibleToken
   static reconstruct(data: NonFungibleToken): NonFungibleToken {
     let ret = new NonFungibleToken();
     Object.assign(ret, data);
+    ret.owner_by_id = UnorderedMap.reconstruct(ret.owner_by_id);
+    if (ret.token_metadata_by_id) {
+      ret.token_metadata_by_id = LookupMap.reconstruct(ret.token_metadata_by_id);
+    }
+    if (ret.tokens_per_owner) {
+      ret.tokens_per_owner = LookupMap.reconstruct(ret.tokens_per_owner);
+    }
+    if (ret.approvals_by_id) {
+      ret.approvals_by_id = LookupMap.reconstruct(ret.approvals_by_id);
+    }
+    if (ret.next_approval_id_by_id) {
+      ret.next_approval_id_by_id = LookupMap.reconstruct(
+        ret.next_approval_id_by_id
+      );
+    }
     return ret;
   }
 

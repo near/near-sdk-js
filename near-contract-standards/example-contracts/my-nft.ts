@@ -91,14 +91,6 @@ class MyNFT implements NonFungibleTokenCore, NonFungibleTokenMetadataProvider {
 
   @view({})
   nft_token(token_id: string): Option<Token> {
-    // @ts-ignore
-
-    // return this.metadata instanceof NFTContractMetadata;
-    // @ts-ignore
-
-    // return this.tokens.constructor.name;
-    // @ts-ignore
-
     return this.tokens.nft_token(token_id);
   }
 

@@ -41,5 +41,5 @@ test("Simple transfer", async (t) => {
   const { ali, bob, nft } = t.context.accounts;
 
   let token = await nft.view("nft_token", "0");
-  t.is(token, nft.accountId);
+  t.is(token, null);
 });
