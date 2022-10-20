@@ -33,3 +33,7 @@ export async function executeCommand(
     process.exit(1);
   }
 }
+
+export async function download(url: string, verbose = false) {
+  await executeCommand(`curl -LOf ${url}`, verbose);
+}
