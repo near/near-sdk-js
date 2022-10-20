@@ -17,7 +17,7 @@ import {
 import { IntoStorageKey, Option } from "../src/non_fungible_token/utils";
 import { AccountId } from "../../lib/types";
 import { NonFungibleTokenCore } from "../src/non_fungible_token/core/core_impl";
-import { Token } from "../src/non_fungible_token/token";
+import { Token, TokenId } from "../src/non_fungible_token/token";
 
 class StorageKey {}
 
@@ -121,7 +121,7 @@ class MyNFT implements NonFungibleTokenCore, NonFungibleTokenMetadataProvider {
     token_owner_id,
     token_metadata,
   }: {
-    token_id: AccountId;
+    token_id: TokenId;
     token_owner_id: AccountId;
     token_metadata: TokenMetadata;
   }) {

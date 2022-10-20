@@ -313,6 +313,9 @@ export class NonFungibleToken
       let token_ids = this.tokens_per_owner.get(owner_id, {
         reconstructor: UnorderedSet.reconstruct,
       });
+      if (token_ids === null) {
+        token_ids = new UnorderedSet(new TokensPerOwner(near.sha256(owner_id)).into_storage_key())
+      }
       token_ids.set(token_id);
       this.tokens_per_owner.set(owner_id, token_ids);
     }

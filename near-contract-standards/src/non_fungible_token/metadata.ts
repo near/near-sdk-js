@@ -97,7 +97,6 @@ export class TokenMetadata {
   }
 
   static reconstruct(data: TokenMetadata): TokenMetadata {
-    throw new Error("abc");
     return new TokenMetadata(
       data.title,
       data.description,
