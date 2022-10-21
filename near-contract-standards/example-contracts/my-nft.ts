@@ -62,31 +62,31 @@ class MyNFT implements NonFungibleTokenCore, NonFungibleTokenMetadataProvider {
     return this.metadata;
   }
 
-  @call({})
-  nft_transfer(
+  @call({payableFunction: true})
+  nft_transfer([receiver_id, token_id, approval_id, memo]: [
     receiver_id: string,
     token_id: string,
     approval_id: bigint,
     memo: string
-  ) {
-    this.tokens.nft_transfer(receiver_id, token_id, approval_id, memo);
+  ]) {
+    this.tokens.nft_transfer([receiver_id, token_id, approval_id, memo]);
   }
 
   @call({})
-  nft_transfer_call(
+  nft_transfer_call([receiver_id, token_id, approval_id, memo, msg]: [
     receiver_id: string,
     token_id: string,
     approval_id: bigint,
     memo: string,
     msg: string
-  ): PromiseOrValue<boolean> {
-    return this.tokens.nft_transfer_call(
+  ]): PromiseOrValue<boolean> {
+    return this.tokens.nft_transfer_call([
       receiver_id,
       token_id,
       approval_id,
       memo,
       msg
-    );
+    ]);
   }
 
   @view({})

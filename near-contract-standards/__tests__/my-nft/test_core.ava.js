@@ -1,7 +1,7 @@
 import { Worker } from "near-workspaces";
 import test from "ava";
 
-test.before(async (t) => {
+test.beforeEach(async (t) => {
   // Init the worker and start a Sandbox server
   const worker = await Worker.init();
 
@@ -48,7 +48,7 @@ test.before(async (t) => {
   };
 });
 
-test.after(async (t) => {
+test.afterEach.always(async (t) => {
   await t.context.worker.tearDown().catch((error) => {
     console.log("Failed tear down the worker:", error);
   });
@@ -59,4 +59,12 @@ test("Simple transfer", async (t) => {
 
   let token = await nft.view("nft_token", "0");
   t.is(token.owner_id, nftOwner.accountId);
+
+  let res = await nftOwner.callRaw(nft, 'nft_transfer', [ali.accountId, '0', null, 'simple transfer'], {attachedDeposit: '1'})
+  t.is(res.result.status.SuccessValue, "");
+
+  t.is(res.logs.length, 1);
+
+  token = await nft.view("nft_token", "0");
+  t.is(token.owner_id, ali.accountId);
 });

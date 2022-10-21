@@ -25,19 +25,19 @@ import { AccountId } from "near-sdk-js/lib/types/index";
 import { Token, TokenId } from "../token";
 
 export interface NonFungibleTokenCore {
-  nft_transfer(
+  nft_transfer([receiver_id, token_id, approval_id, memo]: [
     receiver_id: AccountId,
     token_id: TokenId,
     approval_id: Option<bigint>,
     memo: Option<string>
-  );
-  nft_transfer_call(
+  ]);
+  nft_transfer_call([receiver_id, token_id, approval_id, memo]: [
     receiver_id: AccountId,
     token_id: TokenId,
     approval_id: Option<bigint>,
     memo: Option<string>,
     msg: string
-  );
+  ]);
   nft_token(token_id: TokenId): Option<Token>;
 }
 
@@ -208,6 +208,11 @@ export class NonFungibleToken
       let receiver_tokens_set = this.tokens_per_owner.get(to, {
         reconstructor: UnorderedSet.reconstruct,
       });
+      if (receiver_tokens_set === null) {
+        receiver_tokens_set = new UnorderedSet<string>(
+          new TokensPerOwner(near.sha256(to)).into_storage_key()
+        );
+      }
       receiver_tokens_set.set(token_id);
       this.tokens_per_owner.set(to, receiver_tokens_set);
     }
@@ -328,24 +333,24 @@ export class NonFungibleToken
     return new Token(token_id, owner_id, token_metadata, approved_account_ids);
   }
 
-  nft_transfer(
+  nft_transfer([receiver_id, token_id, approval_id, memo]: [
     receiver_id: string,
     token_id: string,
     approval_id: Option<bigint>,
     memo: Option<string>
-  ) {
+  ]) {
     assert_at_least_one_yocto();
     const sender_id = near.predecessorAccountId();
     this.internal_transfer(sender_id, receiver_id, token_id, approval_id, memo);
   }
 
-  nft_transfer_call(
+  nft_transfer_call([receiver_id, token_id, approval_id, memo, msg]: [
     receiver_id: string,
     token_id: string,
     approval_id: Option<bigint>,
     memo: Option<string>,
     msg: string
-  ) {
+  ]) {
     assert_at_least_one_yocto();
     assert(
       near.prepaidGas() > GAS_FOR_NFT_TRANSFER_CALL,
