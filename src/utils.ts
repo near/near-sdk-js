@@ -4,10 +4,15 @@ import { GetOptions } from "./types/collections";
  * A string containing byte characters. Can be safely used in NEAR calls.
  */
 export type Bytes = string;
+
+// make PromiseIndex a nominal typing
+enum PromiseIndexBrand {
+  _ = -1,
+}
 /**
  * A PromiseIndex which represents the ID of a NEAR Promise.
  */
-export type PromiseIndex = number | bigint;
+export type PromiseIndex = (number | bigint) & PromiseIndexBrand;
 /**
  * A number that specifies the amount of NEAR in yoctoNEAR.
  */

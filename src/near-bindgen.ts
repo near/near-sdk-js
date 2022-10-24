@@ -90,6 +90,50 @@ export function call({
 }
 
 /**
+ * The interface that a middleware has to implement in order to be used as a middleware function/class.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+interface Middleware<Arguments extends Array<any>> {
+  /**
+   * The method that gets called with the same arguments that are passed to the function it is wrapping.
+   *
+   * @param args - Arguments that will be passed to the function - immutable.
+   */
+  (...args: Arguments): void;
+}
+
+/**
+ * Tells the SDK to apply an array of passed in middleware to the function execution.
+ *
+ * @param middlewares - The middlewares to be executed.
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export function middleware<Arguments extends Array<any>>(
+  ...middlewares: Middleware<Arguments>[]
+): DecoratorFunction {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return function <AnyFunction extends (...args: Arguments) => any>(
+    _target: object,
+    _key: string | symbol,
+    descriptor: TypedPropertyDescriptor<AnyFunction>
+  ): void {
+    const originalMethod = descriptor.value;
+
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    descriptor.value = function (...args: Arguments): ReturnType<AnyFunction> {
+      try {
+        middlewares.forEach((middleware) => middleware(...args));
+      } catch (error) {
+        throw new Error(error);
+      }
+
+      return originalMethod.apply(this, args);
+    };
+  };
+}
+
+/**
  * Extends this class with the methods needed to make the contract storable/serializable and readable/deserializable to and from the blockchain.
  * Also tells the SDK to capture and expose all view, call and initialize functions.
  * Tells the SDK whether the contract requires initialization and whether to use a custom serialization/deserialization function when storing/reading the state.

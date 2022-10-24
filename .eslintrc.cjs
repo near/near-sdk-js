@@ -1,3 +1,4 @@
+/** @type {import('eslint').Linter.Config} */
 module.exports = {
   root: true,
   env: {
@@ -41,6 +42,8 @@ module.exports = {
     "build",
     "./**/deps",
     "deps",
+    "cli/**/*.ts",
+    "cli/**/*.js",
   ],
   rules: {},
 };
