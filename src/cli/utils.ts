@@ -1,6 +1,8 @@
 import childProcess from "child_process";
 import { promisify } from "util";
 import signal from "signale"
+import { Project } from "ts-morph";
+import chalk from "chalk";
 
 const {Signale} = signal;
 
@@ -36,4 +38,56 @@ export async function executeCommand(
 
 export async function download(url: string, verbose = false) {
   await executeCommand(`curl -LOf ${url}`, verbose);
+}
+
+export async function validateContract(contractPath: string): Promise<boolean> {
+  const project = new Project();
+  project.addSourceFilesAtPaths(contractPath);
+  const contractClassFile = project.getSourceFile(contractPath);
+  const contractClasses = contractClassFile.getClasses();
+  for (const contractClass of contractClasses) {
+    const classStructure = contractClass.getStructure();
+    const { decorators, properties } = classStructure;
+    const hasBindgen = decorators.find(
+      (decorator) => decorator.name === "NearBindgen"
+    );
+    if (hasBindgen) {
+      const constructors = contractClass.getConstructors();
+      const hasConstructor = constructors.length > 0;
+      const propertiesToBeInited = properties.filter((p) => !p.initializer);
+      // reson: examples/clean-state.js
+      if (!hasConstructor && propertiesToBeInited.length === 0) {
+        return true;
+      }
+      if (!hasConstructor && propertiesToBeInited.length > 0) {
+        console.log(
+          chalk.redBright(
+            `Ops, constructor isnt initialized, after initialization include ${propertiesToBeInited
+              .map((p) => p.name)
+              .join(", ")} in constructor`
+          )
+        );
+        process.exit(2);
+      }
+      const constructor = constructors[0];
+      const constructorContent = constructor.getText();
+      const nonInitedProperties = [];
+      for (const property of propertiesToBeInited) {
+        if (!constructorContent.includes(`this.${property.name} =`)) {
+          nonInitedProperties.push(property.name);
+        }
+      }
+      if (nonInitedProperties.length > 0) {
+        console.log(
+          chalk.redBright(
+            `Ops, please initialise ${nonInitedProperties.join(
+              ", "
+            )} in constructor`
+          )
+        );
+        process.exit(2);
+      }
+    }
+  }
+  return true;
 }
