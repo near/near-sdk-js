@@ -61,9 +61,8 @@ export async function validateContract(contractPath: string): Promise<boolean> {
       if (!hasConstructor && propertiesToBeInited.length > 0) {
         console.log(
           chalk.redBright(
-            `Ops, constructor is not initialized, after initialization include ${propertiesToBeInited
-              .map((p) => p.name)
-              .join(", ")} in constructor`
+            `All parameters must be initialized in the constructor. Uninitialized parameters:
+              ${propertiesToBeInited.map((p) => p.name)}`
           )
         );
         process.exit(2);
@@ -79,9 +78,8 @@ export async function validateContract(contractPath: string): Promise<boolean> {
       if (nonInitedProperties.length > 0) {
         console.log(
           chalk.redBright(
-            `Ops, please initialise ${nonInitedProperties.join(
-              ", "
-            )} in constructor`
+            `All properties must be initialized in the constructor. Uninitialized properties:
+            ${nonInitedProperties.join(", ")}`
           )
         );
         process.exit(2);
