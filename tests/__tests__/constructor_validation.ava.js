@@ -5,7 +5,7 @@ test("should build, constructor is correctly initialized", async (t) => {
   let result = null;
   try {
     result = execSync(
-      "near-sdk-js build src/constructor-validation/version-1.ts build/constructor-validation/version-1.wasm"
+      "near-sdk-js build src/constructor-validation/all-parameters-set-in-constructor.ts build/constructor-validation/all-parameters-set-in-constructor.wasm"
     ).toString();
   } catch (e) {
     result = e;
@@ -13,11 +13,11 @@ test("should build, constructor is correctly initialized", async (t) => {
   t.not(result.status, 2);
 });
 
-test("should throw error, name isnt inited", async (t) => {
+test("should throw error, name is not inited", async (t) => {
   let result = null;
   try {
     result = execSync(
-      "near-sdk-js build src/constructor-validation/version-2.ts build/constructor-validation/version-2.wasm"
+      "near-sdk-js build src/constructor-validation/1-parameter-not-set-in-constructor.ts build/constructor-validation/1-parameter-not-set-in-constructor.wasm"
     ).toString();
   } catch (e) {
     result = e;
@@ -30,7 +30,7 @@ test("should throw error, construcor is empty", async (t) => {
   let result = null;
   try {
     result = execSync(
-      "near-sdk-js build src/constructor-validation/version-3.ts build/constructor-validation/version-3.wasm"
+      "near-sdk-js build src/constructor-validation/no-parameters-set-in-constructor.ts build/constructor-validation/no-parameters-set-in-constructor.wasm"
     ).toString();
   } catch (e) {
     result = e;
@@ -39,11 +39,11 @@ test("should throw error, construcor is empty", async (t) => {
   t.is(result.status, 2);
 });
 
-test("should throw error, construcor isnt declared", async (t) => {
+test("should throw error, construcor is not declared", async (t) => {
   let result = null;
   try {
     result = execSync(
-      "near-sdk-js build src/constructor-validation/version-4.ts build/constructor-validation/version-4.wasm"
+      "near-sdk-js build src/constructor-validation/no-constructor.ts build/constructor-validation/no-constructor.wasm"
     ).toString();
   } catch (e) {
     result = e;

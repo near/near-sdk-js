@@ -62,7 +62,7 @@ export async function validateContract(contractPath: string): Promise<boolean> {
       if (!hasConstructor && propertiesToBeInited.length > 0) {
         console.log(
           chalk.redBright(
-            `Ops, constructor isnt initialized, after initialization include ${propertiesToBeInited
+            `Ops, constructor is not initialized, after initialization include ${propertiesToBeInited
               .map((p) => p.name)
               .join(", ")} in constructor`
           )
