@@ -1,4 +1,4 @@
-import { NonFungibleToken } from "../src/index";
+import { NonFungibleToken } from "../../src/index";
 import {
   assert,
   Bytes,
@@ -13,11 +13,11 @@ import {
   NFTContractMetadata,
   NonFungibleTokenMetadataProvider,
   TokenMetadata,
-} from "../src/non_fungible_token/metadata";
-import { IntoStorageKey, Option } from "../src/non_fungible_token/utils";
-import { AccountId } from "../../lib/types";
-import { NonFungibleTokenCore } from "../src/non_fungible_token/core/core_impl";
-import { Token, TokenId } from "../src/non_fungible_token/token";
+} from "../../src/non_fungible_token/metadata";
+import { IntoStorageKey, Option } from "../../src/non_fungible_token/utils";
+import { AccountId } from "../../../lib/types";
+import { NonFungibleTokenCore } from "../../src/non_fungible_token/core/core_impl";
+import { Token, TokenId } from "../../src/non_fungible_token/token";
 
 class StorageKey {}
 
@@ -116,15 +116,15 @@ class MyNFT implements NonFungibleTokenCore, NonFungibleTokenMetadataProvider {
   }
 
   @call({ payableFunction: true })
-  nft_mint({
+  nft_mint([
     token_id,
     token_owner_id,
     token_metadata,
-  }: {
-    token_id: TokenId;
-    token_owner_id: AccountId;
-    token_metadata: TokenMetadata;
-  }) {
+  ]: [
+    token_id: TokenId,
+    token_owner_id: AccountId,
+    token_metadata: TokenMetadata,
+  ]) {
     assert(
       near.predecessorAccountId() === this.tokens.owner_id,
       "Unauthorized"

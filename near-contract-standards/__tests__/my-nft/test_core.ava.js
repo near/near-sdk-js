@@ -15,11 +15,14 @@ test.beforeEach(async (t) => {
   const ali = await root.createSubAccount("ali");
   const bob = await root.createSubAccount("bob");
   const nftOwner = await root.createSubAccount("owner");
+  const nftReceiver = await root.devDeploy("./build/nft-receiver.wasm");
 
   await nft.call(nft, "init", {
     owner_id: nftOwner.accountId,
     metadata: { spec: "nft-1.0.0", name: "My NFT", symbol: "NFT" },
   });
+
+  await nftReceiver.call(nftReceiver, 'init', nft.accountId)
 
   let token_metadata = {
     title: "Olympus Mons",
@@ -35,7 +38,7 @@ test.beforeEach(async (t) => {
     reference: null,
     reference_hash: null,
   };
-  await nftOwner.call(nft, "nft_mint", {token_id: "0", token_owner_id: nftOwner.accountId, token_metadata}, {attachedDeposit: '10 mN'})
+  await nftOwner.call(nft, "nft_mint", ["0", nftOwner.accountId, token_metadata], {attachedDeposit: '10 mN'})
 
   // Save state for test runs, it is unique for each test
   t.context.worker = worker;
@@ -44,7 +47,8 @@ test.beforeEach(async (t) => {
     nft,
     ali,
     bob,
-    nftOwner
+    nftOwner,
+    nftReceiver
   };
 });
 
@@ -55,7 +59,7 @@ test.afterEach.always(async (t) => {
 });
 
 test("Simple transfer", async (t) => {
-  const { ali, bob, nft, nftOwner } = t.context.accounts;
+  const { ali, nft, nftOwner } = t.context.accounts;
 
   let token = await nft.view("nft_token", "0");
   t.is(token.owner_id, nftOwner.accountId);
@@ -67,4 +71,14 @@ test("Simple transfer", async (t) => {
 
   token = await nft.view("nft_token", "0");
   t.is(token.owner_id, ali.accountId);
+});
+
+test("Transfer call fast return to sender", async (t) => {
+  const { nft, nftOwner, nftReceiver } = t.context.accounts;
+
+  let res = await nftOwner.callRaw("nft_transfer_call", [nftReceiver.accountId, "0", null, "transfer & call", "return-it-now"], {attachedDeposit: '1'})
+  t.is(JSON.stringify(res, null, 2), "");
+
+  token = await nft.view("nft_token", "0");
+  t.is(token.owner_id, nftOwner.accountId);
 });

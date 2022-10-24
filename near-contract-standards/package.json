@@ -6,11 +6,13 @@
   "type": "module",
   "scripts": {
     "postinstall": "cd .. && yarn link && cd near-contract-standards && yarn link near-sdk-js",
-    "build": "yarn build:non-fungible-token",
+    "build": "run-s build:*",
     "rebuild": "cd .. && yarn build && cd near-contract-standards && rm -rf node_modules && rm -rf build && yarn && yarn build",
-    "build:non-fungible-token": "near-sdk-js build example-contracts/my-nft.ts build/my-nft.wasm",
+    "build:nft": "run-s build:nft-*",
+    "build:nft-contract": "near-sdk-js build example-contracts/non-fungible-token/my-nft.ts build/my-nft.wasm",
+    "build:nft-receiver": "near-sdk-js build example-contracts/non-fungible-token/test-token-receiver.ts build/nft-receiver.wasm",
     "test": "ava",
-    "test:non-fungible-token": "ava __tests__/my-nft/*"
+    "test:nft": "ava __tests__/my-nft/*"
   },
   "author": "Near Inc <hello@nearprotocol.com>",
   "license": "Apache-2.0",
