@@ -46,20 +46,16 @@ export async function validateContract(contractPath: string): Promise<boolean> {
   const contractClassFile = project.getSourceFile(contractPath);
   const contractClasses = contractClassFile.getClasses();
   for (const contractClass of contractClasses) {
-    console.log(`Analizing ${contractClass.getName()} class`);
     const classStructure = contractClass.getStructure();
     const { decorators, properties } = classStructure;
-    const hasBindgen = decorators.find(
+    const hasBindgen: boolean = decorators.find(
       (decorator) => decorator.name === "NearBindgen"
-    );
-    console.log("hasBindgen:", hasBindgen)
+    ) ? true : false;
     if (hasBindgen) {
       const constructors = contractClass.getConstructors();
       const hasConstructor = constructors.length > 0;
-      console.log("hasConstructor:", hasConstructor);
       const propertiesToBeInited = properties.filter((p) => !p.initializer);
       if (!hasConstructor && propertiesToBeInited.length === 0) {
-        console.log("No constructor, no properties to be inited. Done.");
         return true;
       }
       if (!hasConstructor && propertiesToBeInited.length > 0) {
@@ -69,7 +65,6 @@ export async function validateContract(contractPath: string): Promise<boolean> {
               ${propertiesToBeInited.map((p) => p.name)}`
           )
         );
-        console.log("Found ununitialized parameters. Done.");
         process.exit(2);
       }
       const constructor = constructors[0];
@@ -80,7 +75,6 @@ export async function validateContract(contractPath: string): Promise<boolean> {
           nonInitedProperties.push(property.name);
         }
       }
-      console.log("nonInitedProperties:", nonInitedProperties);
       if (nonInitedProperties.length > 0) {
         console.log(
           chalk.redBright(
@@ -88,7 +82,6 @@ export async function validateContract(contractPath: string): Promise<boolean> {
             ${nonInitedProperties.join(", ")}`
           )
         );
-        console.log("Found ununitialized properties. Done.");
         process.exit(2);
       }
     }

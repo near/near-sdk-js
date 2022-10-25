@@ -10,7 +10,7 @@ import { rollup } from "rollup";
 import { Command } from "commander";
 import signal from "signale";
 
-import { executeCommand } from "./utils.js";
+import { executeCommand, validateContract } from "./utils.js";
 
 const { Signale } = signal;
 const PROJECT_DIR = process.cwd();
@@ -65,6 +65,9 @@ export async function buildCom(
 
   signale.await(`Creating ${TARGET_DIR} directory...`);
   await executeCommand(`mkdir -p ${TARGET_DIR}`, verbose);
+
+  signal.await(`Validatig ${source} contract...`);
+  await validateContract(source);
 
   signale.await(`Creating ${source} file with Rollup...`);
   await createJsFileWithRullup(source, ROLLUP_TARGET, verbose);
