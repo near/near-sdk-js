@@ -43,6 +43,10 @@ export async function download(url: string, verbose = false) {
 
 const UNINITIALIZED_PARAMETERS_ERROR = "All parameters must be initialized in the constructor. Uninitialized parameters:";
 
+/**
+ * Validates the contract by checking that all parameters are initialized in the constructor. Works only for contracts written in TypeScript.
+ * @param contractPath Path to the contract.
+ **/
 export async function validateContract(contractPath: string): Promise<boolean> {
   const project: Project = new Project();
   project.addSourceFilesAtPaths(contractPath);
