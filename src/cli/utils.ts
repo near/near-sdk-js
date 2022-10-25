@@ -1,7 +1,7 @@
 import childProcess from "child_process";
 import { promisify } from "util";
 import signal from "signale"
-import { Project } from "ts-morph";
+import { ClassDeclaration, ClassDeclarationStructure, ConstructorDeclaration, OptionalKind, Project, PropertyDeclarationStructure, SourceFile } from "ts-morph";
 import chalk from "chalk";
 
 const {Signale} = signal;
@@ -40,48 +40,40 @@ export async function download(url: string, verbose = false) {
   await executeCommand(`curl -LOf ${url}`, verbose);
 }
 
+const UNINITIALIZED_PARAMETERS_ERROR = "All parameters must be initialized in the constructor. Uninitialized parameters:";
+
 export async function validateContract(contractPath: string): Promise<boolean> {
-  const project = new Project();
+  const project: Project = new Project();
   project.addSourceFilesAtPaths(contractPath);
-  const contractClassFile = project.getSourceFile(contractPath);
-  const contractClasses = contractClassFile.getClasses();
-  for (const contractClass of contractClasses) {
-    const classStructure = contractClass.getStructure();
+  const sourceFile: SourceFile = project.getSourceFile(contractPath);
+  const classDeclarations: ClassDeclaration[] = sourceFile.getClasses();
+  for (const classDeclaration of classDeclarations) {
+    const classStructure: ClassDeclarationStructure = classDeclaration.getStructure();
     const { decorators, properties } = classStructure;
-    const hasBindgen: boolean = decorators.find(
+    const hasNearBindgen: boolean = decorators.find(
       (decorator) => decorator.name === "NearBindgen"
     ) ? true : false;
-    if (hasBindgen) {
-      const constructors = contractClass.getConstructors();
+    if (hasNearBindgen) {
+      const constructors: ConstructorDeclaration[] = classDeclaration.getConstructors();
       const hasConstructor = constructors.length > 0;
-      const propertiesToBeInited = properties.filter((p) => !p.initializer);
+      const propertiesToBeInited: OptionalKind<PropertyDeclarationStructure>[] = properties.filter((p) => !p.initializer);
       if (!hasConstructor && propertiesToBeInited.length === 0) {
         return true;
       }
       if (!hasConstructor && propertiesToBeInited.length > 0) {
-        console.log(
-          chalk.redBright(
-            `All parameters must be initialized in the constructor. Uninitialized parameters:
-              ${propertiesToBeInited.map((p) => p.name)}`
-          )
-        );
+        console.log(chalk.redBright(`${UNINITIALIZED_PARAMETERS_ERROR} ${propertiesToBeInited.map((p) => p.name)}`));
         process.exit(2);
       }
-      const constructor = constructors[0];
-      const constructorContent = constructor.getText();
-      const nonInitedProperties = [];
+      const constructor: ConstructorDeclaration = constructors[0];
+      const constructorContent: string = constructor.getText();
+      const nonInitedProperties: string[] = [];
       for (const property of propertiesToBeInited) {
-        if (!constructorContent.includes(`this.${property.name} =`)) {
+        if (!constructorContent.includes(`this.${property.name}`)) {
           nonInitedProperties.push(property.name);
         }
       }
       if (nonInitedProperties.length > 0) {
-        console.log(
-          chalk.redBright(
-            `All properties must be initialized in the constructor. Uninitialized properties:
-            ${nonInitedProperties.join(", ")}`
-          )
-        );
+        console.log(chalk.redBright(`${UNINITIALIZED_PARAMETERS_ERROR} ${nonInitedProperties.join(", ")}`));
         process.exit(2);
       }
     }
