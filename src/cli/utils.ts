@@ -3,6 +3,7 @@ import { promisify } from "util";
 import signal from "signale"
 import { ClassDeclaration, ClassDeclarationStructure, ConstructorDeclaration, OptionalKind, Project, PropertyDeclarationStructure, SourceFile } from "ts-morph";
 import chalk from "chalk";
+import signale from "signale";
 
 const {Signale} = signal;
 
@@ -61,8 +62,8 @@ export async function validateContract(contractPath: string): Promise<boolean> {
         return true;
       }
       if (!hasConstructor && propertiesToBeInited.length > 0) {
-        console.log(chalk.redBright(`${UNINITIALIZED_PARAMETERS_ERROR} ${propertiesToBeInited.map((p) => p.name)}`));
-        process.exit(2);
+        signale.error(chalk.redBright(`${UNINITIALIZED_PARAMETERS_ERROR} ${propertiesToBeInited.map((p) => p.name)}`));
+        process.exit(1);
       }
       const constructor: ConstructorDeclaration = constructors[0];
       const constructorContent: string = constructor.getText();
@@ -73,8 +74,8 @@ export async function validateContract(contractPath: string): Promise<boolean> {
         }
       }
       if (nonInitedProperties.length > 0) {
-        console.log(chalk.redBright(`${UNINITIALIZED_PARAMETERS_ERROR} ${nonInitedProperties.join(", ")}`));
-        process.exit(2);
+        signale.error(chalk.redBright(`${UNINITIALIZED_PARAMETERS_ERROR} ${nonInitedProperties.join(", ")}`));
+        process.exit(1);
       }
     }
   }
