@@ -1,6 +1,8 @@
 import { Worker } from "near-workspaces";
 import test from "ava";
 
+const MAX_GAS = 300_000_000_000_000n;
+
 test.beforeEach(async (t) => {
   // Init the worker and start a Sandbox server
   const worker = await Worker.init();
@@ -76,9 +78,9 @@ test("Simple transfer", async (t) => {
 test("Transfer call fast return to sender", async (t) => {
   const { nft, nftOwner, nftReceiver } = t.context.accounts;
 
-  let res = await nftOwner.callRaw("nft_transfer_call", [nftReceiver.accountId, "0", null, "transfer & call", "return-it-now"], {attachedDeposit: '1'})
-  t.is(JSON.stringify(res, null, 2), "");
+  let res = await nftOwner.callRaw(nft, "nft_transfer_call", [nftReceiver.accountId, "0", null, "transfer & call", "return-it-now"], {attachedDeposit: '1', gas: MAX_GAS})
+  t.is(Buffer.from(res.result.status.SuccessValue, 'base64').toString(), 'false');
 
-  token = await nft.view("nft_token", "0");
+  let token = await nft.view("nft_token", "0");
   t.is(token.owner_id, nftOwner.accountId);
 });

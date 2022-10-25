@@ -41,9 +41,9 @@ export interface NonFungibleTokenCore {
   nft_token(token_id: TokenId): Option<Token>;
 }
 
-const GAS_FOR_RESOLVE_TRANSFER = 5_000_000_000_000n;
+const GAS_FOR_RESOLVE_TRANSFER = 15_000_000_000_000n;
 const GAS_FOR_NFT_TRANSFER_CALL =
-  25_000_000_000_000n + GAS_FOR_RESOLVE_TRANSFER;
+  30_000_000_000_000n + GAS_FOR_RESOLVE_TRANSFER;
 
 function repeat(str: string, n: number) {
   return Array(n + 1).join(str);
@@ -369,12 +369,12 @@ export class NonFungibleToken
       .functionCall(
         "nft_on_transfer",
         bytes(
-          JSON.stringify({
+          JSON.stringify([
             sender_id,
-            previous_owner_id: old_owner,
+            old_owner,
             token_id,
             msg,
-          })
+          ])
         ),
         0n,
         near.prepaidGas() - GAS_FOR_NFT_TRANSFER_CALL
@@ -383,12 +383,12 @@ export class NonFungibleToken
         NearPromise.new(near.currentAccountId()).functionCall(
           "nft_resolve_transfer",
           bytes(
-            JSON.stringify({
-              previous_owner_id: old_owner,
+            JSON.stringify([
+              old_owner,
               receiver_id,
               token_id,
-              approvals: old_approvals,
-            })
+              old_approvals,
+            ])
           ),
           0n,
           GAS_FOR_RESOLVE_TRANSFER
@@ -411,12 +411,12 @@ export class NonFungibleToken
     return new Token(token_id, owner_id, metadata, approved_account_ids);
   }
 
-  nft_resolve_transfer(
+  nft_resolve_transfer([previous_owner_id, receiver_id, token_id, approved_account_ids]: [
     previous_owner_id: string,
     receiver_id: string,
     token_id: string,
     approved_account_ids: Option<{ [approvals: string]: bigint }>
-  ): boolean {
+  ]): boolean {
     let must_revert = false;
     let p: Bytes;
     try {

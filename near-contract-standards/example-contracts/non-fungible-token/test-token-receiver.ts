@@ -13,8 +13,8 @@ import {
 } from "near-sdk-js/lib/index";
 import { AccountId } from "near-sdk-js/lib/types";
 
-const BASE_GAS = 5_000_000_000_000n;
-const PROMISE_CALL = 5_000_000_000_000n;
+const BASE_GAS = 10_000_000_000_000n;
+const PROMISE_CALL = 10_000_000_000_000n;
 const GAS_FOR_NFT_ON_TRANSFER = BASE_GAS + PROMISE_CALL;
 
 interface ValueReturnInterface {
@@ -33,7 +33,7 @@ class TokenReceiver implements NonFungibleTokenReceiver, ValueReturnInterface {
     init(non_fungible_token_account_id: AccountId) {
         this.non_fungible_token_account_id = non_fungible_token_account_id;
     }
-    
+
     @call({})
     nft_on_transfer([sender_id, previous_owner_id, token_id, msg]: [sender_id: string, previous_owner_id: string, token_id: string, msg: String]): PromiseOrValue<boolean> {
         assert(near.predecessorAccountId() === this.non_fungible_token_account_id, "Only supports the one non-fungible token contract");

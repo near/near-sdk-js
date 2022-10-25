@@ -18,6 +18,7 @@ import { IntoStorageKey, Option } from "../../src/non_fungible_token/utils";
 import { AccountId } from "../../../lib/types";
 import { NonFungibleTokenCore } from "../../src/non_fungible_token/core/core_impl";
 import { Token, TokenId } from "../../src/non_fungible_token/token";
+import { NonFungibleTokenResolver } from "../../src/non_fungible_token/core/resolver";
 
 class StorageKey {}
 
@@ -46,7 +47,7 @@ class StorageKeyApproval extends StorageKey implements IntoStorageKey {
 }
 
 @NearBindgen({ requireInit: true })
-class MyNFT implements NonFungibleTokenCore, NonFungibleTokenMetadataProvider {
+class MyNFT implements NonFungibleTokenCore, NonFungibleTokenMetadataProvider, NonFungibleTokenResolver {
   tokens: NonFungibleToken;
   metadata: Option<NFTContractMetadata>;
 
@@ -54,6 +55,11 @@ class MyNFT implements NonFungibleTokenCore, NonFungibleTokenMetadataProvider {
     this.tokens = new NonFungibleToken();
     // @ts-ignore
     this.metadata = new NFTContractMetadata();
+  }
+
+  @call({})
+  nft_resolve_transfer([previous_owner_id, receiver_id, token_id, approvals]: [previous_owner_id: string, receiver_id: string, token_id: string, approvals: { [approval: string]: bigint; }]): boolean {
+    return this.tokens.nft_resolve_transfer([previous_owner_id, receiver_id, token_id, approvals])
   }
 
   @view({})
@@ -72,7 +78,7 @@ class MyNFT implements NonFungibleTokenCore, NonFungibleTokenMetadataProvider {
     this.tokens.nft_transfer([receiver_id, token_id, approval_id, memo]);
   }
 
-  @call({})
+  @call({payableFunction: true})
   nft_transfer_call([receiver_id, token_id, approval_id, memo, msg]: [
     receiver_id: string,
     token_id: string,
