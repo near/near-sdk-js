@@ -1,0 +1,23 @@
+name: Examples
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+      - develop
+jobs:
+  examples:
+    strategy:
+      matrix:
+        platform: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: "16"
+      - name: Install dependencies
+        run: yarn && cd near-contract-standards && yarn
+      - name: nft
+        run: cd near-contract-standards && yarn build:nft && yarn test:nft
+      

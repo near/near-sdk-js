@@ -84,3 +84,73 @@ test("Transfer call fast return to sender", async (t) => {
   let token = await nft.view("nft_token", "0");
   t.is(token.owner_id, nftOwner.accountId);
 });
+
+test("Transfer call slow return to sender", async (t) => {
+  const { nft, nftOwner, nftReceiver } = t.context.accounts;
+
+  let res = await nftOwner.callRaw(nft, "nft_transfer_call", [nftReceiver.accountId, "0", null, "transfer & call", "return-it-later"], {attachedDeposit: '1', gas: MAX_GAS})
+  t.is(Buffer.from(res.result.status.SuccessValue, 'base64').toString(), 'false');
+
+  let token = await nft.view("nft_token", "0");
+  t.is(token.owner_id, nftOwner.accountId);
+})
+
+test("Transfer call fast keep with sender", async (t) => {
+  const { nft, nftOwner, nftReceiver } = t.context.accounts;
+
+  let res = await nftOwner.callRaw(nft, "nft_transfer_call", [nftReceiver.accountId, "0", null, "transfer & call", "keep-it-now"], {attachedDeposit: '1', gas: MAX_GAS})
+  t.is(Buffer.from(res.result.status.SuccessValue, 'base64').toString(), 'true');
+
+  let token = await nft.view("nft_token", "0");
+  t.is(token.owner_id, nftReceiver.accountId);
+})
+
+test("Transfer call slow keep with sender", async (t) => {
+  const { nft, nftOwner, nftReceiver } = t.context.accounts;
+
+  let res = await nftOwner.callRaw(nft, "nft_transfer_call", [nftReceiver.accountId, "0", null, "transfer & call", "keep-it-later"], {attachedDeposit: '1', gas: MAX_GAS})
+  t.is(Buffer.from(res.result.status.SuccessValue, 'base64').toString(), 'true');
+
+  let token = await nft.view("nft_token", "0");
+  t.is(token.owner_id, nftReceiver.accountId);
+})
+
+test("Transfer call receiver panics", async (t) => {
+  const { nft, nftOwner, nftReceiver } = t.context.accounts;
+
+  let res = await nftOwner.callRaw(nft, "nft_transfer_call", [nftReceiver.accountId, "0", null, "transfer & call", "incorrect message"], {attachedDeposit: '1', gas: MAX_GAS})
+  t.is(Buffer.from(res.result.status.SuccessValue, 'base64').toString(), 'false');
+
+  t.is(res.logs.length, 3);
+
+  let token = await nft.view("nft_token", "0");
+  t.is(token.owner_id, nftOwner.accountId);
+})
+
+test("Transfer call receiver panics and nft_resolve_transfer produces no log if not enough gas", async (t) => {
+  const { nft, nftOwner, nftReceiver } = t.context.accounts;
+
+  let res = await nftOwner.callRaw(nft, "nft_transfer_call", [nftReceiver.accountId, "0", null, "transfer & call", "incorrect message"], {attachedDeposit: '1', gas: 30_000_000_000_000n})
+  t.assert(res.result.status.Failure !== undefined);
+
+  t.is(res.logs.length, 0);
+
+  let token = await nft.view("nft_token", "0");
+  t.is(token.owner_id, nftOwner.accountId);
+})
+
+test("Simple transfer no logs on failure", async (t) => {
+  const { nft, nftOwner } = t.context.accounts;
+
+  let token = await nft.view("nft_token", "0");
+  t.is(token.owner_id, nftOwner.accountId);
+
+  // transfer to the current owner should fail and not print log
+  let res = await nftOwner.callRaw(nft, 'nft_transfer', [nftOwner.accountId, '0', null, 'simple transfer'], {attachedDeposit: '1'})
+  t.assert(res.result.status.Failure !== undefined);
+
+  t.is(res.logs.length, 0);
+
+  token = await nft.view("nft_token", "0");
+  t.is(token.owner_id, nftOwner.accountId);
+})
