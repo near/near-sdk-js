@@ -9,7 +9,7 @@ import {
   bytes,
 } from "near-sdk-js/lib";
 import { PromiseResult } from "near-sdk-js/lib/types";
-import { TokenMetadata } from "../metadata";
+import { TokenMetadata } from "./metadata";
 import {
   hash_account_id,
   refund_approved_account_ids,
@@ -18,28 +18,12 @@ import {
   assert_at_least_one_yocto,
   IntoStorageKey,
   Option,
-} from "../utils";
-import { NftMint, NftTransfer } from "../events";
-import { NonFungibleTokenResolver } from "./resolver";
+} from "./utils";
+import { NftMint, NftTransfer } from "./events";
+import { NonFungibleTokenResolver } from "./core/resolver";
 import { AccountId } from "near-sdk-js/lib/types/index";
-import { Token, TokenId } from "../token";
-
-export interface NonFungibleTokenCore {
-  nft_transfer([receiver_id, token_id, approval_id, memo]: [
-    receiver_id: AccountId,
-    token_id: TokenId,
-    approval_id: Option<bigint>,
-    memo: Option<string>
-  ]);
-  nft_transfer_call([receiver_id, token_id, approval_id, memo]: [
-    receiver_id: AccountId,
-    token_id: TokenId,
-    approval_id: Option<bigint>,
-    memo: Option<string>,
-    msg: string
-  ]);
-  nft_token(token_id: TokenId): Option<Token>;
-}
+import { Token, TokenId } from "./token";
+import { NonFungibleTokenCore } from "./core";
 
 const GAS_FOR_RESOLVE_TRANSFER = 15_000_000_000_000n;
 const GAS_FOR_NFT_TRANSFER_CALL =

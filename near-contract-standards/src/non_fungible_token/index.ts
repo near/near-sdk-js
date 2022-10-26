@@ -1,3 +1,3 @@
-import { NonFungibleToken } from "./core/index";
+import { NonFungibleToken } from "./impl";
 
 export { NonFungibleToken };

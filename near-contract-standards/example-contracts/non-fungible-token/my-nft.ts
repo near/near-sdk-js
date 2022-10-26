@@ -16,7 +16,7 @@ import {
 } from "../../src/non_fungible_token/metadata";
 import { IntoStorageKey, Option } from "../../src/non_fungible_token/utils";
 import { AccountId } from "../../../lib/types";
-import { NonFungibleTokenCore } from "../../src/non_fungible_token/core/core_impl";
+import { NonFungibleTokenCore } from "../../src/non_fungible_token/core";
 import { Token, TokenId } from "../../src/non_fungible_token/token";
 import { NonFungibleTokenResolver } from "../../src/non_fungible_token/core/resolver";
 

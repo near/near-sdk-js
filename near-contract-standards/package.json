@@ -8,7 +8,7 @@
     "postinstall": "cd .. && yarn link && cd near-contract-standards && yarn link near-sdk-js",
     "build": "run-s build:*",
     "rebuild": "cd .. && yarn build && cd near-contract-standards && rm -rf node_modules && rm -rf build && yarn && yarn build",
-    "build:nft": "run-s build:nft-*",
+    "build-nft": "run-s build:nft-*",
     "build:nft-contract": "near-sdk-js build example-contracts/non-fungible-token/my-nft.ts build/my-nft.wasm",
     "build:nft-receiver": "near-sdk-js build example-contracts/non-fungible-token/test-token-receiver.ts build/nft-receiver.wasm",
     "test": "ava",
