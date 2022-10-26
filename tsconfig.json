@@ -19,7 +19,7 @@
     "experimentalDecorators": true,
     "resolveJsonModule": true,
     "allowJs": true,
-    "skipLibCheck": true,
+    "skipLibCheck": true
   },
   "files": [
     "src/index.ts",
