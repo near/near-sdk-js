@@ -6,6 +6,7 @@ import {
   initialize,
   near,
   NearBindgen,
+  NearPromise,
   PromiseOrValue,
   view,
 } from "near-sdk-js/lib/index";
@@ -19,6 +20,7 @@ import { AccountId } from "../../../lib/types";
 import { NonFungibleTokenCore } from "../../src/non_fungible_token/core";
 import { Token, TokenId } from "../../src/non_fungible_token/token";
 import { NonFungibleTokenResolver } from "../../src/non_fungible_token/core/resolver";
+import { NonFungibleTokenApproval } from "../../src/non_fungible_token/approval";
 
 class StorageKey {}
 
@@ -47,7 +49,7 @@ class StorageKeyApproval extends StorageKey implements IntoStorageKey {
 }
 
 @NearBindgen({ requireInit: true })
-class MyNFT implements NonFungibleTokenCore, NonFungibleTokenMetadataProvider, NonFungibleTokenResolver {
+class MyNFT implements NonFungibleTokenCore, NonFungibleTokenMetadataProvider, NonFungibleTokenResolver, NonFungibleTokenApproval {
   tokens: NonFungibleToken;
   metadata: Option<NFTContractMetadata>;
 
@@ -55,6 +57,26 @@ class MyNFT implements NonFungibleTokenCore, NonFungibleTokenMetadataProvider, N
     this.tokens = new NonFungibleToken();
     // @ts-ignore
     this.metadata = new NFTContractMetadata();
+  }
+
+  @call({payableFunction: true})
+  nft_approve([token_id, account_id, msg]: [token_id: string, account_id: string, msg: string]): NearPromise {
+    return this.tokens.nft_approve([token_id, account_id, msg]);
+  }
+
+  @call({payableFunction: true})
+  nft_revoke([token_id, account_id]: [token_id: string, account_id: string]) {
+    return this.tokens.nft_revoke([token_id, account_id]);
+  }
+
+  @call({payableFunction: true})
+  nft_revoke_all(token_id: string) {
+    return this.tokens.nft_revoke_all(token_id);
+  }
+
+  @view({})
+  nft_is_approved([token_id, approved_account_id, approval_id]: [token_id: string, approved_account_id: string, approval_id: bigint]): boolean {
+    return this.tokens.nft_is_approved([token_id, approved_account_id, approval_id]);
   }
 
   @call({})

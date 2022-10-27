@@ -66,6 +66,13 @@ export function assert_at_least_one_yocto(): void {
   );
 }
 
+export function assert_one_yocto(): void {
+  assert(
+    near.attachedDeposit() === 1n,
+    "Requires attached deposit of 1 yoctoNEAR"
+  );
+}
+
 export type Option<T> = T | null;
 
 export interface IntoStorageKey {

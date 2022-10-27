@@ -7,6 +7,7 @@ import {
   assert,
   NearPromise,
   bytes,
+  PromiseOrValue,
 } from "near-sdk-js/lib";
 import { PromiseResult } from "near-sdk-js/lib/types";
 import { TokenMetadata } from "./metadata";
@@ -18,23 +19,43 @@ import {
   assert_at_least_one_yocto,
   IntoStorageKey,
   Option,
+  bytes_for_approved_account_id,
+  assert_one_yocto,
+  refund_approved_account_ids_iter,
 } from "./utils";
 import { NftMint, NftTransfer } from "./events";
 import { NonFungibleTokenResolver } from "./core/resolver";
 import { AccountId } from "near-sdk-js/lib/types/index";
 import { Token, TokenId } from "./token";
 import { NonFungibleTokenCore } from "./core";
+import { NonFungibleTokenApproval } from "./approval";
 
 const GAS_FOR_RESOLVE_TRANSFER = 15_000_000_000_000n;
 const GAS_FOR_NFT_TRANSFER_CALL =
   30_000_000_000_000n + GAS_FOR_RESOLVE_TRANSFER;
+const GAS_FOR_NFT_APPROVE = 10_000_000_000_000n;
+
 
 function repeat(str: string, n: number) {
   return Array(n + 1).join(str);
 }
 
+function expect_token_found<T>(option: Option<T>): T {
+  if (option === null) {
+    throw new Error("Token not found");
+  }
+  return option;
+}
+
+function expect_approval<T>(option: Option<T>): T {
+  if (option === null) {
+    throw new Error("next_approval_by_id must be set for approval ext");
+  }
+  return option;
+}
+
 export class NonFungibleToken
-  implements NonFungibleTokenCore, NonFungibleTokenResolver
+  implements NonFungibleTokenCore, NonFungibleTokenResolver, NonFungibleTokenApproval
 {
   public owner_id: string;
   public extra_storage_in_bytes_per_token: bigint;
@@ -54,6 +75,99 @@ export class NonFungibleToken
     this.next_approval_id_by_id = null;
   }
 
+  nft_approve([token_id, account_id, msg]: [token_id: string, account_id: string, msg: string]): NearPromise {
+    assert_at_least_one_yocto();
+    if (this.approvals_by_id === null) {
+      throw new Error("NFT does not support Approval Management");
+    }
+    let approvals_by_id = this.approvals_by_id;
+    let owner_id = expect_token_found(this.owner_by_id.get(token_id));
+    
+    assert(near.predecessorAccountId() === owner_id, "Predecessor must be token owner.");
+    
+    let next_approval_id_by_id = expect_approval(this.next_approval_id_by_id);
+    let approved_account_ids = approvals_by_id.get(token_id) ?? {};
+    let approval_id = next_approval_id_by_id.get(token_id) ?? 1n;
+    let old_approval_id = approved_account_ids[account_id] = approval_id;
+
+    approvals_by_id.set(token_id, approved_account_ids);
+    
+    next_approval_id_by_id.set(token_id, approval_id + 1n);
+
+    let storage_used = (old_approval_id === null) ? bytes_for_approved_account_id(account_id) : 0;
+    refund_deposit(BigInt(storage_used));
+
+    if(msg) {
+      return NearPromise.new(account_id).functionCall('nft_on_approve', bytes(JSON.stringify([token_id, owner_id, approval_id, msg])), 0n, near.prepaidGas() - GAS_FOR_NFT_APPROVE);
+    }
+  }
+
+  nft_revoke([token_id, account_id]: [token_id: string, account_id: string]) {
+    assert_one_yocto();
+    if (this.approvals_by_id === null) {
+      throw new Error("NFT does not support Approval Management");
+    }
+    let approvals_by_id = this.approvals_by_id;
+    let owner_id = expect_token_found(this.owner_by_id.get(token_id));
+    
+    let predecessorAccountId = near.predecessorAccountId();
+    assert(predecessorAccountId === owner_id, "Predecessor must be token owner.");
+    
+    let approved_account_ids = approvals_by_id.get(token_id);
+    if (approved_account_ids) {
+      refund_approved_account_ids_iter(predecessorAccountId, [account_id]);
+
+      if (Object.keys(approved_account_ids).length === 0) {
+        approvals_by_id.remove(token_id);
+      } else {
+        approvals_by_id.set(token_id, approved_account_ids)
+      }
+    }
+  }
+
+  nft_revoke_all(token_id: string) {
+    assert_one_yocto();
+    if (this.approvals_by_id === null) {
+      throw new Error("NFT does not support Approval Management");
+    }
+    let approvals_by_id = this.approvals_by_id;
+    let owner_id = expect_token_found(this.owner_by_id.get(token_id));
+    
+    let predecessorAccountId = near.predecessorAccountId();
+    assert(predecessorAccountId === owner_id, "Predecessor must be token owner.");
+    
+    let approved_account_ids = approvals_by_id.get(token_id);
+    if (approved_account_ids) {
+      refund_approved_account_ids(predecessorAccountId, approved_account_ids);
+
+      approvals_by_id.remove(token_id);
+    } 
+  }
+
+  nft_is_approved([token_id, approved_account_id, approval_id]: [token_id: string, approved_account_id: string, approval_id: bigint]): boolean {
+    expect_token_found(this.owner_by_id.get(token_id));
+
+    if (this.approvals_by_id === null) {
+      return false;
+    }
+    let approval_by_ids = this.approvals_by_id;
+
+    let approved_account_ids = approval_by_ids.get(token_id) === null;
+    if (approved_account_ids === null) {
+      return false;
+    }
+
+    let actual_approval_id = approved_account_ids[approved_account_id];
+    if (actual_approval_id === undefined) {
+      return false;
+    }
+
+    if (approval_id) {
+      return approval_id === actual_approval_id;
+    }
+    return true;
+  }
+  
   init(
     owner_by_id_prefix: IntoStorageKey,
     owner_id: string,

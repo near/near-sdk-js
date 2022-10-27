@@ -11,6 +11,7 @@
     "build-nft": "run-s build:nft-*",
     "build:nft-contract": "near-sdk-js build example-contracts/non-fungible-token/my-nft.ts build/my-nft.wasm",
     "build:nft-receiver": "near-sdk-js build example-contracts/non-fungible-token/test-token-receiver.ts build/nft-receiver.wasm",
+    "build:nft-approval-receiver": "near-sdk-js build example-contracts/non-fungible-token/test-approval-receiver.ts build/nft-approval-receiver.wasm",
     "test": "ava",
     "test:nft": "ava __tests__/my-nft/*"
   },
