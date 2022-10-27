@@ -67,7 +67,9 @@ export async function buildCom(
   await executeCommand(`mkdir -p ${TARGET_DIR}`, verbose);
 
   signal.await(`Validatig ${source} contract...`);
-  await validateContract(source);
+  if (!await validateContract(source, verbose)) {
+    process.exit(1);
+  }
 
   signale.await(`Creating ${source} file with Rollup...`);
   await createJsFileWithRullup(source, ROLLUP_TARGET, verbose);
@@ -146,8 +148,8 @@ async function createMethodsHeaderFile(rollupTarget: string, verbose = false) {
   const buildPath = path.dirname(rollupTarget);
 
   if (verbose) {
-    new Signale({scope: "method-header"}).info(
-rollupTarget
+    new Signale({ scope: "method-header" }).info(
+      rollupTarget
     )
   }
 
@@ -189,8 +191,7 @@ async function createWasmContract(
   await executeCommand(`mv ${qjscTarget} build/code.h`, verbose);
 
   await executeCommand(
-    `${CC} --target=wasm32-wasi -nostartfiles -Oz -flto ${DEFS} ${INCLUDES} ${SOURCES} ${LIBS} -Wl,--no-entry -Wl,--allow-undefined -Wl,-z,stack-size=${
-      256 * 1024
+    `${CC} --target=wasm32-wasi -nostartfiles -Oz -flto ${DEFS} ${INCLUDES} ${SOURCES} ${LIBS} -Wl,--no-entry -Wl,--allow-undefined -Wl,-z,stack-size=${256 * 1024
     } -Wl,--lto-O3 -o ${contractTarget}`,
     verbose
   );
