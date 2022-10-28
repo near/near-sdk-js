@@ -88,7 +88,8 @@ export class NonFungibleToken
     let next_approval_id_by_id = expect_approval(this.next_approval_id_by_id);
     let approved_account_ids = approvals_by_id.get(token_id) ?? {};
     let approval_id = next_approval_id_by_id.get(token_id) ?? 1n;
-    let old_approval_id = approved_account_ids[account_id] = approval_id;
+    let old_approval_id = approved_account_ids[account_id]
+    approved_account_ids[account_id] = approval_id;
 
     approvals_by_id.set(token_id, approved_account_ids);
     
@@ -150,9 +151,9 @@ export class NonFungibleToken
     if (this.approvals_by_id === null) {
       return false;
     }
-    let approval_by_ids = this.approvals_by_id;
+    let approvals_by_id = this.approvals_by_id;
 
-    let approved_account_ids = approval_by_ids.get(token_id) === null;
+    let approved_account_ids = approvals_by_id.get(token_id);
     if (approved_account_ids === null) {
       return false;
     }
@@ -180,7 +181,7 @@ export class NonFungibleToken
     if (approval_prefix) {
       const prefix = approval_prefix.into_storage_key();
       approvals_by_id = new LookupMap(prefix);
-      next_approval_id_by_id = new LookupMap(prefix);
+      next_approval_id_by_id = new LookupMap(prefix + 'n');
     } else {
       approvals_by_id = null;
       next_approval_id_by_id = null;

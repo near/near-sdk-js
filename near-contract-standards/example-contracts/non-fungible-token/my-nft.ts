@@ -44,7 +44,7 @@ class StorageKeyTokenEnumeration extends StorageKey implements IntoStorageKey {
 
 class StorageKeyApproval extends StorageKey implements IntoStorageKey {
   into_storage_key(): Bytes {
-    return "APPROVAL_";
+    return "APPROVAL1_";
   }
 }
 
