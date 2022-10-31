@@ -9,6 +9,7 @@ import {
   bytes,
   PromiseOrValue,
 } from "near-sdk-js/lib";
+import {serialize} from 'near-sdk-js/lib/utils'
 import { PromiseResult } from "near-sdk-js/lib/types";
 import { TokenMetadata } from "./metadata";
 import {
@@ -33,7 +34,7 @@ import { NonFungibleTokenApproval } from "./approval";
 const GAS_FOR_RESOLVE_TRANSFER = 15_000_000_000_000n;
 const GAS_FOR_NFT_TRANSFER_CALL =
   30_000_000_000_000n + GAS_FOR_RESOLVE_TRANSFER;
-const GAS_FOR_NFT_APPROVE = 10_000_000_000_000n;
+const GAS_FOR_NFT_APPROVE = 20_000_000_000_000n;
 
 
 function repeat(str: string, n: number) {
@@ -99,7 +100,7 @@ export class NonFungibleToken
     refund_deposit(BigInt(storage_used));
 
     if(msg) {
-      return NearPromise.new(account_id).functionCall('nft_on_approve', bytes(JSON.stringify([token_id, owner_id, approval_id, msg])), 0n, near.prepaidGas() - GAS_FOR_NFT_APPROVE);
+      return NearPromise.new(account_id).functionCall('nft_on_approve', bytes(serialize([token_id, owner_id, approval_id, msg])), 0n, near.prepaidGas() - GAS_FOR_NFT_APPROVE);
     }
   }
 
@@ -115,7 +116,8 @@ export class NonFungibleToken
     assert(predecessorAccountId === owner_id, "Predecessor must be token owner.");
     
     let approved_account_ids = approvals_by_id.get(token_id);
-    if (approved_account_ids) {
+    if (approved_account_ids[account_id]) {
+      delete approved_account_ids[account_id]
       refund_approved_account_ids_iter(predecessorAccountId, [account_id]);
 
       if (Object.keys(approved_account_ids).length === 0) {
@@ -164,7 +166,7 @@ export class NonFungibleToken
     }
 
     if (approval_id) {
-      return approval_id === actual_approval_id;
+      return BigInt(approval_id) === actual_approval_id;
     }
     return true;
   }
