@@ -7,6 +7,13 @@ const { Signale } = signal;
 
 const signale = new Signale({ scope: "postinstall", interactive: true });
 
+// Clean existing deps folder
+process.chdir("lib/cli");
+const DEPS = "deps";
+fs.rmSync(DEPS, { recursive: true, force: true });
+fs.mkdirSync(DEPS);
+process.chdir(DEPS)
+
 const PLATFORM = os.platform();
 const ARCH = os.arch();
 console.log(`Current platform: ${PLATFORM}, current architecture: ${ARCH}`);
