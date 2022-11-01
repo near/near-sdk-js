@@ -21,6 +21,7 @@ import { NonFungibleTokenCore } from "../../src/non_fungible_token/core";
 import { Token, TokenId } from "../../src/non_fungible_token/token";
 import { NonFungibleTokenResolver } from "../../src/non_fungible_token/core/resolver";
 import { NonFungibleTokenApproval } from "../../src/non_fungible_token/approval";
+import { NonFungibleTokenEnumeration } from "../../src/non_fungible_token/enumeration";
 
 class StorageKey {}
 
@@ -49,7 +50,7 @@ class StorageKeyApproval extends StorageKey implements IntoStorageKey {
 }
 
 @NearBindgen({ requireInit: true })
-class MyNFT implements NonFungibleTokenCore, NonFungibleTokenMetadataProvider, NonFungibleTokenResolver, NonFungibleTokenApproval {
+class MyNFT implements NonFungibleTokenCore, NonFungibleTokenMetadataProvider, NonFungibleTokenResolver, NonFungibleTokenApproval, NonFungibleTokenEnumeration {
   tokens: NonFungibleToken;
   metadata: Option<NFTContractMetadata>;
 
@@ -57,6 +58,26 @@ class MyNFT implements NonFungibleTokenCore, NonFungibleTokenMetadataProvider, N
     this.tokens = new NonFungibleToken();
     // @ts-ignore
     this.metadata = new NFTContractMetadata();
+  }
+
+  @view({})
+  nft_total_supply(): number {
+    return this.tokens.nft_total_supply()
+  }
+
+  @view({})
+  nft_tokens([from_index, limit]: [from_index: number, limit: number]): Token[] {
+    return this.tokens.nft_tokens([from_index, limit])
+  }
+
+  @view({})
+  nft_supply_for_owner(account_id: string): number {
+    return this.tokens.nft_supply_for_owner(account_id)
+  }
+
+  @view({})
+  nft_tokens_for_owner([account_id, from_index, limit]: [account_id: string, from_index: number, limit: number]): Token[] {
+    return this.tokens.nft_tokens_for_owner([account_id, from_index, limit])
   }
 
   @call({payableFunction: true})

@@ -30,6 +30,7 @@ import { AccountId } from "near-sdk-js/lib/types/index";
 import { Token, TokenId } from "./token";
 import { NonFungibleTokenCore } from "./core";
 import { NonFungibleTokenApproval } from "./approval";
+import { NonFungibleTokenEnumeration } from "./enumeration";
 
 const GAS_FOR_RESOLVE_TRANSFER = 15_000_000_000_000n;
 const GAS_FOR_NFT_TRANSFER_CALL =
@@ -56,7 +57,7 @@ function expect_approval<T>(option: Option<T>): T {
 }
 
 export class NonFungibleToken
-  implements NonFungibleTokenCore, NonFungibleTokenResolver, NonFungibleTokenApproval
+  implements NonFungibleTokenCore, NonFungibleTokenResolver, NonFungibleTokenApproval, NonFungibleTokenEnumeration
 {
   public owner_id: string;
   public extra_storage_in_bytes_per_token: bigint;
@@ -74,6 +75,64 @@ export class NonFungibleToken
     this.tokens_per_owner = null;
     this.approvals_by_id = null;
     this.next_approval_id_by_id = null;
+  }
+
+  nft_total_supply(): number {
+    return this.owner_by_id.length
+  }
+
+  private enum_get_token(owner_id: AccountId, token_id: TokenId): Token {
+    let metadata = this.token_metadata_by_id.get(token_id, {reconstructor: TokenMetadata.reconstruct})
+    let approved_account_ids = this.approvals_by_id.get(token_id, {defaultValue: {}})
+    return new Token(token_id, owner_id, metadata, approved_account_ids)
+  }
+
+  nft_tokens([from_index, limit]: [from_index: number | null, limit: number | null]): Token[] {
+    let start_index = from_index === null ? 0 : from_index;
+    assert(this.owner_by_id.length >= start_index, "Out of bounds, please use a smaller from_index.");
+    let l = limit === null ? 2**32 : limit;
+    assert(l >= 0, "limit must be greater than 0.");
+    l = Math.min(l, this.owner_by_id.length - start_index);
+    let ret: Token[] = [];
+    for (let i = start_index; i < l; i++) {
+      let token_id = this.owner_by_id.keys.get(i);
+      let owner_id = this.owner_by_id.get(token_id);
+      ret.push(this.enum_get_token(owner_id, token_id));
+    }
+    return ret;
+  }
+
+  nft_supply_for_owner(account_id: string): number {
+    let tokens_per_owner = this.tokens_per_owner
+    assert(tokens_per_owner !== null, 
+          "Could not find tokens_per_owner when calling a method on the enumeration standard.",
+    );
+
+    let account_tokens = tokens_per_owner.get(account_id, {reconstructor: UnorderedSet.reconstruct});
+    return account_tokens === null ? 0 : account_tokens.length
+  }
+
+  nft_tokens_for_owner([account_id, from_index, limit]: [account_id: string, from_index: number, limit: number]): Token[] {
+    let tokens_per_owner = this.tokens_per_owner
+    assert(tokens_per_owner !== null, 
+          "Could not find tokens_per_owner when calling a method on the enumeration standard.",
+    );
+    let token_set = tokens_per_owner.get(account_id, {reconstructor: UnorderedSet.reconstruct});
+    assert(token_set !== null, "Token set is empty");
+
+    let start_index = from_index === null ? 0 : from_index;
+    assert(token_set.length >= start_index, "Out of bounds, please use a smaller from_index.");
+    let l = limit === null ? 2**32 : limit;
+    assert(l >= 0, "limit must be greater than 0.");
+    l = Math.min(l, token_set.length - start_index);
+
+    let ret: Token[] = [];
+    for (let i = start_index; i < l; i++) {
+      let token_id = token_set.elements.get(i);
+      let owner_id = this.owner_by_id.get(token_id);
+      ret.push(this.enum_get_token(owner_id, token_id));
+    }
+    return ret;
   }
 
   nft_approve([token_id, account_id, msg]: [token_id: string, account_id: string, msg: string]): NearPromise {
