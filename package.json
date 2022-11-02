@@ -21,7 +21,7 @@
   ],
   "license": "(MIT AND Apache-2.0)",
   "scripts": {
-    "build": "tsc -p ./tsconfig.json && chmod u+x lib/cli/cli.js",
+    "build": "tsc -p ./tsconfig.json",
     "pretest": "yarn build",
     "test": "run-s test:*",
     "lint": "eslint --fix .",
