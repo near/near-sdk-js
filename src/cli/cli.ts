@@ -10,7 +10,7 @@ import { rollup } from "rollup";
 import { Command } from "commander";
 import signal from "signale";
 
-import { executeCommand } from "./utils.js";
+import { executeCommand, validateContract } from "./utils.js";
 
 const { Signale } = signal;
 const PROJECT_DIR = process.cwd();
@@ -43,7 +43,7 @@ export async function buildCom(
   const TARGET_DIR = dirname(target);
   const TARGET_EXT = target.split(".").pop();
   const TARGET_FILE_NAME = basename(target, `.${TARGET_EXT}`);
-  const signale = new Signale({ scope: "build", interactive: true });
+  const signale = new Signale({ scope: "build", interactive: !verbose });
 
   if (TARGET_EXT !== "wasm") {
     signale.error(
@@ -65,6 +65,11 @@ export async function buildCom(
 
   signale.await(`Creating ${TARGET_DIR} directory...`);
   await executeCommand(`mkdir -p ${TARGET_DIR}`, verbose);
+
+  signal.await(`Validatig ${source} contract...`);
+  if (!(await validateContract(source, verbose))) {
+    process.exit(1);
+  }
 
   signale.await(`Creating ${source} file with Rollup...`);
   await createJsFileWithRullup(source, ROLLUP_TARGET, verbose);
@@ -89,7 +94,7 @@ async function checkTsBuildWithTsc(
   verbose = false
 ) {
   await executeCommand(
-    `${TSC} --noEmit --experimentalDecorators --target es2020 --moduleResolution node ${sourceFileWithPath}`,
+    `${TSC} --noEmit --skipLibCheck --experimentalDecorators --target es2020 --moduleResolution node ${sourceFileWithPath}`,
     verbose
   );
 }
@@ -143,7 +148,7 @@ async function createMethodsHeaderFile(rollupTarget: string, verbose = false) {
   const buildPath = path.dirname(rollupTarget);
 
   if (verbose) {
-    console.log(rollupTarget);
+    new Signale({ scope: "method-header" }).info(rollupTarget);
   }
 
   const mod = await import(`${PROJECT_DIR}/${rollupTarget}`);

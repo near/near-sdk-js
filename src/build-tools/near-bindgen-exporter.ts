@@ -1,6 +1,9 @@
 import { PluginPass } from "@babel/core";
 import { Node, Visitor } from "@babel/traverse";
 import * as t from "@babel/types";
+import signal from "signale";
+
+const { Signale } = signal;
 
 /**
  * A list of supported method types/decorators.
@@ -388,7 +391,9 @@ export default function (): { visitor: Visitor } {
                 );
 
                 if (verbose) {
-                  console.log(`Babel ${child.key.name} method export done`);
+                  new Signale({
+                    scope: "near-bindgen-exporter",
+                  }).info(`Babel ${child.key.name} method export done.`);
                 }
               }
             }
