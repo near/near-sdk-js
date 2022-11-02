@@ -1,4 +1,4 @@
-name: Examples
+name: Contract standard
 on:
   pull_request:
   push:
@@ -19,4 +19,4 @@ jobs:
       - name: Install dependencies
         run: yarn && cd near-contract-standards && yarn
       - name: nft
-        run: cd near-contract-standards && yarn build:nft && yarn test:nft
+        run: cd near-contract-standards && yarn build-nft && yarn test:nft
