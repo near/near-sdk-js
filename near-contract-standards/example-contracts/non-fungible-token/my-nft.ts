@@ -50,59 +50,94 @@ class StorageKeyApproval extends StorageKey implements IntoStorageKey {
 }
 
 @NearBindgen({ requireInit: true })
-class MyNFT implements NonFungibleTokenCore, NonFungibleTokenMetadataProvider, NonFungibleTokenResolver, NonFungibleTokenApproval, NonFungibleTokenEnumeration {
+export class MyNFT
+  implements
+    NonFungibleTokenCore,
+    NonFungibleTokenMetadataProvider,
+    NonFungibleTokenResolver,
+    NonFungibleTokenApproval,
+    NonFungibleTokenEnumeration
+{
   tokens: NonFungibleToken;
   metadata: Option<NFTContractMetadata>;
 
   constructor() {
     this.tokens = new NonFungibleToken();
-    // @ts-ignore
     this.metadata = new NFTContractMetadata();
   }
 
   @view({})
   nft_total_supply(): number {
-    return this.tokens.nft_total_supply()
+    return this.tokens.nft_total_supply();
   }
 
   @view({})
-  nft_tokens([from_index, limit]: [from_index: number, limit: number]): Token[] {
-    return this.tokens.nft_tokens([from_index, limit])
+  nft_tokens([from_index, limit]: [
+    from_index: number,
+    limit: number
+  ]): Token[] {
+    return this.tokens.nft_tokens([from_index, limit]);
   }
 
   @view({})
   nft_supply_for_owner(account_id: string): number {
-    return this.tokens.nft_supply_for_owner(account_id)
+    return this.tokens.nft_supply_for_owner(account_id);
   }
 
   @view({})
-  nft_tokens_for_owner([account_id, from_index, limit]: [account_id: string, from_index: number, limit: number]): Token[] {
-    return this.tokens.nft_tokens_for_owner([account_id, from_index, limit])
+  nft_tokens_for_owner([account_id, from_index, limit]: [
+    account_id: string,
+    from_index: number,
+    limit: number
+  ]): Token[] {
+    return this.tokens.nft_tokens_for_owner([account_id, from_index, limit]);
   }
 
-  @call({payableFunction: true})
-  nft_approve([token_id, account_id, msg]: [token_id: string, account_id: string, msg: string]): NearPromise {
+  @call({ payableFunction: true })
+  nft_approve([token_id, account_id, msg]: [
+    token_id: string,
+    account_id: string,
+    msg: string
+  ]): NearPromise {
     return this.tokens.nft_approve([token_id, account_id, msg]);
   }
 
-  @call({payableFunction: true})
+  @call({ payableFunction: true })
   nft_revoke([token_id, account_id]: [token_id: string, account_id: string]) {
     return this.tokens.nft_revoke([token_id, account_id]);
   }
 
-  @call({payableFunction: true})
+  @call({ payableFunction: true })
   nft_revoke_all(token_id: string) {
     return this.tokens.nft_revoke_all(token_id);
   }
 
   @view({})
-  nft_is_approved([token_id, approved_account_id, approval_id]: [token_id: string, approved_account_id: string, approval_id: bigint]): boolean {
-    return this.tokens.nft_is_approved([token_id, approved_account_id, approval_id]);
+  nft_is_approved([token_id, approved_account_id, approval_id]: [
+    token_id: string,
+    approved_account_id: string,
+    approval_id: bigint
+  ]): boolean {
+    return this.tokens.nft_is_approved([
+      token_id,
+      approved_account_id,
+      approval_id,
+    ]);
   }
 
   @call({})
-  nft_resolve_transfer([previous_owner_id, receiver_id, token_id, approvals]: [previous_owner_id: string, receiver_id: string, token_id: string, approvals: { [approval: string]: bigint; }]): boolean {
-    return this.tokens.nft_resolve_transfer([previous_owner_id, receiver_id, token_id, approvals])
+  nft_resolve_transfer([previous_owner_id, receiver_id, token_id, approvals]: [
+    previous_owner_id: string,
+    receiver_id: string,
+    token_id: string,
+    approvals: { [approval: string]: bigint }
+  ]): boolean {
+    return this.tokens.nft_resolve_transfer([
+      previous_owner_id,
+      receiver_id,
+      token_id,
+      approvals,
+    ]);
   }
 
   @view({})
@@ -111,7 +146,7 @@ class MyNFT implements NonFungibleTokenCore, NonFungibleTokenMetadataProvider, N
     return this.metadata;
   }
 
-  @call({payableFunction: true})
+  @call({ payableFunction: true })
   nft_transfer([receiver_id, token_id, approval_id, memo]: [
     receiver_id: string,
     token_id: string,
@@ -121,7 +156,7 @@ class MyNFT implements NonFungibleTokenCore, NonFungibleTokenMetadataProvider, N
     this.tokens.nft_transfer([receiver_id, token_id, approval_id, memo]);
   }
 
-  @call({payableFunction: true})
+  @call({ payableFunction: true })
   nft_transfer_call([receiver_id, token_id, approval_id, memo, msg]: [
     receiver_id: string,
     token_id: string,
@@ -134,7 +169,7 @@ class MyNFT implements NonFungibleTokenCore, NonFungibleTokenMetadataProvider, N
       token_id,
       approval_id,
       memo,
-      msg
+      msg,
     ]);
   }
 
@@ -151,7 +186,6 @@ class MyNFT implements NonFungibleTokenCore, NonFungibleTokenMetadataProvider, N
     owner_id: string;
     metadata: NFTContractMetadata;
   }) {
-    // @ts-ignore
     this.metadata = Object.assign(new NFTContractMetadata(), metadata);
     this.metadata.assert_valid();
     this.tokens = new NonFungibleToken();
@@ -165,14 +199,10 @@ class MyNFT implements NonFungibleTokenCore, NonFungibleTokenMetadataProvider, N
   }
 
   @call({ payableFunction: true })
-  nft_mint([
-    token_id,
-    token_owner_id,
-    token_metadata,
-  ]: [
+  nft_mint([token_id, token_owner_id, token_metadata]: [
     token_id: TokenId,
     token_owner_id: AccountId,
-    token_metadata: TokenMetadata,
+    token_metadata: TokenMetadata
   ]) {
     assert(
       near.predecessorAccountId() === this.tokens.owner_id,

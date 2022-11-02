@@ -1,5 +1,5 @@
 import { Bytes } from "near-sdk-js";
-import { near, assert } from "near-sdk-js";
+import { assert } from "near-sdk-js";
 import { Option } from "./utils";
 
 export const NFT_METADATA_SPEC = "nft-1.0.0";
@@ -53,7 +53,7 @@ export class NFTContractMetadata {
   }
 
   static reconstruct(data: NFTContractMetadata): NFTContractMetadata {
-    let metadata = new NFTContractMetadata();
+    const metadata = new NFTContractMetadata();
     Object.assign(metadata, data);
     return metadata;
   }

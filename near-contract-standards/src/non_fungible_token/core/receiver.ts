@@ -7,6 +7,6 @@ export interface NonFungibleTokenReceiver {
     sender_id: AccountId,
     previous_owner_id: AccountId,
     token_id: TokenId,
-    msg: String
+    msg: string
   ]): PromiseOrValue<boolean>;
 }

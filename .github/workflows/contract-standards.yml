@@ -20,4 +20,3 @@ jobs:
         run: yarn && cd near-contract-standards && yarn
       - name: nft
         run: cd near-contract-standards && yarn build:nft && yarn test:nft
-      

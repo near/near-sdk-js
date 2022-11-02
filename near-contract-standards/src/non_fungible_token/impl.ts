@@ -7,13 +7,10 @@ import {
   assert,
   NearPromise,
   bytes,
-  PromiseOrValue,
 } from "near-sdk-js/lib";
-import {serialize} from 'near-sdk-js/lib/utils'
-import { PromiseResult } from "near-sdk-js/lib/types";
+import { serialize } from "near-sdk-js/lib/utils";
 import { TokenMetadata } from "./metadata";
 import {
-  hash_account_id,
   refund_approved_account_ids,
   refund_deposit,
   refund_deposit_to_account,
@@ -37,7 +34,6 @@ const GAS_FOR_NFT_TRANSFER_CALL =
   30_000_000_000_000n + GAS_FOR_RESOLVE_TRANSFER;
 const GAS_FOR_NFT_APPROVE = 20_000_000_000_000n;
 
-
 function repeat(str: string, n: number) {
   return Array(n + 1).join(str);
 }
@@ -57,7 +53,11 @@ function expect_approval<T>(option: Option<T>): T {
 }
 
 export class NonFungibleToken
-  implements NonFungibleTokenCore, NonFungibleTokenResolver, NonFungibleTokenApproval, NonFungibleTokenEnumeration
+  implements
+    NonFungibleTokenCore,
+    NonFungibleTokenResolver,
+    NonFungibleTokenApproval,
+    NonFungibleTokenEnumeration
 {
   public owner_id: string;
   public extra_storage_in_bytes_per_token: bigint;
@@ -78,88 +78,124 @@ export class NonFungibleToken
   }
 
   nft_total_supply(): number {
-    return this.owner_by_id.length
+    return this.owner_by_id.length;
   }
 
   private enum_get_token(owner_id: AccountId, token_id: TokenId): Token {
-    let metadata = this.token_metadata_by_id.get(token_id, {reconstructor: TokenMetadata.reconstruct})
-    let approved_account_ids = this.approvals_by_id.get(token_id, {defaultValue: {}})
-    return new Token(token_id, owner_id, metadata, approved_account_ids)
+    const metadata = this.token_metadata_by_id.get(token_id, {
+      reconstructor: TokenMetadata.reconstruct,
+    });
+    const approved_account_ids = this.approvals_by_id.get(token_id, {
+      defaultValue: {},
+    });
+    return new Token(token_id, owner_id, metadata, approved_account_ids);
   }
 
-  nft_tokens([from_index, limit]: [from_index: number | null, limit: number | null]): Token[] {
-    let start_index = from_index === null ? 0 : from_index;
-    assert(this.owner_by_id.length >= start_index, "Out of bounds, please use a smaller from_index.");
-    let l = limit === null ? 2**32 : limit;
-    assert(l >= 0, "limit must be greater than 0.");
+  nft_tokens([from_index, limit]: [
+    from_index: number | null,
+    limit: number | null
+  ]): Token[] {
+    const start_index = from_index === null ? 0 : from_index;
+    assert(
+      this.owner_by_id.length >= start_index,
+      "Out of bounds, please use a smaller from_index."
+    );
+    let l = limit === null ? 2 ** 32 : limit;
+    assert(l > 0, "limit must be greater than 0.");
     l = Math.min(l, this.owner_by_id.length - start_index);
-    let ret: Token[] = [];
-    for (let i = start_index; i < l; i++) {
-      let token_id = this.owner_by_id.keys.get(i);
-      let owner_id = this.owner_by_id.get(token_id);
+    const ret: Token[] = [];
+    for (let i = start_index; i < start_index + l; i++) {
+      const token_id = this.owner_by_id.keys.get(i);
+      const owner_id = this.owner_by_id.get(token_id);
       ret.push(this.enum_get_token(owner_id, token_id));
     }
     return ret;
   }
 
   nft_supply_for_owner(account_id: string): number {
-    let tokens_per_owner = this.tokens_per_owner
-    assert(tokens_per_owner !== null, 
-          "Could not find tokens_per_owner when calling a method on the enumeration standard.",
+    const tokens_per_owner = this.tokens_per_owner;
+    assert(
+      tokens_per_owner !== null,
+      "Could not find tokens_per_owner when calling a method on the enumeration standard."
     );
 
-    let account_tokens = tokens_per_owner.get(account_id, {reconstructor: UnorderedSet.reconstruct});
-    return account_tokens === null ? 0 : account_tokens.length
+    const account_tokens = tokens_per_owner.get(account_id, {
+      reconstructor: UnorderedSet.reconstruct,
+    });
+    return account_tokens === null ? 0 : account_tokens.length;
   }
 
-  nft_tokens_for_owner([account_id, from_index, limit]: [account_id: string, from_index: number, limit: number]): Token[] {
-    let tokens_per_owner = this.tokens_per_owner
-    assert(tokens_per_owner !== null, 
-          "Could not find tokens_per_owner when calling a method on the enumeration standard.",
+  nft_tokens_for_owner([account_id, from_index, limit]: [
+    account_id: string,
+    from_index: number,
+    limit: number
+  ]): Token[] {
+    const tokens_per_owner = this.tokens_per_owner;
+    assert(
+      tokens_per_owner !== null,
+      "Could not find tokens_per_owner when calling a method on the enumeration standard."
     );
-    let token_set = tokens_per_owner.get(account_id, {reconstructor: UnorderedSet.reconstruct});
+    const token_set = tokens_per_owner.get(account_id, {
+      reconstructor: UnorderedSet.reconstruct,
+    });
     assert(token_set !== null, "Token set is empty");
 
-    let start_index = from_index === null ? 0 : from_index;
-    assert(token_set.length >= start_index, "Out of bounds, please use a smaller from_index.");
-    let l = limit === null ? 2**32 : limit;
-    assert(l >= 0, "limit must be greater than 0.");
+    const start_index = from_index === null ? 0 : from_index;
+    assert(
+      token_set.length >= start_index,
+      "Out of bounds, please use a smaller from_index."
+    );
+    let l = limit === null ? 2 ** 32 : limit;
+    assert(l > 0, "limit must be greater than 0.");
     l = Math.min(l, token_set.length - start_index);
 
-    let ret: Token[] = [];
-    for (let i = start_index; i < l; i++) {
-      let token_id = token_set.elements.get(i);
-      let owner_id = this.owner_by_id.get(token_id);
+    const ret: Token[] = [];
+    for (let i = start_index; i < start_index + l; i++) {
+      const token_id = token_set.elements.get(i);
+      const owner_id = this.owner_by_id.get(token_id);
       ret.push(this.enum_get_token(owner_id, token_id));
     }
     return ret;
   }
 
-  nft_approve([token_id, account_id, msg]: [token_id: string, account_id: string, msg: string]): NearPromise {
+  nft_approve([token_id, account_id, msg]: [
+    token_id: string,
+    account_id: string,
+    msg: string
+  ]): NearPromise {
     assert_at_least_one_yocto();
     if (this.approvals_by_id === null) {
       throw new Error("NFT does not support Approval Management");
     }
-    let approvals_by_id = this.approvals_by_id;
-    let owner_id = expect_token_found(this.owner_by_id.get(token_id));
-    
-    assert(near.predecessorAccountId() === owner_id, "Predecessor must be token owner.");
-    
-    let next_approval_id_by_id = expect_approval(this.next_approval_id_by_id);
-    let approved_account_ids = approvals_by_id.get(token_id) ?? {};
-    let approval_id = next_approval_id_by_id.get(token_id) ?? 1n;
-    let old_approval_id = approved_account_ids[account_id]
+    const approvals_by_id = this.approvals_by_id;
+    const owner_id = expect_token_found(this.owner_by_id.get(token_id));
+
+    assert(
+      near.predecessorAccountId() === owner_id,
+      "Predecessor must be token owner."
+    );
+
+    const next_approval_id_by_id = expect_approval(this.next_approval_id_by_id);
+    const approved_account_ids = approvals_by_id.get(token_id) ?? {};
+    const approval_id = next_approval_id_by_id.get(token_id) ?? 1n;
+    const old_approval_id = approved_account_ids[account_id];
     approved_account_ids[account_id] = approval_id;
 
     approvals_by_id.set(token_id, approved_account_ids);
-    
+
     next_approval_id_by_id.set(token_id, approval_id + 1n);
 
-    let storage_used = (old_approval_id === null) ? bytes_for_approved_account_id(account_id) : 0;
+    const storage_used =
+      old_approval_id === null ? bytes_for_approved_account_id(account_id) : 0;
     refund_deposit(BigInt(storage_used));
 
-    if(msg) {
-      return NearPromise.new(account_id).functionCall('nft_on_approve', bytes(serialize([token_id, owner_id, approval_id, msg])), 0n, near.prepaidGas() - GAS_FOR_NFT_APPROVE);
+    if (msg) {
+      return NearPromise.new(account_id).functionCall(
+        "nft_on_approve",
+        bytes(serialize([token_id, owner_id, approval_id, msg])),
+        0n,
+        near.prepaidGas() - GAS_FOR_NFT_APPROVE
+      );
     }
   }
 
@@ -168,21 +204,24 @@ export class NonFungibleToken
     if (this.approvals_by_id === null) {
       throw new Error("NFT does not support Approval Management");
     }
-    let approvals_by_id = this.approvals_by_id;
-    let owner_id = expect_token_found(this.owner_by_id.get(token_id));
-    
-    let predecessorAccountId = near.predecessorAccountId();
-    assert(predecessorAccountId === owner_id, "Predecessor must be token owner.");
-    
-    let approved_account_ids = approvals_by_id.get(token_id);
+    const approvals_by_id = this.approvals_by_id;
+    const owner_id = expect_token_found(this.owner_by_id.get(token_id));
+
+    const predecessorAccountId = near.predecessorAccountId();
+    assert(
+      predecessorAccountId === owner_id,
+      "Predecessor must be token owner."
+    );
+
+    const approved_account_ids = approvals_by_id.get(token_id);
     if (approved_account_ids[account_id]) {
-      delete approved_account_ids[account_id]
+      delete approved_account_ids[account_id];
       refund_approved_account_ids_iter(predecessorAccountId, [account_id]);
 
       if (Object.keys(approved_account_ids).length === 0) {
         approvals_by_id.remove(token_id);
       } else {
-        approvals_by_id.set(token_id, approved_account_ids)
+        approvals_by_id.set(token_id, approved_account_ids);
       }
     }
   }
@@ -192,34 +231,41 @@ export class NonFungibleToken
     if (this.approvals_by_id === null) {
       throw new Error("NFT does not support Approval Management");
     }
-    let approvals_by_id = this.approvals_by_id;
-    let owner_id = expect_token_found(this.owner_by_id.get(token_id));
-    
-    let predecessorAccountId = near.predecessorAccountId();
-    assert(predecessorAccountId === owner_id, "Predecessor must be token owner.");
-    
-    let approved_account_ids = approvals_by_id.get(token_id);
+    const approvals_by_id = this.approvals_by_id;
+    const owner_id = expect_token_found(this.owner_by_id.get(token_id));
+
+    const predecessorAccountId = near.predecessorAccountId();
+    assert(
+      predecessorAccountId === owner_id,
+      "Predecessor must be token owner."
+    );
+
+    const approved_account_ids = approvals_by_id.get(token_id);
     if (approved_account_ids) {
       refund_approved_account_ids(predecessorAccountId, approved_account_ids);
 
       approvals_by_id.remove(token_id);
-    } 
+    }
   }
 
-  nft_is_approved([token_id, approved_account_id, approval_id]: [token_id: string, approved_account_id: string, approval_id: bigint]): boolean {
+  nft_is_approved([token_id, approved_account_id, approval_id]: [
+    token_id: string,
+    approved_account_id: string,
+    approval_id: bigint
+  ]): boolean {
     expect_token_found(this.owner_by_id.get(token_id));
 
     if (this.approvals_by_id === null) {
       return false;
     }
-    let approvals_by_id = this.approvals_by_id;
+    const approvals_by_id = this.approvals_by_id;
 
-    let approved_account_ids = approvals_by_id.get(token_id);
+    const approved_account_ids = approvals_by_id.get(token_id);
     if (approved_account_ids === null) {
       return false;
     }
 
-    let actual_approval_id = approved_account_ids[approved_account_id];
+    const actual_approval_id = approved_account_ids[approved_account_id];
     if (actual_approval_id === undefined) {
       return false;
     }
@@ -229,7 +275,7 @@ export class NonFungibleToken
     }
     return true;
   }
-  
+
   init(
     owner_by_id_prefix: IntoStorageKey,
     owner_id: string,
@@ -242,7 +288,7 @@ export class NonFungibleToken
     if (approval_prefix) {
       const prefix = approval_prefix.into_storage_key();
       approvals_by_id = new LookupMap(prefix);
-      next_approval_id_by_id = new LookupMap(prefix + 'n');
+      next_approval_id_by_id = new LookupMap(prefix + "n");
     } else {
       approvals_by_id = null;
       next_approval_id_by_id = null;
@@ -263,11 +309,13 @@ export class NonFungibleToken
   }
 
   static reconstruct(data: NonFungibleToken): NonFungibleToken {
-    let ret = new NonFungibleToken();
+    const ret = new NonFungibleToken();
     Object.assign(ret, data);
     ret.owner_by_id = UnorderedMap.reconstruct(ret.owner_by_id);
     if (ret.token_metadata_by_id) {
-      ret.token_metadata_by_id = LookupMap.reconstruct(ret.token_metadata_by_id);
+      ret.token_metadata_by_id = LookupMap.reconstruct(
+        ret.token_metadata_by_id
+      );
     }
     if (ret.tokens_per_owner) {
       ret.tokens_per_owner = LookupMap.reconstruct(ret.tokens_per_owner);
@@ -338,7 +386,7 @@ export class NonFungibleToken
       this.approvals_by_id.remove(tmp_token_id);
     }
     if (this.tokens_per_owner) {
-      let u = this.tokens_per_owner.remove(tmp_owner_id, {
+      const u = this.tokens_per_owner.remove(tmp_owner_id, {
         reconstructor: UnorderedSet.reconstruct,
       });
       u.remove(tmp_token_id);
@@ -359,6 +407,7 @@ export class NonFungibleToken
       if (owner_tokens_set == null) {
         throw new Error("Unable to access tokens per owner in unguarded call.");
       }
+      owner_tokens_set.remove(token_id);
       if (owner_tokens_set.isEmpty()) {
         this.tokens_per_owner.remove(from);
       } else {
@@ -398,7 +447,7 @@ export class NonFungibleToken
         throw new Error("Unauthorized");
       }
 
-      const actual_approval_id = (approved_account_ids as any)[sender_id];
+      const actual_approval_id = approved_account_ids[sender_id];
       if (!actual_approval_id) {
         throw new Error("Sender not approved");
       }
@@ -479,7 +528,9 @@ export class NonFungibleToken
         reconstructor: UnorderedSet.reconstruct,
       });
       if (token_ids === null) {
-        token_ids = new UnorderedSet(new TokensPerOwner(near.sha256(owner_id)).into_storage_key())
+        token_ids = new UnorderedSet(
+          new TokensPerOwner(near.sha256(owner_id)).into_storage_key()
+        );
       }
       token_ids.set(token_id);
       this.tokens_per_owner.set(owner_id, token_ids);
@@ -525,17 +576,10 @@ export class NonFungibleToken
       memo
     );
 
-    let promise = NearPromise.new(receiver_id)
+    const promise = NearPromise.new(receiver_id)
       .functionCall(
         "nft_on_transfer",
-        bytes(
-          JSON.stringify([
-            sender_id,
-            old_owner,
-            token_id,
-            msg,
-          ])
-        ),
+        bytes(JSON.stringify([sender_id, old_owner, token_id, msg])),
         0n,
         near.prepaidGas() - GAS_FOR_NFT_TRANSFER_CALL
       )
@@ -543,12 +587,7 @@ export class NonFungibleToken
         NearPromise.new(near.currentAccountId()).functionCall(
           "nft_resolve_transfer",
           bytes(
-            JSON.stringify([
-              old_owner,
-              receiver_id,
-              token_id,
-              old_approvals,
-            ])
+            JSON.stringify([old_owner, receiver_id, token_id, old_approvals])
           ),
           0n,
           GAS_FOR_RESOLVE_TRANSFER
@@ -571,7 +610,12 @@ export class NonFungibleToken
     return new Token(token_id, owner_id, metadata, approved_account_ids);
   }
 
-  nft_resolve_transfer([previous_owner_id, receiver_id, token_id, approved_account_ids]: [
+  nft_resolve_transfer([
+    previous_owner_id,
+    receiver_id,
+    token_id,
+    approved_account_ids,
+  ]: [
     previous_owner_id: string,
     receiver_id: string,
     token_id: string,
@@ -620,7 +664,7 @@ export class NonFungibleToken
     this.internal_transfer_unguarded(token_id, receiver_id, previous_owner_id);
 
     if (this.approvals_by_id) {
-      let receiver_approvals = this.approvals_by_id.get(token_id);
+      const receiver_approvals = this.approvals_by_id.get(token_id);
       if (receiver_approvals) {
         refund_approved_account_ids(receiver_id, receiver_approvals);
       }
