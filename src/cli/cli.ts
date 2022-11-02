@@ -94,7 +94,7 @@ async function checkTsBuildWithTsc(
   verbose = false
 ) {
   await executeCommand(
-    `${TSC} --noEmit --experimentalDecorators --target es2020 --moduleResolution node ${sourceFileWithPath}`,
+    `${TSC} --noEmit --skipLibCheck --experimentalDecorators --target es2020 --moduleResolution node ${sourceFileWithPath}`,
     verbose
   );
 }
