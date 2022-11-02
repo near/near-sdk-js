@@ -1,6 +1,6 @@
 {
   "name": "near-sdk-js",
-  "version": "0.6.0-0",
+  "version": "0.6.0",
   "description": "High Level JavaScript SDK for building smart contracts on NEAR",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -28,7 +28,7 @@
     "format": "prettier --write .",
     "test:unit": "yarn && cd tests && yarn && yarn build && yarn test && cd ..",
     "test:examples": "yarn && cd examples && yarn && yarn build && yarn test && cd ..",
-    "postinstall": "cd lib/cli && rm -rf deps && mkdir -p deps && cd deps && node ../post-install.js"
+    "postinstall": "node lib/cli/post-install.js"
   },
   "bin": {
     "near-sdk-js": "lib/cli/cli.js"
