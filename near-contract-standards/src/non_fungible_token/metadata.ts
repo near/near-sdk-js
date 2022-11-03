@@ -2,8 +2,10 @@ import { Bytes } from "near-sdk-js";
 import { assert } from "near-sdk-js";
 import { Option } from "./utils";
 
+/** This spec can be treated like a version of the standard. */
 export const NFT_METADATA_SPEC = "nft-1.0.0";
 
+/** Metadata for the NFT contract itself. */
 export class NFTContractMetadata {
   public spec: string; // required, essentially a version like "nft-1.0.0"
   public name: string; // required, ex. "Mosaics"
@@ -26,11 +28,11 @@ export class NFTContractMetadata {
   init(
     spec: string,
     name: string,
-    symbol: string, // required, ex. "MOSIAC"
-    icon: Option<string>, // Data URL
-    base_uri: Option<string>, // Centralized gateway known to have reliable access to decentralized storage assets referenced by `reference` or `media` URLs
-    reference: Option<string>, // URL to a JSON file with more info
-    reference_hash: Option<Bytes> // Base64-encoded sha256 hash of JSON from reference field. Required if `reference` is included.
+    symbol: string,
+    icon: Option<string>,
+    base_uri: Option<string>,
+    reference: Option<string>,
+    reference_hash: Option<Bytes>
   ) {
     this.spec = spec;
     this.name = name;
@@ -59,6 +61,7 @@ export class NFTContractMetadata {
   }
 }
 
+/** Metadata on the individual token level. */
 export class TokenMetadata {
   constructor(
     public title: Option<string>, // ex. "Arch Nemesis: Mail Carrier" or "Parcel #5055"
@@ -114,6 +117,7 @@ export class TokenMetadata {
   }
 }
 
+/** Offers details on the contract-level metadata. */
 export interface NonFungibleTokenMetadataProvider {
   nft_metadata(): NFTContractMetadata;
 }

@@ -51,6 +51,7 @@ export function refund_deposit_to_account(
   }
 }
 
+/** Assumes that the precedecessor will be refunded */
 export function refund_deposit(storage_used: bigint): void {
   refund_deposit_to_account(storage_used, near.predecessorAccountId());
 }
@@ -59,6 +60,7 @@ export function hash_account_id(account_id: string): Bytes {
   return near.sha256(account_id);
 }
 
+/** Assert that at least 1 yoctoNEAR was attached. */
 export function assert_at_least_one_yocto(): void {
   assert(
     near.attachedDeposit() >= 1n,
@@ -66,6 +68,7 @@ export function assert_at_least_one_yocto(): void {
   );
 }
 
+/** Assert that exactly 1 yoctoNEAR was attached */
 export function assert_one_yocto(): void {
   assert(
     near.attachedDeposit() === 1n,
