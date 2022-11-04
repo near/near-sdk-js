@@ -12,7 +12,7 @@ export class Token {
     public owner_id: AccountId,
     public metadata: Option<TokenMetadata>,
     public approved_account_ids: Option<{
-      [approved_account_id: string]: bigint;
+      [approved_account_id: AccountId]: bigint;
     }>
   ) {}
 }

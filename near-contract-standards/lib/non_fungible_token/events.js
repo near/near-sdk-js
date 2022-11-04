@@ -1,18 +1,3 @@
-/** Standard for nep171 (Non-Fungible Token) events.
- *
- * These events will be picked up by the NEAR indexer.
- *
- * <https://github.com/near/NEPs/blob/69f76c6c78c2ebf05d856347c9c98ae48ad84ebd/specs/Standards/NonFungibleToken/Event.md>
- *
- * This is an extension of the events format (nep-297):
- * <https://github.com/near/NEPs/blob/master/specs/Standards/EventsFormat.md>
- *
- * The three events in this standard are [`NftMint`], [`NftTransfer`], and [`NftBurn`].
- *
- * These events can be logged by calling `.emit()` on them if a single event, or calling
- * [`NftMint.emit_many`], [`NftTransfer.emit_many`],
- * or [`NftBurn.emit_many`] respectively.
- */
 import { NearEvent } from "../event";
 export class Nep171Event extends NearEvent {
     constructor(version, event_kind) {

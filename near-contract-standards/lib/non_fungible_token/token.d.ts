@@ -9,9 +9,9 @@ export declare class Token {
     owner_id: AccountId;
     metadata: Option<TokenMetadata>;
     approved_account_ids: Option<{
-        [approved_account_id: string]: bigint;
+        [approved_account_id: AccountId]: bigint;
     }>;
     constructor(token_id: TokenId, owner_id: AccountId, metadata: Option<TokenMetadata>, approved_account_ids: Option<{
-        [approved_account_id: string]: bigint;
+        [approved_account_id: AccountId]: bigint;
     }>);
 }

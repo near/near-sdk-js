@@ -13,7 +13,9 @@
  * [`NftMint.emit_many`], [`NftTransfer.emit_many`],
  * or [`NftBurn.emit_many`] respectively.
  */
+import { AccountId } from "near-sdk-js/lib/types";
 import { NearEvent } from "../event";
+import { TokenId } from "./token";
 import { Option } from "./utils";
 export declare type Nep171EventKind = NftMint[] | NftTransfer[] | NftBurn[];
 export declare class Nep171Event extends NearEvent {
@@ -23,10 +25,10 @@ export declare class Nep171Event extends NearEvent {
 }
 /** Data to log for an NFT mint event. To log this event, call `.emit()` */
 export declare class NftMint {
-    owner_id: string;
-    token_ids: string[];
+    owner_id: AccountId;
+    token_ids: TokenId[];
     memo: Option<string>;
-    constructor(owner_id: string, token_ids: string[], memo: Option<string>);
+    constructor(owner_id: AccountId, token_ids: TokenId[], memo: Option<string>);
     /** Logs the event to the host. This is required to ensure that the event is triggered
      * and to consume the event. */
     emit(): void;
@@ -37,12 +39,12 @@ export declare class NftMint {
 /** Data to log for an NFT transfer event. To log this event,
  * call [`.emit()`](NftTransfer.emit). */
 export declare class NftTransfer {
-    old_owner_id: string;
-    new_owner_id: string;
-    token_ids: string[];
-    authorized_id: Option<string>;
+    old_owner_id: AccountId;
+    new_owner_id: AccountId;
+    token_ids: TokenId[];
+    authorized_id: Option<AccountId>;
     memo: Option<string>;
-    constructor(old_owner_id: string, new_owner_id: string, token_ids: string[], authorized_id: Option<string>, memo: Option<string>);
+    constructor(old_owner_id: AccountId, new_owner_id: AccountId, token_ids: TokenId[], authorized_id: Option<AccountId>, memo: Option<string>);
     /** Logs the event to the host. This is required to ensure that the event is triggered
      * and to consume the event. */
     emit(): void;
@@ -52,10 +54,10 @@ export declare class NftTransfer {
 }
 /** Data to log for an NFT burn event. To log this event, call [`.emit()`](NftBurn.emit). */
 export declare class NftBurn {
-    owner_id: string;
-    token_ids: string[];
+    owner_id: AccountId;
+    token_ids: TokenId[];
     memo: Option<string>;
-    constructor(owner_id: string, token_ids: string[], authorized_id: Option<string>, memo: Option<string>);
+    constructor(owner_id: AccountId, token_ids: TokenId[], authorized_id: Option<string>, memo: Option<string>);
     /** Logs the event to the host. This is required to ensure that the event is triggered
      * and to consume the event. */
     emit(): void;

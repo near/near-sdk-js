@@ -34,7 +34,7 @@ export interface NonFungibleTokenResolver {
         receiver_id: AccountId,
         token_id: TokenId,
         approvals: Option<{
-            [approval: string]: bigint;
+            [approval: AccountId]: bigint;
         }>
     ]): boolean;
 }

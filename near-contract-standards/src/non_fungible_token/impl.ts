@@ -69,12 +69,12 @@ export class NonFungibleToken
     NonFungibleTokenApproval,
     NonFungibleTokenEnumeration
 {
-  public owner_id: string;
+  public owner_id: AccountId;
   public extra_storage_in_bytes_per_token: bigint;
   public owner_by_id: UnorderedMap<AccountId>;
   public token_metadata_by_id: Option<LookupMap<TokenMetadata>>;
-  public tokens_per_owner: Option<LookupMap<UnorderedSet<string>>>;
-  public approvals_by_id: Option<LookupMap<{ [approvals: string]: bigint }>>;
+  public tokens_per_owner: Option<LookupMap<UnorderedSet<TokenId>>>;
+  public approvals_by_id: Option<LookupMap<{ [approvals: AccountId]: bigint }>>;
   public next_approval_id_by_id: Option<LookupMap<bigint>>;
 
   constructor() {
@@ -122,7 +122,7 @@ export class NonFungibleToken
     return ret;
   }
 
-  nft_supply_for_owner(account_id: string): number {
+  nft_supply_for_owner(account_id: AccountId): number {
     const tokens_per_owner = this.tokens_per_owner;
     assert(
       tokens_per_owner !== null,
@@ -136,7 +136,7 @@ export class NonFungibleToken
   }
 
   nft_tokens_for_owner([account_id, from_index, limit]: [
-    account_id: string,
+    account_id: AccountId,
     from_index: number,
     limit: number
   ]): Token[] {
@@ -169,8 +169,8 @@ export class NonFungibleToken
   }
 
   nft_approve([token_id, account_id, msg]: [
-    token_id: string,
-    account_id: string,
+    token_id: TokenId,
+    account_id: AccountId,
     msg: string
   ]): Option<NearPromise> {
     assert_at_least_one_yocto();
@@ -210,7 +210,10 @@ export class NonFungibleToken
     return null;
   }
 
-  nft_revoke([token_id, account_id]: [token_id: string, account_id: string]) {
+  nft_revoke([token_id, account_id]: [
+    token_id: TokenId,
+    account_id: AccountId
+  ]) {
     assert_one_yocto();
     if (this.approvals_by_id === null) {
       throw new Error("NFT does not support Approval Management");
@@ -237,7 +240,7 @@ export class NonFungibleToken
     }
   }
 
-  nft_revoke_all(token_id: string) {
+  nft_revoke_all(token_id: TokenId) {
     assert_one_yocto();
     if (this.approvals_by_id === null) {
       throw new Error("NFT does not support Approval Management");
@@ -260,8 +263,8 @@ export class NonFungibleToken
   }
 
   nft_is_approved([token_id, approved_account_id, approval_id]: [
-    token_id: string,
-    approved_account_id: string,
+    token_id: TokenId,
+    approved_account_id: AccountId,
     approval_id: bigint
   ]): boolean {
     expect_token_found(this.owner_by_id.get(token_id));
@@ -289,12 +292,12 @@ export class NonFungibleToken
 
   init(
     owner_by_id_prefix: IntoStorageKey,
-    owner_id: string,
+    owner_id: AccountId,
     token_metadata_prefix: Option<IntoStorageKey>,
     enumeration_prefix: Option<IntoStorageKey>,
     approval_prefix: Option<IntoStorageKey>
   ) {
-    let approvals_by_id: Option<LookupMap<{ [approvals: string]: bigint }>>;
+    let approvals_by_id: Option<LookupMap<{ [approvals: AccountId]: bigint }>>;
     let next_approval_id_by_id: Option<LookupMap<bigint>>;
     if (approval_prefix) {
       const prefix = approval_prefix.into_storage_key();
@@ -370,7 +373,7 @@ export class NonFungibleToken
       );
     }
     if (this.tokens_per_owner) {
-      const u = new UnorderedSet<string>(
+      const u = new UnorderedSet<AccountId>(
         new TokensPerOwner(near.sha256(tmp_owner_id)).into_storage_key()
       );
       u.set(tmp_token_id);
@@ -408,7 +411,11 @@ export class NonFungibleToken
     this.owner_by_id.remove(tmp_token_id);
   }
 
-  internal_transfer_unguarded(token_id: string, from: string, to: string) {
+  internal_transfer_unguarded(
+    token_id: TokenId,
+    from: AccountId,
+    to: AccountId
+  ) {
     this.owner_by_id.set(token_id, to);
 
     if (this.tokens_per_owner) {
@@ -429,7 +436,7 @@ export class NonFungibleToken
         reconstructor: UnorderedSet.reconstruct,
       });
       if (receiver_tokens_set === null) {
-        receiver_tokens_set = new UnorderedSet<string>(
+        receiver_tokens_set = new UnorderedSet<TokenId>(
           new TokensPerOwner(near.sha256(to)).into_storage_key()
         );
       }
@@ -439,12 +446,12 @@ export class NonFungibleToken
   }
 
   internal_transfer(
-    sender_id: string,
-    receiver_id: string,
-    token_id: string,
+    sender_id: AccountId,
+    receiver_id: AccountId,
+    token_id: TokenId,
     approval_id: Option<bigint>,
     memo: Option<string>
-  ): [string, { [approvals: string]: bigint } | null] {
+  ): [AccountId, { [approvals: AccountId]: bigint } | null] {
     const owner_id = this.owner_by_id.get(token_id);
     if (owner_id == null) {
       throw new Error("Token not found");
@@ -472,22 +479,22 @@ export class NonFungibleToken
       sender_id_authorized = null;
     }
     assert(owner_id != receiver_id, "Current and next owner must differ");
-    this.internal_transfer_unguarded(token_id, owner_id as string, receiver_id);
+    this.internal_transfer_unguarded(token_id, owner_id, receiver_id);
     NonFungibleToken.emit_transfer(
-      owner_id as string,
+      owner_id,
       receiver_id,
       token_id,
       sender_id_authorized,
       memo
     );
-    return [owner_id as string, approved_account_ids];
+    return [owner_id, approved_account_ids];
   }
 
   static emit_transfer(
-    owner_id: string,
-    receiver_id: string,
-    token_id: string,
-    sender_id: Option<string>,
+    owner_id: AccountId,
+    receiver_id: AccountId,
+    token_id: TokenId,
+    sender_id: Option<AccountId>,
     memo: Option<string>
   ) {
     new NftTransfer(
@@ -500,8 +507,8 @@ export class NonFungibleToken
   }
 
   internal_mint(
-    token_id: string,
-    token_owner_id: string,
+    token_id: TokenId,
+    token_owner_id: AccountId,
     token_metadata: Option<TokenMetadata>
   ): Token {
     const token = this.internal_mint_with_refund(
@@ -515,8 +522,8 @@ export class NonFungibleToken
   }
 
   internal_mint_with_refund(
-    token_id: string,
-    token_owner_id: string,
+    token_id: TokenId,
+    token_owner_id: AccountId,
     token_metadata: Option<TokenMetadata>,
     refund_id: Option<string>
   ): Token {
@@ -556,8 +563,8 @@ export class NonFungibleToken
   }
 
   nft_transfer([receiver_id, token_id, approval_id, memo]: [
-    receiver_id: string,
-    token_id: string,
+    receiver_id: AccountId,
+    token_id: TokenId,
     approval_id: Option<bigint>,
     memo: Option<string>
   ]) {
@@ -567,8 +574,8 @@ export class NonFungibleToken
   }
 
   nft_transfer_call([receiver_id, token_id, approval_id, memo, msg]: [
-    receiver_id: string,
-    token_id: string,
+    receiver_id: AccountId,
+    token_id: TokenId,
     approval_id: Option<bigint>,
     memo: Option<string>,
     msg: string
@@ -607,7 +614,7 @@ export class NonFungibleToken
     return promise;
   }
 
-  nft_token(token_id: string): Option<Token> {
+  nft_token(token_id: TokenId): Option<Token> {
     const owner_id = this.owner_by_id.get(token_id);
     if (owner_id == null) {
       return null;
@@ -616,7 +623,7 @@ export class NonFungibleToken
       reconstructor: TokenMetadata.reconstruct,
     });
     const approved_account_ids = this.approvals_by_id?.get(token_id) as Option<{
-      [approvals: string]: bigint;
+      [approvals: AccountId]: bigint;
     }>;
     return new Token(token_id, owner_id, metadata, approved_account_ids);
   }
@@ -627,10 +634,10 @@ export class NonFungibleToken
     token_id,
     approved_account_ids,
   ]: [
-    previous_owner_id: string,
-    receiver_id: string,
-    token_id: string,
-    approved_account_ids: Option<{ [approvals: string]: bigint }>
+    previous_owner_id: AccountId,
+    receiver_id: AccountId,
+    token_id: TokenId,
+    approved_account_ids: Option<{ [approvals: AccountId]: bigint }>
   ]): boolean {
     let must_revert = false;
     let p: Bytes;

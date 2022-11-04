@@ -13,7 +13,9 @@
  * [`NftMint.emit_many`], [`NftTransfer.emit_many`],
  * or [`NftBurn.emit_many`] respectively.
  */
+import { AccountId } from "near-sdk-js/lib/types";
 import { NearEvent } from "../event";
+import { TokenId } from "./token";
 import { Option } from "./utils";
 
 export type Nep171EventKind = NftMint[] | NftTransfer[] | NftBurn[];
@@ -32,8 +34,8 @@ export class Nep171Event extends NearEvent {
 /** Data to log for an NFT mint event. To log this event, call `.emit()` */
 export class NftMint {
   constructor(
-    public owner_id: string,
-    public token_ids: string[],
+    public owner_id: AccountId,
+    public token_ids: TokenId[],
     public memo: Option<string>
   ) {}
 
@@ -54,10 +56,10 @@ export class NftMint {
  * call [`.emit()`](NftTransfer.emit). */
 export class NftTransfer {
   constructor(
-    public old_owner_id: string,
-    public new_owner_id: string,
-    public token_ids: string[],
-    public authorized_id: Option<string>,
+    public old_owner_id: AccountId,
+    public new_owner_id: AccountId,
+    public token_ids: TokenId[],
+    public authorized_id: Option<AccountId>,
     public memo: Option<string>
   ) {}
 
@@ -77,8 +79,8 @@ export class NftTransfer {
 /** Data to log for an NFT burn event. To log this event, call [`.emit()`](NftBurn.emit). */
 export class NftBurn {
   constructor(
-    public owner_id: string,
-    public token_ids: string[],
+    public owner_id: AccountId,
+    public token_ids: TokenId[],
     authorized_id: Option<string>,
     public memo: Option<string>
   ) {}
