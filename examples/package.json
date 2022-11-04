@@ -42,7 +42,6 @@
   "devDependencies": {
     "@types/lodash-es": "^4.17.6",
     "ava": "^4.2.0",
-    "near-workspaces": "3.2.1",
     "typescript": "^4.7.4",
     "npm-run-all": "^4.1.5"
   }

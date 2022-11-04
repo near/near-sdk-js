@@ -75,7 +75,7 @@ const QUICK_JS_TAR_NAME = `${QUICK_JS_VERSION_TAG}.tar.gz`;
 const QUICK_JS_DOWNLOADED_FOLDER_NAME = `quickjs-${QUICK_JS_VERSION}`;
 const QUICK_JS_TARGET_FOLDER_NAME = "quickjs";
 const QUICK_JS_DOWNLOADED_NAME = `qjsc-${QUICK_JS_SYSTEM_NAME}-${QUICK_JS_ARCH_NAME}${PLATFORM === "win32" ? ".exe" : ""}`;
-const QUICK_JS_TARGET_NAME = "qjsc";
+const QUICK_JS_TARGET_NAME = "qjsc"; //TODO: shoud we add .exe for windows?
 
 // Download QuickJS
 await download(
@@ -108,7 +108,7 @@ const WASI_SDK_DOWNLOADED_FOLDER_NAME = `wasi-sdk-${WASI_SDK_MAJOR_VER}.${WASI_S
 const WASI_SDK_SYSTEM_NAME =
   PLATFORM === "linux" ? "linux" :
     PLATFORM === "darwin" ? "macos" :
-      PLATFORM === "win32" ? "windows" : "other";
+      PLATFORM === "win32" ? "mingw" : "other";
 const WASI_SDK_TAR_NAME = `${WASI_SDK_DOWNLOADED_FOLDER_NAME}-${WASI_SDK_SYSTEM_NAME}.tar.gz`;
 
 // Download WASI SDK
