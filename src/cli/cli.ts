@@ -66,7 +66,7 @@ export async function buildCom(
   signale.await(`Creating ${TARGET_DIR} directory...`);
   await executeCommand(`mkdir -p ${TARGET_DIR}`, verbose);
 
-  signal.await(`Validatig ${source} contract...`);
+  signal.await(`Validating ${source} contract...`);
   if (!await validateContract(source, verbose)) {
     process.exit(1);
   }
