@@ -15,10 +15,16 @@ import {
   NonFungibleTokenMetadataProvider,
   TokenMetadata,
 } from "near-contract-standards/lib/non_fungible_token/metadata";
-import { IntoStorageKey, Option } from "near-contract-standards/lib/non_fungible_token/utils";
+import {
+  IntoStorageKey,
+  Option,
+} from "near-contract-standards/lib/non_fungible_token/utils";
 import { AccountId } from "near-sdk-js/lib/types";
 import { NonFungibleTokenCore } from "near-contract-standards/lib/non_fungible_token/core";
-import { Token, TokenId } from "near-contract-standards/lib/non_fungible_token/token";
+import {
+  Token,
+  TokenId,
+} from "near-contract-standards/lib/non_fungible_token/token";
 import { NonFungibleTokenResolver } from "near-contract-standards/lib/non_fungible_token/core/resolver";
 import { NonFungibleTokenApproval } from "near-contract-standards/lib/non_fungible_token/approval";
 import { NonFungibleTokenEnumeration } from "near-contract-standards/lib/non_fungible_token/enumeration";
