@@ -65,7 +65,7 @@ const QUICK_JS_VERSION_TAG = `v${QUICK_JS_VERSION}`;
 const QUICK_JS_SYSTEM_NAME =
   PLATFORM === "linux" ? "Linux" :
     PLATFORM === "darwin" ? "macOS" :
-      PLATFORM === "win32" ? "windows" : "other";
+      PLATFORM === "win32" ? "win32" : "other";
 
 const QUICK_JS_ARCH_NAME =
   ARCH === "x64" ? "X64" :
@@ -79,7 +79,7 @@ const QUICK_JS_TARGET_NAME = "qjsc";
 
 // Download QuickJS
 await download(
-  `https://github.com/near/quickjs/releases/download/${QUICK_JS_VERSION_TAG}/qjsc-${QUICK_JS_SYSTEM_NAME}-${QUICK_JS_ARCH_NAME}`
+  `https://github.com/near/quickjs/releases/download/${QUICK_JS_VERSION_TAG}/${QUICK_JS_DOWNLOADED_NAME}`
 );
 await download(
   `https://github.com/near/quickjs/archive/refs/tags/${QUICK_JS_VERSION_TAG}.tar.gz`
