@@ -2,7 +2,7 @@ import { PromiseOrValue } from "near-sdk-js/lib";
 import { AccountId } from "near-sdk-js/lib/types";
 import { TokenId } from "../token";
 
-/** Approval receiver is the trait for the method called (or attempted to be called) when an NFT contract adds an approval for an account. */
+/** Approval receiver is the interface for the method called (or attempted to be called) when an NFT contract adds an approval for an account. */
 export interface NonFungibleTokenApprovalReceiver {
   /** Respond to notification that contract has been granted approval for a token.
    * 

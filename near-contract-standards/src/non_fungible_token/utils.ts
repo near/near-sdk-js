@@ -7,8 +7,8 @@ export function bytes_for_approved_account_id(account_id: string): number {
 }
 
 export function refund_approved_account_ids_iter(
-  account_id: string,
-  approved_account_ids: string[]
+  account_id: AccountId,
+  approved_account_ids: AccountId[]
 ): void {
   const storage_released = approved_account_ids
     .map(bytes_for_approved_account_id)
@@ -23,7 +23,7 @@ export function refund_approved_account_ids_iter(
 
 export function refund_approved_account_ids(
   account_id: AccountId,
-  approved_account_ids: { [approvals: string]: bigint }
+  approved_account_ids: { [approvals: AccountId]: bigint }
 ) {
   refund_approved_account_ids_iter(
     account_id,
@@ -33,7 +33,7 @@ export function refund_approved_account_ids(
 
 export function refund_deposit_to_account(
   storage_used: bigint,
-  account_id: string
+  account_id: AccountId
 ): void {
   const required_cost = near.storageByteCost() * storage_used;
   const attached_deposit = near.attachedDeposit();
@@ -56,7 +56,7 @@ export function refund_deposit(storage_used: bigint): void {
   refund_deposit_to_account(storage_used, near.predecessorAccountId());
 }
 
-export function hash_account_id(account_id: string): Bytes {
+export function hash_account_id(account_id: AccountId): Bytes {
   return near.sha256(account_id);
 }
 

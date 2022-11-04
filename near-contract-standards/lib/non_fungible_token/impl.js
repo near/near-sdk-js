@@ -24,7 +24,7 @@ function expect_approval(option) {
 }
 /** Implementation of the non-fungible token standard.
  * Allows to include NEP-171 compatible token to any contract.
- * There are next traits that any contract may implement:
+ * There are next interfaces that any contract may implement:
  *     - NonFungibleTokenCore -- interface with nft_transfer methods. NonFungibleToken provides methods for it.
  *     - NonFungibleTokenApproval -- interface with nft_approve methods. NonFungibleToken provides methods for it.
  *     - NonFungibleTokenEnumeration -- interface for getting lists of tokens. NonFungibleToken provides methods for it.

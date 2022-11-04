@@ -10,8 +10,8 @@
  * The three events in this standard are [`NftMint`], [`NftTransfer`], and [`NftBurn`].
  *
  * These events can be logged by calling `.emit()` on them if a single event, or calling
- * [`NftMint::emit_many`], [`NftTransfer::emit_many`],
- * or [`NftBurn::emit_many`] respectively.
+ * [`NftMint.emit_many`], [`NftTransfer.emit_many`],
+ * or [`NftBurn.emit_many`] respectively.
  */
 import { NearEvent } from "../event";
 import { Option } from "./utils";
@@ -21,7 +21,7 @@ export declare class Nep171Event extends NearEvent {
     event_kind: Nep171EventKind;
     constructor(version: string, event_kind: Nep171EventKind);
 }
-/** Data to log for an NFT mint event. To log this event, call [`.emit()`](NftMint::emit). */
+/** Data to log for an NFT mint event. To log this event, call `.emit()` */
 export declare class NftMint {
     owner_id: string;
     token_ids: string[];
@@ -30,12 +30,12 @@ export declare class NftMint {
     /** Logs the event to the host. This is required to ensure that the event is triggered
      * and to consume the event. */
     emit(): void;
-    /** Emits an nft mint event, through [`env::log_str`](near_sdk::env::log_str),
+    /** Emits an nft mint event, through `near.log`,
      * where each [`NftMint`] represents the data of each mint. */
     static emit_many(data: NftMint[]): void;
 }
 /** Data to log for an NFT transfer event. To log this event,
- * call [`.emit()`](NftTransfer::emit). */
+ * call [`.emit()`](NftTransfer.emit). */
 export declare class NftTransfer {
     old_owner_id: string;
     new_owner_id: string;
@@ -46,11 +46,11 @@ export declare class NftTransfer {
     /** Logs the event to the host. This is required to ensure that the event is triggered
      * and to consume the event. */
     emit(): void;
-    /** Emits an nft transfer event, through [`env::log_str`](near_sdk::env::log_str),
+    /** Emits an nft transfer event, through `near.log`,
      * where each [`NftTransfer`] represents the data of each transfer. */
     static emit_many(data: NftTransfer[]): void;
 }
-/** Data to log for an NFT burn event. To log this event, call [`.emit()`](NftBurn::emit). */
+/** Data to log for an NFT burn event. To log this event, call [`.emit()`](NftBurn.emit). */
 export declare class NftBurn {
     owner_id: string;
     token_ids: string[];
@@ -59,7 +59,7 @@ export declare class NftBurn {
     /** Logs the event to the host. This is required to ensure that the event is triggered
      * and to consume the event. */
     emit(): void;
-    /** Emits an nft burn event, through [`env::log_str`](near_sdk::env::log_str),
+    /** Emits an nft burn event, through `near.log`,
      * where each [`NftBurn`] represents the data of each burn. */
     static emit_many(data: NftBurn[]): void;
 }

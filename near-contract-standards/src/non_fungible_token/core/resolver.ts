@@ -2,7 +2,7 @@ import { AccountId } from "../../../../lib/types";
 import { TokenId } from "../token";
 import { Option } from "../utils";
 
-/** Used when an NFT is transferred using `nft_transfer_call`. This is the method that's called after `nft_on_transfer`. This trait is implemented on the NFT contract. */
+/** Used when an NFT is transferred using `nft_transfer_call`. This is the method that's called after `nft_on_transfer`. This interface is implemented on the NFT contract. */
 export interface NonFungibleTokenResolver {
   /** Finalize an `nft_transfer_call` chain of cross-contract calls.
    *

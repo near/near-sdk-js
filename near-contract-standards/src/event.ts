@@ -1,11 +1,11 @@
 import { near } from "near-sdk-js";
 
-export class NearEvent {
-  internal_to_json_string(): string {
+export abstract class NearEvent {
+  private internal_to_json_string(): string {
     return JSON.stringify(this);
   }
 
-  internal_to_json_event_string(): string {
+  private internal_to_json_event_string(): string {
     return `EVENT_JSON: ${this.internal_to_json_string()}`;
   }
 

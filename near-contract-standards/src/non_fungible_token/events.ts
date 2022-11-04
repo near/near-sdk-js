@@ -10,8 +10,8 @@
  * The three events in this standard are [`NftMint`], [`NftTransfer`], and [`NftBurn`].
  *
  * These events can be logged by calling `.emit()` on them if a single event, or calling
- * [`NftMint::emit_many`], [`NftTransfer::emit_many`],
- * or [`NftBurn::emit_many`] respectively.
+ * [`NftMint.emit_many`], [`NftTransfer.emit_many`],
+ * or [`NftBurn.emit_many`] respectively.
  */
 import { NearEvent } from "../event";
 import { Option } from "./utils";
@@ -29,7 +29,7 @@ export class Nep171Event extends NearEvent {
   }
 }
 
-/** Data to log for an NFT mint event. To log this event, call [`.emit()`](NftMint::emit). */
+/** Data to log for an NFT mint event. To log this event, call `.emit()` */
 export class NftMint {
   constructor(
     public owner_id: string,
@@ -43,7 +43,7 @@ export class NftMint {
     NftMint.emit_many([this]);
   }
 
-  /** Emits an nft mint event, through [`env::log_str`](near_sdk::env::log_str),
+  /** Emits an nft mint event, through `near.log`,
    * where each [`NftMint`] represents the data of each mint. */
   static emit_many(data: NftMint[]) {
     new_171_v1(data).emit();
@@ -51,7 +51,7 @@ export class NftMint {
 }
 
 /** Data to log for an NFT transfer event. To log this event,
- * call [`.emit()`](NftTransfer::emit). */
+ * call [`.emit()`](NftTransfer.emit). */
 export class NftTransfer {
   constructor(
     public old_owner_id: string,
@@ -67,14 +67,14 @@ export class NftTransfer {
     NftTransfer.emit_many([this]);
   }
 
-  /** Emits an nft transfer event, through [`env::log_str`](near_sdk::env::log_str),
+  /** Emits an nft transfer event, through `near.log`,
    * where each [`NftTransfer`] represents the data of each transfer. */
   static emit_many(data: NftTransfer[]) {
     new_171_v1(data).emit();
   }
 }
 
-/** Data to log for an NFT burn event. To log this event, call [`.emit()`](NftBurn::emit). */
+/** Data to log for an NFT burn event. To log this event, call [`.emit()`](NftBurn.emit). */
 export class NftBurn {
   constructor(
     public owner_id: string,
@@ -89,7 +89,7 @@ export class NftBurn {
     NftBurn.emit_many([this]);
   }
 
-  /** Emits an nft burn event, through [`env::log_str`](near_sdk::env::log_str),
+  /** Emits an nft burn event, through `near.log`,
    * where each [`NftBurn`] represents the data of each burn. */
   static emit_many(data: NftBurn[]) {
     new_171_v1(data).emit();
