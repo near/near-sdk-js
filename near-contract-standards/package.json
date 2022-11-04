@@ -5,7 +5,6 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "postinstall": "cd .. && yarn link && cd near-contract-standards && yarn link near-sdk-js",
     "build": "tsc"
   },
   "author": "Near Inc <hello@nearprotocol.com>",

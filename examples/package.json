@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "postinstall": "cd .. && yarn link && cd near-contract-standards && yarn link && cd ../examples && yarn link near-sdk-js near-contract-standards",
+    "postinstall": "cd .. && yarn link && cd examples && yarn link near-sdk-js",
     "build": "run-s build:*",
     "build:status-message": "near-sdk-js build src/status-message.js build/status-message.wasm",
     "build:clean-state": "near-sdk-js build src/clean-state.js build/clean-state.wasm",
