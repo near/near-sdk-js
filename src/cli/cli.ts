@@ -32,63 +32,150 @@ program
       .option("--verbose", "Whether to print more verbose output.", false)
       .action(buildCom)
   )
+  .addCommand(
+    new Command("validateContract")
+      .usage("[source]")
+      .description("Validate a NEAR JS Smart-contract. Validates the contract by checking that all parameters are initialized in the constructor. Works only for typescript.")
+      .argument("[source]", "Contract to validate.", "src/index.ts")
+      .option("--verbose", "Whether to print more verbose output.", false)
+      .action(validateCom)
+  )
+  .addCommand(
+    new Command("checkTypescript")
+      .usage("[source]")
+      .description("Run TSC with some cli flags - warning - ignores tsconfig.json.")
+      .argument("[source]", "Typescript file to validate", "src/index.ts")
+      .option("--verbose", "Whether to print more verbose output.", false)
+      .action(checkTypescriptCom)
+  )
+  .addCommand(
+    new Command("createJsFileWithRullup")
+      .usage("[source] [target]")
+      .description("Create intermediate javascript file for later processing with QJSC")
+      .argument("[source]", "Contract to build.", "src/index.js")
+      .argument("[target]", "Target file path and name. The default corresponds to contract.js", "build/contract.wasm")
+      .option("--verbose", "Whether to print more verbose output.", false)
+      .action(createJsFileWithRullupCom)
+  )
+  .addCommand(
+    new Command("transpileJsAndBuildWasm")
+      .usage("[source] [target]")
+      .description("Transpiles the target javascript file into .c and .h using QJSC then compiles that into wasm using clang")
+      .argument("[target]", "Target file path and name. The js file must correspond to the same path with the js extension.", "build/contract.wasm")
+      .option("--verbose", "Whether to print more verbose output.", false)
+      .action(transpileJsAndBuildWasmCom)
+  )
   .parse();
+
+function getTargetDir(target: string): string {
+  return dirname(target);
+}
+
+function getTargetExt(target: string): string {
+  return target.split(".").pop();
+}
+
+function getTargetFileName(target: string): string {
+  return basename(target, `.${getTargetExt(target)}`);
+}
+
+function getRollupTarget(target: string): string {
+  return `${getTargetDir(target)}/${getTargetFileName(target)}.js`
+}
+
+function getQjscTarget(target:string): string {
+  return `${getTargetDir(target)}/${getTargetFileName(target)}.h`;
+}
+
+function getContractTarget(target: string): string {
+  return `${getTargetDir(target)}/${getTargetFileName(target)}.wasm`;
+}
+
+function requireTargetExt(target: string): void {
+  if (getTargetExt(target) === "wasm") {
+    return;
+  }
+
+  signal.error(
+    `Unsupported target ${getTargetExt(target)}, make sure target ends with .wasm!`
+  );
+  process.exit(1);
+}
+
+function ensureTargetDirExists(target: string): void {
+  const targetDir = getTargetDir(target);
+  if (fs.existsSync(targetDir)) {
+    return;
+  }
+
+  signal.await(`Creating ${targetDir} directory...`);
+  fs.mkdirSync(targetDir, {});
+}
+
+export async function validateCom(source: string, { verbose = false}: {verbose: boolean}): Promise<void> {
+  signal.await(`Validating ${source} contract...`);
+  if (!await validateContract(source, verbose)) {
+    process.exit(1);
+  }
+}
+
+export async function checkTypescriptCom(source: string, { verbose = false}: {verbose: boolean}): Promise<void> {
+  const sourceExt = source.split(".").pop();
+  if (sourceExt !== "ts") {
+    signal.info(`Source file is not a typescript file ${source}`)
+    return;
+  }
+
+  signal.await(`Typechecking ${source} with tsc...`);
+  await checkTsBuildWithTsc(source, verbose);
+}
+
+export async function createJsFileWithRullupCom(source: string, target: string, { verbose = false}: {verbose: boolean}): Promise<void> {
+  requireTargetExt(target);
+  ensureTargetDirExists(target);
+
+  signal.await(`Creating ${source} file with Rollup...`);
+  await createJsFileWithRullup(source, getRollupTarget(target), verbose);
+}
+
+
+export async function transpileJsAndBuildWasmCom(target: string, { verbose = false}: {verbose: boolean}): Promise<void> {
+  requireTargetExt(target);
+  ensureTargetDirExists(target);
+
+  signal.await(`Creating ${getQjscTarget(target)} file with QJSC...`);
+  await createHeaderFileWithQjsc(getRollupTarget(target), getQjscTarget(target), verbose);
+
+  signal.await("Generating methods.h file...");
+  await createMethodsHeaderFile(getRollupTarget(target), verbose);
+
+  signal.await(`Creating ${getContractTarget(target)} contract...`);
+  await createWasmContract(getQjscTarget(target), getContractTarget(target), verbose);
+
+  signal.await("Executing wasi-stub...");
+  await wasiStubContract(getContractTarget(target), verbose);
+
+  signal.success(`Generated ${getContractTarget(target)} contract successfully!`);
+}
 
 export async function buildCom(
   source: string,
   target: string,
   { verbose = false }: { verbose: boolean }
 ): Promise<void> {
-  const SOURCE_EXT = source.split(".").pop();
-  const TARGET_DIR = dirname(target);
-  const TARGET_EXT = target.split(".").pop();
-  const TARGET_FILE_NAME = basename(target, `.${TARGET_EXT}`);
-  const signale = new Signale({ scope: "build", interactive: !verbose });
+  requireTargetExt(target);
 
-  if (TARGET_EXT !== "wasm") {
-    signale.error(
-      `Unsupported target ${TARGET_EXT}, make sure target ends with .wasm!`
-    );
-    process.exit(1);
-  }
+  signal.await(`Building ${source} contract...`);
 
-  const ROLLUP_TARGET = `${TARGET_DIR}/${TARGET_FILE_NAME}.js`;
-  const QJSC_TARGET = `${TARGET_DIR}/${TARGET_FILE_NAME}.h`;
-  const CONTRACT_TARGET = `${TARGET_DIR}/${TARGET_FILE_NAME}.wasm`;
+  await checkTypescriptCom(source, { verbose });
 
-  signale.await(`Building ${source} contract...`);
+  ensureTargetDirExists(target);
 
-  if (SOURCE_EXT === "ts") {
-    signale.await(`Typechecking ${source} with tsc...`);
-    await checkTsBuildWithTsc(source, verbose);
-  }
+  await validateCom(source, { verbose });
 
-  signale.await(`Creating ${TARGET_DIR} directory...`);
-  if (!fs.existsSync(TARGET_DIR)) {
-    fs.mkdirSync(TARGET_DIR, {});
-  }
+  await createJsFileWithRullupCom(source, target, { verbose });
 
-  signal.await(`Validatig ${source} contract...`);
-  if (!await validateContract(source, verbose)) {
-    process.exit(1);
-  }
-
-  signale.await(`Creating ${source} file with Rollup...`);
-  await createJsFileWithRullup(source, ROLLUP_TARGET, verbose);
-
-  signale.await(`Creating ${QJSC_TARGET} file with QJSC...`);
-  await createHeaderFileWithQjsc(ROLLUP_TARGET, QJSC_TARGET, verbose);
-
-  signale.await("Generating methods.h file...");
-  await createMethodsHeaderFile(ROLLUP_TARGET, verbose);
-
-  signale.await(`Creating ${CONTRACT_TARGET} contract...`);
-  await createWasmContract(QJSC_TARGET, CONTRACT_TARGET, verbose);
-
-  signale.await("Executing wasi-stub...");
-  await wasiStubContract(CONTRACT_TARGET, verbose);
-
-  signale.success(`Generated ${CONTRACT_TARGET} contract successfully!`);
+  await transpileJsAndBuildWasmCom(target, { verbose });
 }
 
 async function checkTsBuildWithTsc(
