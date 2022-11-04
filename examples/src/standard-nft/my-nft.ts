@@ -1,4 +1,4 @@
-import { NonFungibleToken } from "../../src/index";
+import { NonFungibleToken } from "near-contract-standards/lib";
 import {
   assert,
   Bytes,
@@ -9,19 +9,19 @@ import {
   NearPromise,
   PromiseOrValue,
   view,
-} from "near-sdk-js/lib/index";
+} from "near-sdk-js/lib";
 import {
   NFTContractMetadata,
   NonFungibleTokenMetadataProvider,
   TokenMetadata,
-} from "../../src/non_fungible_token/metadata";
-import { IntoStorageKey, Option } from "../../src/non_fungible_token/utils";
-import { AccountId } from "../../../lib/types";
-import { NonFungibleTokenCore } from "../../src/non_fungible_token/core";
-import { Token, TokenId } from "../../src/non_fungible_token/token";
-import { NonFungibleTokenResolver } from "../../src/non_fungible_token/core/resolver";
-import { NonFungibleTokenApproval } from "../../src/non_fungible_token/approval";
-import { NonFungibleTokenEnumeration } from "../../src/non_fungible_token/enumeration";
+} from "near-contract-standards/lib/non_fungible_token/metadata";
+import { IntoStorageKey, Option } from "near-contract-standards/lib/non_fungible_token/utils";
+import { AccountId } from "near-sdk-js/lib/types";
+import { NonFungibleTokenCore } from "near-contract-standards/lib/non_fungible_token/core";
+import { Token, TokenId } from "near-contract-standards/lib/non_fungible_token/token";
+import { NonFungibleTokenResolver } from "near-contract-standards/lib/non_fungible_token/core/resolver";
+import { NonFungibleTokenApproval } from "near-contract-standards/lib/non_fungible_token/approval";
+import { NonFungibleTokenEnumeration } from "near-contract-standards/lib/non_fungible_token/enumeration";
 
 class StorageKey {}
 
@@ -98,7 +98,7 @@ export class MyNFT
     token_id: string,
     account_id: string,
     msg: string
-  ]): NearPromise {
+  ]): Option<NearPromise> {
     return this.tokens.nft_approve([token_id, account_id, msg]);
   }
 

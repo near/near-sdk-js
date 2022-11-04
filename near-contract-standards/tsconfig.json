@@ -1,9 +1,30 @@
 {
   "compilerOptions": {
-    "experimentalDecorators": true,
+    "esModuleInterop": true,
+    "lib": ["es2015", "esnext", "dom"],
+    "module": "esnext",
     "target": "es2020",
-    "noEmit": true,
-    "moduleResolution": "node"
+    "moduleResolution": "node",
+    "alwaysStrict": true,
+    "outDir": "./lib",
+    "declaration": true,
+    "preserveSymlinks": true,
+    "preserveWatchOutput": true,
+    "pretty": false,
+    "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitAny": false,
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
+    "experimentalDecorators": true,
+    "resolveJsonModule": true,
+    "allowJs": true,
+    "skipLibCheck": true
   },
+  "files": [
+    "src/index.ts",
+    "src/non_fungible_token/approval/approval_receiver.ts",
+    "src/non_fungible_token/core/receiver.ts"
+  ],
   "exclude": ["node_modules"]
 }

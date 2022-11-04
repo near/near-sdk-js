@@ -172,7 +172,7 @@ export class NonFungibleToken
     token_id: string,
     account_id: string,
     msg: string
-  ]): NearPromise {
+  ]): Option<NearPromise> {
     assert_at_least_one_yocto();
     if (this.approvals_by_id === null) {
       throw new Error("NFT does not support Approval Management");
@@ -207,6 +207,7 @@ export class NonFungibleToken
         near.prepaidGas() - GAS_FOR_NFT_APPROVE
       );
     }
+    return null;
   }
 
   nft_revoke([token_id, account_id]: [token_id: string, account_id: string]) {

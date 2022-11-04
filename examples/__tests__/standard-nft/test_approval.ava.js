@@ -77,7 +77,7 @@ test("Simple approve", async (t) => {
     ["0", ali.accountId, null],
     { attachedDeposit: "510000000000000000000" }
   );
-  t.is(res.result.status.SuccessValue, "");
+  t.assert(res.result.status.SuccessValue);
 
   let alice_approved = await nft.view("nft_is_approved", [
     "0",
@@ -103,7 +103,7 @@ test("Simple approve", async (t) => {
   res = await nftOwner.callRaw(nft, "nft_approve", ["0", ali.accountId, null], {
     attachedDeposit: "1",
   });
-  t.is(res.result.status.SuccessValue, "");
+  t.assert(res.result.status.SuccessValue);
   alice_approval_id_is_2 = await nft.view("nft_is_approved", [
     "0",
     ali.accountId,
@@ -114,7 +114,7 @@ test("Simple approve", async (t) => {
   res = await nftOwner.callRaw(nft, "nft_approve", ["0", bob.accountId, null], {
     attachedDeposit: "450000000000000000000",
   });
-  t.is(res.result.status.SuccessValue, "");
+  t.assert(res.result.status.SuccessValue);
 
   let bob_approval_id_is_3 = await nft.view("nft_is_approved", [
     "0",
@@ -153,7 +153,7 @@ test("Approved account transfers token", async (t) => {
     ["0", ali.accountId, null],
     { attachedDeposit: "510000000000000000000" }
   );
-  t.is(res.result.status.SuccessValue, "");
+  t.assert(res.result.status.SuccessValue);
 
   let token = await nft.view("nft_token", "0");
   t.is(token.owner_id, nftOwner.accountId);
@@ -179,12 +179,12 @@ test("revoke", async (t) => {
     ["0", ali.accountId, null],
     { attachedDeposit: "510000000000000000000" }
   );
-  t.is(res.result.status.SuccessValue, "");
+  t.assert(res.result.status.SuccessValue);
 
   res = await nftOwner.callRaw(nft, "nft_approve", ["0", bob.accountId, null], {
     attachedDeposit: "510000000000000000000",
   });
-  t.is(res.result.status.SuccessValue, "");
+  t.assert(res.result.status.SuccessValue);
 
   res = await nftOwner.callRaw(nft, "nft_revoke", ["0", ali.accountId], {
     attachedDeposit: "1",
@@ -230,12 +230,12 @@ test("revoke all", async (t) => {
     ["0", ali.accountId, null],
     { attachedDeposit: "510000000000000000000" }
   );
-  t.is(res.result.status.SuccessValue, "");
+  t.assert(res.result.status.SuccessValue);
 
   res = await nftOwner.callRaw(nft, "nft_approve", ["0", bob.accountId, null], {
     attachedDeposit: "510000000000000000000",
   });
-  t.is(res.result.status.SuccessValue, "");
+  t.assert(res.result.status.SuccessValue);
 
   res = await nftOwner.callRaw(nft, "nft_revoke_all", "0", {
     attachedDeposit: "1",

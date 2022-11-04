@@ -1,4 +1,4 @@
-import { NonFungibleTokenReceiver } from "../../src/non_fungible_token/core/receiver";
+import { NonFungibleTokenReceiver } from "near-contract-standards/lib/non_fungible_token/core/receiver";
 import {
   assert,
   call,
@@ -7,7 +7,7 @@ import {
   NearBindgen,
   NearPromise,
   PromiseOrValue,
-} from "near-sdk-js/lib/index";
+} from "near-sdk-js/lib";
 import { AccountId } from "near-sdk-js/lib/types";
 
 const BASE_GAS = 10_000_000_000_000n;

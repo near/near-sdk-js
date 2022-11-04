@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "postinstall": "cd .. && yarn link && cd examples && yarn link near-sdk-js",
+    "postinstall": "cd .. && yarn link && cd near-contract-standards && yarn link && cd ../examples && yarn link near-sdk-js near-contract-standards",
     "build": "run-s build:*",
     "build:status-message": "near-sdk-js build src/status-message.js build/status-message.wasm",
     "build:clean-state": "near-sdk-js build src/clean-state.js build/clean-state.wasm",
@@ -19,7 +19,12 @@
     "build:status-message-collections": "near-sdk-js build src/status-message-collections.js build/status-message-collections.wasm",
     "build:parking-lot": "near-sdk-js build src/parking-lot.ts build/parking-lot.wasm",
     "build:nested-collections": "near-sdk-js build src/nested-collections.ts build/nested-collections.wasm",
+    "build-nft": "run-s build:nft-*",
+    "build:nft-contract": "near-sdk-js build src/standard-nft/my-nft.ts build/my-nft.wasm",
+    "build:nft-receiver": "near-sdk-js build src/standard-nft/test-token-receiver.ts build/nft-receiver.wasm",
+    "build:nft-approval-receiver": "near-sdk-js build src/standard-nft/test-approval-receiver.ts build/nft-approval-receiver.wasm",
     "test": "ava && yarn test:counter-lowlevel && yarn test:counter-ts",
+    "test:nft": "ava __tests__/standard-nft/*",
     "test:status-message": "ava __tests__/test-status-message.ava.js",
     "test:clean-state": "ava __tests__/test-clean-state.ava.js",
     "test:counter": "ava __tests__/test-counter.ava.js",
@@ -37,7 +42,8 @@
   "license": "Apache-2.0",
   "dependencies": {
     "lodash-es": "^4.17.21",
-    "near-sdk-js": "file:../"
+    "near-sdk-js": "file:../",
+    "near-contract-standards": "file:../near-contract-standards/"
   },
   "devDependencies": {
     "@types/lodash-es": "^4.17.6",

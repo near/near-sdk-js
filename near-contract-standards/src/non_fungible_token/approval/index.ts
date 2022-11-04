@@ -1,5 +1,5 @@
 import { AccountId } from "near-sdk-js/lib/types";
-import { NearPromise } from "../../../../lib";
+import { NearPromise } from "near-sdk-js/lib";
 import { TokenId } from "../token";
 import { Option } from "../utils";
 

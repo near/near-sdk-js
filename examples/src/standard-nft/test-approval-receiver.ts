@@ -6,9 +6,9 @@ import {
   PromiseOrValue,
   assert,
   call,
-} from "../../../lib";
-import { AccountId } from "../../../lib/types";
-import { NonFungibleTokenApprovalReceiver } from "../../src/non_fungible_token/approval/approval_receiver";
+} from "near-sdk-js/lib";
+import { AccountId } from "near-sdk-js/lib/types";
+import { NonFungibleTokenApprovalReceiver } from "near-contract-standards/lib/non_fungible_token/approval/approval_receiver";
 
 const BASE_GAS = 20_000_000_000_000n;
 const PROMISE_CALL = 20_000_000_000_000n;
