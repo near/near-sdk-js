@@ -37,6 +37,7 @@ There are a couple of contract examples in the project:
 - [Non fungible token receiver contract](https://github.com/near/near-sdk-js/tree/develop/examples/src/non-fungible-token-receiver.js)
 - [Status message board](https://github.com/near/near-sdk-js/tree/develop/examples/src/status-message.js)
 - [Status message board with unique messages](https://github.com/near/near-sdk-js/tree/develop/examples/src/status-message-collections.js)
+- [Programmatic Update After Locking The Contract](https://github.com/near/near-sdk-js/tree/develop/examples/src/programmatic-update.js)
 
 To build all examples, run `yarn build` in `examples/`. To test all examples, run `yarn test`. You can also build and test one specific example with `yarn build:<example-name>` and `yarn test:<example-name>`, see `examples/package.json`.
 
