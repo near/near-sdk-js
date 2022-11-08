@@ -40,3 +40,5 @@ jobs:
         run: cd examples && yarn build:status-message && yarn test:status-message
       - name: parking-lot
         run: cd examples && yarn build:parking-lot && yarn test:parking-lot
+      - name: standard nft
+        run: cd examples && yarn build-nft && yarn test:nft
