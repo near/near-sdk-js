@@ -58,7 +58,7 @@ fs.rmSync(BINARYEN_TAR_NAME);
 
 signale.await("Installing QuickJS...");
 
-const QUICK_JS_VERSION = `0.1.2`;
+const QUICK_JS_VERSION = `0.1.3`;
 const QUICK_JS_VERSION_TAG = `v${QUICK_JS_VERSION}`;
 
 const QUICK_JS_SYSTEM_NAME =
