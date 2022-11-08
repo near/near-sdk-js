@@ -1876,6 +1876,12 @@ near-api-js@^0.44.1:
     text-encoding-utf-8 "^1.0.2"
     tweetnacl "^1.0.1"
 
+"near-contract-standards@file:../near-contract-standards":
+  version "1.0.0"
+  dependencies:
+    lodash-es "^4.17.21"
+    near-sdk-js "file:../../../.cache/yarn/v6/npm-near-contract-standards-1.0.0-eb290289-756e-48dc-a42b-83469cf20f4f-1667544242717/node_modules"
+
 near-sandbox@^0.0.13:
   version "0.0.13"
   resolved "https://registry.yarnpkg.com/near-sandbox/-/near-sandbox-0.0.13.tgz#139b70708ccefcdf2dd406710f6615590d1880e5"
@@ -1885,7 +1891,7 @@ near-sandbox@^0.0.13:
     tar "^6.1.0"
 
 "near-sdk-js@file:..":
-  version "0.6.0-0"
+  version "0.6.0"
   dependencies:
     "@babel/core" "^7.17.5"
     "@babel/plugin-proposal-decorators" "^7.17.2"
