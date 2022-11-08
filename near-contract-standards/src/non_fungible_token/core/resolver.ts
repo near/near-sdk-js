@@ -30,10 +30,15 @@ export interface NonFungibleTokenResolver {
    *
    * @returns true if token was successfully transferred to `receiver_id`.
    */
-  nft_resolve_transfer([previous_owner_id, receiver_id, token_id, approvals]: [
-    previous_owner_id: AccountId,
-    receiver_id: AccountId,
-    token_id: TokenId,
-    approvals: Option<{ [approval: AccountId]: bigint }>
-  ]): boolean;
+  nft_resolve_transfer({
+    previous_owner_id,
+    receiver_id,
+    token_id,
+    approved_account_ids,
+  }: {
+    previous_owner_id: AccountId;
+    receiver_id: AccountId;
+    token_id: TokenId;
+    approved_account_ids: Option<{ [approval: AccountId]: bigint }>;
+  }): boolean;
 }

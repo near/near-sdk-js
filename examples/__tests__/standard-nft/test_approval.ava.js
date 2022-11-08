@@ -25,8 +25,12 @@ test.beforeEach(async (t) => {
     metadata: { spec: "nft-1.0.0", name: "My NFT", symbol: "NFT" },
   });
 
-  await nftReceiver.call(nftReceiver, "init", nft.accountId);
-  await nftReceiver.call(approvalReceiver, "init", nft.accountId);
+  await nftReceiver.call(nftReceiver, "init", {
+    non_fungible_token_account_id: nft.accountId,
+  });
+  await approvalReceiver.call(approvalReceiver, "init", {
+    non_fungible_token_account_id: nft.accountId,
+  });
 
   let token_metadata = {
     title: "Olympus Mons",
@@ -45,7 +49,11 @@ test.beforeEach(async (t) => {
   await nftOwner.call(
     nft,
     "nft_mint",
-    ["0", nftOwner.accountId, token_metadata],
+    {
+      token_id: "0",
+      token_owner_id: nftOwner.accountId,
+      token_metadata,
+    },
     { attachedDeposit: "10 mN" }
   );
 
@@ -74,53 +82,75 @@ test("Simple approve", async (t) => {
   let res = await nftOwner.callRaw(
     nft,
     "nft_approve",
-    ["0", ali.accountId, null],
+    {
+      token_id: "0",
+      account_id: ali.accountId,
+      msg: null,
+    },
     { attachedDeposit: "510000000000000000000" }
   );
   t.assert(res.result.status.SuccessValue);
 
-  let alice_approved = await nft.view("nft_is_approved", [
-    "0",
-    ali.accountId,
-    null,
-  ]);
+  let alice_approved = await nft.view("nft_is_approved", {
+    token_id: "0",
+    approved_account_id: ali.accountId,
+    approval_id: null,
+  });
   t.assert(alice_approved);
 
-  let alice_approval_id_is_1 = await nft.view("nft_is_approved", [
-    "0",
-    ali.accountId,
-    "1",
-  ]);
+  let alice_approval_id_is_1 = await nft.view("nft_is_approved", {
+    token_id: "0",
+    approved_account_id: ali.accountId,
+    approval_id: "1",
+  });
   t.assert(alice_approval_id_is_1);
 
-  let alice_approval_id_is_2 = await nft.view("nft_is_approved", [
-    "0",
-    ali.accountId,
-    "2",
-  ]);
+  let alice_approval_id_is_2 = await nft.view("nft_is_approved", {
+    token_id: "0",
+    approved_account_id: ali.accountId,
+    approval_id: "2",
+  });
   t.assert(!alice_approval_id_is_2);
 
-  res = await nftOwner.callRaw(nft, "nft_approve", ["0", ali.accountId, null], {
-    attachedDeposit: "1",
-  });
+  res = await nftOwner.callRaw(
+    nft,
+    "nft_approve",
+    {
+      token_id: "0",
+      account_id: ali.accountId,
+      msg: null,
+    },
+    {
+      attachedDeposit: "1",
+    }
+  );
   t.assert(res.result.status.SuccessValue);
-  alice_approval_id_is_2 = await nft.view("nft_is_approved", [
-    "0",
-    ali.accountId,
-    "2",
-  ]);
+  alice_approval_id_is_2 = await nft.view("nft_is_approved", {
+    token_id: "0",
+    approved_account_id: ali.accountId,
+    approval_id: "2",
+  });
   t.assert(alice_approval_id_is_2);
 
-  res = await nftOwner.callRaw(nft, "nft_approve", ["0", bob.accountId, null], {
-    attachedDeposit: "450000000000000000000",
-  });
+  res = await nftOwner.callRaw(
+    nft,
+    "nft_approve",
+    {
+      token_id: "0",
+      account_id: bob.accountId,
+      msg: null,
+    },
+    {
+      attachedDeposit: "450000000000000000000",
+    }
+  );
   t.assert(res.result.status.SuccessValue);
 
-  let bob_approval_id_is_3 = await nft.view("nft_is_approved", [
-    "0",
-    bob.accountId,
-    "3",
-  ]);
+  let bob_approval_id_is_3 = await nft.view("nft_is_approved", {
+    token_id: "0",
+    approved_account_id: bob.accountId,
+    approval_id: "3",
+  });
   t.assert(bob_approval_id_is_3);
 });
 
@@ -130,7 +160,11 @@ test("Approve call", async (t) => {
   let res = await nftOwner.call(
     nft,
     "nft_approve",
-    ["0", approvalReceiver.accountId, "return-now"],
+    {
+      token_id: "0",
+      account_id: approvalReceiver.accountId,
+      msg: "return-now",
+    },
     { attachedDeposit: "450000000000000000000", gas: "300 Tgas" }
   );
   t.is(res, "cool");
@@ -138,7 +172,11 @@ test("Approve call", async (t) => {
   res = await nftOwner.call(
     nft,
     "nft_approve",
-    ["0", approvalReceiver.accountId, "hahaha"],
+    {
+      token_id: "0",
+      account_id: approvalReceiver.accountId,
+      msg: "hahaha",
+    },
     { attachedDeposit: "1", gas: "300 Tgas" }
   );
   t.is(res, "hahaha");
@@ -150,23 +188,32 @@ test("Approved account transfers token", async (t) => {
   let res = await nftOwner.callRaw(
     nft,
     "nft_approve",
-    ["0", ali.accountId, null],
+    {
+      token_id: "0",
+      account_id: ali.accountId,
+      msg: null,
+    },
     { attachedDeposit: "510000000000000000000" }
   );
   t.assert(res.result.status.SuccessValue);
 
-  let token = await nft.view("nft_token", "0");
+  let token = await nft.view("nft_token", { token_id: "0" });
   t.is(token.owner_id, nftOwner.accountId);
 
   res = await ali.callRaw(
     nft,
     "nft_transfer",
-    [ali.accountId, "0", null, "gotcha! bahahaha"],
+    {
+      receiver_id: ali.accountId,
+      token_id: "0",
+      approval_id: null,
+      memo: "gotcha! bahahaha",
+    },
     { attachedDeposit: "1" }
   );
   t.is(res.result.status.SuccessValue, "");
 
-  token = await nft.view("nft_token", "0");
+  token = await nft.view("nft_token", { token_id: "0" });
   t.is(token.owner_id, ali.accountId);
 });
 
@@ -176,48 +223,81 @@ test("revoke", async (t) => {
   let res = await nftOwner.callRaw(
     nft,
     "nft_approve",
-    ["0", ali.accountId, null],
+    {
+      token_id: "0",
+      account_id: ali.accountId,
+      msg: null,
+    },
     { attachedDeposit: "510000000000000000000" }
   );
   t.assert(res.result.status.SuccessValue);
 
-  res = await nftOwner.callRaw(nft, "nft_approve", ["0", bob.accountId, null], {
-    attachedDeposit: "510000000000000000000",
-  });
+  res = await nftOwner.callRaw(
+    nft,
+    "nft_approve",
+    {
+      token_id: "0",
+      account_id: bob.accountId,
+      msg: null,
+    },
+    {
+      attachedDeposit: "510000000000000000000",
+    }
+  );
   t.assert(res.result.status.SuccessValue);
 
-  res = await nftOwner.callRaw(nft, "nft_revoke", ["0", ali.accountId], {
-    attachedDeposit: "1",
-  });
+  res = await nftOwner.callRaw(
+    nft,
+    "nft_revoke",
+    {
+      token_id: "0",
+      account_id: ali.accountId,
+    },
+    {
+      attachedDeposit: "1",
+    }
+  );
   t.is(res.result.status.SuccessValue, "");
 
-  let alice_approved = await nft.view("nft_is_approved", [
-    "0",
-    ali.accountId,
-    null,
-  ]);
+  let alice_approved = await nft.view("nft_is_approved", {
+    token_id: "0",
+    approved_account_id: ali.accountId,
+    approval_id: null,
+  });
   t.assert(!alice_approved);
 
-  let bob_approved = await nft.view("nft_is_approved", [
-    "0",
-    bob.accountId,
-    null,
-  ]);
+  let bob_approved = await nft.view("nft_is_approved", {
+    token_id: "0",
+    approved_account_id: bob.accountId,
+    approval_id: null,
+  });
   t.assert(bob_approved);
 
-  res = await nftOwner.callRaw(nft, "nft_revoke", ["0", bob.accountId], {
-    attachedDeposit: "1",
-  });
+  res = await nftOwner.callRaw(
+    nft,
+    "nft_revoke",
+    {
+      token_id: "0",
+      account_id: bob.accountId,
+    },
+    {
+      attachedDeposit: "1",
+    }
+  );
   t.is(res.result.status.SuccessValue, "");
 
-  alice_approved = await nft.view("nft_is_approved", [
-    "0",
-    ali.accountId,
-    null,
-  ]);
+  alice_approved = await nft.view("nft_is_approved", {
+    token_id: "0",
+    approved_account_id: ali.accountId,
+    approval_id: null,
+  });
   t.assert(!alice_approved);
 
-  bob_approved = await nft.view("nft_is_approved", ["0", bob.accountId, null]);
+  bob_approved = await nft.view("nft_is_approved", {
+    token_id: "0",
+    approved_account_id: bob.accountId,
+    approval_id: null,
+  });
   t.assert(!bob_approved);
 });
 
@@ -227,32 +307,50 @@ test("revoke all", async (t) => {
   let res = await nftOwner.callRaw(
     nft,
     "nft_approve",
-    ["0", ali.accountId, null],
+    {
+      token_id: "0",
+      accountId: ali.accountId,
+      msg: null,
+    },
     { attachedDeposit: "510000000000000000000" }
   );
   t.assert(res.result.status.SuccessValue);
 
-  res = await nftOwner.callRaw(nft, "nft_approve", ["0", bob.accountId, null], {
-    attachedDeposit: "510000000000000000000",
-  });
+  res = await nftOwner.callRaw(
+    nft,
+    "nft_approve",
+    {
+      token_id: "0",
+      accountId: bob.accountId,
+      msg: null,
+    },
+    {
+      attachedDeposit: "510000000000000000000",
+    }
+  );
   t.assert(res.result.status.SuccessValue);
 
-  res = await nftOwner.callRaw(nft, "nft_revoke_all", "0", {
-    attachedDeposit: "1",
-  });
+  res = await nftOwner.callRaw(
+    nft,
+    "nft_revoke_all",
+    { token_id: "0" },
+    {
+      attachedDeposit: "1",
+    }
+  );
   t.is(res.result.status.SuccessValue, "");
 
-  let alice_approved = await nft.view("nft_is_approved", [
-    "0",
-    ali.accountId,
-    null,
-  ]);
+  let alice_approved = await nft.view("nft_is_approved", {
+    token_id: "0",
+    approved_account_id: ali.accountId,
+    approval_id: null,
+  });
   t.assert(!alice_approved);
 
-  let bob_approved = await nft.view("nft_is_approved", [
-    "0",
-    bob.accountId,
-    null,
-  ]);
+  let bob_approved = await nft.view("nft_is_approved", {
+    token_id: "0",
+    approved_account_id: bob.accountId,
+    approval_id: null,
+  });
   t.assert(!bob_approved);
 });

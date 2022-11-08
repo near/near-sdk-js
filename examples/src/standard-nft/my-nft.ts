@@ -78,72 +78,98 @@ export class MyNFT
   }
 
   @view({})
-  nft_tokens([from_index, limit]: [
-    from_index: number,
-    limit: number
-  ]): Token[] {
-    return this.tokens.nft_tokens([from_index, limit]);
+  nft_tokens({
+    from_index,
+    limit,
+  }: {
+    from_index: number;
+    limit: number;
+  }): Token[] {
+    return this.tokens.nft_tokens({ from_index, limit });
   }
 
   @view({})
-  nft_supply_for_owner(account_id: string): number {
-    return this.tokens.nft_supply_for_owner(account_id);
+  nft_supply_for_owner({ account_id }: { account_id: string }): number {
+    return this.tokens.nft_supply_for_owner({ account_id });
   }
 
   @view({})
-  nft_tokens_for_owner([account_id, from_index, limit]: [
-    account_id: string,
-    from_index: number,
-    limit: number
-  ]): Token[] {
-    return this.tokens.nft_tokens_for_owner([account_id, from_index, limit]);
+  nft_tokens_for_owner({
+    account_id,
+    from_index,
+    limit,
+  }: {
+    account_id: string;
+    from_index: number;
+    limit: number;
+  }): Token[] {
+    return this.tokens.nft_tokens_for_owner({ account_id, from_index, limit });
   }
 
   @call({ payableFunction: true })
-  nft_approve([token_id, account_id, msg]: [
-    token_id: string,
-    account_id: string,
-    msg: string
-  ]): Option<NearPromise> {
-    return this.tokens.nft_approve([token_id, account_id, msg]);
+  nft_approve({
+    token_id,
+    account_id,
+    msg,
+  }: {
+    token_id: string;
+    account_id: string;
+    msg: string;
+  }): Option<NearPromise> {
+    return this.tokens.nft_approve({ token_id, account_id, msg });
   }
 
   @call({ payableFunction: true })
-  nft_revoke([token_id, account_id]: [token_id: string, account_id: string]) {
-    return this.tokens.nft_revoke([token_id, account_id]);
+  nft_revoke({
+    token_id,
+    account_id,
+  }: {
+    token_id: string;
+    account_id: string;
+  }) {
+    return this.tokens.nft_revoke({ token_id, account_id });
   }
 
   @call({ payableFunction: true })
-  nft_revoke_all(token_id: string) {
-    return this.tokens.nft_revoke_all(token_id);
+  nft_revoke_all({ token_id }: { token_id: string }) {
+    return this.tokens.nft_revoke_all({ token_id });
   }
 
   @view({})
-  nft_is_approved([token_id, approved_account_id, approval_id]: [
-    token_id: string,
-    approved_account_id: string,
-    approval_id: bigint
-  ]): boolean {
-    return this.tokens.nft_is_approved([
+  nft_is_approved({
+    token_id,
+    approved_account_id,
+    approval_id,
+  }: {
+    token_id: string;
+    approved_account_id: string;
+    approval_id: bigint;
+  }): boolean {
+    return this.tokens.nft_is_approved({
       token_id,
       approved_account_id,
       approval_id,
-    ]);
+    });
   }
 
   @call({})
-  nft_resolve_transfer([previous_owner_id, receiver_id, token_id, approvals]: [
-    previous_owner_id: string,
-    receiver_id: string,
-    token_id: string,
-    approvals: { [approval: string]: bigint }
-  ]): boolean {
-    return this.tokens.nft_resolve_transfer([
+  nft_resolve_transfer({
+    previous_owner_id,
+    receiver_id,
+    token_id,
+    approved_account_ids,
+  }: {
+    previous_owner_id: string;
+    receiver_id: string;
+    token_id: string;
+    approved_account_ids: { [approval: string]: bigint };
+  }): boolean {
+    return this.tokens.nft_resolve_transfer({
       previous_owner_id,
       receiver_id,
       token_id,
-      approvals,
-    ]);
+      approved_account_ids,
+    });
   }
 
   @view({})
@@ -153,35 +179,46 @@ export class MyNFT
   }
 
   @call({ payableFunction: true })
-  nft_transfer([receiver_id, token_id, approval_id, memo]: [
-    receiver_id: string,
-    token_id: string,
-    approval_id: bigint,
-    memo: string
-  ]) {
-    this.tokens.nft_transfer([receiver_id, token_id, approval_id, memo]);
+  nft_transfer({
+    receiver_id,
+    token_id,
+    approval_id,
+    memo,
+  }: {
+    receiver_id: string;
+    token_id: string;
+    approval_id: bigint;
+    memo: string;
+  }) {
+    this.tokens.nft_transfer({ receiver_id, token_id, approval_id, memo });
   }
 
   @call({ payableFunction: true })
-  nft_transfer_call([receiver_id, token_id, approval_id, memo, msg]: [
-    receiver_id: string,
-    token_id: string,
-    approval_id: bigint,
-    memo: string,
-    msg: string
-  ]): PromiseOrValue<boolean> {
-    return this.tokens.nft_transfer_call([
+  nft_transfer_call({
+    receiver_id,
+    token_id,
+    approval_id,
+    memo,
+    msg,
+  }: {
+    receiver_id: string;
+    token_id: string;
+    approval_id: bigint;
+    memo: string;
+    msg: string;
+  }): PromiseOrValue<boolean> {
+    return this.tokens.nft_transfer_call({
       receiver_id,
       token_id,
       approval_id,
       memo,
       msg,
-    ]);
+    });
   }
 
   @view({})
-  nft_token(token_id: string): Option<Token> {
-    return this.tokens.nft_token(token_id);
+  nft_token({ token_id }: { token_id: string }): Option<Token> {
+    return this.tokens.nft_token({ token_id });
   }
 
   @initialize({ requireInit: true })
@@ -205,11 +242,15 @@ export class MyNFT
   }
 
   @call({ payableFunction: true })
-  nft_mint([token_id, token_owner_id, token_metadata]: [
-    token_id: TokenId,
-    token_owner_id: AccountId,
-    token_metadata: TokenMetadata
-  ]) {
+  nft_mint({
+    token_id,
+    token_owner_id,
+    token_metadata,
+  }: {
+    token_id: TokenId;
+    token_owner_id: AccountId;
+    token_metadata: TokenMetadata;
+  }) {
     assert(
       near.predecessorAccountId() === this.tokens.owner_id,
       "Unauthorized"

@@ -35,11 +35,15 @@ export interface NonFungibleTokenApproval {
    * @returns void, if no `msg` given. Otherwise, returns promise call to
    *          `nft_on_approve`, which can resolve with whatever it wants.
    */
-  nft_approve([token_id, account_id, msg]: [
-    token_id: TokenId,
-    account_id: AccountId,
-    msg: Option<string>
-  ]): Option<NearPromise>;
+  nft_approve({
+    token_id,
+    account_id,
+    msg,
+  }: {
+    token_id: TokenId;
+    account_id: AccountId;
+    msg: Option<string>;
+  }): Option<NearPromise>;
 
   /** Revoke an approved account for a specific token.
    *
@@ -53,10 +57,13 @@ export interface NonFungibleTokenApproval {
    * @param token_id - The token for which to revoke an approval
    * @param account_id - The account to remove from `approvals`
    */
-  nft_revoke([token_id, account_id]: [
-    token_id: TokenId,
-    account_id: AccountId
-  ]);
+  nft_revoke({
+    token_id,
+    account_id,
+  }: {
+    token_id: TokenId;
+    account_id: AccountId;
+  });
 
   /** Revoke all approved accounts for a specific token.
    *
@@ -69,7 +76,7 @@ export interface NonFungibleTokenApproval {
    *
    * @param token_id - The token with approvals to revoke
    */
-  nft_revoke_all(token_id: TokenId);
+  nft_revoke_all({ token_id }: { token_id: TokenId });
 
   /** Check if a token is approved for transfer by a given account, optionally
    * checking an approval_id
@@ -80,9 +87,13 @@ export interface NonFungibleTokenApproval {
    * @returns if `approval_id` given, `true` if `approved_account_id` is approved with given `approval_id`
    * otherwise, `true` if `approved_account_id` is in list of approved accounts
    */
-  nft_is_approved([token_id, approved_account_id, approval_id]: [
-    token_id: TokenId,
-    approved_account_id: AccountId,
-    approval_id: Option<bigint>
-  ]): boolean;
+  nft_is_approved({
+    token_id,
+    approved_account_id,
+    approval_id,
+  }: {
+    token_id: TokenId;
+    approved_account_id: AccountId;
+    approval_id: Option<bigint>;
+  }): boolean;
 }

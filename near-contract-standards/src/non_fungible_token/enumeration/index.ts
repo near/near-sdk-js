@@ -12,17 +12,20 @@ export interface NonFungibleTokenEnumeration {
    * @param limit - The maximum number of tokens to return
    * @returns - An array of Token objects, as described in Core standard
    */
-  nft_tokens([from_index, limit]: [
-    from_index: number | null, // default: "0"
-    limit: number | null // default: unlimited (could fail due to gas limit)
-  ]): Token[];
+  nft_tokens({
+    from_index,
+    limit,
+  }: {
+    from_index: number | null; // default: "0"
+    limit: number | null; // default: unlimited (could fail due to gas limit)
+  }): Token[];
 
   /** Get number of tokens owned by a given account
    *
    * @param account_id - A valid NEAR account
    * @returns - The number of non-fungible tokens owned by given `account_id`
    */
-  nft_supply_for_owner(account_id: AccountId): number;
+  nft_supply_for_owner({ account_id }: { account_id: AccountId }): number;
 
   /** Get list of all tokens owned by a given account
    *
@@ -31,9 +34,13 @@ export interface NonFungibleTokenEnumeration {
    * @param limit - The maximum number of tokens to return
    * @returns - A paginated list of all tokens owned by this account
    */
-  nft_tokens_for_owner([account_id, from_index, limit]: [
-    account_id: AccountId,
-    from_index: number, // default: "0"
-    limit: number // default: unlimited (could fail due to gas limit)
-  ]): Token[];
+  nft_tokens_for_owner({
+    account_id,
+    from_index,
+    limit,
+  }: {
+    account_id: AccountId;
+    from_index: number; // default: "0"
+    limit: number; // default: unlimited (could fail due to gas limit)
+  }): Token[];
 }

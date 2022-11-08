@@ -32,12 +32,12 @@ export interface NonFungibleTokenCore {
      * @param memo (optional) - For use cases that may benefit from indexing or
      *        providing information for a transfer
      */
-    nft_transfer([receiver_id, token_id, approval_id, memo]: [
-        receiver_id: AccountId,
-        token_id: TokenId,
-        approval_id: Option<bigint>,
-        memo: Option<string>
-    ]): any;
+    nft_transfer({ receiver_id, token_id, approval_id, memo }: {
+        receiver_id: AccountId;
+        token_id: TokenId;
+        approval_id: Option<bigint>;
+        memo: Option<string>;
+    }): any;
     /** Transfer token and call a method on a receiver contract. A successful
      * workflow will end in a success execution outcome to the callback on the NFT
      * contract at the method `nft_resolve_transfer`.
@@ -71,13 +71,15 @@ export interface NonFungibleTokenCore {
      *        order to properly handle the transfer. Can indicate both a function to
      *        call and the parameters to pass to that function.
      */
-    nft_transfer_call([receiver_id, token_id, approval_id, memo]: [
-        receiver_id: AccountId,
-        token_id: TokenId,
-        approval_id: Option<bigint>,
-        memo: Option<string>,
-        msg: string
-    ]): any;
+    nft_transfer_call({ receiver_id, token_id, approval_id, memo }: {
+        receiver_id: AccountId;
+        token_id: TokenId;
+        approval_id: Option<bigint>;
+        memo: Option<string>;
+        msg: string;
+    }): any;
     /** Returns the token with the given `token_id` or `null` if no such token. */
-    nft_token(token_id: TokenId): Option<Token>;
+    nft_token({ token_id }: {
+        token_id: TokenId;
+    }): Option<Token>;
 }

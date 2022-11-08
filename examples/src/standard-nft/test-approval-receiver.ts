@@ -29,12 +29,17 @@ export class ApprovalReceiver
   }
 
   @call({})
-  nft_on_approve([token_id, owner_id, approval_id, msg]: [
-    token_id: string,
-    owner_id: string,
-    approval_id: bigint,
-    msg: string
-  ]): PromiseOrValue<string> {
+  nft_on_approve({
+    token_id,
+    owner_id,
+    approval_id,
+    msg,
+  }: {
+    token_id: string;
+    owner_id: string;
+    approval_id: bigint;
+    msg: string;
+  }): PromiseOrValue<string> {
     assert(
       near.predecessorAccountId() === this.non_fungible_token_account_id,
       "Only supports the one non-fungible token contract"
@@ -66,7 +71,11 @@ export class ApprovalReceiver
   }
 
   @initialize({})
-  init(non_fungible_token_account_id: AccountId) {
+  init({
+    non_fungible_token_account_id,
+  }: {
+    non_fungible_token_account_id: AccountId;
+  }) {
     this.non_fungible_token_account_id = non_fungible_token_account_id;
   }
 }

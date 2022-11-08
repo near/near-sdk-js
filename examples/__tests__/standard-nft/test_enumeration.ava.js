@@ -19,7 +19,11 @@ async function helper_mint(nft, nftOwner, id, title, description) {
   await nftOwner.call(
     nft,
     "nft_mint",
-    [id, nftOwner.accountId, token_metadata],
+    {
+      token_id: id,
+      token_owner_id: nftOwner.accountId,
+      token_metadata,
+    },
     { attachedDeposit: "10 mN" }
   );
 }
@@ -45,7 +49,9 @@ test.beforeEach(async (t) => {
     metadata: { spec: "nft-1.0.0", name: "My NFT", symbol: "NFT" },
   });
 
-  await nftReceiver.call(nftReceiver, "init", nft.accountId);
+  await nftReceiver.call(nftReceiver, "init", {
+    non_fungible_token_account_id: nft.accountId,
+  });
 
   await helper_mint(
     nft,
@@ -86,13 +92,13 @@ test("Enumerate NFT tokens total supply", async (t) => {
 test("Enumerate NFT tokens", async (t) => {
   const { nft } = t.context.accounts;
 
-  let nftTokens = await nft.view("nft_tokens", [1, null]);
+  let nftTokens = await nft.view("nft_tokens", { from_index: 1, limit: null });
   t.is(nftTokens.length, 3);
   t.is(nftTokens[0].token_id, "1");
   t.is(nftTokens[1].token_id, "2");
   t.is(nftTokens[2].token_id, "3");
 
-  nftTokens = await nft.view("nft_tokens", [null, 2]);
+  nftTokens = await nft.view("nft_tokens", { from_index: null, limit: 2 });
   t.is(nftTokens.length, 2);
   t.is(nftTokens[0].token_id, "0");
   t.is(nftTokens[1].token_id, "1");
@@ -101,42 +107,46 @@ test("Enumerate NFT tokens", async (t) => {
 test("Enumerate NFT tokens supply for owner", async (t) => {
   const { ali, nft, nftOwner } = t.context.accounts;
 
-  let aliNfts = await nft.view("nft_supply_for_owner", ali.accountId);
+  let aliNfts = await nft.view("nft_supply_for_owner", {
+    account_id: ali.accountId,
+  });
   t.is(aliNfts, 0);
 
-  let ownerNfts = await nft.view("nft_supply_for_owner", nftOwner.accountId);
+  let ownerNfts = await nft.view("nft_supply_for_owner", {
+    account_id: nftOwner.accountId,
+  });
   t.is(ownerNfts, 4);
 });
 
 test("Enumerate NFT tokens for owner", async (t) => {
   const { ali, nft, nftOwner } = t.context.accounts;
 
-  let nftTokens = await nft.view("nft_tokens_for_owner", [
-    nftOwner.accountId,
-    null,
-    null,
-  ]);
+  let nftTokens = await nft.view("nft_tokens_for_owner", {
+    account_id: nftOwner.accountId,
+    from_index: null,
+    limit: null,
+  });
   t.is(nftTokens.length, 4);
   t.is(nftTokens[0].token_id, "0");
   t.is(nftTokens[1].token_id, "1");
   t.is(nftTokens[2].token_id, "2");
   t.is(nftTokens[3].token_id, "3");
 
-  nftTokens = await nft.view("nft_tokens_for_owner", [
-    nftOwner.accountId,
-    1,
-    null,
-  ]);
+  nftTokens = await nft.view("nft_tokens_for_owner", {
+    account_id: nftOwner.accountId,
+    from_index: 1,
+    limit: null,
+  });
   t.is(nftTokens.length, 3);
   t.is(nftTokens[0].token_id, "1");
   t.is(nftTokens[1].token_id, "2");
   t.is(nftTokens[2].token_id, "3");
 
-  nftTokens = await nft.view("nft_tokens_for_owner", [
-    nftOwner.accountId,
-    null,
-    2,
-  ]);
+  nftTokens = await nft.view("nft_tokens_for_owner", {
+    account_id: nftOwner.accountId,
+    from_index: null,
+    limit: 2,
+  });
   t.is(nftTokens.length, 2);
   t.is(nftTokens[0].token_id, "0");
   t.is(nftTokens[1].token_id, "1");
@@ -144,23 +154,28 @@ test("Enumerate NFT tokens for owner", async (t) => {
   let res = await nftOwner.callRaw(
     nft,
     "nft_transfer",
-    [ali.accountId, "0", null, "simple transfer"],
+    {
+      receiver_id: ali.accountId,
+      token_id: "0",
+      approval_id: null,
+      memo: "simple transfer",
+    },
     { attachedDeposit: "1" }
   );
   t.is(res.result.status.SuccessValue, "");
 
-  nftTokens = await nft.view("nft_tokens_for_owner", [
-    ali.accountId,
-    null,
-    null,
-  ]);
+  nftTokens = await nft.view("nft_tokens_for_owner", {
+    account_id: ali.accountId,
+    from_index: null,
+    limit: null,
+  });
   t.is(nftTokens.length, 1);
 
-  nftTokens = await nft.view("nft_tokens_for_owner", [
-    nftOwner.accountId,
-    null,
-    null,
-  ]);
+  nftTokens = await nft.view("nft_tokens_for_owner", {
+    account_id: nftOwner.accountId,
+    from_index: null,
+    limit: null,
+  });
   t.is(nftTokens.length, 3);
   t.is(nftTokens[0].token_id, "3");
   t.is(nftTokens[1].token_id, "1");

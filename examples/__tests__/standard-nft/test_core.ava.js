@@ -24,7 +24,9 @@ test.beforeEach(async (t) => {
     metadata: { spec: "nft-1.0.0", name: "My NFT", symbol: "NFT" },
   });
 
-  await nftReceiver.call(nftReceiver, "init", nft.accountId);
+  await nftReceiver.call(nftReceiver, "init", {
+    non_fungible_token_account_id: nft.accountId,
+  });
 
   let token_metadata = {
     title: "Olympus Mons",
@@ -43,7 +45,11 @@ test.beforeEach(async (t) => {
   await nftOwner.call(
     nft,
     "nft_mint",
-    ["0", nftOwner.accountId, token_metadata],
+    {
+      token_id: "0",
+      token_owner_id: nftOwner.accountId,
+      token_metadata,
+    },
     { attachedDeposit: "10 mN" }
   );
 
@@ -68,20 +74,25 @@ test.afterEach.always(async (t) => {
 test("Simple transfer", async (t) => {
   const { ali, nft, nftOwner } = t.context.accounts;
 
-  let token = await nft.view("nft_token", "0");
+  let token = await nft.view("nft_token", { token_id: "0" });
   t.is(token.owner_id, nftOwner.accountId);
 
   let res = await nftOwner.callRaw(
     nft,
     "nft_transfer",
-    [ali.accountId, "0", null, "simple transfer"],
+    {
+      receiver_id: ali.accountId,
+      token_id: "0",
+      approval_id: null,
+      memo: "simple transfer",
+    },
     { attachedDeposit: "1" }
   );
   t.is(res.result.status.SuccessValue, "");
 
   t.is(res.logs.length, 1);
 
-  token = await nft.view("nft_token", "0");
+  token = await nft.view("nft_token", { token_id: "0" });
   t.is(token.owner_id, ali.accountId);
 });
 
@@ -91,7 +102,13 @@ test("Transfer call fast return to sender", async (t) => {
   let res = await nftOwner.callRaw(
     nft,
     "nft_transfer_call",
-    [nftReceiver.accountId, "0", null, "transfer & call", "return-it-now"],
+    {
+      receiver_id: nftReceiver.accountId,
+      token_id: "0",
+      approval_id: null,
+      memo: "transfer & call",
+      msg: "return-it-now",
+    },
     { attachedDeposit: "1", gas: MAX_GAS }
   );
   t.is(
@@ -99,7 +116,7 @@ test("Transfer call fast return to sender", async (t) => {
     "false"
   );
 
-  let token = await nft.view("nft_token", "0");
+  let token = await nft.view("nft_token", { token_id: "0" });
   t.is(token.owner_id, nftOwner.accountId);
 });
 
@@ -109,7 +126,13 @@ test("Transfer call slow return to sender", async (t) => {
   let res = await nftOwner.callRaw(
     nft,
     "nft_transfer_call",
-    [nftReceiver.accountId, "0", null, "transfer & call", "return-it-later"],
+    {
+      receiver_id: nftReceiver.accountId,
+      token_id: "0",
+      approval_id: null,
+      memo: "transfer & call",
+      msg: "return-it-later",
+    },
     { attachedDeposit: "1", gas: MAX_GAS }
   );
   t.is(
@@ -117,7 +140,7 @@ test("Transfer call slow return to sender", async (t) => {
     "false"
   );
 
-  let token = await nft.view("nft_token", "0");
+  let token = await nft.view("nft_token", { token_id: "0" });
   t.is(token.owner_id, nftOwner.accountId);
 });
 
@@ -127,7 +150,13 @@ test("Transfer call fast keep with sender", async (t) => {
   let res = await nftOwner.callRaw(
     nft,
     "nft_transfer_call",
-    [nftReceiver.accountId, "0", null, "transfer & call", "keep-it-now"],
+    {
+      receiver_id: nftReceiver.accountId,
+      token_id: "0",
+      approval_id: null,
+      memo: "transfer & call",
+      msg: "keep-it-now",
+    },
     { attachedDeposit: "1", gas: MAX_GAS }
   );
   t.is(
@@ -135,7 +164,7 @@ test("Transfer call fast keep with sender", async (t) => {
     "true"
   );
 
-  let token = await nft.view("nft_token", "0");
+  let token = await nft.view("nft_token", { token_id: "0" });
   t.is(token.owner_id, nftReceiver.accountId);
 });
 
@@ -145,7 +174,13 @@ test("Transfer call slow keep with sender", async (t) => {
   let res = await nftOwner.callRaw(
     nft,
     "nft_transfer_call",
-    [nftReceiver.accountId, "0", null, "transfer & call", "keep-it-later"],
+    {
+      receiver_id: nftReceiver.accountId,
+      token_id: "0",
+      approval_id: null,
+      memo: "transfer & call",
+      msg: "keep-it-later",
+    },
     { attachedDeposit: "1", gas: MAX_GAS }
   );
   t.is(
@@ -153,7 +188,7 @@ test("Transfer call slow keep with sender", async (t) => {
     "true"
   );
 
-  let token = await nft.view("nft_token", "0");
+  let token = await nft.view("nft_token", { token_id: "0" });
   t.is(token.owner_id, nftReceiver.accountId);
 });
 
@@ -163,7 +198,13 @@ test("Transfer call receiver panics", async (t) => {
   let res = await nftOwner.callRaw(
     nft,
     "nft_transfer_call",
-    [nftReceiver.accountId, "0", null, "transfer & call", "incorrect message"],
+    {
+      receiver_id: nftReceiver.accountId,
+      token_id: "0",
+      approval_id: null,
+      memo: "transfer & call",
+      msg: "incorrect message",
+    },
     { attachedDeposit: "1", gas: MAX_GAS }
   );
   t.is(
@@ -173,7 +214,7 @@ test("Transfer call receiver panics", async (t) => {
 
   t.is(res.logs.length, 3);
 
-  let token = await nft.view("nft_token", "0");
+  let token = await nft.view("nft_token", { token_id: "0" });
   t.is(token.owner_id, nftOwner.accountId);
 });
 
@@ -183,34 +224,45 @@ test("Transfer call receiver panics and nft_resolve_transfer produces no log if 
   let res = await nftOwner.callRaw(
     nft,
     "nft_transfer_call",
-    [nftReceiver.accountId, "0", null, "transfer & call", "incorrect message"],
+    {
+      receiver_id: nftReceiver.accountId,
+      token_id: "0",
+      approval_id: null,
+      memo: "transfer & call",
+      msg: "incorrect message",
+    },
     { attachedDeposit: "1", gas: 30_000_000_000_000n }
   );
   t.assert(res.result.status.Failure !== undefined);
 
   t.is(res.logs.length, 0);
 
-  let token = await nft.view("nft_token", "0");
+  let token = await nft.view("nft_token", { token_id: "0" });
   t.is(token.owner_id, nftOwner.accountId);
 });
 
 test("Simple transfer no logs on failure", async (t) => {
   const { nft, nftOwner } = t.context.accounts;
 
-  let token = await nft.view("nft_token", "0");
+  let token = await nft.view("nft_token", { token_id: "0" });
   t.is(token.owner_id, nftOwner.accountId);
 
   // transfer to the current owner should fail and not print log
   let res = await nftOwner.callRaw(
     nft,
     "nft_transfer",
-    [nftOwner.accountId, "0", null, "simple transfer"],
+    {
+      receiver_id: nftOwner.accountId,
+      token_id: "0",
+      approval_id: null,
+      memo: "simple transfer",
+    },
     { attachedDeposit: "1" }
   );
   t.assert(res.result.status.Failure !== undefined);
 
   t.is(res.logs.length, 0);
 
-  token = await nft.view("nft_token", "0");
+  token = await nft.view("nft_token", { token_id: "0" });
   t.is(token.owner_id, nftOwner.accountId);
 });

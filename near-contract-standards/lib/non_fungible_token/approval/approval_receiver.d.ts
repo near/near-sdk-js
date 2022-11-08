@@ -16,10 +16,10 @@ export interface NonFungibleTokenApprovalReceiver {
               handle the approval. Can indicate both a function to call and the
               parameters to pass to that function.
     */
-    nft_on_approve([token_id, owner_id, approval_id, msg]: [
-        token_id: TokenId,
-        owner_id: AccountId,
-        approval_id: bigint,
-        msg: string
-    ]): PromiseOrValue<string>;
+    nft_on_approve({ token_id, owner_id, approval_id, msg }: {
+        token_id: TokenId;
+        owner_id: AccountId;
+        approval_id: bigint;
+        msg: string;
+    }): PromiseOrValue<string>;
 }

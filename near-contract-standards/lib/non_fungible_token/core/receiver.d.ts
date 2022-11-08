@@ -19,10 +19,10 @@ export interface NonFungibleTokenReceiver {
      *
      * @returns true if token should be returned to `sender_id`
      */
-    nft_on_transfer([sender_id, previous_owner_id, token_id, msg]: [
-        sender_id: AccountId,
-        previous_owner_id: AccountId,
-        token_id: TokenId,
-        msg: string
-    ]): PromiseOrValue<boolean>;
+    nft_on_transfer({ sender_id, previous_owner_id, token_id, msg }: {
+        sender_id: AccountId;
+        previous_owner_id: AccountId;
+        token_id: TokenId;
+        msg: string;
+    }): PromiseOrValue<boolean>;
 }

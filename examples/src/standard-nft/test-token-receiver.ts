@@ -29,17 +29,26 @@ export class TokenReceiver
   }
 
   @initialize({})
-  init(non_fungible_token_account_id: AccountId) {
+  init({
+    non_fungible_token_account_id,
+  }: {
+    non_fungible_token_account_id: AccountId;
+  }) {
     this.non_fungible_token_account_id = non_fungible_token_account_id;
   }
 
   @call({})
-  nft_on_transfer([sender_id, previous_owner_id, token_id, msg]: [
-    sender_id: string,
-    previous_owner_id: string,
-    token_id: string,
-    msg: string
-  ]): PromiseOrValue<boolean> {
+  nft_on_transfer({
+    sender_id,
+    previous_owner_id,
+    token_id,
+    msg,
+  }: {
+    sender_id: string;
+    previous_owner_id: string;
+    token_id: string;
+    msg: string;
+  }): PromiseOrValue<boolean> {
     assert(
       near.predecessorAccountId() === this.non_fungible_token_account_id,
       "Only supports the one non-fungible token contract"
