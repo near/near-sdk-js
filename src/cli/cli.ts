@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import fs from "fs/promises";
+import fs from "fs";
 import path, { basename, dirname } from "path";
 
 import { nodeResolve } from "@rollup/plugin-node-resolve";
@@ -64,9 +64,11 @@ export async function buildCom(
   }
 
   signale.await(`Creating ${TARGET_DIR} directory...`);
-  await executeCommand(`mkdir -p ${TARGET_DIR}`, verbose);
+  if (!fs.existsSync(TARGET_DIR)) {
+    fs.mkdirSync(TARGET_DIR, {});
+  }
 
-  signal.await(`Validating ${source} contract...`);
+  signal.await(`Validatig ${source} contract...`);
   if (!await validateContract(source, verbose)) {
     process.exit(1);
   }
@@ -160,7 +162,7 @@ async function createMethodsHeaderFile(rollupTarget: string, verbose = false) {
     ""
   );
 
-  await fs.writeFile(`${buildPath}/methods.h`, methods);
+  fs.writeFileSync(`${buildPath}/methods.h`, methods);
 }
 
 async function createWasmContract(
@@ -184,11 +186,9 @@ async function createWasmContract(
   const LIBS = `-lm`;
 
   // copying builder.c file to the build folder
-  await executeCommand(
-    `cp ${ORIGINAL_BUILDER_PATH} ${NEW_BUILDER_PATH}`,
-    verbose
-  );
-  await executeCommand(`mv ${qjscTarget} build/code.h`, verbose);
+  fs.cpSync(ORIGINAL_BUILDER_PATH, NEW_BUILDER_PATH);
+
+  fs.renameSync(qjscTarget, "build/code.h");
 
   await executeCommand(
     `${CC} --target=wasm32-wasi -nostartfiles -Oz -flto ${DEFS} ${INCLUDES} ${SOURCES} ${LIBS} -Wl,--no-entry -Wl,--allow-undefined -Wl,-z,stack-size=${256 * 1024
