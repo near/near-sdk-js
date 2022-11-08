@@ -1,32 +1,31 @@
 {
-    "compilerOptions": {
-        "esModuleInterop": true,
-        "lib": [
-            "es2015",
-            "esnext",
-            "dom"
-        ],
-        "module": "esnext",
-        "target": "es2020",
-        "moduleResolution": "node",
-        "alwaysStrict": true,
-        "outDir": "./lib",
-        "declaration": true,
-        "preserveSymlinks": true,
-        "preserveWatchOutput": true,
-        "pretty": false,
-        "forceConsistentCasingInFileNames": true,
-        "noFallthroughCasesInSwitch": true,
-        "noImplicitAny": false,
-        "noImplicitReturns": true,
-        "noUnusedLocals": true,
-        "experimentalDecorators": true,
-        "resolveJsonModule": true,
-		"allowJs": true,
-    },
-    "files": [
-        "src/index.ts",
-        "src/build-tools/near-bindgen-exporter.js",
-        "src/build-tools/include-bytes.js",
-    ]
+  "compilerOptions": {
+    "esModuleInterop": true,
+    "lib": ["es2015", "esnext", "dom"],
+    "module": "esnext",
+    "target": "es2020",
+    "moduleResolution": "node",
+    "alwaysStrict": true,
+    "outDir": "./lib",
+    "declaration": true,
+    "preserveSymlinks": true,
+    "preserveWatchOutput": true,
+    "pretty": false,
+    "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitAny": false,
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
+    "experimentalDecorators": true,
+    "resolveJsonModule": true,
+    "allowJs": true
+  },
+  "files": [
+    "src/index.ts",
+    "src/build-tools/near-bindgen-exporter.ts",
+    "src/build-tools/include-bytes.ts",
+    "src/cli/cli.ts",
+    "src/cli/post-install.ts"
+  ],
+  "exclude": ["src/cli/**/*"]
 }

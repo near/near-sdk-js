@@ -1,228 +1,545 @@
-import { Bytes } from "./utils";
+import { assert, Bytes, PromiseIndex } from "./utils";
 import * as near from "./api";
 import { Balance, PublicKey, AccountId, Gas, GasWeight } from "./types";
 import { Nonce } from "./types/primitives";
 
+/**
+ * A promise action which can be executed on the NEAR blockchain.
+ */
 export abstract class PromiseAction {
-    abstract add(promise_index: number | bigint): void;
+  /**
+   * The method that describes how a promise action adds it's _action_ to the promise batch with the provided index.
+   *
+   * @param promiseIndex - The index of the promise batch to attach the action to.
+   */
+  abstract add(promiseIndex: PromiseIndex): void;
 }
 
+/**
+ * A create account promise action.
+ *
+ * @extends {PromiseAction}
+ */
 export class CreateAccount extends PromiseAction {
-    add(promise_index: number | bigint) {
-        near.promiseBatchActionCreateAccount(promise_index);
-    }
+  add(promiseIndex: PromiseIndex) {
+    near.promiseBatchActionCreateAccount(promiseIndex);
+  }
 }
 
+/**
+ * A deploy contract promise action.
+ *
+ * @extends {PromiseAction}
+ */
 export class DeployContract extends PromiseAction {
-    constructor(public code: Bytes) { super() }
+  /**
+   * @param code - The code of the contract to be deployed.
+   */
+  constructor(public code: Bytes) {
+    super();
+  }
 
-    add(promise_index: number | bigint) {
-        near.promiseBatchActionDeployContract(promise_index, this.code);
-    }
+  add(promiseIndex: PromiseIndex) {
+    near.promiseBatchActionDeployContract(promiseIndex, this.code);
+  }
 }
 
-export class FunctionCall extends PromiseAction{
-    constructor(public function_name: string, public args: Bytes, public amount: Balance, public gas: Gas) { super() }
+/**
+ * A function call promise action.
+ *
+ * @extends {PromiseAction}
+ */
+export class FunctionCall extends PromiseAction {
+  /**
+   * @param functionName - The name of the function to be called.
+   * @param args - The arguments to be passed to the function.
+   * @param amount - The amount of NEAR to attach to the call.
+   * @param gas - The amount of Gas to attach to the call.
+   */
+  constructor(
+    public functionName: string,
+    public args: Bytes,
+    public amount: Balance,
+    public gas: Gas
+  ) {
+    super();
+  }
 
-    add(promise_index: number | bigint) {
-        near.promiseBatchActionFunctionCall(promise_index, this.function_name, this.args, this.amount, this.gas);
-    }
+  add(promiseIndex: PromiseIndex) {
+    near.promiseBatchActionFunctionCall(
+      promiseIndex,
+      this.functionName,
+      this.args,
+      this.amount,
+      this.gas
+    );
+  }
 }
 
+/**
+ * A function call weight promise action.
+ *
+ * @extends {PromiseAction}
+ */
 export class FunctionCallWeight extends PromiseAction {
-    constructor(public function_name: string, public args: Bytes, public amount: Balance, public gas: Gas, public weight: GasWeight) { super() }
-    
-    add(promise_index: number | bigint) {
-        near.promiseBatchActionFunctionCallWeight(promise_index, this.function_name, this.args, this.amount, this.gas, this.weight);
-    }
+  /**
+   * @param functionName - The name of the function to be called.
+   * @param args - The arguments to be passed to the function.
+   * @param amount - The amount of NEAR to attach to the call.
+   * @param gas - The amount of Gas to attach to the call.
+   * @param weight - The weight of unused Gas to use.
+   */
+  constructor(
+    public functionName: string,
+    public args: Bytes,
+    public amount: Balance,
+    public gas: Gas,
+    public weight: GasWeight
+  ) {
+    super();
+  }
+
+  add(promiseIndex: PromiseIndex) {
+    near.promiseBatchActionFunctionCallWeight(
+      promiseIndex,
+      this.functionName,
+      this.args,
+      this.amount,
+      this.gas,
+      this.weight
+    );
+  }
 }
 
+/**
+ * A transfer promise action.
+ *
+ * @extends {PromiseAction}
+ */
 export class Transfer extends PromiseAction {
-    constructor(public amount: Balance) { super() }
+  /**
+   * @param amount - The amount of NEAR to tranfer.
+   */
+  constructor(public amount: Balance) {
+    super();
+  }
 
-    add(promise_index: number | bigint) {
-        near.promiseBatchActionTransfer(promise_index, this.amount);
-    }
+  add(promiseIndex: PromiseIndex) {
+    near.promiseBatchActionTransfer(promiseIndex, this.amount);
+  }
 }
 
+/**
+ * A stake promise action.
+ *
+ * @extends {PromiseAction}
+ */
 export class Stake extends PromiseAction {
-    constructor(public amount: Balance, public public_key: PublicKey) { super() }
+  /**
+   * @param amount - The amount of NEAR to tranfer.
+   * @param publicKey - The public key to use for staking.
+   */
+  constructor(public amount: Balance, public publicKey: PublicKey) {
+    super();
+  }
 
-    add(promise_index: number | bigint) {
-        near.promiseBatchActionStake(promise_index, this.amount, this.public_key.data);
-    }
+  add(promiseIndex: PromiseIndex) {
+    near.promiseBatchActionStake(
+      promiseIndex,
+      this.amount,
+      this.publicKey.data
+    );
+  }
 }
 
+/**
+ * A add full access key promise action.
+ *
+ * @extends {PromiseAction}
+ */
 export class AddFullAccessKey extends PromiseAction {
-    constructor(public public_key: PublicKey, public nonce: Nonce) { super() }
+  /**
+   * @param publicKey - The public key to add as a full access key.
+   * @param nonce - The nonce to use.
+   */
+  constructor(public publicKey: PublicKey, public nonce: Nonce) {
+    super();
+  }
 
-    add(promise_index: number | bigint) {
-        near.promiseBatchActionAddKeyWithFullAccess(promise_index, this.public_key.data, this.nonce);
-    }
+  add(promiseIndex: PromiseIndex) {
+    near.promiseBatchActionAddKeyWithFullAccess(
+      promiseIndex,
+      this.publicKey.data,
+      this.nonce
+    );
+  }
 }
 
+/**
+ * A add access key promise action.
+ *
+ * @extends {PromiseAction}
+ */
 export class AddAccessKey extends PromiseAction {
-    constructor(public public_key: PublicKey, public allowance: Balance, public receiver_id: AccountId, public function_names: string, public nonce: Nonce) { super() }
+  /**
+   * @param publicKey - The public key to add as a access key.
+   * @param allowance - The allowance for the key in yoctoNEAR.
+   * @param receiverId - The account ID of the reciever.
+   * @param functionNames - The names of funcitons to authorize.
+   * @param nonce - The nonce to use.
+   */
+  constructor(
+    public publicKey: PublicKey,
+    public allowance: Balance,
+    public receiverId: AccountId,
+    public functionNames: string,
+    public nonce: Nonce
+  ) {
+    super();
+  }
 
-    add(promise_index: number | bigint) {
-        near.promiseBatchActionAddKeyWithFunctionCall(promise_index, this.public_key.data, this.nonce, this.allowance, this.receiver_id, this.function_names);
-    }
+  add(promiseIndex: PromiseIndex) {
+    near.promiseBatchActionAddKeyWithFunctionCall(
+      promiseIndex,
+      this.publicKey.data,
+      this.nonce,
+      this.allowance,
+      this.receiverId,
+      this.functionNames
+    );
+  }
 }
 
+/**
+ * A delete key promise action.
+ *
+ * @extends {PromiseAction}
+ */
 export class DeleteKey extends PromiseAction {
-    constructor(public public_key: PublicKey) { super() }
+  /**
+   * @param publicKey - The public key to delete from the account.
+   */
+  constructor(public publicKey: PublicKey) {
+    super();
+  }
 
-    add(promise_index: number | bigint) {
-        near.promiseBatchActionDeleteKey(promise_index, this.public_key.data);
-    }
+  add(promiseIndex: PromiseIndex) {
+    near.promiseBatchActionDeleteKey(promiseIndex, this.publicKey.data);
+  }
 }
-
+/**
+ * A delete account promise action.
+ *
+ * @extends {PromiseAction}
+ */
 export class DeleteAccount extends PromiseAction {
-    constructor(public beneficiary_id: AccountId) { super() }
+  /**
+   * @param beneficiaryId - The beneficiary of the account deletion - the account to recieve all of the remaining funds of the deleted account.
+   */
+  constructor(public beneficiaryId: AccountId) {
+    super();
+  }
 
-    add(promise_index: number | bigint) {
-        near.promiseBatchActionDeleteAccount(promise_index, this.beneficiary_id);
-    }
+  add(promiseIndex: PromiseIndex) {
+    near.promiseBatchActionDeleteAccount(promiseIndex, this.beneficiaryId);
+  }
 }
 
 class PromiseSingle {
-    constructor(public account_id: AccountId, public actions: PromiseAction[], public after: NearPromise | null, public promise_index: number | bigint | null) { }
+  constructor(
+    public accountId: AccountId,
+    public actions: PromiseAction[],
+    public after: NearPromise | null,
+    public promiseIndex: PromiseIndex | null
+  ) {}
 
-    constructRecursively(): number | bigint {
-        if (this.promise_index !== null) {
-            return this.promise_index;
-        }
-        let promise_index;
-        if (this.after) {
-            promise_index = near.promiseBatchThen(this.after.constructRecursively(), this.account_id)
-        } else {
-            promise_index = near.promiseBatchCreate(this.account_id);
-        }
-        for (let action of this.actions) {
-            action.add(promise_index);
-        }
-        this.promise_index = promise_index;
-        return promise_index
+  constructRecursively(): PromiseIndex {
+    if (this.promiseIndex !== null) {
+      return this.promiseIndex;
     }
+
+    const promiseIndex = this.after
+      ? near.promiseBatchThen(this.after.constructRecursively(), this.accountId)
+      : near.promiseBatchCreate(this.accountId);
+
+    this.actions.forEach((action) => action.add(promiseIndex));
+
+    this.promiseIndex = promiseIndex;
+
+    return promiseIndex;
+  }
 }
 
 export class PromiseJoint {
-    constructor(public promise_a: NearPromise, public promise_b: NearPromise, public promise_index: number | bigint | null) { }
+  constructor(
+    public promiseA: NearPromise,
+    public promiseB: NearPromise,
+    public promiseIndex: PromiseIndex | null
+  ) {}
 
-    constructRecursively(): number | bigint {
-        if (this.promise_index !== null) {
-            return this.promise_index;
-        }
-        let res = near.promiseAnd(BigInt(this.promise_a.constructRecursively()), BigInt(this.promise_b.constructRecursively()));
-        this.promise_index = res
-        return res
+  constructRecursively(): PromiseIndex {
+    if (this.promiseIndex !== null) {
+      return this.promiseIndex;
     }
+
+    const result = near.promiseAnd(
+      this.promiseA.constructRecursively(),
+      this.promiseB.constructRecursively()
+    );
+    this.promiseIndex = result;
+
+    return result;
+  }
 }
 
 type PromiseSubtype = PromiseSingle | PromiseJoint;
 
+/**
+ * A high level class to construct and work with NEAR promises.
+ */
 export class NearPromise {
-    constructor(private subtype: PromiseSubtype, private should_return: boolean) { }
+  /**
+   * @param subtype - The subtype of the promise.
+   * @param shouldReturn - Whether the promise should return.
+   */
+  constructor(private subtype: PromiseSubtype, private shouldReturn: boolean) {}
 
-    static new(account_id: AccountId): NearPromise {
-        let subtype = new PromiseSingle(account_id, [], null, null);
-        let ret =  new NearPromise(subtype, false); 
-        return ret;
+  /**
+   * Creates a new promise to the provided account ID.
+   *
+   * @param accountId - The account ID on which to call the promise.
+   */
+  static new(accountId: AccountId): NearPromise {
+    const subtype = new PromiseSingle(accountId, [], null, null);
+    return new NearPromise(subtype, false);
+  }
+
+  private addAction(action: PromiseAction): NearPromise {
+    if (this.subtype instanceof PromiseJoint) {
+      throw new Error("Cannot add action to a joint promise.");
     }
 
-    private add_action(action: PromiseAction): NearPromise{
-        if (this.subtype instanceof PromiseJoint) {
-            throw new Error("Cannot add action to a joint promise.")
-        } else {
-            this.subtype.actions.push(action);
-        }
-        return this;
+    this.subtype.actions.push(action);
+
+    return this;
+  }
+
+  /**
+   * Creates a create account promise action and adds it to the current promise.
+   */
+  createAccount(): NearPromise {
+    return this.addAction(new CreateAccount());
+  }
+
+  /**
+   * Creates a deploy contract promise action and adds it to the current promise.
+   *
+   * @param code - The code of the contract to be deployed.
+   */
+  deployContract(code: Bytes): NearPromise {
+    return this.addAction(new DeployContract(code));
+  }
+
+  /**
+   * Creates a function call promise action and adds it to the current promise.
+   *
+   * @param functionName - The name of the function to be called.
+   * @param args - The arguments to be passed to the function.
+   * @param amount - The amount of NEAR to attach to the call.
+   * @param gas - The amount of Gas to attach to the call.
+   */
+  functionCall(
+    functionName: string,
+    args: Bytes,
+    amount: Balance,
+    gas: Gas
+  ): NearPromise {
+    return this.addAction(new FunctionCall(functionName, args, amount, gas));
+  }
+
+  /**
+   * Creates a function call weight promise action and adds it to the current promise.
+   *
+   * @param functionName - The name of the function to be called.
+   * @param args - The arguments to be passed to the function.
+   * @param amount - The amount of NEAR to attach to the call.
+   * @param gas - The amount of Gas to attach to the call.
+   * @param weight - The weight of unused Gas to use.
+   */
+  functionCallWeight(
+    functionName: string,
+    args: Bytes,
+    amount: Balance,
+    gas: Gas,
+    weight: GasWeight
+  ): NearPromise {
+    return this.addAction(
+      new FunctionCallWeight(functionName, args, amount, gas, weight)
+    );
+  }
+
+  /**
+   * Creates a transfer promise action and adds it to the current promise.
+   *
+   * @param amount - The amount of NEAR to tranfer.
+   */
+  transfer(amount: Balance): NearPromise {
+    return this.addAction(new Transfer(amount));
+  }
+
+  /**
+   * Creates a stake promise action and adds it to the current promise.
+   *
+   * @param amount - The amount of NEAR to tranfer.
+   * @param publicKey - The public key to use for staking.
+   */
+  stake(amount: Balance, publicKey: PublicKey): NearPromise {
+    return this.addAction(new Stake(amount, publicKey));
+  }
+
+  /**
+   * Creates a add full access key promise action and adds it to the current promise.
+   * Uses 0n as the nonce.
+   *
+   * @param publicKey - The public key to add as a full access key.
+   */
+  addFullAccessKey(publicKey: PublicKey): NearPromise {
+    return this.addFullAccessKeyWithNonce(publicKey, 0n);
+  }
+
+  /**
+   * Creates a add full access key promise action and adds it to the current promise.
+   * Allows you to specify the nonce.
+   *
+   * @param publicKey - The public key to add as a full access key.
+   * @param nonce - The nonce to use.
+   */
+  addFullAccessKeyWithNonce(publicKey: PublicKey, nonce: Nonce): NearPromise {
+    return this.addAction(new AddFullAccessKey(publicKey, nonce));
+  }
+
+  /**
+   * Creates a add access key promise action and adds it to the current promise.
+   * Uses 0n as the nonce.
+   *
+   * @param publicKey - The public key to add as a access key.
+   * @param allowance - The allowance for the key in yoctoNEAR.
+   * @param receiverId - The account ID of the reciever.
+   * @param functionNames - The names of funcitons to authorize.
+   */
+  addAccessKey(
+    publicKey: PublicKey,
+    allowance: Balance,
+    receiverId: AccountId,
+    functionNames: string
+  ): NearPromise {
+    return this.addAccessKeyWithNonce(
+      publicKey,
+      allowance,
+      receiverId,
+      functionNames,
+      0n
+    );
+  }
+
+  /**
+   * Creates a add access key promise action and adds it to the current promise.
+   * Allows you to specify the nonce.
+   *
+   * @param publicKey - The public key to add as a access key.
+   * @param allowance - The allowance for the key in yoctoNEAR.
+   * @param receiverId - The account ID of the reciever.
+   * @param functionNames - The names of funcitons to authorize.
+   * @param nonce - The nonce to use.
+   */
+  addAccessKeyWithNonce(
+    publicKey: PublicKey,
+    allowance: Balance,
+    receiverId: AccountId,
+    functionNames: string,
+    nonce: Nonce
+  ): NearPromise {
+    return this.addAction(
+      new AddAccessKey(publicKey, allowance, receiverId, functionNames, nonce)
+    );
+  }
+
+  /**
+   * Creates a delete key promise action and adds it to the current promise.
+   *
+   * @param publicKey - The public key to delete from the account.
+   */
+  deleteKey(publicKey: PublicKey): NearPromise {
+    return this.addAction(new DeleteKey(publicKey));
+  }
+
+  /**
+   * Creates a delete account promise action and adds it to the current promise.
+   *
+   * @param beneficiaryId - The beneficiary of the account deletion - the account to recieve all of the remaining funds of the deleted account.
+   */
+  deleteAccount(beneficiaryId: AccountId): NearPromise {
+    return this.addAction(new DeleteAccount(beneficiaryId));
+  }
+
+  /**
+   * Joins the provided promise with the current promise, making the current promise a joint promise subtype.
+   *
+   * @param other - The promise to join with the current promise.
+   */
+  and(other: NearPromise): NearPromise {
+    const subtype = new PromiseJoint(this, other, null);
+    return new NearPromise(subtype, false);
+  }
+
+  /**
+   * Adds a callback to the current promise.
+   *
+   * @param other - The promise to be executed as the promise.
+   */
+  then(other: NearPromise): NearPromise {
+    assert(
+      other.subtype instanceof PromiseSingle,
+      "Cannot callback joint promise."
+    );
+
+    assert(
+      other.subtype.after === null,
+      "Cannot callback promise which is already scheduled after another"
+    );
+
+    other.subtype.after = this;
+
+    return other;
+  }
+
+  /**
+   * Sets the shouldReturn field to true.
+   */
+  asReturn(): NearPromise {
+    this.shouldReturn = true;
+    return this;
+  }
+
+  /**
+   * Recursively goes through the current promise to get the promise index.
+   */
+  constructRecursively(): PromiseIndex {
+    const result = this.subtype.constructRecursively();
+
+    if (this.shouldReturn) {
+      near.promiseReturn(result);
     }
 
-    createAccount(): NearPromise {
-        return this.add_action(new CreateAccount());
-    }
+    return result;
+  }
 
-    deployContract(code: Bytes): NearPromise {
-        return this.add_action(new DeployContract(code));
-    }
-
-    functionCall(function_name: string, args: Bytes, amount: Balance, gas: Gas): NearPromise {
-        return this.add_action(new FunctionCall(function_name, args, amount, gas));
-    }
-
-    functionCallWeight(function_name: string, args: Bytes, amount: Balance, gas: Gas, weight: GasWeight): NearPromise {
-        return this.add_action(new FunctionCallWeight(function_name, args, amount, gas, weight));
-    }
-
-    transfer(amount: Balance): NearPromise {
-        return this.add_action(new Transfer(amount));
-    }
-
-    stake(amount: Balance, public_key: PublicKey): NearPromise {
-        return this.add_action(new Stake(amount, public_key));
-    }
-
-    addFullAccessKey(public_key: PublicKey): NearPromise {
-        return this.addFullAccessKeyWithNonce(public_key, 0n)
-    }
-
-    addFullAccessKeyWithNonce(public_key: PublicKey, nonce: Nonce): NearPromise {
-        return this.add_action(new AddFullAccessKey(public_key, nonce));
-    }
-
-    addAccessKey(public_key: PublicKey, allowance: Balance, receiver_id: AccountId, method_names: string): NearPromise {
-        return this.addAccessKeyWithNonce(public_key, allowance, receiver_id, method_names, 0n)
-    }
-
-    addAccessKeyWithNonce(public_key: PublicKey, allowance: Balance, receiver_id: AccountId, method_names: string, nonce: Nonce): NearPromise {
-        return this.add_action(new AddAccessKey(public_key, allowance, receiver_id, method_names, nonce));
-    }
-
-    deleteKey(public_key: PublicKey): NearPromise {
-        return this.add_action(new DeleteKey(public_key));
-    }
-
-    deleteAccount(beneficiary_id: AccountId): NearPromise {
-        return this.add_action(new DeleteAccount(beneficiary_id));
-    }
-
-    and(other: NearPromise): NearPromise {
-        let subtype = new PromiseJoint(this, other, null);
-        let ret = new NearPromise(subtype, false);
-        return ret;
-    }
-
-    then(other: NearPromise): NearPromise {
-        if (other.subtype instanceof PromiseSingle) {
-            if (other.subtype.after !== null) {
-                throw new Error("Cannot callback promise which is already scheduled after another");
-            }
-            other.subtype.after = this;
-        } else {
-            throw new Error("Cannot callback joint promise.")
-        }
-        return other;
-    }
-
-    asReturn(): NearPromise {
-        this.should_return = true;
-        return this;
-    }
-
-    constructRecursively(): number | bigint {
-        let res = this.subtype.constructRecursively();
-        if (this.should_return) {
-            near.promiseReturn(res);
-        }
-        return res;
-    }
-
-    // Called by NearBindgen, when return object is a NearPromise instance.
-    onReturn() {
-        this.asReturn().constructRecursively();
-    }
+  /**
+   * Called by NearBindgen, when return object is a NearPromise instance.
+   */
+  onReturn() {
+    this.asReturn().constructRecursively();
+  }
 }
 
 export type PromiseOrValue<T> = NearPromise | T;
-
