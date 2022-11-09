@@ -9,9 +9,11 @@ import {
   UnorderedSet,
 } from "./collections";
 
-import { bytes, Bytes, assert, validateAccountId } from "./utils";
+import { bytes, Bytes, assert, validateAccountId, serialize } from "./utils";
 
 import { NearPromise, PromiseOrValue } from "./promise";
+
+import { AccountId } from "./types";
 
 export {
   call,
@@ -28,6 +30,8 @@ export {
   Bytes,
   assert,
   validateAccountId,
+  serialize,
   NearPromise,
   PromiseOrValue,
+  AccountId,
 };

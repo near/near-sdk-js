@@ -1,5 +1,4 @@
-import { Bytes } from "near-sdk-js";
-import { assert } from "near-sdk-js";
+import { assert, Bytes } from "near-sdk-js";
 import { Option } from "./utils";
 
 /** This spec can be treated like a version of the standard. */

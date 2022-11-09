@@ -1,4 +1,4 @@
-import { AccountId } from "../../../../lib/types";
+import { AccountId } from "near-sdk-js";
 import { TokenId } from "../token";
 import { Option } from "../utils";
 /** Used when an NFT is transferred using `nft_transfer_call`. This is the method that's called after `nft_on_transfer`. This interface is implemented on the NFT contract. */
@@ -29,7 +29,7 @@ export interface NonFungibleTokenResolver {
      *
      * @returns true if token was successfully transferred to `receiver_id`.
      */
-    nft_resolve_transfer({ previous_owner_id, receiver_id, token_id, approved_account_ids }: {
+    nft_resolve_transfer({ previous_owner_id, receiver_id, token_id, approved_account_ids, }: {
         previous_owner_id: AccountId;
         receiver_id: AccountId;
         token_id: TokenId;

@@ -1,5 +1,4 @@
-import { PromiseOrValue } from "near-sdk-js/lib";
-import { AccountId } from "near-sdk-js/lib/types";
+import { AccountId, PromiseOrValue } from "near-sdk-js";
 import { TokenId } from "../token";
 /** Approval receiver is the interface for the method called (or attempted to be called) when an NFT contract adds an approval for an account. */
 export interface NonFungibleTokenApprovalReceiver {
@@ -16,7 +15,7 @@ export interface NonFungibleTokenApprovalReceiver {
               handle the approval. Can indicate both a function to call and the
               parameters to pass to that function.
     */
-    nft_on_approve({ token_id, owner_id, approval_id, msg }: {
+    nft_on_approve({ token_id, owner_id, approval_id, msg, }: {
         token_id: TokenId;
         owner_id: AccountId;
         approval_id: bigint;

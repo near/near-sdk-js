@@ -1,5 +1,4 @@
-import { UnorderedMap, LookupMap, near, UnorderedSet, assert, NearPromise, bytes, } from "near-sdk-js/lib";
-import { serialize } from "near-sdk-js/lib/utils";
+import { UnorderedMap, LookupMap, near, UnorderedSet, assert, NearPromise, bytes, serialize } from "near-sdk-js";
 import { TokenMetadata } from "./metadata";
 import { refund_approved_account_ids, refund_deposit, refund_deposit_to_account, assert_at_least_one_yocto, bytes_for_approved_account_id, assert_one_yocto, refund_approved_account_ids_iter, } from "./utils";
 import { NftMint, NftTransfer } from "./events";
@@ -54,7 +53,7 @@ export class NonFungibleToken {
         });
         return new Token(token_id, owner_id, metadata, approved_account_ids);
     }
-    nft_tokens({ from_index, limit }) {
+    nft_tokens({ from_index, limit, }) {
         const start_index = from_index === null ? 0 : from_index;
         assert(this.owner_by_id.length >= start_index, "Out of bounds, please use a smaller from_index.");
         let l = limit === null ? 2 ** 32 : limit;
@@ -76,7 +75,7 @@ export class NonFungibleToken {
         });
         return account_tokens === null ? 0 : account_tokens.length;
     }
-    nft_tokens_for_owner({ account_id, from_index, limit }) {
+    nft_tokens_for_owner({ account_id, from_index, limit, }) {
         const tokens_per_owner = this.tokens_per_owner;
         assert(tokens_per_owner !== null, "Could not find tokens_per_owner when calling a method on the enumeration standard.");
         const token_set = tokens_per_owner.get(account_id, {
@@ -96,7 +95,7 @@ export class NonFungibleToken {
         }
         return ret;
     }
-    nft_approve({ token_id, account_id, msg }) {
+    nft_approve({ token_id, account_id, msg, }) {
         assert_at_least_one_yocto();
         if (this.approvals_by_id === null) {
             throw new Error("NFT does not support Approval Management");
@@ -118,7 +117,7 @@ export class NonFungibleToken {
         }
         return null;
     }
-    nft_revoke({ token_id, account_id }) {
+    nft_revoke({ token_id, account_id, }) {
         assert_one_yocto();
         if (this.approvals_by_id === null) {
             throw new Error("NFT does not support Approval Management");
@@ -154,7 +153,7 @@ export class NonFungibleToken {
             approvals_by_id.remove(token_id);
         }
     }
-    nft_is_approved({ token_id, approved_account_id, approval_id }) {
+    nft_is_approved({ token_id, approved_account_id, approval_id, }) {
         expect_token_found(this.owner_by_id.get(token_id));
         if (this.approvals_by_id === null) {
             return false;
@@ -349,12 +348,12 @@ export class NonFungibleToken {
         }
         return new Token(token_id, owner_id, token_metadata, approved_account_ids);
     }
-    nft_transfer({ receiver_id, token_id, approval_id, memo }) {
+    nft_transfer({ receiver_id, token_id, approval_id, memo, }) {
         assert_at_least_one_yocto();
         const sender_id = near.predecessorAccountId();
         this.internal_transfer(sender_id, receiver_id, token_id, approval_id, memo);
     }
-    nft_transfer_call({ receiver_id, token_id, approval_id, memo, msg }) {
+    nft_transfer_call({ receiver_id, token_id, approval_id, memo, msg, }) {
         assert_at_least_one_yocto();
         assert(near.prepaidGas() > GAS_FOR_NFT_TRANSFER_CALL, "Not enough prepaid gas");
         const sender_id = near.predecessorAccountId();
