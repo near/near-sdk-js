@@ -8,7 +8,7 @@ import {
   assert,
   NearPromise,
   bytes,
-  serialize
+  serialize,
 } from "near-sdk-js";
 import { TokenMetadata } from "./metadata";
 import {
