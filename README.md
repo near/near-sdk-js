@@ -545,3 +545,18 @@ PublicKey.fromString('secp256k1:5r22SrjrDvgY3wdQsnjgxkeAbU1VcM71FYvALEQWihjM3Xk4
 ```
 
 Once a PublicKey object is created, it can be used in high level promise APIs that takes a public key, such as `addFullAccessKey`, `addAccessKey` and `stake`.
+
+
+## How to use NEAR SDK JS on Windows
+You can develop smart contracts on Windows using Windows Subsystem for Linux (WSL2).
+In order to use WSL2, follow the next steps:
+- Run `PowerShell` as Administrator
+- Execute `wsl --install` to install Ubuntu and do additional setup automatically. Check more details [here](https://learn.microsoft.com/en-us/windows/wsl/install)
+- Restart your machine
+- `WSL2` will continue setup process on start. Setup your username and password when prompted.
+- Check [this](https://learn.microsoft.com/en-us/windows/dev-environment/javascript/nodejs-on-wsl) guide to setup `npm`, `node`, `npx`, `VSCode` and other tools of your choice in order to start developing.
+
+In case of any issues of setting up WSL2:
+- Make sure your Windows OS is up to date
+- Virtualisation is turned on in BIOS
+- `Windows Subsystem for Linux` and `Virtual Machine Platform` are turned on in `Windows Features` (Start -> Search -> Turn Windows Feature On or Off)
