@@ -20,10 +20,18 @@ test.before(async (t) => {
   // Test users
   const ali = await root.createSubAccount("ali");
   const bob = await root.createSubAccount("bob");
+  const carl = await root.createSubAccount("carl");
 
   // Save state for test runs
   t.context.worker = worker;
-  t.context.accounts = { root, highlevelPromise, ali, bob, calleeContract };
+  t.context.accounts = {
+    root,
+    highlevelPromise,
+    ali,
+    bob,
+    carl,
+    calleeContract,
+  };
 });
 
 test.after.always(async (t) => {
@@ -106,9 +114,9 @@ test("cross contract call panic", async (t) => {
   );
 });
 
-test.only("before and after cross contract call panic", async (t) => {
-  const { ali, highlevelPromise } = t.context.accounts;
-  let r = await ali.callRaw(
+test("before and after cross contract call panic", async (t) => {
+  const { carl, highlevelPromise } = t.context.accounts;
+  let r = await carl.callRaw(
     highlevelPromise,
     "before_and_after_callee_panic",
     "",
@@ -125,9 +133,9 @@ test.only("before and after cross contract call panic", async (t) => {
   t.deepEqual(r.result.transaction_outcome.outcome.logs, []);
 });
 
-test.only("cross contract call panic then callback another contract method", async (t) => {
-  const { ali, highlevelPromise } = t.context.accounts;
-  let r = await ali.callRaw(highlevelPromise, "callee_panic_then", "", {
+test("cross contract call panic then callback another contract method", async (t) => {
+  const { carl, highlevelPromise } = t.context.accounts;
+  let r = await carl.callRaw(highlevelPromise, "callee_panic_then", "", {
     gas: "70 Tgas",
   });
   // promise then will continue, even though the promise before promise.then failed
@@ -136,9 +144,9 @@ test.only("cross contract call panic then callback another contract method", asy
   t.is(state.length, 4);
 });
 
-test.only("cross contract call panic and cross contract call success then callback another contract method", async (t) => {
-  const { ali, highlevelPromise, calleeContract } = t.context.accounts;
-  let r = await ali.callRaw(highlevelPromise, "callee_panic_and", "", {
+test("cross contract call panic and cross contract call success then callback another contract method", async (t) => {
+  const { carl, highlevelPromise, calleeContract } = t.context.accounts;
+  let r = await carl.callRaw(highlevelPromise, "callee_panic_and", "", {
     gas: "100 Tgas",
   });
   // promise `and` promise `then` continues, even though one of two promise and was failed. Entire transaction also success
@@ -149,11 +157,16 @@ test.only("cross contract call panic and cross contract call success then callba
   t.is(state.length, 4);
 });
 
-test.only("cross contract call success then call a panic method", async (t) => {
-  const { ali, highlevelPromise, calleeContract } = t.context.accounts;
-  let r = await ali.callRaw(highlevelPromise, "callee_success_then_panic", "", {
-    gas: "100 Tgas",
-  });
+test("cross contract call success then call a panic method", async (t) => {
+  const { carl, highlevelPromise, calleeContract } = t.context.accounts;
+  let r = await carl.callRaw(
+    highlevelPromise,
+    "callee_success_then_panic",
+    "",
+    {
+      gas: "100 Tgas",
+    }
+  );
   // the last promise fail, cause the transaction fail
   t.assert(
     r.result.status.Failure.ActionError.kind.FunctionCallError.ExecutionError.includes(
@@ -163,6 +176,40 @@ test.only("cross contract call success then call a panic method", async (t) => {
   // but the first success cross contract call won't revert, the state is persisted
   let state = await calleeContract.viewStateRaw();
   t.is(state.length, 3);
+});
+
+test("handling error in promise then", async (t) => {
+  const { carl, highlevelPromise } = t.context.accounts;
+  let r = await carl.callRaw(
+    highlevelPromise,
+    "handle_error_in_promise_then",
+    "",
+    {
+      gas: "70 Tgas",
+    }
+  );
+  t.assert(
+    r.result.status.Failure.ActionError.kind.FunctionCallError.ExecutionError.includes(
+      "caught error in the callback: "
+    )
+  );
+});
+
+test("handling error in promise then after promise and", async (t) => {
+  const { carl, highlevelPromise } = t.context.accounts;
+  let r = await carl.callRaw(
+    highlevelPromise,
+    "handle_error_in_promise_then_after_promise_and",
+    "",
+    {
+      gas: "100 Tgas",
+    }
+  );
+  t.assert(
+    r.result.status.Failure.ActionError.kind.FunctionCallError.ExecutionError.includes(
+      "caught error in the callback: "
+    )
+  );
 });
 
 test("highlevel promise then", async (t) => {
