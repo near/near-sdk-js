@@ -1,5 +1,4 @@
-import { near, assert, Bytes } from "near-sdk-js";
-import { AccountId } from "near-sdk-js/lib/types";
+import { near, assert, Bytes, AccountId } from "near-sdk-js";
 
 export function bytes_for_approved_account_id(account_id: AccountId): number {
   // The extra 4 bytes are coming from Borsh serialization to store the length of the string.

@@ -1,5 +1,4 @@
-import { PromiseOrValue } from "near-sdk-js/lib";
-import { AccountId } from "near-sdk-js/lib/types";
+import { AccountId, PromiseOrValue } from "near-sdk-js";
 import { TokenId } from "../token";
 /** Used when an NFT is transferred using `nft_transfer_call`. This interface is implemented on the receiving contract, not on the NFT contract. */
 export interface NonFungibleTokenReceiver {
@@ -19,7 +18,7 @@ export interface NonFungibleTokenReceiver {
      *
      * @returns true if token should be returned to `sender_id`
      */
-    nft_on_transfer({ sender_id, previous_owner_id, token_id, msg }: {
+    nft_on_transfer({ sender_id, previous_owner_id, token_id, msg, }: {
         sender_id: AccountId;
         previous_owner_id: AccountId;
         token_id: TokenId;

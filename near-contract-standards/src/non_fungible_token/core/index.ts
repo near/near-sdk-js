@@ -1,4 +1,4 @@
-import { AccountId } from "near-sdk-js/lib/types";
+import { AccountId } from "near-sdk-js";
 import { Token, TokenId } from "../token";
 import { Option } from "../utils";
 

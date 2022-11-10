@@ -1,5 +1,4 @@
-import { Bytes } from "near-sdk-js";
-import { AccountId } from "near-sdk-js/lib/types";
+import { Bytes, AccountId } from "near-sdk-js";
 export declare function bytes_for_approved_account_id(account_id: AccountId): number;
 export declare function refund_approved_account_ids_iter(account_id: AccountId, approved_account_ids: AccountId[]): void;
 export declare function refund_approved_account_ids(account_id: AccountId, approved_account_ids: {

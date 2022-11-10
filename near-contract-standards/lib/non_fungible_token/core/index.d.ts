@@ -1,4 +1,4 @@
-import { AccountId } from "near-sdk-js/lib/types";
+import { AccountId } from "near-sdk-js";
 import { Token, TokenId } from "../token";
 import { Option } from "../utils";
 /** Used for all non-fungible tokens. The specification for the
@@ -32,7 +32,7 @@ export interface NonFungibleTokenCore {
      * @param memo (optional) - For use cases that may benefit from indexing or
      *        providing information for a transfer
      */
-    nft_transfer({ receiver_id, token_id, approval_id, memo }: {
+    nft_transfer({ receiver_id, token_id, approval_id, memo, }: {
         receiver_id: AccountId;
         token_id: TokenId;
         approval_id: Option<bigint>;
@@ -71,7 +71,7 @@ export interface NonFungibleTokenCore {
      *        order to properly handle the transfer. Can indicate both a function to
      *        call and the parameters to pass to that function.
      */
-    nft_transfer_call({ receiver_id, token_id, approval_id, memo }: {
+    nft_transfer_call({ receiver_id, token_id, approval_id, memo, }: {
         receiver_id: AccountId;
         token_id: TokenId;
         approval_id: Option<bigint>;
