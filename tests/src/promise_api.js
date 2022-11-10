@@ -4,6 +4,17 @@ function arrayN(n) {
   return [...Array(Number(n)).keys()];
 }
 
+export function just_panic() {
+  throw new Error("it just panic");
+}
+
+export function write_some_state() {
+  // Attempt to write something in state. If this one is successfully executed and not revoked, these should be in state
+  near.storageWrite("aaa", "bbb");
+  near.storageWrite("ccc", "ddd");
+  near.storageWrite("eee", "fff");
+}
+
 function callingData() {
   return {
     currentAccountId: near.currentAccountId(),

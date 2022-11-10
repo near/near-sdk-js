@@ -116,6 +116,7 @@ export class HighlevelPromiseContract {
 
   @call({})
   cross_contract_callback({ callbackArg1 }) {
+    near.log("in callback");
     return {
       ...callingData(),
       promiseResults: arrayN(near.promiseResultsCount()).map((i) =>
@@ -123,5 +124,153 @@ export class HighlevelPromiseContract {
       ),
       callbackArg1,
     };
+  }
+
+  @call({})
+  cross_contract_callback_write_state() {
+    // Attempt to write something in state. If this one is successfully executed and not revoked, these should be in state
+    near.storageWrite("aaa", "bbb");
+    near.storageWrite("ccc", "ddd");
+    near.storageWrite("eee", "fff");
+  }
+
+  @call({})
+  callee_panic() {
+    let promise = NearPromise.new("callee-contract.test.near").functionCall(
+      "just_panic",
+      bytes(""),
+      0,
+      2 * Math.pow(10, 13)
+    );
+    return promise;
+  }
+
+  @call({})
+  before_and_after_callee_panic() {
+    near.log("log before call the callee");
+    let promise = NearPromise.new("callee-contract.test.near").functionCall(
+      "just_panic",
+      bytes(""),
+      0,
+      2 * Math.pow(10, 13)
+    );
+    near.log("log after call the callee");
+    return promise;
+  }
+
+  @call({})
+  callee_panic_then() {
+    let promise = NearPromise.new("callee-contract.test.near")
+      .functionCall("just_panic", bytes(""), 0, 2 * Math.pow(10, 13))
+      .then(
+        NearPromise.new("highlevel-promise.test.near").functionCall(
+          "cross_contract_callback_write_state",
+          bytes(""),
+          0,
+          2 * Math.pow(10, 13)
+        )
+      );
+    return promise;
+  }
+
+  @call({})
+  callee_panic_and() {
+    let promise = NearPromise.new("callee-contract.test.near").functionCall(
+      "just_panic",
+      bytes(""),
+      0,
+      2 * Math.pow(10, 13)
+    );
+    let promise2 = NearPromise.new("callee-contract.test.near").functionCall(
+      "write_some_state",
+      bytes(""),
+      0,
+      2 * Math.pow(10, 13)
+    );
+    let retPromise = promise
+      .and(promise2)
+      .then(
+        NearPromise.new("highlevel-promise.test.near").functionCall(
+          "cross_contract_callback_write_state",
+          bytes(""),
+          0,
+          3 * Math.pow(10, 13)
+        )
+      );
+
+    return retPromise;
+  }
+
+  @call({})
+  callee_success_then_panic() {
+    let promise = NearPromise.new("callee-contract.test.near")
+      .functionCall("write_some_state", bytes("abc"), 0, 2 * Math.pow(10, 13))
+      .then(
+        NearPromise.new("callee-contract.test.near").functionCall(
+          "just_panic",
+          bytes(""),
+          0,
+          2 * Math.pow(10, 13)
+        )
+      );
+    near.storageWrite("aaa", "bbb");
+    return promise;
+  }
+
+  @call({})
+  handler({ promiseId }) {
+    // example to catch and handle one given promiseId. This is to simulate when you know some
+    // promiseId can be possibly fail and some promiseId can never fail. If more than one promiseId
+    // can be failed. a similar approach can be applied to all promiseIds.
+    let res;
+    try {
+      res = near.promiseResult(promiseId);
+    } catch (e) {
+      throw new Error("caught error in the callback: " + e.toString());
+    }
+    return "callback got " + res;
+  }
+
+  @call({})
+  handle_error_in_promise_then() {
+    let promise = NearPromise.new("callee-contract.test.near")
+      .functionCall("just_panic", bytes(""), 0, 2 * Math.pow(10, 13))
+      .then(
+        NearPromise.new("highlevel-promise.test.near").functionCall(
+          "handler",
+          bytes(JSON.stringify({ promiseId: 0 })),
+          0,
+          2 * Math.pow(10, 13)
+        )
+      );
+    return promise;
+  }
+
+  @call({})
+  handle_error_in_promise_then_after_promise_and() {
+    let promise = NearPromise.new("callee-contract.test.near")
+      .functionCall(
+        "cross_contract_callee",
+        bytes("abc"),
+        0,
+        2 * Math.pow(10, 13)
+      )
+      .and(
+        NearPromise.new("callee-contract.test.near").functionCall(
+          "just_panic",
+          bytes(""),
+          0,
+          2 * Math.pow(10, 13)
+        )
+      )
+      .then(
+        NearPromise.new("highlevel-promise.test.near").functionCall(
+          "handler",
+          bytes(JSON.stringify({ promiseId: 1 })),
+          0,
+          2 * Math.pow(10, 13)
+        )
+      );
+    return promise;
   }
 }
