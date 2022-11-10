@@ -1,8 +1,7 @@
-import { UnorderedMap, LookupMap, Bytes, UnorderedSet, NearPromise } from "near-sdk-js/lib";
+import { AccountId, UnorderedMap, LookupMap, Bytes, UnorderedSet, NearPromise } from "near-sdk-js";
 import { TokenMetadata } from "./metadata";
 import { IntoStorageKey, Option } from "./utils";
 import { NonFungibleTokenResolver } from "./core/resolver";
-import { AccountId } from "near-sdk-js/lib/types/index";
 import { Token, TokenId } from "./token";
 import { NonFungibleTokenCore } from "./core";
 import { NonFungibleTokenApproval } from "./approval";
@@ -30,31 +29,31 @@ export declare class NonFungibleToken implements NonFungibleTokenCore, NonFungib
     constructor();
     nft_total_supply(): number;
     private enum_get_token;
-    nft_tokens({ from_index, limit }: {
+    nft_tokens({ from_index, limit, }: {
         from_index: number | null;
         limit: number | null;
     }): Token[];
     nft_supply_for_owner({ account_id }: {
         account_id: AccountId;
     }): number;
-    nft_tokens_for_owner({ account_id, from_index, limit }: {
+    nft_tokens_for_owner({ account_id, from_index, limit, }: {
         account_id: AccountId;
         from_index: number;
         limit: number;
     }): Token[];
-    nft_approve({ token_id, account_id, msg }: {
+    nft_approve({ token_id, account_id, msg, }: {
         token_id: TokenId;
         account_id: AccountId;
         msg: string;
     }): Option<NearPromise>;
-    nft_revoke({ token_id, account_id }: {
+    nft_revoke({ token_id, account_id, }: {
         token_id: TokenId;
         account_id: AccountId;
     }): void;
     nft_revoke_all({ token_id }: {
         token_id: TokenId;
     }): void;
-    nft_is_approved({ token_id, approved_account_id, approval_id }: {
+    nft_is_approved({ token_id, approved_account_id, approval_id, }: {
         token_id: TokenId;
         approved_account_id: AccountId;
         approval_id: Option<bigint>;
@@ -69,13 +68,13 @@ export declare class NonFungibleToken implements NonFungibleTokenCore, NonFungib
     static emit_transfer(owner_id: AccountId, receiver_id: AccountId, token_id: TokenId, sender_id: Option<AccountId>, memo: Option<string>): void;
     internal_mint(token_id: TokenId, token_owner_id: AccountId, token_metadata: Option<TokenMetadata>): Token;
     internal_mint_with_refund(token_id: TokenId, token_owner_id: AccountId, token_metadata: Option<TokenMetadata>, refund_id: Option<string>): Token;
-    nft_transfer({ receiver_id, token_id, approval_id, memo }: {
+    nft_transfer({ receiver_id, token_id, approval_id, memo, }: {
         receiver_id: AccountId;
         token_id: TokenId;
         approval_id: Option<bigint>;
         memo: Option<string>;
     }): void;
-    nft_transfer_call({ receiver_id, token_id, approval_id, memo, msg }: {
+    nft_transfer_call({ receiver_id, token_id, approval_id, memo, msg, }: {
         receiver_id: AccountId;
         token_id: TokenId;
         approval_id: Option<bigint>;

@@ -1,4 +1,4 @@
-import { AccountId } from "../../../../lib/types";
+import { AccountId } from "near-sdk-js";
 import { Token } from "../token";
 
 /** Offers methods helpful in determining account ownership of NFTs and provides a way to page through NFTs per owner, determine total supply, etc. */
