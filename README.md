@@ -556,7 +556,7 @@ In order to use WSL2, follow the next steps:
 - `WSL2` will continue setup process on start. Setup your username and password when prompted.
 - Check [this](https://learn.microsoft.com/en-us/windows/dev-environment/javascript/nodejs-on-wsl) guide to setup `npm`, `node`, `npx`, `VSCode` and other tools of your choice in order to start developing.
 
-In case of any issues of setting up WSL2:
-- Make sure your Windows OS is up to date
+In case of any issues of setting up WSL2 make sure that:
+- Your Windows OS is up to date
 - Virtualisation is turned on in BIOS
 - `Windows Subsystem for Linux` and `Virtual Machine Platform` are turned on in `Windows Features` (Start -> Search -> Turn Windows Feature On or Off)
