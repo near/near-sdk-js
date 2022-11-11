@@ -1,7 +1,7 @@
-# NEAR JavaScript SDK
-
 > **Warning**
 > This is alpha software. The JavaScript runtime has not been audited yet so for now use the [Rust SDK](https://github.com/near/near-sdk-rs) if your contract stores anything of significant value.
+
+# NEAR JavaScript SDK
 
 ## Quick Start
 
