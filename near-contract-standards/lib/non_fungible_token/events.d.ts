@@ -13,7 +13,7 @@
  * [`NftMint.emit_many`], [`NftTransfer.emit_many`],
  * or [`NftBurn.emit_many`] respectively.
  */
-import { AccountId } from "near-sdk-js/lib/types";
+import { AccountId } from "near-sdk-js";
 import { NearEvent } from "../event";
 import { TokenId } from "./token";
 import { Option } from "./utils";

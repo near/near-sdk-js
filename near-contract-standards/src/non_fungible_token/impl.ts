@@ -1,4 +1,5 @@
 import {
+  AccountId,
   UnorderedMap,
   LookupMap,
   Bytes,
@@ -7,8 +8,8 @@ import {
   assert,
   NearPromise,
   bytes,
-} from "near-sdk-js/lib";
-import { serialize } from "near-sdk-js/lib/utils";
+  serialize,
+} from "near-sdk-js";
 import { TokenMetadata } from "./metadata";
 import {
   refund_approved_account_ids,
@@ -23,7 +24,6 @@ import {
 } from "./utils";
 import { NftMint, NftTransfer } from "./events";
 import { NonFungibleTokenResolver } from "./core/resolver";
-import { AccountId } from "near-sdk-js/lib/types/index";
 import { Token, TokenId } from "./token";
 import { NonFungibleTokenCore } from "./core";
 import { NonFungibleTokenApproval } from "./approval";

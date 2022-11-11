@@ -1,5 +1,4 @@
-import { AccountId } from "near-sdk-js/lib/types";
-import { NearPromise } from "near-sdk-js/lib";
+import { AccountId, NearPromise } from "near-sdk-js";
 import { TokenId } from "../token";
 import { Option } from "../utils";
 /** Interface used when it's desired to have a non-fungible token that has a
@@ -34,7 +33,7 @@ export interface NonFungibleTokenApproval {
      * @returns void, if no `msg` given. Otherwise, returns promise call to
      *          `nft_on_approve`, which can resolve with whatever it wants.
      */
-    nft_approve({ token_id, account_id, msg }: {
+    nft_approve({ token_id, account_id, msg, }: {
         token_id: TokenId;
         account_id: AccountId;
         msg: Option<string>;
@@ -51,7 +50,7 @@ export interface NonFungibleTokenApproval {
      * @param token_id - The token for which to revoke an approval
      * @param account_id - The account to remove from `approvals`
      */
-    nft_revoke({ token_id, account_id }: {
+    nft_revoke({ token_id, account_id, }: {
         token_id: TokenId;
         account_id: AccountId;
     }): any;
@@ -78,7 +77,7 @@ export interface NonFungibleTokenApproval {
      * @returns if `approval_id` given, `true` if `approved_account_id` is approved with given `approval_id`
      * otherwise, `true` if `approved_account_id` is in list of approved accounts
      */
-    nft_is_approved({ token_id, approved_account_id, approval_id }: {
+    nft_is_approved({ token_id, approved_account_id, approval_id, }: {
         token_id: TokenId;
         approved_account_id: AccountId;
         approval_id: Option<bigint>;

@@ -20,10 +20,18 @@ test.before(async (t) => {
   // Test users
   const ali = await root.createSubAccount("ali");
   const bob = await root.createSubAccount("bob");
+  const carl = await root.createSubAccount("carl");
 
   // Save state for test runs
   t.context.worker = worker;
-  t.context.accounts = { root, highlevelPromise, ali, bob, calleeContract };
+  t.context.accounts = {
+    root,
+    highlevelPromise,
+    ali,
+    bob,
+    carl,
+    calleeContract,
+  };
 });
 
 test.after.always(async (t) => {
@@ -92,6 +100,116 @@ test("highlevel promise delete account", async (t) => {
   });
   t.is(r.result.status.SuccessValue, "");
   t.is(await highlevelPromise.getSubAccount("e").exists(), false);
+});
+
+test("cross contract call panic", async (t) => {
+  const { ali, highlevelPromise } = t.context.accounts;
+  let r = await ali.callRaw(highlevelPromise, "callee_panic", "", {
+    gas: "70 Tgas",
+  });
+  t.assert(
+    r.result.status.Failure.ActionError.kind.FunctionCallError.ExecutionError.includes(
+      "Smart contract panicked: it just panic"
+    )
+  );
+});
+
+test("before and after cross contract call panic", async (t) => {
+  const { carl, highlevelPromise } = t.context.accounts;
+  let r = await carl.callRaw(
+    highlevelPromise,
+    "before_and_after_callee_panic",
+    "",
+    {
+      gas: "70 Tgas",
+    }
+  );
+  t.assert(
+    r.result.status.Failure.ActionError.kind.FunctionCallError.ExecutionError.includes(
+      "Smart contract panicked: it just panic"
+    )
+  );
+  // full transaction is revert, no log
+  t.deepEqual(r.result.transaction_outcome.outcome.logs, []);
+});
+
+test("cross contract call panic then callback another contract method", async (t) => {
+  const { carl, highlevelPromise } = t.context.accounts;
+  let r = await carl.callRaw(highlevelPromise, "callee_panic_then", "", {
+    gas: "70 Tgas",
+  });
+  // promise then will continue, even though the promise before promise.then failed
+  t.is(r.result.status.SuccessValue, "");
+  let state = await highlevelPromise.viewStateRaw();
+  t.is(state.length, 4);
+});
+
+test("cross contract call panic and cross contract call success then callback another contract method", async (t) => {
+  const { carl, highlevelPromise, calleeContract } = t.context.accounts;
+  let r = await carl.callRaw(highlevelPromise, "callee_panic_and", "", {
+    gas: "100 Tgas",
+  });
+  // promise `and` promise `then` continues, even though one of two promise and was failed. Entire transaction also success
+  t.is(r.result.status.SuccessValue, "");
+  let state = await calleeContract.viewStateRaw();
+  t.is(state.length, 3);
+  state = await highlevelPromise.viewStateRaw();
+  t.is(state.length, 4);
+});
+
+test("cross contract call success then call a panic method", async (t) => {
+  const { carl, highlevelPromise, calleeContract } = t.context.accounts;
+  let r = await carl.callRaw(
+    highlevelPromise,
+    "callee_success_then_panic",
+    "",
+    {
+      gas: "100 Tgas",
+    }
+  );
+  // the last promise fail, cause the transaction fail
+  t.assert(
+    r.result.status.Failure.ActionError.kind.FunctionCallError.ExecutionError.includes(
+      "Smart contract panicked: it just panic"
+    )
+  );
+  // but the first success cross contract call won't revert, the state is persisted
+  let state = await calleeContract.viewStateRaw();
+  t.is(state.length, 3);
+});
+
+test("handling error in promise then", async (t) => {
+  const { carl, highlevelPromise } = t.context.accounts;
+  let r = await carl.callRaw(
+    highlevelPromise,
+    "handle_error_in_promise_then",
+    "",
+    {
+      gas: "70 Tgas",
+    }
+  );
+  t.assert(
+    r.result.status.Failure.ActionError.kind.FunctionCallError.ExecutionError.includes(
+      "caught error in the callback: "
+    )
+  );
+});
+
+test("handling error in promise then after promise and", async (t) => {
+  const { carl, highlevelPromise } = t.context.accounts;
+  let r = await carl.callRaw(
+    highlevelPromise,
+    "handle_error_in_promise_then_after_promise_and",
+    "",
+    {
+      gas: "100 Tgas",
+    }
+  );
+  t.assert(
+    r.result.status.Failure.ActionError.kind.FunctionCallError.ExecutionError.includes(
+      "caught error in the callback: "
+    )
+  );
 });
 
 test("highlevel promise then", async (t) => {

@@ -1,5 +1,4 @@
-import { PromiseOrValue } from "near-sdk-js/lib";
-import { AccountId } from "near-sdk-js/lib/types";
+import { AccountId, PromiseOrValue } from "near-sdk-js";
 import { TokenId } from "../token";
 
 /** Used when an NFT is transferred using `nft_transfer_call`. This interface is implemented on the receiving contract, not on the NFT contract. */

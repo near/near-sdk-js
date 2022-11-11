@@ -1,5 +1,4 @@
-import { PromiseOrValue } from "near-sdk-js/lib";
-import { AccountId } from "near-sdk-js/lib/types";
+import { AccountId, PromiseOrValue } from "near-sdk-js";
 import { TokenId } from "../token";
 
 /** Approval receiver is the interface for the method called (or attempted to be called) when an NFT contract adds an approval for an account. */
