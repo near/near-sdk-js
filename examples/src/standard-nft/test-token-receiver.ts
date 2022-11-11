@@ -7,8 +7,8 @@ import {
   NearBindgen,
   NearPromise,
   PromiseOrValue,
-} from "near-sdk-js/lib";
-import { AccountId } from "near-sdk-js/lib/types";
+} from "near-sdk-js";
+import { AccountId } from "near-sdk-js";
 
 const BASE_GAS = 10_000_000_000_000n;
 const PROMISE_CALL = 10_000_000_000_000n;

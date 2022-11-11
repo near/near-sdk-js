@@ -1,5 +1,5 @@
 import { NearBindgen, call, NearPromise, near, bytes } from "near-sdk-js";
-import { PublicKey } from "near-sdk-js/lib/types";
+import { PublicKey } from "near-sdk-js";
 
 function callingData() {
   return {

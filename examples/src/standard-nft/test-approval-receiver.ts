@@ -6,8 +6,8 @@ import {
   PromiseOrValue,
   assert,
   call,
-} from "near-sdk-js/lib";
-import { AccountId } from "near-sdk-js/lib/types";
+} from "near-sdk-js";
+import { AccountId } from "near-sdk-js";
 import { NonFungibleTokenApprovalReceiver } from "near-contract-standards/lib/non_fungible_token/approval/approval_receiver";
 
 const BASE_GAS = 20_000_000_000_000n;
