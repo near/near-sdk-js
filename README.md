@@ -1,5 +1,13 @@
 > **Warning**
-> This is alpha software. The JavaScript runtime has not been audited yet, use [Rust](https://github.com/near/near-sdk-rs) if your contract holds value.
+> 
+> This SDK is currently in **[`Alpha`](https://github.com/near/near-sdk-js/releases/)**. 
+> 
+> The JavaScript runtime has not been fully audited. For creating smart contracts that hold value please use [`near-sdk-rs`](https://github.com/near/near-sdk-rs). 
+> 
+> Help contribute!
+> - [Report issues you encounter](https://github.com/near/near-sdk-js/issues) 🐞 
+> - [Provide suggestions or feedback](https://github.com/near/near-sdk-js/discussions) 💡 
+> - [Show us what you've built!](https://github.com/near/near-sdk-js/discussions/categories/show-and-tell) 💪  
 
 # NEAR JavaScript SDK
 
