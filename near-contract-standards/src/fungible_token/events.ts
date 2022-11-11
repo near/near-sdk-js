@@ -13,21 +13,19 @@
 //! [`FtMint::emit_many`], [`FtTransfer::emit_many`],
 //! or [`FtBurn::emit_many`] respectively.
 
-use crate::event::NearEvent;
-use near_sdk::json_types::U128;
-use near_sdk::AccountId;
-use serde::Serialize;
+import { NearEvent } from "../event";
+import { Option } from "../non_fungible_token/utils";
+import { AccountId } from "near-sdk-js";
 
 /// Data to log for an FT mint event. To log this event, call [`.emit()`](FtMint::emit).
-class FtMint<'a> {
-    owner_id: &'a AccountId,
-    amount: &'a U128,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    memo: Option<&'a str>,
+export class FtMint {
+    owner_id: AccountId;
+    amount: number;
+    memo: Option<string>;
 
     /// Logs the event to the host. This is required to ensure that the event is triggered
     /// and to consume the event.
-    emit(self) {
+    emit() {
         Self::emit_many(&[self])
     }
 
@@ -40,12 +38,11 @@ class FtMint<'a> {
 
 /// Data to log for an FT transfer event. To log this event,
 /// call [`.emit()`](FtTransfer::emit).
-class FtTransfer<'a> {
-    old_owner_id: &'a AccountId,
-    new_owner_id: &'a AccountId,
-    amount: &'a U128,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    memo: Option<&'a str>,
+export class FtTransfer {
+    old_owner_id: AccountId;
+    new_owner_id: AccountId;
+    amount: number;
+    memo: Option<string>;
 
     /// Logs the event to the host. This is required to ensure that the event is triggered
     /// and to consume the event.
@@ -61,11 +58,10 @@ class FtTransfer<'a> {
 }
 
 /// Data to log for an FT burn event. To log this event, call [`.emit()`](FtBurn::emit).
-class FtBurn<'a> {
-    owner_id: &'a AccountId,
-    amount: &'a U128,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    memo: Option<&'a str>,
+export class FtBurn {
+    owner_id: AccountId;
+    amount: number;
+    memo: Option<string>;
 
      /// Logs the event to the host. This is required to ensure that the event is triggered
     /// and to consume the event.
@@ -80,7 +76,6 @@ class FtBurn<'a> {
     }
 }
 
-#[derive(Serialize, Debug)]
 pub(crate) struct Nep141Event<'a> {
     version: &'static str,
     #[serde(flatten)]

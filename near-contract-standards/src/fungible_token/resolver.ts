@@ -1,10 +1,9 @@
-use near_sdk::{json_types::U128, AccountId};
+import { AccountId } from "near-sdk-js";
 
-interface FungibleTokenResolver {
+export interface FungibleTokenResolver {
     ft_resolve_transfer(
-        &mut self,
         sender_id: AccountId,
         receiver_id: AccountId,
-        amount: U128,
-    ) : U128;
+        amount: number,
+    ) : number;
 }

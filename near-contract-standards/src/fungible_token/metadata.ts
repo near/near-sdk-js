@@ -1,16 +1,20 @@
-use near_sdk::json_types::Base64VecU8;
-use near_sdk::{require};
+import {
+    require,
+    Base64VecU8,
+} from "near-sdk-js";
 
-const FT_METADATA_SPEC: &str = "ft-1.0.0";
+import { Option } from "../non_fungible_token/utils";
 
-class FungibleTokenMetadata {
-    spec: String,
-    name: String,
-    symbol: String,
-    icon: Option<String>,
-    reference: Option<String>,
-    reference_hash: Option<Base64VecU8>,
-    decimals: u8,
+const FT_METADATA_SPEC: string = "ft-1.0.0";
+
+export class FungibleTokenMetadata {
+    spec: string;
+    name: string;
+    symbol: string;
+    icon: Option<string>;
+    reference: Option<string>;
+    reference_hash: Option<Base64VecU8>;
+    decimals: u8;
 
     assert_valid(&self) {
         require!(this.spec == FT_METADATA_SPEC);
@@ -21,6 +25,6 @@ class FungibleTokenMetadata {
     }
 }
 
-interface FungibleTokenMetadataProvider {
-    ft_metadata(&self) : FungibleTokenMetadata;
+export interface FungibleTokenMetadataProvider {
+    ft_metadata() : FungibleTokenMetadata;
 }

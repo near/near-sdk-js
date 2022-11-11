@@ -12,7 +12,7 @@ macro_rules! impl_fungible_token_core {
             ft_transfer(
                 &mut self,
                 receiver_id: AccountId,
-                amount: U128,
+                amount: number,
                 memo: Option<String>,
             ) {
                 self.$token.ft_transfer(receiver_id, amount, memo)
@@ -22,18 +22,18 @@ macro_rules! impl_fungible_token_core {
             ft_transfer_call(
                 &mut self,
                 receiver_id: AccountId,
-                amount: U128,
+                amount: number,
                 memo: Option<String>,
                 msg: String,
-            ) -> PromiseOrValue<U128> {
+            ) -> PromiseOrValue<number> {
                 self.$token.ft_transfer_call(receiver_id, amount, memo, msg)
             }
 
-            ft_total_supply(&self) -> U128 {
+            ft_total_supply(&self) -> number {
                 self.$token.ft_total_supply()
             }
 
-            ft_balance_of(&self, account_id: AccountId) -> U128 {
+            ft_balance_of(&self, account_id: AccountId) -> number {
                 self.$token.ft_balance_of(account_id)
             }
         }
@@ -45,8 +45,8 @@ macro_rules! impl_fungible_token_core {
                 &mut self,
                 sender_id: AccountId,
                 receiver_id: AccountId,
-                amount: U128,
-            ) -> U128 {
+                amount: number,
+            ) -> number {
                 let (used_amount, burned_amount) =
                     self.$token.internal_ft_resolve_transfer(&sender_id, receiver_id, amount);
                 if burned_amount > 0 {
@@ -82,7 +82,7 @@ macro_rules! impl_fungible_token_storage {
             }
 
             #[payable]
-            storage_withdraw(amount: Option<U128>) -> StorageBalance {
+            storage_withdraw(amount: Option<number>) -> StorageBalance {
                 self.$token.storage_withdraw(amount)
             }
 

@@ -1,24 +1,26 @@
-// From storage_impl.ts
-use crate::fungible_token::FungibleToken;
-use crate::storage_management::{StorageBalance, StorageBalanceBounds, StorageManagement};
-use near_sdk::json_types::U128;
-use near_sdk::{assert_one_yocto, env, log, AccountId, Balance, Promise};
+import {StorageBalance, StorageBalanceBounds, StorageManagement} from "../storage_management";
+import { FungibleTokenCore } from "./core";
+import { FtBurn, FtTransfer } from "./events";
+import { FungibleTokenResolver } from "./resolver";
+import {
+    near,
+    AccountId,
+    LookupMap,
+    PromiseOrValue,
+    assert_one_yocto,
+    Balance,
+    Gas,
+    IntoStorageKey,
+    PromiseOrValue,
+    PromiseResult,
+    StorageUsage,
+    call,
+    view,
+} from "near-sdk-js";
 
-use crate::fungible_token::core::FungibleTokenCore;
-use crate::fungible_token::events::{FtBurn, FtTransfer};
-use crate::fungible_token::receiver::ext_ft_receiver;
-use crate::fungible_token::resolver::{FungibleTokenResolver};
-use near_sdk::collections::LookupMap;
-use near_sdk::json_types::U128;
-use near_sdk::{
-    assert_one_yocto, env, log, require, AccountId, Balance, Gas, IntoStorageKey, PromiseOrValue,
-    PromiseResult, StorageUsage,
-};
-
-const GAS_FOR_RESOLVE_TRANSFER: Gas = Gas(5_000_000_000_000);
-const GAS_FOR_FT_TRANSFER_CALL: Gas = Gas(25_000_000_000_000 + GAS_FOR_RESOLVE_TRANSFER.0);
-
-const ERR_TOTAL_SUPPLY_OVERFLOW: &str = "Total supply overflow";
+const GAS_FOR_RESOLVE_TRANSFER: Gas = 5_000_000_000_000;
+const GAS_FOR_FT_TRANSFER_CALL: Gas = 25_000_000_000_000 + GAS_FOR_RESOLVE_TRANSFER;
+const ERR_TOTAL_SUPPLY_OVERFLOW: string = "Total supply overflow";
 
 /// Implementation of a FungibleToken standard.
 /// Allows to include NEP-141 compatible token to any contract.
@@ -31,13 +33,13 @@ const ERR_TOTAL_SUPPLY_OVERFLOW: &str = "Total supply overflow";
 /// For example usage, see examples/fungible-token/src/lib.rs.
 class FungibleToken implements FungibleTokenCore, StorageManagement, FungibleTokenResolver {
     /// AccountID -> Account balance.
-    accounts: LookupMap<AccountId, Balance>,
+    accounts: LookupMap<Balance>;
 
     /// Total supply of the all token.
-    total_supply: Balance,
+    total_supply: Balance;
 
     /// The storage size in bytes for one account.
-    account_storage_usage: StorageUsage,
+    account_storage_usage: StorageUsage;
 
     new<S>(prefix: S) : Self
     where
@@ -49,15 +51,17 @@ class FungibleToken implements FungibleTokenCore, StorageManagement, FungibleTok
         this
     }
 
-    measure_account_storage_usage(&mut self) {
+    @call({})
+    measure_account_storage_usage() {
         let initial_storage_usage = env::storage_usage();
         let tmp_account_id = AccountId::new_unchecked("a".repeat(64));
-        this.accounts.insert(&tmp_account_id, &0u128);
+        this.accounts.insert(&tmp_account_id, &0number);
         this.account_storage_usage = env::storage_usage() - initial_storage_usage;
         this.accounts.remove(&tmp_account_id);
     }
 
-    internal_unwrap_balance_of(&self, account_id: &AccountId) : Balance {
+    @view({})
+    internal_unwrap_balance_of(account_id: AccountId) : Balance {
         match this.accounts.get(account_id) {
             Some(balance) => balance,
             None => {
@@ -66,7 +70,7 @@ class FungibleToken implements FungibleTokenCore, StorageManagement, FungibleTok
         }
     }
 
-    internal_deposit(account_id: &AccountId, amount: Balance) {
+    internal_deposit(account_id: AccountId, amount: Balance) {
         let balance = this.internal_unwrap_balance_of(account_id);
         if let Some(new_balance) = balance.checked_add(amount) {
             this.accounts.insert(account_id, &new_balance);
@@ -79,7 +83,7 @@ class FungibleToken implements FungibleTokenCore, StorageManagement, FungibleTok
         }
     }
 
-    internal_withdraw(account_id: &AccountId, amount: Balance) {
+    internal_withdraw(account_id: AccountId, amount: Balance) {
         let balance = this.internal_unwrap_balance_of(account_id);
         if let Some(new_balance) = balance.checked_sub(amount) {
             this.accounts.insert(account_id, &new_balance);
@@ -93,9 +97,8 @@ class FungibleToken implements FungibleTokenCore, StorageManagement, FungibleTok
     }
 
     internal_transfer(
-        &mut self,
-        sender_id: &AccountId,
-        receiver_id: &AccountId,
+        sender_id: AccountId,
+        receiver_id: AccountId,
         amount: Balance,
         memo: Option<String>,
     ) {
@@ -106,13 +109,13 @@ class FungibleToken implements FungibleTokenCore, StorageManagement, FungibleTok
         FtTransfer {
             old_owner_id: sender_id,
             new_owner_id: receiver_id,
-            amount: &U128(amount),
+            amount: &number(amount),
             memo: memo.as_deref(),
         }
         .emit();
     }
 
-    internal_register_account(account_id: &AccountId) {
+    internal_register_account(account_id: AccountId) {
         if this.accounts.insert(account_id, &0).is_some() {
             env::panic_str("The account is already registered");
         }
@@ -122,18 +125,17 @@ class FungibleToken implements FungibleTokenCore, StorageManagement, FungibleTok
     /// has deleted (unregistered) their account while the `ft_transfer_call` was still in flight.
     /// Returns (Used token amount, Burned token amount)
     internal_ft_resolve_transfer(
-        &mut self,
-        sender_id: &AccountId,
+        sender_id: AccountId,
         receiver_id: AccountId,
-        amount: U128,
-    ) : (u128, u128) {
+        amount: number,
+    ) : (number, number) {
         let amount: Balance = amount.into();
 
         // Get the unused amount from the `ft_on_transfer` call result.
         let unused_amount = match env::promise_result(0) {
             PromiseResult::NotReady => env::abort(),
             PromiseResult::Successful(value) => {
-                if let Ok(unused_amount) = near_sdk::serde_json::from_slice::<U128>(&value) {
+                if let Ok(unused_amount) = near_sdk::serde_json::from_slice::<number>(&value) {
                     std::cmp::min(amount, unused_amount.0)
                 } else {
                     amount
@@ -162,7 +164,7 @@ class FungibleToken implements FungibleTokenCore, StorageManagement, FungibleTok
                     FtTransfer {
                         old_owner_id: &receiver_id,
                         new_owner_id: sender_id,
-                        amount: &U128(refund_amount),
+                        amount: &number(refund_amount),
                         memo: Some("refund"),
                     }
                     .emit();
@@ -179,7 +181,7 @@ class FungibleToken implements FungibleTokenCore, StorageManagement, FungibleTok
                     log!("The account of the sender was deleted");
                     FtBurn {
                         owner_id: &receiver_id,
-                        amount: &U128(refund_amount),
+                        amount: &number(refund_amount),
                         memo: Some("refund"),
                     }
                     .emit();
@@ -191,20 +193,21 @@ class FungibleToken implements FungibleTokenCore, StorageManagement, FungibleTok
     }
 
     // Implementation of FungibleTokenCore
-    ft_transfer(receiver_id: AccountId, amount: U128, memo: Option<String>) {
+    @call({})
+    ft_transfer(receiver_id: AccountId, amount: number, memo: Option<String>) {
         assert_one_yocto();
         let sender_id = env::predecessor_account_id();
         let amount: Balance = amount.into();
         this.internal_transfer(&sender_id, &receiver_id, amount, memo);
     }
 
+    @call({})
     ft_transfer_call(
-        &mut self,
         receiver_id: AccountId,
-        amount: U128,
+        amount: number,
         memo: Option<String>,
         msg: String,
-    ) : PromiseOrValue<U128> {
+    ) : PromiseOrValue<number> {
         assert_one_yocto();
         require!(env::prepaid_gas() > GAS_FOR_FT_TRANSFER_CALL, "More gas is required");
         let sender_id = env::predecessor_account_id();
@@ -226,11 +229,13 @@ class FungibleToken implements FungibleTokenCore, StorageManagement, FungibleTok
             .into()
     }
 
-    ft_total_supply(&self) : U128 {
+    @view({})
+    ft_total_supply() : number {
         this.total_supply.into()
     }
 
-    ft_balance_of(&self, account_id: AccountId) : U128 {
+    @view({})
+    ft_balance_of(account_id: AccountId) : number {
         this.accounts.get(&account_id).unwrap_or(0).into()
     }
 
@@ -238,7 +243,6 @@ class FungibleToken implements FungibleTokenCore, StorageManagement, FungibleTok
     /// Internal method that returns the Account ID and the balance in case the account was
     /// unregistered.
     internal_storage_unregister(
-        &mut self,
         force: Option<bool>,
     ) : Option<(AccountId, Balance)> {
         assert_one_yocto();
@@ -261,7 +265,8 @@ class FungibleToken implements FungibleTokenCore, StorageManagement, FungibleTok
         }
     }
 
-    internal_storage_balance_of(&self, account_id: &AccountId) -> Option<StorageBalance> {
+    @view({})
+    internal_storage_balance_of(account_id: AccountId) -> Option<StorageBalance> {
         if this.accounts.contains_key(account_id) {
             Some(StorageBalance { total: this.storage_balance_bounds().min, available: 0.into() })
         } else {
@@ -271,8 +276,8 @@ class FungibleToken implements FungibleTokenCore, StorageManagement, FungibleTok
 
     // Implementation of StorageManagement
     // `registration_only` doesn't affect the implementation for vanilla fungible token.
+    @call({})
     storage_deposit(
-        &mut self,
         account_id: Option<AccountId>,
         registration_only: Option<bool>,
     ) : StorageBalance {
@@ -304,7 +309,8 @@ class FungibleToken implements FungibleTokenCore, StorageManagement, FungibleTok
     /// * panics if `amount > 0`
     /// * never transfers Ⓝ to caller
     /// * returns a `storage_balance` struct if `amount` is 0
-    storage_withdraw(amount: Option<U128>) : StorageBalance {
+    @view({})
+    storage_withdraw(amount: Option<number>) : StorageBalance {
         assert_one_yocto();
         let predecessor_account_id = env::predecessor_account_id();
         if let Some(storage_balance) = this.internal_storage_balance_of(&predecessor_account_id) {
@@ -321,10 +327,12 @@ class FungibleToken implements FungibleTokenCore, StorageManagement, FungibleTok
         }
     }
 
+    @call({})
     storage_unregister(force: Option<bool>) : bool {
         this.internal_storage_unregister(force).is_some()
     }
 
+    view({})
     storage_balance_bounds(&self) : StorageBalanceBounds {
         let required_storage_balance =
             Balance::from(this.account_storage_usage) * env::storage_byte_cost();
@@ -334,17 +342,18 @@ class FungibleToken implements FungibleTokenCore, StorageManagement, FungibleTok
         }
     }
 
-    storage_balance_of(&self, account_id: AccountId) : Option<StorageBalance> {
+    @view({})
+    storage_balance_of(account_id: AccountId) : Option<StorageBalance> {
         this.internal_storage_balance_of(&account_id)
     }
 
     // Implementation of FungibleTokenResolver
+    @call({})
     ft_resolve_transfer(
-        &mut self,
         sender_id: AccountId,
         receiver_id: AccountId,
-        amount: U128,
-    ) : U128 {
+        amount: number,
+    ) : number {
         this.internal_ft_resolve_transfer(&sender_id, receiver_id, amount).0.into()
     }
 }

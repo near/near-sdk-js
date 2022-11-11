@@ -1,7 +1,6 @@
-use near_sdk::json_types::U128;
-use near_sdk::{AccountId, PromiseOrValue};
+import { AccountId, PromiseOrValue } from "near-sdk-js";
 
-interface FungibleTokenReceiver {
+export interface FungibleTokenReceiver {
     /// Called by fungible token contract after `ft_transfer_call` was initiated by
     /// `sender_id` of the given `amount` with the transfer message given in `msg` field.
     /// The `amount` of tokens were already transferred to this contract account and ready to be used.
@@ -21,9 +20,8 @@ interface FungibleTokenReceiver {
     ///
     /// Returns the amount of unused tokens that should be returned to sender, in a decimal string representation.
     ft_on_transfer(
-        &mut self,
         sender_id: AccountId,
-        amount: U128,
+        amount: number,
         msg: String,
-    ) : PromiseOrValue<U128>;
+    ) : PromiseOrValue<number>;
 }

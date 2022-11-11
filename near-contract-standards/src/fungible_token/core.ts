@@ -1,8 +1,6 @@
-use near_sdk::json_types::U128;
-use near_sdk::AccountId;
-use near_sdk::PromiseOrValue;
-
-interface FungibleTokenCore {
+import { AccountId, PromiseOrValue } from "near-sdk-js"
+import { Option } from "../non_fungible_token/utils"
+export interface FungibleTokenCore {
     /// Transfers positive `amount` of tokens from the `env::predecessor_account_id` to `receiver_id`.
     /// Both accounts must be registered with the contract for transfer to succeed. (See [NEP-145](https://github.com/near/NEPs/discussions/145))
     /// This method must to be able to accept attached deposits, and must not panic on attached deposit.
@@ -13,7 +11,7 @@ interface FungibleTokenCore {
     /// - `receiver_id` - the account ID of the receiver.
     /// - `amount` - the amount of tokens to transfer. Must be a positive number in decimal string representation.
     /// - `memo` - an optional string field in a free form to associate a memo with this transfer.
-    ft_transfer(receiver_id: AccountId, amount: U128, memo: Option<String>);
+    ft_transfer(receiver_id: AccountId, amount: number, memo: Option<String>);
 
     /// Transfers positive `amount` of tokens from the `env::predecessor_account_id` to `receiver_id` account. Then
     /// calls `ft_on_transfer` method on `receiver_id` contract and attaches a callback to resolve this transfer.
@@ -39,16 +37,15 @@ interface FungibleTokenCore {
     ///
     /// Returns a promise which will result in the amount of tokens withdrawn from sender's account.
     ft_transfer_call(
-        &mut self,
         receiver_id: AccountId,
-        amount: U128,
+        amount: number,
         memo: Option<String>,
         msg: String,
-    ) : PromiseOrValue<U128>;
+    ) : PromiseOrValue<number>;
 
     /// Returns the total supply of the token in a decimal string representation.
-    ft_total_supply(&self) : U128;
+    ft_total_supply() : number;
 
     /// Returns the balance of the account. If the account doesn't exist must returns `"0"`.
-    ft_balance_of(&self, account_id: AccountId) : U128;
+    ft_balance_of(account_id: AccountId) : number;
 }

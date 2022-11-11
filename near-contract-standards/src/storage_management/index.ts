@@ -1,25 +1,22 @@
-use near_sdk::borsh::{self, BorshDeserialize, BorshSerialize};
-use near_sdk::json_types::U128;
-use near_sdk::serde::{Deserialize, Serialize};
-use near_sdk::AccountId;
+import { AccountId } from "near-sdk-js"
+import { Option } from "../non_fungible_token/utils"; 
 
-class StorageBalance {
-    total: U128,
-    available: U128,
+export class StorageBalance {
+    total: number;
+    available: number;
 }
 
-class StorageBalanceBounds {
-    min: U128,
-    max: Option<U128>,
+export class StorageBalanceBounds {
+    min: number;
+    max: Option<number>;
 }
 
-interface StorageManagement {
+export interface StorageManagement {
     // if `registration_only=true` MUST refund above the minimum balance if the account didn't exist and
     //     refund full deposit if the account exists.
     storage_deposit(
-        &mut self,
         account_id: Option<AccountId>,
-        registration_only: Option<bool>,
+        registration_only: Option<boolean>,
     ) : StorageBalance;
 
     /// Withdraw specified amount of available Ⓝ for predecessor account.
@@ -36,7 +33,7 @@ interface StorageManagement {
     /// function-call access-key call (UX wallet security)
     ///
     /// Returns the StorageBalance structure showing updated balances.
-    storage_withdraw(&mut self, amount: Option<U128>) : StorageBalance;
+    storage_withdraw(amount: Option<number>) : StorageBalance;
 
     /// Unregisters the predecessor account and returns the storage NEAR deposit back.
     ///
@@ -49,9 +46,9 @@ interface StorageManagement {
     /// (UX wallet security)
     /// Returns `true` iff the account was unregistered.
     /// Returns `false` iff account was not registered before.
-    storage_unregister(&mut self, force: Option<bool>) : bool;
+    storage_unregister(force: Option<boolean>) : boolean;
 
-    storage_balance_bounds(&self) : StorageBalanceBounds;
+    storage_balance_bounds() : StorageBalanceBounds;
 
-    storage_balance_of(&self, account_id: AccountId) : Option<StorageBalance>;
+    storage_balance_of(account_id: AccountId) : Option<StorageBalance>;
 }
