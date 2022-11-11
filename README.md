@@ -1,5 +1,5 @@
 > **Warning**
-> This is alpha software. The JavaScript runtime has not been audited yet, for now use the [Rust SDK](https://github.com/near/near-sdk-rs) if your contract stores value.
+> This is alpha software. The JavaScript runtime has not been audited yet, use the [Rust SDK](https://github.com/near/near-sdk-rs) if your contract stores value.
 
 # NEAR JavaScript SDK
 
