@@ -1,3 +1,15 @@
+> **Warning**
+>
+> This SDK is currently in **[`Alpha`](https://github.com/near/near-sdk-js/releases/)**.
+>
+> The JavaScript runtime has not been fully audited. For creating smart contracts that hold value please use [`near-sdk-rs`](https://github.com/near/near-sdk-rs).
+>
+> Help contribute!
+>
+> - [Report issues you encounter](https://github.com/near/near-sdk-js/issues) 🐞
+> - [Provide suggestions or feedback](https://github.com/near/near-sdk-js/discussions) 💡
+> - [Show us what you've built!](https://github.com/near/near-sdk-js/discussions/categories/show-and-tell) 💪
+
 # NEAR JavaScript SDK
 
 ## Quick Start
@@ -545,3 +557,20 @@ PublicKey.fromString('secp256k1:5r22SrjrDvgY3wdQsnjgxkeAbU1VcM71FYvALEQWihjM3Xk4
 ```
 
 Once a PublicKey object is created, it can be used in high level promise APIs that takes a public key, such as `addFullAccessKey`, `addAccessKey` and `stake`.
+
+## How to use NEAR SDK JS on Windows
+
+You can develop smart contracts on Windows using Windows Subsystem for Linux (WSL2).
+In order to use WSL2, follow the next steps:
+
+- Run `PowerShell` as Administrator
+- Execute `wsl --install` to install Ubuntu and do additional setup automatically. Check more details [here](https://learn.microsoft.com/en-us/windows/wsl/install)
+- Restart your machine
+- `WSL2` will continue setup process on start. Setup your username and password when prompted.
+- Check [this](https://learn.microsoft.com/en-us/windows/dev-environment/javascript/nodejs-on-wsl) guide to setup `npm`, `node`, `npx`, `VSCode` and other tools of your choice in order to start developing.
+
+In case of any issues of setting up WSL2 make sure that:
+
+- Your Windows OS is up to date
+- Virtualisation is turned on in BIOS
+- `Windows Subsystem for Linux` and `Virtual Machine Platform` are turned on in `Windows Features` (Start -> Search -> Turn Windows Feature On or Off)
