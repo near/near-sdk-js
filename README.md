@@ -1,13 +1,14 @@
 > **Warning**
-> 
-> This SDK is currently in **[`Alpha`](https://github.com/near/near-sdk-js/releases/)**. 
-> 
-> The JavaScript runtime has not been fully audited. For creating smart contracts that hold value please use [`near-sdk-rs`](https://github.com/near/near-sdk-rs). 
-> 
+>
+> This SDK is currently in **[`Alpha`](https://github.com/near/near-sdk-js/releases/)**.
+>
+> The JavaScript runtime has not been fully audited. For creating smart contracts that hold value please use [`near-sdk-rs`](https://github.com/near/near-sdk-rs).
+>
 > Help contribute!
-> - [Report issues you encounter](https://github.com/near/near-sdk-js/issues) 🐞 
-> - [Provide suggestions or feedback](https://github.com/near/near-sdk-js/discussions) 💡 
-> - [Show us what you've built!](https://github.com/near/near-sdk-js/discussions/categories/show-and-tell) 💪  
+>
+> - [Report issues you encounter](https://github.com/near/near-sdk-js/issues) 🐞
+> - [Provide suggestions or feedback](https://github.com/near/near-sdk-js/discussions) 💡
+> - [Show us what you've built!](https://github.com/near/near-sdk-js/discussions/categories/show-and-tell) 💪
 
 # NEAR JavaScript SDK
 
