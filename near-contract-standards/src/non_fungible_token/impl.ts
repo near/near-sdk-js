@@ -12,15 +12,13 @@ import {
 } from "near-sdk-js";
 import { TokenMetadata } from "./metadata";
 import {
-  refund_approved_account_ids,
+  refund_storage_deposit,
   refund_deposit,
   refund_deposit_to_account,
   assert_at_least_one_yocto,
   IntoStorageKey,
   Option,
-  bytes_for_approved_account_id,
   assert_one_yocto,
-  refund_approved_account_ids_iter,
 } from "./utils";
 import { NftMint, NftTransfer } from "./events";
 import { NonFungibleTokenResolver } from "./core/resolver";
@@ -199,15 +197,18 @@ export class NonFungibleToken
     const next_approval_id_by_id = expect_approval(this.next_approval_id_by_id);
     const approved_account_ids = approvals_by_id.get(token_id) ?? {};
     const approval_id = next_approval_id_by_id.get(token_id) ?? 1n;
-    const old_approval_id = approved_account_ids[account_id];
+    const old_approved_account_ids_size =
+      JSON.stringify(approved_account_ids).length;
     approved_account_ids[account_id] = approval_id;
+    const new_approved_account_ids_size =
+      JSON.stringify(approved_account_ids).length;
 
     approvals_by_id.set(token_id, approved_account_ids);
 
     next_approval_id_by_id.set(token_id, approval_id + 1n);
 
     const storage_used =
-      old_approval_id === null ? bytes_for_approved_account_id(account_id) : 0;
+      new_approved_account_ids_size - old_approved_account_ids_size;
     refund_deposit(BigInt(storage_used));
 
     if (msg) {
@@ -242,15 +243,24 @@ export class NonFungibleToken
     );
 
     const approved_account_ids = approvals_by_id.get(token_id);
+    const old_approved_account_ids_size =
+      JSON.stringify(approved_account_ids).length;
+    let new_approved_account_ids_size;
+
     if (approved_account_ids[account_id]) {
       delete approved_account_ids[account_id];
-      refund_approved_account_ids_iter(predecessorAccountId, [account_id]);
-
       if (Object.keys(approved_account_ids).length === 0) {
         approvals_by_id.remove(token_id);
+        new_approved_account_ids_size =
+          JSON.stringify(approved_account_ids).length;
       } else {
         approvals_by_id.set(token_id, approved_account_ids);
+        new_approved_account_ids_size = 0;
       }
+      refund_storage_deposit(
+        predecessorAccountId,
+        new_approved_account_ids_size - old_approved_account_ids_size
+      );
     }
   }
 
@@ -270,7 +280,10 @@ export class NonFungibleToken
 
     const approved_account_ids = approvals_by_id.get(token_id);
     if (approved_account_ids) {
-      refund_approved_account_ids(predecessorAccountId, approved_account_ids);
+      refund_storage_deposit(
+        predecessorAccountId,
+        JSON.stringify(approved_account_ids).length
+      );
 
       approvals_by_id.remove(token_id);
     }
@@ -708,7 +721,10 @@ export class NonFungibleToken
       }
     } else {
       if (approved_account_ids) {
-        refund_approved_account_ids(previous_owner_id, approved_account_ids);
+        refund_storage_deposit(
+          previous_owner_id,
+          JSON.stringify(approved_account_ids).length
+        );
       }
       return true;
     }
@@ -718,7 +734,10 @@ export class NonFungibleToken
     if (this.approvals_by_id) {
       const receiver_approvals = this.approvals_by_id.get(token_id);
       if (receiver_approvals) {
-        refund_approved_account_ids(receiver_id, receiver_approvals);
+        refund_storage_deposit(
+          receiver_id,
+          JSON.stringify(receiver_approvals).length
+        );
       }
       if (approved_account_ids) {
         this.approvals_by_id.set(token_id, approved_account_ids);

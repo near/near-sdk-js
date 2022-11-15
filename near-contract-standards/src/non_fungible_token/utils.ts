@@ -1,33 +1,15 @@
 import { near, assert, Bytes, AccountId } from "near-sdk-js";
 
-export function bytes_for_approved_account_id(account_id: AccountId): number {
-  // The extra 4 bytes are coming from Borsh serialization to store the length of the string.
-  return account_id.length + 4 + 8;
-}
-
-export function refund_approved_account_ids_iter(
+export function refund_storage_deposit(
   account_id: AccountId,
-  approved_account_ids: AccountId[]
+  storage_released: number
 ): void {
-  const storage_released = approved_account_ids
-    .map(bytes_for_approved_account_id)
-    .reduce((a, b) => a + b);
   const promise_id = near.promiseBatchCreate(account_id);
   near.promiseBatchActionTransfer(
     promise_id,
     BigInt(storage_released) * near.storageByteCost()
   );
   near.promiseReturn(promise_id);
-}
-
-export function refund_approved_account_ids(
-  account_id: AccountId,
-  approved_account_ids: { [approvals: AccountId]: bigint }
-) {
-  refund_approved_account_ids_iter(
-    account_id,
-    Array.from(Object.keys(approved_account_ids))
-  );
 }
 
 export function refund_deposit_to_account(

@@ -1,6 +1,6 @@
-import { UnorderedMap, LookupMap, near, UnorderedSet, assert, NearPromise, bytes, serialize } from "near-sdk-js";
+import { UnorderedMap, LookupMap, near, UnorderedSet, assert, NearPromise, bytes, serialize, } from "near-sdk-js";
 import { TokenMetadata } from "./metadata";
-import { refund_approved_account_ids, refund_deposit, refund_deposit_to_account, assert_at_least_one_yocto, bytes_for_approved_account_id, assert_one_yocto, refund_approved_account_ids_iter, } from "./utils";
+import { refund_storage_deposit, refund_deposit, refund_deposit_to_account, assert_at_least_one_yocto, assert_one_yocto, } from "./utils";
 import { NftMint, NftTransfer } from "./events";
 import { Token } from "./token";
 const GAS_FOR_RESOLVE_TRANSFER = 15000000000000n;
@@ -106,11 +106,12 @@ export class NonFungibleToken {
         const next_approval_id_by_id = expect_approval(this.next_approval_id_by_id);
         const approved_account_ids = approvals_by_id.get(token_id) ?? {};
         const approval_id = next_approval_id_by_id.get(token_id) ?? 1n;
-        const old_approval_id = approved_account_ids[account_id];
+        let old_approved_account_ids_size = JSON.stringify(approved_account_ids).length;
         approved_account_ids[account_id] = approval_id;
+        let new_approved_account_ids_size = JSON.stringify(approved_account_ids).length;
         approvals_by_id.set(token_id, approved_account_ids);
         next_approval_id_by_id.set(token_id, approval_id + 1n);
-        const storage_used = old_approval_id === null ? bytes_for_approved_account_id(account_id) : 0;
+        const storage_used = new_approved_account_ids_size - old_approved_account_ids_size;
         refund_deposit(BigInt(storage_used));
         if (msg) {
             return NearPromise.new(account_id).functionCall("nft_on_approve", bytes(serialize({ token_id, owner_id, approval_id, msg })), 0n, near.prepaidGas() - GAS_FOR_NFT_APPROVE);
@@ -127,15 +128,20 @@ export class NonFungibleToken {
         const predecessorAccountId = near.predecessorAccountId();
         assert(predecessorAccountId === owner_id, "Predecessor must be token owner.");
         const approved_account_ids = approvals_by_id.get(token_id);
+        const old_approved_account_ids_size = JSON.stringify(approved_account_ids).length;
+        let new_approved_account_ids_size;
         if (approved_account_ids[account_id]) {
             delete approved_account_ids[account_id];
-            refund_approved_account_ids_iter(predecessorAccountId, [account_id]);
             if (Object.keys(approved_account_ids).length === 0) {
                 approvals_by_id.remove(token_id);
+                new_approved_account_ids_size =
+                    JSON.stringify(approved_account_ids).length;
             }
             else {
                 approvals_by_id.set(token_id, approved_account_ids);
+                new_approved_account_ids_size = 0;
             }
+            refund_storage_deposit(predecessorAccountId, new_approved_account_ids_size - old_approved_account_ids_size);
         }
     }
     nft_revoke_all({ token_id }) {
@@ -149,7 +155,7 @@ export class NonFungibleToken {
         assert(predecessorAccountId === owner_id, "Predecessor must be token owner.");
         const approved_account_ids = approvals_by_id.get(token_id);
         if (approved_account_ids) {
-            refund_approved_account_ids(predecessorAccountId, approved_account_ids);
+            refund_storage_deposit(predecessorAccountId, JSON.stringify(approved_account_ids).length);
             approvals_by_id.remove(token_id);
         }
     }
@@ -418,7 +424,7 @@ export class NonFungibleToken {
         }
         else {
             if (approved_account_ids) {
-                refund_approved_account_ids(previous_owner_id, approved_account_ids);
+                refund_storage_deposit(previous_owner_id, JSON.stringify(approved_account_ids).length);
             }
             return true;
         }
@@ -426,7 +432,7 @@ export class NonFungibleToken {
         if (this.approvals_by_id) {
             const receiver_approvals = this.approvals_by_id.get(token_id);
             if (receiver_approvals) {
-                refund_approved_account_ids(receiver_id, receiver_approvals);
+                refund_storage_deposit(receiver_id, JSON.stringify(receiver_approvals).length);
             }
             if (approved_account_ids) {
                 this.approvals_by_id.set(token_id, approved_account_ids);
