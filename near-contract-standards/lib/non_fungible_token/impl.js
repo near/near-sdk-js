@@ -106,9 +106,9 @@ export class NonFungibleToken {
         const next_approval_id_by_id = expect_approval(this.next_approval_id_by_id);
         const approved_account_ids = approvals_by_id.get(token_id) ?? {};
         const approval_id = next_approval_id_by_id.get(token_id) ?? 1n;
-        let old_approved_account_ids_size = JSON.stringify(approved_account_ids).length;
+        const old_approved_account_ids_size = serialize(approved_account_ids).length;
         approved_account_ids[account_id] = approval_id;
-        let new_approved_account_ids_size = JSON.stringify(approved_account_ids).length;
+        const new_approved_account_ids_size = serialize(approved_account_ids).length;
         approvals_by_id.set(token_id, approved_account_ids);
         next_approval_id_by_id.set(token_id, approval_id + 1n);
         const storage_used = new_approved_account_ids_size - old_approved_account_ids_size;
@@ -128,14 +128,14 @@ export class NonFungibleToken {
         const predecessorAccountId = near.predecessorAccountId();
         assert(predecessorAccountId === owner_id, "Predecessor must be token owner.");
         const approved_account_ids = approvals_by_id.get(token_id);
-        const old_approved_account_ids_size = JSON.stringify(approved_account_ids).length;
+        const old_approved_account_ids_size = serialize(approved_account_ids).length;
         let new_approved_account_ids_size;
         if (approved_account_ids[account_id]) {
             delete approved_account_ids[account_id];
             if (Object.keys(approved_account_ids).length === 0) {
                 approvals_by_id.remove(token_id);
                 new_approved_account_ids_size =
-                    JSON.stringify(approved_account_ids).length;
+                    serialize(approved_account_ids).length;
             }
             else {
                 approvals_by_id.set(token_id, approved_account_ids);
@@ -155,7 +155,7 @@ export class NonFungibleToken {
         assert(predecessorAccountId === owner_id, "Predecessor must be token owner.");
         const approved_account_ids = approvals_by_id.get(token_id);
         if (approved_account_ids) {
-            refund_storage_deposit(predecessorAccountId, JSON.stringify(approved_account_ids).length);
+            refund_storage_deposit(predecessorAccountId, serialize(approved_account_ids).length);
             approvals_by_id.remove(token_id);
         }
     }
@@ -424,7 +424,7 @@ export class NonFungibleToken {
         }
         else {
             if (approved_account_ids) {
-                refund_storage_deposit(previous_owner_id, JSON.stringify(approved_account_ids).length);
+                refund_storage_deposit(previous_owner_id, serialize(approved_account_ids).length);
             }
             return true;
         }
@@ -432,7 +432,7 @@ export class NonFungibleToken {
         if (this.approvals_by_id) {
             const receiver_approvals = this.approvals_by_id.get(token_id);
             if (receiver_approvals) {
-                refund_storage_deposit(receiver_id, JSON.stringify(receiver_approvals).length);
+                refund_storage_deposit(receiver_id, serialize(receiver_approvals).length);
             }
             if (approved_account_ids) {
                 this.approvals_by_id.set(token_id, approved_account_ids);

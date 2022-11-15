@@ -198,10 +198,10 @@ export class NonFungibleToken
     const approved_account_ids = approvals_by_id.get(token_id) ?? {};
     const approval_id = next_approval_id_by_id.get(token_id) ?? 1n;
     const old_approved_account_ids_size =
-      JSON.stringify(approved_account_ids).length;
+      serialize(approved_account_ids).length;
     approved_account_ids[account_id] = approval_id;
     const new_approved_account_ids_size =
-      JSON.stringify(approved_account_ids).length;
+      serialize(approved_account_ids).length;
 
     approvals_by_id.set(token_id, approved_account_ids);
 
@@ -244,15 +244,14 @@ export class NonFungibleToken
 
     const approved_account_ids = approvals_by_id.get(token_id);
     const old_approved_account_ids_size =
-      JSON.stringify(approved_account_ids).length;
+      serialize(approved_account_ids).length;
     let new_approved_account_ids_size;
 
     if (approved_account_ids[account_id]) {
       delete approved_account_ids[account_id];
       if (Object.keys(approved_account_ids).length === 0) {
         approvals_by_id.remove(token_id);
-        new_approved_account_ids_size =
-          JSON.stringify(approved_account_ids).length;
+        new_approved_account_ids_size = serialize(approved_account_ids).length;
       } else {
         approvals_by_id.set(token_id, approved_account_ids);
         new_approved_account_ids_size = 0;
@@ -282,7 +281,7 @@ export class NonFungibleToken
     if (approved_account_ids) {
       refund_storage_deposit(
         predecessorAccountId,
-        JSON.stringify(approved_account_ids).length
+        serialize(approved_account_ids).length
       );
 
       approvals_by_id.remove(token_id);
@@ -723,7 +722,7 @@ export class NonFungibleToken
       if (approved_account_ids) {
         refund_storage_deposit(
           previous_owner_id,
-          JSON.stringify(approved_account_ids).length
+          serialize(approved_account_ids).length
         );
       }
       return true;
@@ -736,7 +735,7 @@ export class NonFungibleToken
       if (receiver_approvals) {
         refund_storage_deposit(
           receiver_id,
-          JSON.stringify(receiver_approvals).length
+          serialize(receiver_approvals).length
         );
       }
       if (approved_account_ids) {
