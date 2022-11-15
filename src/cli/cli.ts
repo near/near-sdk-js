@@ -11,6 +11,7 @@ import { Command } from "commander";
 import signal from "signale";
 
 import { executeCommand, validateContract } from "./utils.js";
+import { runAbiCompilerPlugin } from "./abi.js";
 
 const { Signale } = signal;
 const PROJECT_DIR = process.cwd();
@@ -29,6 +30,7 @@ program
       .description("Build NEAR JS Smart-contract")
       .argument("[source]", "Contract to build.", "src/index.js")
       .argument("[target]", "Target file path and name.", "build/contract.wasm")
+      .argument("[packageJson]", "Target file path and name.", "package.json")
       .option("--verbose", "Whether to print more verbose output.", false)
       .action(buildCom)
   )
@@ -83,12 +85,16 @@ function getRollupTarget(target: string): string {
   return `${getTargetDir(target)}/${getTargetFileName(target)}.js`
 }
 
-function getQjscTarget(target:string): string {
+function getQjscTarget(target: string): string {
   return `${getTargetDir(target)}/${getTargetFileName(target)}.h`;
 }
 
 function getContractTarget(target: string): string {
   return `${getTargetDir(target)}/${getTargetFileName(target)}.wasm`;
+}
+
+function getContractAbi(target: string): string {
+  return `${getTargetDir(target)}/${getTargetFileName(target)}-abi.json`;
 }
 
 function requireTargetExt(target: string): void {
@@ -112,14 +118,14 @@ function ensureTargetDirExists(target: string): void {
   fs.mkdirSync(targetDir, {});
 }
 
-export async function validateCom(source: string, { verbose = false}: {verbose: boolean}): Promise<void> {
+export async function validateCom(source: string, { verbose = false }: { verbose: boolean }): Promise<void> {
   signal.await(`Validating ${source} contract...`);
   if (!await validateContract(source, verbose)) {
     process.exit(1);
   }
 }
 
-export async function checkTypescriptCom(source: string, { verbose = false}: {verbose: boolean}): Promise<void> {
+export async function checkTypescriptCom(source: string, { verbose = false }: { verbose: boolean }): Promise<void> {
   const sourceExt = source.split(".").pop();
   if (sourceExt !== "ts") {
     signal.info(`Source file is not a typescript file ${source}`)
@@ -130,7 +136,20 @@ export async function checkTypescriptCom(source: string, { verbose = false}: {ve
   await checkTsBuildWithTsc(source, verbose);
 }
 
-export async function createJsFileWithRullupCom(source: string, target: string, { verbose = false}: {verbose: boolean}): Promise<void> {
+export async function generateAbi(source: string, target: string, packageJson: string): Promise<void> {
+  const sourceExt = source.split(".").pop();
+  if (sourceExt !== "ts") {
+    signal.info(`Skipping ABI generation as source file is not a typescript file ${source}`)
+    return;
+  }
+
+  signal.await("Generating ABI...");
+  const abi = runAbiCompilerPlugin(source, packageJson);
+  fs.writeFileSync(getContractAbi(target), JSON.stringify(abi, null, 2));
+  signal.success(`Generated ${getContractAbi(target)} ABI successfully!`);
+}
+
+export async function createJsFileWithRullupCom(source: string, target: string, { verbose = false }: { verbose: boolean }): Promise<void> {
   requireTargetExt(target);
   ensureTargetDirExists(target);
 
@@ -139,7 +158,7 @@ export async function createJsFileWithRullupCom(source: string, target: string, 
 }
 
 
-export async function transpileJsAndBuildWasmCom(target: string, { verbose = false}: {verbose: boolean}): Promise<void> {
+export async function transpileJsAndBuildWasmCom(target: string, { verbose = false }: { verbose: boolean }): Promise<void> {
   requireTargetExt(target);
   ensureTargetDirExists(target);
 
@@ -161,6 +180,7 @@ export async function transpileJsAndBuildWasmCom(target: string, { verbose = fal
 export async function buildCom(
   source: string,
   target: string,
+  packageJson: string,
   { verbose = false }: { verbose: boolean }
 ): Promise<void> {
   requireTargetExt(target);
@@ -168,6 +188,8 @@ export async function buildCom(
   signal.await(`Building ${source} contract...`);
 
   await checkTypescriptCom(source, { verbose });
+
+  await generateAbi(source, target, packageJson);
 
   ensureTargetDirExists(target);
 
