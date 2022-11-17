@@ -54,9 +54,9 @@ export class NonFungibleToken {
         return new Token(token_id, owner_id, metadata, approved_account_ids);
     }
     nft_tokens({ from_index, limit, }) {
-        const start_index = from_index === null ? 0 : from_index;
+        const start_index = from_index === undefined ? 0 : from_index;
         assert(this.owner_by_id.length >= start_index, "Out of bounds, please use a smaller from_index.");
-        let l = limit === null ? 2 ** 32 : limit;
+        let l = limit === undefined ? 2 ** 32 : limit;
         assert(l > 0, "limit must be greater than 0.");
         l = Math.min(l, this.owner_by_id.length - start_index);
         const ret = [];
@@ -77,14 +77,14 @@ export class NonFungibleToken {
     }
     nft_tokens_for_owner({ account_id, from_index, limit, }) {
         const tokens_per_owner = this.tokens_per_owner;
-        assert(tokens_per_owner !== null, "Could not find tokens_per_owner when calling a method on the enumeration standard.");
+        assert(tokens_per_owner !== undefined, "Could not find tokens_per_owner when calling a method on the enumeration standard.");
         const token_set = tokens_per_owner.get(account_id, {
             reconstructor: UnorderedSet.reconstruct,
         });
         assert(token_set !== null, "Token set is empty");
-        const start_index = from_index === null ? 0 : from_index;
+        const start_index = from_index === undefined ? 0 : from_index;
         assert(token_set.length >= start_index, "Out of bounds, please use a smaller from_index.");
-        let l = limit === null ? 2 ** 32 : limit;
+        let l = limit === undefined ? 2 ** 32 : limit;
         assert(l > 0, "limit must be greater than 0.");
         l = Math.min(l, token_set.length - start_index);
         const ret = [];
@@ -134,8 +134,7 @@ export class NonFungibleToken {
             delete approved_account_ids[account_id];
             if (Object.keys(approved_account_ids).length === 0) {
                 approvals_by_id.remove(token_id);
-                new_approved_account_ids_size =
-                    serialize(approved_account_ids).length;
+                new_approved_account_ids_size = serialize(approved_account_ids).length;
             }
             else {
                 approvals_by_id.set(token_id, approved_account_ids);
@@ -196,7 +195,7 @@ export class NonFungibleToken {
         this.token_metadata_by_id = token_metadata_prefix
             ? new LookupMap(token_metadata_prefix.into_storage_key())
             : null;
-        this.tokens_per_owner = new LookupMap(enumeration_prefix.into_storage_key());
+        this.tokens_per_owner = enumeration_prefix ? new LookupMap(enumeration_prefix.into_storage_key()) : null;
         this.approvals_by_id = approvals_by_id;
         this.next_approval_id_by_id = next_approval_id_by_id;
         this.measure_min_token_storage_cost();
@@ -304,11 +303,11 @@ export class NonFungibleToken {
             if (!actual_approval_id) {
                 throw new Error("Sender not approved");
             }
-            assert(approval_id == null || approval_id == actual_approval_id, `The actual approval_id ${actual_approval_id} is different from the given ${approval_id}`);
+            assert(approval_id === undefined || approval_id == actual_approval_id, `The actual approval_id ${actual_approval_id} is different from the given ${approval_id}`);
             sender_id_authorized = sender_id;
         }
         else {
-            sender_id_authorized = null;
+            sender_id_authorized = undefined;
         }
         assert(owner_id != receiver_id, "Current and next owner must differ");
         this.internal_transfer_unguarded(token_id, owner_id, receiver_id);
@@ -316,11 +315,11 @@ export class NonFungibleToken {
         return [owner_id, approved_account_ids];
     }
     static emit_transfer(owner_id, receiver_id, token_id, sender_id, memo) {
-        new NftTransfer(owner_id, receiver_id, [token_id], sender_id && sender_id == owner_id ? sender_id : null, memo).emit();
+        new NftTransfer(owner_id, receiver_id, [token_id], sender_id && sender_id == owner_id ? sender_id : undefined, memo).emit();
     }
     internal_mint(token_id, token_owner_id, token_metadata) {
         const token = this.internal_mint_with_refund(token_id, token_owner_id, token_metadata, near.predecessorAccountId());
-        new NftMint(token.owner_id, [token.token_id], null).emit();
+        new NftMint(token.owner_id, [token.token_id]).emit();
         return token;
     }
     internal_mint_with_refund(token_id, token_owner_id, token_metadata, refund_id) {
@@ -328,7 +327,7 @@ export class NonFungibleToken {
         if (refund_id) {
             initial_storage_usage = [refund_id, near.storageUsage()];
         }
-        if (this.token_metadata_by_id && token_metadata == null) {
+        if (this.token_metadata_by_id && token_metadata === undefined) {
             throw new Error("Must provide metadata");
         }
         if (this.owner_by_id.get(token_id)) {
@@ -347,7 +346,7 @@ export class NonFungibleToken {
             token_ids.set(token_id);
             this.tokens_per_owner.set(owner_id, token_ids);
         }
-        const approved_account_ids = this.approvals_by_id ? {} : null;
+        const approved_account_ids = this.approvals_by_id ? {} : undefined;
         if (initial_storage_usage) {
             const [id, storage_usage] = initial_storage_usage;
             refund_deposit_to_account(near.storageUsage() - storage_usage, id);

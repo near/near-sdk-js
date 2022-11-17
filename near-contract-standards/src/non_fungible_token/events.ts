@@ -16,7 +16,6 @@
 import { AccountId } from "near-sdk-js";
 import { NearEvent } from "../event";
 import { TokenId } from "./token";
-import { Option } from "./utils";
 
 export type Nep171EventKind = NftMint[] | NftTransfer[] | NftBurn[];
 
@@ -36,7 +35,7 @@ export class NftMint {
   constructor(
     public owner_id: AccountId,
     public token_ids: TokenId[],
-    public memo: Option<string>
+    public memo?: string
   ) {}
 
   /** Logs the event to the host. This is required to ensure that the event is triggered
@@ -59,8 +58,8 @@ export class NftTransfer {
     public old_owner_id: AccountId,
     public new_owner_id: AccountId,
     public token_ids: TokenId[],
-    public authorized_id: Option<AccountId>,
-    public memo: Option<string>
+    public authorized_id?: AccountId,
+    public memo?: string
   ) {}
 
   /** Logs the event to the host. This is required to ensure that the event is triggered
@@ -81,8 +80,8 @@ export class NftBurn {
   constructor(
     public owner_id: AccountId,
     public token_ids: TokenId[],
-    authorized_id: Option<string>,
-    public memo: Option<string>
+    public authorized_id?: string,
+    public memo?: string
   ) {}
 
   /** Logs the event to the host. This is required to ensure that the event is triggered

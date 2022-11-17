@@ -5,16 +5,8 @@ async function helper_mint(nft, nftOwner, id, title, description) {
   let token_metadata = {
     title,
     description,
-    media: null,
-    media_hash: null,
+
     copies: 1,
-    issued_at: null,
-    expires_at: null,
-    starts_at: null,
-    updated_at: null,
-    extra: null,
-    reference: null,
-    reference_hash: null,
   };
   await nftOwner.call(
     nft,
@@ -92,13 +84,13 @@ test("Enumerate NFT tokens total supply", async (t) => {
 test("Enumerate NFT tokens", async (t) => {
   const { nft } = t.context.accounts;
 
-  let nftTokens = await nft.view("nft_tokens", { from_index: 1, limit: null });
+  let nftTokens = await nft.view("nft_tokens", { from_index: 1 });
   t.is(nftTokens.length, 3);
   t.is(nftTokens[0].token_id, "1");
   t.is(nftTokens[1].token_id, "2");
   t.is(nftTokens[2].token_id, "3");
 
-  nftTokens = await nft.view("nft_tokens", { from_index: null, limit: 2 });
+  nftTokens = await nft.view("nft_tokens", { limit: 2 });
   t.is(nftTokens.length, 2);
   t.is(nftTokens[0].token_id, "0");
   t.is(nftTokens[1].token_id, "1");
@@ -123,8 +115,6 @@ test("Enumerate NFT tokens for owner", async (t) => {
 
   let nftTokens = await nft.view("nft_tokens_for_owner", {
     account_id: nftOwner.accountId,
-    from_index: null,
-    limit: null,
   });
   t.is(nftTokens.length, 4);
   t.is(nftTokens[0].token_id, "0");
@@ -135,7 +125,6 @@ test("Enumerate NFT tokens for owner", async (t) => {
   nftTokens = await nft.view("nft_tokens_for_owner", {
     account_id: nftOwner.accountId,
     from_index: 1,
-    limit: null,
   });
   t.is(nftTokens.length, 3);
   t.is(nftTokens[0].token_id, "1");
@@ -144,7 +133,6 @@ test("Enumerate NFT tokens for owner", async (t) => {
 
   nftTokens = await nft.view("nft_tokens_for_owner", {
     account_id: nftOwner.accountId,
-    from_index: null,
     limit: 2,
   });
   t.is(nftTokens.length, 2);
@@ -157,7 +145,6 @@ test("Enumerate NFT tokens for owner", async (t) => {
     {
       receiver_id: ali.accountId,
       token_id: "0",
-      approval_id: null,
       memo: "simple transfer",
     },
     { attachedDeposit: "1" }
@@ -166,15 +153,11 @@ test("Enumerate NFT tokens for owner", async (t) => {
 
   nftTokens = await nft.view("nft_tokens_for_owner", {
     account_id: ali.accountId,
-    from_index: null,
-    limit: null,
   });
   t.is(nftTokens.length, 1);
 
   nftTokens = await nft.view("nft_tokens_for_owner", {
     account_id: nftOwner.accountId,
-    from_index: null,
-    limit: null,
   });
   t.is(nftTokens.length, 3);
   t.is(nftTokens[0].token_id, "3");

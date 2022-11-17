@@ -35,16 +35,8 @@ test.beforeEach(async (t) => {
   let token_metadata = {
     title: "Olympus Mons",
     description: "The tallest mountain in the charted solar system",
-    media: null,
-    media_hash: null,
+
     copies: 1,
-    issued_at: null,
-    expires_at: null,
-    starts_at: null,
-    updated_at: null,
-    extra: null,
-    reference: null,
-    reference_hash: null,
   };
   await nftOwner.call(
     nft,
@@ -85,7 +77,6 @@ test("Simple approve", async (t) => {
     {
       token_id: "0",
       account_id: ali.accountId,
-      msg: null,
     },
     { attachedDeposit: "510000000000000000000" }
   );
@@ -94,7 +85,6 @@ test("Simple approve", async (t) => {
   let alice_approved = await nft.view("nft_is_approved", {
     token_id: "0",
     approved_account_id: ali.accountId,
-    approval_id: null,
   });
   t.assert(alice_approved);
 
@@ -118,7 +108,6 @@ test("Simple approve", async (t) => {
     {
       token_id: "0",
       account_id: ali.accountId,
-      msg: null,
     },
     {
       attachedDeposit: "1",
@@ -138,7 +127,6 @@ test("Simple approve", async (t) => {
     {
       token_id: "0",
       account_id: bob.accountId,
-      msg: null,
     },
     {
       attachedDeposit: "550000000000000000000",
@@ -191,7 +179,6 @@ test("Approved account transfers token", async (t) => {
     {
       token_id: "0",
       account_id: ali.accountId,
-      msg: null,
     },
     { attachedDeposit: "510000000000000000000" }
   );
@@ -206,7 +193,6 @@ test("Approved account transfers token", async (t) => {
     {
       receiver_id: ali.accountId,
       token_id: "0",
-      approval_id: null,
       memo: "gotcha! bahahaha",
     },
     { attachedDeposit: "1" }
@@ -226,7 +212,6 @@ test("revoke", async (t) => {
     {
       token_id: "0",
       account_id: ali.accountId,
-      msg: null,
     },
     { attachedDeposit: "510000000000000000000" }
   );
@@ -238,7 +223,6 @@ test("revoke", async (t) => {
     {
       token_id: "0",
       account_id: bob.accountId,
-      msg: null,
     },
     {
       attachedDeposit: "510000000000000000000",
@@ -262,14 +246,12 @@ test("revoke", async (t) => {
   let alice_approved = await nft.view("nft_is_approved", {
     token_id: "0",
     approved_account_id: ali.accountId,
-    approval_id: null,
   });
   t.assert(!alice_approved);
 
   let bob_approved = await nft.view("nft_is_approved", {
     token_id: "0",
     approved_account_id: bob.accountId,
-    approval_id: null,
   });
   t.assert(bob_approved);
 
@@ -289,14 +271,12 @@ test("revoke", async (t) => {
   alice_approved = await nft.view("nft_is_approved", {
     token_id: "0",
     approved_account_id: ali.accountId,
-    approval_id: null,
   });
   t.assert(!alice_approved);
 
   bob_approved = await nft.view("nft_is_approved", {
     token_id: "0",
     approved_account_id: bob.accountId,
-    approval_id: null,
   });
   t.assert(!bob_approved);
 });
@@ -310,7 +290,6 @@ test("revoke all", async (t) => {
     {
       token_id: "0",
       accountId: ali.accountId,
-      msg: null,
     },
     { attachedDeposit: "510000000000000000000" }
   );
@@ -322,7 +301,6 @@ test("revoke all", async (t) => {
     {
       token_id: "0",
       accountId: bob.accountId,
-      msg: null,
     },
     {
       attachedDeposit: "510000000000000000000",
@@ -343,14 +321,12 @@ test("revoke all", async (t) => {
   let alice_approved = await nft.view("nft_is_approved", {
     token_id: "0",
     approved_account_id: ali.accountId,
-    approval_id: null,
   });
   t.assert(!alice_approved);
 
   let bob_approved = await nft.view("nft_is_approved", {
     token_id: "0",
     approved_account_id: bob.accountId,
-    approval_id: null,
   });
   t.assert(!bob_approved);
 });

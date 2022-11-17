@@ -36,7 +36,7 @@ export interface NonFungibleTokenApproval {
     nft_approve({ token_id, account_id, msg, }: {
         token_id: TokenId;
         account_id: AccountId;
-        msg: Option<string>;
+        msg?: string;
     }): Option<NearPromise>;
     /** Revoke an approved account for a specific token.
      *
@@ -80,6 +80,6 @@ export interface NonFungibleTokenApproval {
     nft_is_approved({ token_id, approved_account_id, approval_id, }: {
         token_id: TokenId;
         approved_account_id: AccountId;
-        approval_id: Option<bigint>;
+        approval_id?: bigint;
     }): boolean;
 }
