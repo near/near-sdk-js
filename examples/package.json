@@ -18,7 +18,7 @@
     "build:non-fungible-token": "near-sdk-js build src/non-fungible-token-receiver.js build/non-fungible-token-receiver.wasm && near-sdk-js build src/non-fungible-token.js build/non-fungible-token.wasm",
     "build:status-message-collections": "near-sdk-js build src/status-message-collections.js build/status-message-collections.wasm",
     "build:parking-lot": "near-sdk-js build src/parking-lot.ts build/parking-lot.wasm",
-    "build:programmatic-update": "near-sdk-js build src/programmatic-update.ts build/programmatic-update.wasm",
+    "build:programmatic-update": "near-sdk-js build src/programmatic-update-before.ts build/programmatic-update-before.wasm && near-sdk-js build src/programmatic-update-after.ts build/programmatic-update-after.wasm",
     "build:nested-collections": "near-sdk-js build src/nested-collections.ts build/nested-collections.wasm",
     "build-nft": "run-s build:nft-*",
     "build:nft-contract": "near-sdk-js build src/standard-nft/my-nft.ts build/my-nft.wasm",
