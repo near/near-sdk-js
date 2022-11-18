@@ -1,9 +1,9 @@
-import { NearBindgen, near, initialize, assert, view, includeBytes, bytes } from 'near-sdk-js';
+import { NearBindgen, near, initialize, assert, view } from 'near-sdk-js';
 
 @NearBindgen({requireInit: true})
-class ProgrammaticUpdateAfter {
+export class ProgrammaticUpdateAfter {
 
-  greeting: string = "Hello";
+  greeting = "Hello";
 
   @initialize({privateFunction: true}) 
   init({ manager }:{manager: string}) {
@@ -19,10 +19,10 @@ class ProgrammaticUpdateAfter {
 
 
 export function updateContract() {
-  let manager = near.storageRead("MANAGER");
+  const manager = near.storageRead("MANAGER");
   assert(near.predecessorAccountId() === manager, "Only the manager can update the code")
 
-  let promiseId = near.promiseBatchCreate(near.currentAccountId());
+  const promiseId = near.promiseBatchCreate(near.currentAccountId());
   near.promiseBatchActionDeployContract(
     promiseId,
     near.input()
