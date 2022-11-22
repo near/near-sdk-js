@@ -1,4 +1,10 @@
-import { assert, NearAmount, PromiseIndex, Register, u8ArrayToLatin1 } from "./utils";
+import {
+  assert,
+  NearAmount,
+  PromiseIndex,
+  Register,
+  u8ArrayToLatin1,
+} from "./utils";
 import { GasWeight, PromiseResult } from "./types";
 
 const U64_MAX = 2n ** 64n - 1n;
@@ -85,7 +91,10 @@ interface Env {
   promise_batch_create(accountId: string): bigint;
   promise_batch_then(promiseIndex: bigint, accountId: string): bigint;
   promise_batch_action_create_account(promiseIndex: bigint): void;
-  promise_batch_action_deploy_contract(promiseIndex: bigint, code: Uint8Array): void;
+  promise_batch_action_deploy_contract(
+    promiseIndex: bigint,
+    code: Uint8Array
+  ): void;
   promise_batch_action_function_call(
     promiseIndex: bigint,
     methodName: string,
@@ -112,7 +121,10 @@ interface Env {
     receiverId: string,
     methodNames: string
   ): void;
-  promise_batch_action_delete_key(promiseIndex: bigint, publicKey: Uint8Array): void;
+  promise_batch_action_delete_key(
+    promiseIndex: bigint,
+    publicKey: Uint8Array
+  ): void;
   promise_batch_action_delete_account(
     promiseIndex: bigint,
     beneficiaryId: string
