@@ -71,8 +71,8 @@ export function runAbiCompilerPlugin(
     if (diagnostics.length > 0) {
         diagnostics.forEach((diagnostic) => {
             const message = ts.flattenDiagnosticMessageText(diagnostic.messageText, "\n");
-            if (diagnostic.file) {
-                const { line, character } = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start!);
+            if (diagnostic.file && diagnostic.start) {
+                const { line, character } = diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start);
                 console.error(`${diagnostic.file.fileName} (${line + 1},${character + 1}): ${message}`);
             } else {
                 console.error(message);
@@ -81,7 +81,10 @@ export function runAbiCompilerPlugin(
         throw Error("Failed to compile the contract");
     }
 
-    const generator = TJS.buildGenerator(program)!;
+    const generator = TJS.buildGenerator(program);
+    if (!generator) {
+        throw Error("Failed to generate ABI due to an unexpected typescript-json-schema error. Please report this.");
+    }
 
     const abiFunctions: abi.AbiFunction[] = [];
 
@@ -108,6 +111,7 @@ export function runAbiCompilerPlugin(
                             if (arg.kind !== ts.SyntaxKind.ObjectLiteralExpression) return;
                             const objLiteral = arg as ts.ObjectLiteralExpression;
                             objLiteral.properties.forEach((prop) => {
+                                // eslint-disable-next-line @typescript-eslint/no-explicit-any
                                 const propName = (prop.name as any).text;
                                 if (propName === "privateFunction") {
                                     if (prop.kind !== ts.SyntaxKind.PropertyAssignment) return;
@@ -166,6 +170,7 @@ export function runAbiCompilerPlugin(
                         const nodeType = tc.getTypeAtLocation(parameter);
                         const schema = generator.getTypeDefinition(nodeType, true);
                         const abiParameter: abi.AbiJsonParameter = {
+                            // eslint-disable-next-line @typescript-eslint/no-explicit-any
                             name: (parameter.name as any).text,
                             type_schema: schema as JSONSchema7
                         };
@@ -184,6 +189,7 @@ export function runAbiCompilerPlugin(
                     };
                 }
                 const abiFunction: abi.AbiFunction = {
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     name: (methodDeclaration.name as any).text,
                     kind: isView ? abi.AbiFunctionKind.View : abi.AbiFunctionKind.Call,
                     modifiers: abiModifiers,
