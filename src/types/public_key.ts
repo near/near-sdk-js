@@ -1,81 +1,126 @@
 import { Bytes, bytes } from "../utils";
-import { base58 } from '@scure/base';
+import { base58 } from "@scure/base";
 
 export enum CurveType {
-    ED25519 = 0,
-    SECP256K1 = 1,
+  ED25519 = 0,
+  SECP256K1 = 1,
 }
 
-function data_len(c: CurveType): number {
-    switch (c) {
-        case CurveType.ED25519:
-            return 32;
-        case CurveType.SECP256K1:
-            return 64;
-        default:
-            throw new UnknownCurve()
-    }
+enum DataLength {
+  ED25519 = 32,
+  SECP256K1 = 64,
 }
 
-function split_key_type_data(value: string): [CurveType, string] {
-    let idx = value.indexOf(":");
-    if (idx >= 0) {
-        return [curveTypeFromStr(value.substring(0, idx)), value.substring(idx + 1)];
-    } else {
-        return [CurveType.ED25519, value];
-    }
+function getCurveType(curveType: CurveType | number): CurveType {
+  switch (curveType) {
+    case CurveType.ED25519:
+    case CurveType.SECP256K1:
+      return curveType;
+    default:
+      throw new UnknownCurve();
+  }
+}
+
+function dataLength(curveType: CurveType | number): DataLength {
+  switch (curveType) {
+    case CurveType.ED25519:
+    case CurveType.SECP256K1:
+      return {
+        [CurveType.ED25519]: DataLength.ED25519,
+        [CurveType.SECP256K1]: DataLength.SECP256K1,
+      }[curveType];
+    default:
+      throw new UnknownCurve();
+  }
+}
+
+function splitKeyTypeData(value: string): [CurveType, string] {
+  const idx = value.indexOf(":");
+  if (idx >= 0) {
+    return [
+      curveTypeFromStr(value.substring(0, idx)),
+      value.substring(idx + 1),
+    ];
+  } else {
+    return [CurveType.ED25519, value];
+  }
 }
 
 export function curveTypeFromStr(value: string): CurveType {
-    switch (value) {
-        case "ed25519":
-            return CurveType.ED25519;
-        case "secp256k1":
-            return CurveType.SECP256K1;
-        default:
-            throw new UnknownCurve();
-    }
+  switch (value) {
+    case "ed25519":
+      return CurveType.ED25519;
+    case "secp256k1":
+      return CurveType.SECP256K1;
+    default:
+      throw new UnknownCurve();
+  }
 }
 
 export class ParsePublicKeyError extends Error {}
+
 export class InvalidLengthError extends ParsePublicKeyError {
-    constructor(public length: number) {
-        super(`Invalid length: ${length}`);
-    }
+  constructor(public length: number, public expectedLength: number) {
+    super(`Invalid length: ${length}. Expected: ${expectedLength}`);
+  }
 }
 export class Base58Error extends ParsePublicKeyError {
-    constructor(public error: string) {
-        super(`Base58 error: ${error}`);
-    }
+  constructor(public error: string) {
+    super(`Base58 error: ${error}`);
+  }
 }
 export class UnknownCurve extends ParsePublicKeyError {
-    constructor() {
-        super("Unknown curve");
-    }
+  constructor() {
+    super("Unknown curve");
+  }
 }
 
+/**
+ * A abstraction on top of the NEAR public key string.
+ */
 export class PublicKey {
-    constructor(public data: Bytes) {
-        let curve_type = data.charCodeAt(0) as CurveType
-        let curve_len = data_len(curve_type)
-        if (data.length != curve_len + 1) {
-            throw new InvalidLengthError(data.length)
-        }
-        this.data = data
+  /**
+   * The actual value of the public key.
+   */
+  public data: Bytes;
+  private type: CurveType;
+
+  /**
+   * @param data - The string you want to create a PublicKey from.
+   */
+  constructor(data: Bytes) {
+    const curveLenght = dataLength(data.charCodeAt(0));
+
+    if (data.length !== curveLenght + 1) {
+      throw new InvalidLengthError(data.length, curveLenght + 1);
     }
 
-    curveType(): CurveType {
-        return this.data.charCodeAt(0) as CurveType
+    this.type = getCurveType(data.charCodeAt(0));
+    this.data = data;
+  }
+
+  /**
+   * The curve type of the public key.
+   */
+  curveType(): CurveType {
+    return this.type;
+  }
+
+  /**
+   * Create a public key from a public key string.
+   *
+   * @param publicKeyString - The public key string you want to create a PublicKey from.
+   */
+  static fromString(publicKeyString: string) {
+    const [curve, keyData] = splitKeyTypeData(publicKeyString);
+    let data: Bytes;
+
+    try {
+      data = bytes(base58.decode(keyData));
+    } catch (error) {
+      throw new Base58Error(error.message);
     }
 
-    static fromString(s: string) {
-        let [curve, key_data] = split_key_type_data(s);
-        let data: Bytes;
-        try {
-            data = bytes(base58.decode(key_data));
-        } catch (err) {
-            throw new Base58Error(err.message);
-        }
-        return new PublicKey(String.fromCharCode(curve) + data);
-    }
+    return new PublicKey(`${String.fromCharCode(curve)}${data}`);
+  }
 }

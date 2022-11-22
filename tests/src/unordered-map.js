@@ -1,76 +1,73 @@
-import {
-    NearContract,
-    NearBindgen,
-    call,
-    view,
-    UnorderedMap,
-    Vector
-} from 'near-sdk-js'
-import {House, Room} from './model.js';
+import { NearBindgen, call, view, UnorderedMap } from "near-sdk-js";
+import { House, Room } from "./model.js";
 
-@NearBindgen
-class UnorderedMapTestContract extends NearContract {
-    constructor() {
-        super()
-        this.unorderedMap = new UnorderedMap('a');
-    }
+@NearBindgen({})
+export class UnorderedMapTestContract {
+  constructor() {
+    this.unorderedMap = new UnorderedMap("a");
+  }
 
-    default() {
-        return new UnorderedMapTestContract();
-    }
+  @view({})
+  len() {
+    return this.unorderedMap.length;
+  }
 
-    @view
-    len() {
-        return this.unorderedMap.length;
-    }
+  @view({})
+  isEmpty() {
+    return this.unorderedMap.isEmpty();
+  }
 
-    @view
-    isEmpty() {
-        return this.unorderedMap.isEmpty();
-    }
+  @view({})
+  get({ key }) {
+    return this.unorderedMap.get(key);
+  }
 
-    @view
-    get({key}) {
-        return this.unorderedMap.get(key);
-    }
+  @call({})
+  set({ key, value }) {
+    this.unorderedMap.set(key, value);
+  }
 
-    @call
-    set({key, value}) {
-        this.unorderedMap.set(key, value);
-    }
+  @call({})
+  remove_key({ key }) {
+    this.unorderedMap.remove(key);
+  }
 
-    @call
-    remove_key({key}) {
-        this.unorderedMap.remove(key);
-    }
+  @call({})
+  clear() {
+    this.unorderedMap.clear();
+  }
 
-    @call
-    clear() {
-        this.unorderedMap.clear();
-    }
+  @view({})
+  toArray() {
+    return this.unorderedMap.toArray();
+  }
 
-    @view
-    toArray() {
-        return this.unorderedMap.toArray();
-    }
+  @call({})
+  extend({ kvs }) {
+    this.unorderedMap.extend(kvs);
+  }
 
-    @call
-    extend({kvs}) {
-        this.unorderedMap.extend(kvs);
-    }
+  @call({})
+  add_house() {
+    this.unorderedMap.set(
+      "house1",
+      new House("house1", [
+        new Room("room1", "200sqft"),
+        new Room("room2", "300sqft"),
+      ])
+    );
+  }
 
-    @call
-    add_house() {
-        this.unorderedMap.set('house1', new House('house1', [new Room('room1', '200sqft'), new Room('room2', '300sqft')]))
-    }
-
-    @view
-    get_house() {
-        const rawHouse = this.unorderedMap.get('house1')
-        const house = new House(rawHouse.name, rawHouse.rooms)
-        const rawRoom = house.rooms[0]
-        const room = new Room(rawRoom.name, rawRoom.size)
-        return house.describe() + room.describe()
-    }
+  @view({})
+  get_house() {
+    const house = this.unorderedMap.get("house1", {
+      reconstructor: (rawHouse) =>
+        new House(
+          rawHouse.name,
+          rawHouse.rooms.map((rawRoom) => new Room(rawRoom.name, rawRoom.size))
+        ),
+    });
+    const room = house.rooms[0];
+    return house.describe() + room.describe();
+  }
 }
-

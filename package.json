@@ -1,6 +1,6 @@
 {
   "name": "near-sdk-js",
-  "version": "0.4.0",
+  "version": "0.6.0",
   "description": "High Level JavaScript SDK for building smart contracts on NEAR",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -23,13 +23,18 @@
   "scripts": {
     "build": "tsc -p ./tsconfig.json",
     "pretest": "yarn build",
-    "test": "yarn test:unit && yarn test:examples",
+    "test": "run-s test:*",
+    "lint": "eslint --fix .",
+    "format": "prettier --write .",
     "test:unit": "yarn && cd tests && yarn && yarn build && yarn test && cd ..",
     "test:examples": "yarn && cd examples && yarn && yarn build && yarn test && cd ..",
-    "postinstall": "cd cli && rm -rf deps && mkdir -p deps && cd deps && node ../post-install.js"
+    "postinstall": "node lib/cli/post-install.js"
   },
   "bin": {
-    "near-sdk-js": "cli/cli.js"
+    "near-sdk-js": "lib/cli/cli.js"
+  },
+  "engines": {
+    "node": ">=14 <16.6.0 || >16.6.0"
   },
   "author": "Near Inc <hello@nearprotocol.com>",
   "dependencies": {
@@ -40,19 +45,34 @@
     "@rollup/plugin-commonjs": "^21.0.1",
     "@rollup/plugin-node-resolve": "^13.1.1",
     "@scure/base": "^1.1.1",
-    "bs58": "^5.0.0",
+    "commander": "^9.4.1",
     "rollup": "^2.61.1",
     "rollup-plugin-sourcemaps": "^0.6.3",
-    "yargs": "^17.5.1"
+    "signale": "^1.4.0",
+    "ts-morph": "^16.0.0"
   },
   "files": [
-    "cli",
+    "builder",
     "lib"
   ],
   "devDependencies": {
     "@rollup/plugin-typescript": "^8.3.2",
+    "@types/babel__core": "^7.1.19",
+    "@types/babel__traverse": "^7.18.1",
+    "@types/eslint": "^8.4.6",
     "@types/node": "^17.0.38",
     "@types/rollup": "^0.54.0",
+    "chalk": "^5.1.0",
+    "@types/signale": "^1.4.4",
+    "@typescript-eslint/eslint-plugin": "^5.37.0",
+    "@typescript-eslint/parser": "^5.37.0",
+    "eslint": "^8.23.1",
+    "eslint-config-prettier": "^8.5.0",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^2.7.1",
     "typescript": "^4.7.2"
+  },
+  "resolutions": {
+    "**/@types/estree": "^1.0.0"
   }
 }
