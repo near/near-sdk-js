@@ -31,6 +31,7 @@ program
       .argument("[source]", "Contract to build.", "src/index.js")
       .argument("[target]", "Target file path and name.", "build/contract.wasm")
       .argument("[packageJson]", "Target file path and name.", "package.json")
+      .argument("[tsConfig]", "Target file path and name.", "tsconfig.json")
       .option("--verbose", "Whether to print more verbose output.", false)
       .action(buildCom)
   )
@@ -136,7 +137,7 @@ export async function checkTypescriptCom(source: string, { verbose = false }: { 
   await checkTsBuildWithTsc(source, verbose);
 }
 
-export async function generateAbi(source: string, target: string, packageJson: string): Promise<void> {
+export async function generateAbi(source: string, target: string, packageJson: string, tsConfig: string): Promise<void> {
   const sourceExt = source.split(".").pop();
   if (sourceExt !== "ts") {
     signal.info(`Skipping ABI generation as source file is not a typescript file ${source}`)
@@ -144,7 +145,7 @@ export async function generateAbi(source: string, target: string, packageJson: s
   }
 
   signal.await("Generating ABI...");
-  const abi = runAbiCompilerPlugin(source, packageJson);
+  const abi = runAbiCompilerPlugin(source, packageJson, tsConfig);
   fs.writeFileSync(getContractAbi(target), JSON.stringify(abi, null, 2));
   signal.success(`Generated ${getContractAbi(target)} ABI successfully!`);
 }
@@ -181,6 +182,7 @@ export async function buildCom(
   source: string,
   target: string,
   packageJson: string,
+  tsConfig: string,
   { verbose = false }: { verbose: boolean }
 ): Promise<void> {
   requireTargetExt(target);
@@ -189,7 +191,7 @@ export async function buildCom(
 
   await checkTypescriptCom(source, { verbose });
 
-  await generateAbi(source, target, packageJson);
+  await generateAbi(source, target, packageJson, tsConfig);
 
   ensureTargetDirExists(target);
 

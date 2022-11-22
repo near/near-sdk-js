@@ -25,24 +25,15 @@ function parseMetadata(packageJsonPath: string): abi.AbiMetadata {
 
 function getProgramFromFiles(
     files: string[],
-    jsonCompilerOptions = {},
+    jsonCompilerOptions: string,
     basePath = "./"
 ): ts.Program {
-    // use built-in default options
-    const compilerOptions = ts.convertCompilerOptionsFromJson(jsonCompilerOptions, basePath).options;
-    const options: ts.CompilerOptions = {
-        noEmit: true,
-        emitDecoratorMetadata: true,
-        experimentalDecorators: true,
-        target: ts.ScriptTarget.ES5,
-        module: ts.ModuleKind.CommonJS,
-        allowUnusedLabels: true,
-    };
-    for (const k in compilerOptions) {
-        // eslint-disable-next-line no-prototype-builtins
-        if (compilerOptions.hasOwnProperty(k)) {
-            options[k] = compilerOptions[k];
-        }
+    const { options, errors } = ts.convertCompilerOptionsFromJson(jsonCompilerOptions, basePath);
+    if (errors.length > 0) {
+        errors.forEach((error) => {
+            console.log(error.messageText);
+        });
+        throw Error("Invalid compiler options");
     }
     return ts.createProgram(files, options);
 }
@@ -70,8 +61,10 @@ function validateNearClass(node: ts.Node) {
 export function runAbiCompilerPlugin(
     tsFile: string,
     packageJsonPath: string,
+    tsConfigJsonPath: string,
 ) {
-    const program = getProgramFromFiles([tsFile]);
+    const tsConfig = JSON.parse(fs.readFileSync(tsConfigJsonPath, 'utf8'));
+    const program = getProgramFromFiles([tsFile], tsConfig["compilerOptions"]);
     const typeChecker = program.getTypeChecker();
 
     const diagnostics = ts.getPreEmitDiagnostics(program);
@@ -85,7 +78,7 @@ export function runAbiCompilerPlugin(
                 console.error(message);
             }
         });
-        return undefined;
+        throw Error("Failed to compile the contract");
     }
 
     const generator = TJS.buildGenerator(program)!;

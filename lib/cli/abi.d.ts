@@ -1,2 +1,2 @@
 import * as abi from "near-abi";
-export declare function runAbiCompilerPlugin(tsFile: string, packageJsonPath: string): abi.AbiRoot;
+export declare function runAbiCompilerPlugin(tsFile: string, packageJsonPath: string, tsConfigJsonPath: string): abi.AbiRoot;
