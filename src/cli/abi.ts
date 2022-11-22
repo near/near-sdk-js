@@ -128,7 +128,7 @@ export function runAbiCompilerPlugin(
                 });
                 const nearDecoratorsCount = [isCall, isView, isInit].filter((b) => b).length;
                 if (nearDecoratorsCount > 1) {
-                    throw Error("NEAR function cannot be call and view at the same time");
+                    throw Error("NEAR function cannot be init, call and view at the same time");
                 }
                 if (nearDecoratorsCount === 0) {
                     return;

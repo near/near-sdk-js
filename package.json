@@ -21,7 +21,6 @@
   ],
   "license": "(MIT AND Apache-2.0)",
   "scripts": {
-    "prebuild": "node -p \"'export const LIB_VERSION = ' + JSON.stringify(require('./package.json').version) + ';'\" > src/version.ts",
     "build": "tsc -p ./tsconfig.json",
     "pretest": "yarn build",
     "test": "run-s test:*",
