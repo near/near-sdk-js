@@ -1,14 +1,13 @@
-import { NearBindgen, near, initialize, assert, view } from 'near-sdk-js';
+import { NearBindgen, near, initialize, assert, view } from "near-sdk-js";
 
-@NearBindgen({requireInit: true})
+@NearBindgen({ requireInit: true })
 export class ProgrammaticUpdateBefore {
-
   greeting = "Hello";
 
-  @initialize({privateFunction: true}) 
-  init({ manager }:{manager: string}) {
-    near.log(`Setting manager to be ${manager}`)
-    near.storageWrite("MANAGER", manager )
+  @initialize({ privateFunction: true })
+  init({ manager }: { manager: string }) {
+    near.log(`Setting manager to be ${manager}`);
+    near.storageWrite("MANAGER", manager);
   }
 
   @view({}) // This method will be renamed after update and will return "Hi" if greeting is "Hello"
@@ -17,16 +16,15 @@ export class ProgrammaticUpdateBefore {
   }
 }
 
-
 export function updateContract() {
   const manager = near.storageRead("MANAGER");
-  assert(near.predecessorAccountId() === manager, "Only the manager can update the code")
+  assert(
+    near.predecessorAccountId() === manager,
+    "Only the manager can update the code"
+  );
 
   const promiseId = near.promiseBatchCreate(near.currentAccountId());
-  near.promiseBatchActionDeployContract(
-    promiseId,
-    near.input()
-  );
-  
+  near.promiseBatchActionDeployContract(promiseId, near.input());
+
   return near.promiseReturn(promiseId);
 }
