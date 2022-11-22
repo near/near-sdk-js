@@ -1,4 +1,4 @@
-import ts, { Decorator, NodeArray } from "typescript";
+import ts, { ClassDeclaration, Decorator, NodeArray } from "typescript";
 import * as abi from "near-abi";
 import * as TJS from "near-typescript-json-schema";
 import { JSONSchema7 } from "json-schema";
@@ -45,6 +45,26 @@ function getProgramFromFiles(
         }
     }
     return ts.createProgram(files, options);
+}
+
+function validateNearClass(node: ts.Node) {
+    if (node.kind !== ts.SyntaxKind.ClassDeclaration) {
+        throw Error("Expected NEAR function to be inside of a class");
+    }
+    const classDeclaration = node as ClassDeclaration;
+    const decorators = classDeclaration.decorators || ([] as unknown as NodeArray<Decorator>);
+    const containsNearBindgen = decorators.some((decorator) => {
+        if (decorator.expression.kind !== ts.SyntaxKind.CallExpression) return false;
+        const decoratorExpression = decorator.expression as ts.CallExpression;
+        if (decoratorExpression.expression.kind !== ts.SyntaxKind.Identifier) return false;
+        const decoratorIdentifier = decoratorExpression.expression as ts.Identifier;
+        const decoratorName = decoratorIdentifier.text;
+        return decoratorName === "NearBindgen";
+    });
+
+    if (!containsNearBindgen) {
+        throw Error("Expected NEAR function to be inside of a class decorated with @NearBindgen");
+    }
 }
 
 export function runAbiCompilerPlugin(
@@ -133,6 +153,7 @@ export function runAbiCompilerPlugin(
                 if (nearDecoratorsCount === 0) {
                     return;
                 }
+                validateNearClass(node.parent);
 
                 let abiParams: abi.AbiJsonParameter[] = [];
                 if (methodDeclaration.parameters.length > 1) {
