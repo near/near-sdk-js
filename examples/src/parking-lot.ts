@@ -67,7 +67,7 @@ export class ParkingLot {
   }
 
   @view({})
-  getCarSpecs({ name }: { name: string }) {
+  getCarSpecs({ name }: { name: string }): CarSpecs {
     near.log(`getCarSpecs() called, name: ${name}`);
     return this.cars.get(name);
   }

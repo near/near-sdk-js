@@ -1,6 +1,6 @@
 import ts, { Decorator, NodeArray } from "typescript";
 import * as abi from "near-abi";
-import * as TJS from "typescript-json-schema";
+import * as TJS from "near-typescript-json-schema";
 import { JSONSchema7 } from "json-schema";
 import * as fs from "fs";
 import { LIB_VERSION } from "../version.js";
