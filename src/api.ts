@@ -673,58 +673,42 @@ export function promiseReturn(promiseIndex: PromiseIndex): void {
   env.promise_return(promiseIndex as unknown as bigint);
 }
 
-<<<<<<< HEAD
-export function sha256(value: Uint8Array): Uint8Array {
-=======
 /**
  * Returns sha256 hash of given value
  * @param value - value to be hashed, in Bytes
  * @returns hash result in Bytes
  */
-export function sha256(value: Bytes): Bytes {
->>>>>>> develop
+export function sha256(value: Uint8Array): Uint8Array {
   env.sha256(value, 0);
   return env.read_register(0);
 }
 
-<<<<<<< HEAD
-export function keccak256(value: Uint8Array): Uint8Array {
-=======
 /**
  * Returns keccak256 hash of given value
  * @param value - value to be hashed, in Bytes
  * @returns hash result in Bytes
  */
-export function keccak256(value: Bytes): Bytes {
->>>>>>> develop
+export function keccak256(value: Uint8Array): Uint8Array {
   env.keccak256(value, 0);
   return env.read_register(0);
 }
 
-<<<<<<< HEAD
-export function keccak512(value: Uint8Array): Uint8Array {
-=======
 /**
  * Returns keccak512 hash of given value
  * @param value - value to be hashed, in Bytes
  * @returns hash result in Bytes
  */
-export function keccak512(value: Bytes): Bytes {
->>>>>>> develop
+export function keccak512(value: Uint8Array): Uint8Array {
   env.keccak512(value, 0);
   return env.read_register(0);
 }
 
-<<<<<<< HEAD
-export function ripemd160(value: Uint8Array): Uint8Array {
-=======
 /**
  * Returns ripemd160 hash of given value
  * @param value - value to be hashed, in Bytes
  * @returns hash result in Bytes
  */
-export function ripemd160(value: Bytes): Bytes {
->>>>>>> develop
+export function ripemd160(value: Uint8Array): Uint8Array {
   env.ripemd160(value, 0);
   return env.read_register(0);
 }
