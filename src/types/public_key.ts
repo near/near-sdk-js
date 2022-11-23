@@ -1,5 +1,5 @@
-import { Bytes, bytes } from "../utils";
 import { base58 } from "@scure/base";
+import { u8ArrayConcat } from "../utils";
 
 export enum CurveType {
   ED25519 = 0,
@@ -82,20 +82,20 @@ export class PublicKey {
   /**
    * The actual value of the public key.
    */
-  public data: Bytes;
+  public data: Uint8Array;
   private type: CurveType;
 
   /**
    * @param data - The string you want to create a PublicKey from.
    */
-  constructor(data: Bytes) {
-    const curveLenght = dataLength(data.charCodeAt(0));
+  constructor(data: Uint8Array) {
+    const curveLenght = dataLength(data[0]);
 
     if (data.length !== curveLenght + 1) {
       throw new InvalidLengthError(data.length, curveLenght + 1);
     }
 
-    this.type = getCurveType(data.charCodeAt(0));
+    this.type = getCurveType(data[0]);
     this.data = data;
   }
 
@@ -113,14 +113,14 @@ export class PublicKey {
    */
   static fromString(publicKeyString: string) {
     const [curve, keyData] = splitKeyTypeData(publicKeyString);
-    let data: Bytes;
+    let data: Uint8Array;
 
     try {
-      data = bytes(base58.decode(keyData));
+      data = base58.decode(keyData);
     } catch (error) {
       throw new Base58Error(error.message);
     }
 
-    return new PublicKey(`${String.fromCharCode(curve)}${data}`);
+    return new PublicKey(u8ArrayConcat(new Uint8Array([curve]), data));
   }
 }

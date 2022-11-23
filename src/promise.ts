@@ -1,4 +1,4 @@
-import { assert, Bytes, PromiseIndex } from "./utils";
+import { assert, PromiseIndex } from "./utils";
 import * as near from "./api";
 import { Balance, PublicKey, AccountId, Gas, GasWeight } from "./types";
 import { Nonce } from "./types/primitives";
@@ -35,7 +35,7 @@ export class DeployContract extends PromiseAction {
   /**
    * @param code - The code of the contract to be deployed.
    */
-  constructor(public code: Bytes) {
+  constructor(public code: Uint8Array) {
     super();
   }
 
@@ -58,7 +58,7 @@ export class FunctionCall extends PromiseAction {
    */
   constructor(
     public functionName: string,
-    public args: Bytes,
+    public args: Uint8Array,
     public amount: Balance,
     public gas: Gas
   ) {
@@ -91,7 +91,7 @@ export class FunctionCallWeight extends PromiseAction {
    */
   constructor(
     public functionName: string,
-    public args: Bytes,
+    public args: Uint8Array,
     public amount: Balance,
     public gas: Gas,
     public weight: GasWeight
@@ -336,7 +336,7 @@ export class NearPromise {
    *
    * @param code - The code of the contract to be deployed.
    */
-  deployContract(code: Bytes): NearPromise {
+  deployContract(code: Uint8Array): NearPromise {
     return this.addAction(new DeployContract(code));
   }
 
@@ -350,7 +350,7 @@ export class NearPromise {
    */
   functionCall(
     functionName: string,
-    args: Bytes,
+    args: Uint8Array,
     amount: Balance,
     gas: Gas
   ): NearPromise {
@@ -368,7 +368,7 @@ export class NearPromise {
    */
   functionCallWeight(
     functionName: string,
-    args: Bytes,
+    args: Uint8Array,
     amount: Balance,
     gas: Gas,
     weight: GasWeight

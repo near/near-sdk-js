@@ -1,4 +1,3 @@
-import { Bytes } from "../utils";
 export declare enum CurveType {
     ED25519 = 0,
     SECP256K1 = 1
@@ -25,12 +24,12 @@ export declare class PublicKey {
     /**
      * The actual value of the public key.
      */
-    data: Bytes;
+    data: Uint8Array;
     private type;
     /**
      * @param data - The string you want to create a PublicKey from.
      */
-    constructor(data: Bytes);
+    constructor(data: Uint8Array);
     /**
      * The curve type of the public key.
      */

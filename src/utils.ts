@@ -1,10 +1,5 @@
 import { GetOptions } from "./types/collections";
 
-/**
- * A string containing byte characters. Can be safely used in NEAR calls.
- */
-export type Bytes = string;
-
 // make PromiseIndex a nominal typing
 enum PromiseIndexBrand {
   _ = -1,
@@ -35,46 +30,49 @@ export const ERR_INDEX_OUT_OF_BOUNDS = "Index out of bounds";
 const ACCOUNT_ID_REGEX =
   /^(([a-z\d]+[-_])*[a-z\d]+\.)*([a-z\d]+[-_])*[a-z\d]+$/;
 
-export function u8ArrayToBytes(array: Uint8Array): Bytes {
-  return array.reduce(
-    (result, value) => `${result}${String.fromCharCode(value)}`,
-    ""
-  );
-}
-
-// TODO this function is a bit broken and the type can't be string
-// TODO for more info: https://github.com/near/near-sdk-js/issues/78
-export function bytesToU8Array(bytes: Bytes): Uint8Array {
-  return Uint8Array.from([...bytes].map((byte) => byte.charCodeAt(0)));
+/**
+ * Convert a Uint8Array to string, use Latin1 encoding
+ * @param array - Uint8Array to convert
+ * @returns result string
+ */
+export function u8ArrayToLatin1(array: Uint8Array): string {
+  let ret = "";
+  for (let e of array) {
+    ret += String.fromCharCode(e);
+  }
+  return ret;
 }
 
 /**
- * Accepts a string or Uint8Array and either checks for the validity of the string or converts the Uint8Array to Bytes.
- *
- * @param stringOrU8Array - The string or Uint8Array to be checked/transformed
- * @returns Safe Bytes to be used in NEAR calls.
+ * Convert a Latin1 string to Uint8Array
+ * @param latin1 - string that with only Latin1 character to convert
+ * @returns result Uint8Array
  */
-export function bytes(stringOrU8Array: string | Uint8Array): Bytes {
-  if (typeof stringOrU8Array === "string") {
-    return checkStringIsBytes(stringOrU8Array);
+export function latin1ToU8Array(latin1: string): Uint8Array {
+  let ret = new Uint8Array(latin1.length);
+  for (let i = 0; i < latin1.length; i++) {
+    let code = latin1.charCodeAt(i);
+    if (code > 255) {
+      throw new Error(
+        `string at index ${i}: ${latin1[i]} is not a valid latin1 char`
+      );
+    }
+    ret[i] = code;
   }
-
-  if (stringOrU8Array instanceof Uint8Array) {
-    return u8ArrayToBytes(stringOrU8Array);
-  }
-
-  throw new Error("bytes: expected string or Uint8Array");
+  return ret;
 }
-
-function checkStringIsBytes(value: string): string {
-  [...value].forEach((character, index) => {
-    assert(
-      character.charCodeAt(0) <= 255,
-      `string ${value} at index ${index}: ${character} is not a valid byte`
-    );
-  });
-
-  return value;
+  
+/**
+ * Concat two Uint8Array
+ * @param array1 
+ * @param array2 
+ * @returns the concatenation of two array
+ */
+export function u8ArrayConcat(array1: Uint8Array, array2: Uint8Array): Uint8Array {
+  let mergedArray = new Uint8Array(array1.length + array2.length);
+  mergedArray.set(array1);
+  mergedArray.set(array2, array1.length);
+  return mergedArray
 }
 
 /**
@@ -95,7 +93,7 @@ export function assert(
 export type Mutable<T> = { -readonly [P in keyof T]: T[P] };
 
 export function getValueWithOptions<DataType>(
-  value: string,
+  value: Uint8Array,
   options: Omit<GetOptions<DataType>, "serializer"> = {
     deserializer: deserialize,
   }
@@ -118,12 +116,12 @@ export function serializeValueWithOptions<DataType>(
   { serializer }: Pick<GetOptions<DataType>, "serializer"> = {
     serializer: serialize,
   }
-): string {
+): Uint8Array {
   return serializer(value);
 }
 
-export function serialize(valueToSerialize: unknown): string {
-  return JSON.stringify(valueToSerialize, function (key, value) {
+export function serialize(valueToSerialize: unknown): Uint8Array {
+  return latin1ToU8Array(JSON.stringify(valueToSerialize, function (key, value) {
     if (typeof value === "bigint") {
       return {
         value: value.toString(),
@@ -143,11 +141,11 @@ export function serialize(valueToSerialize: unknown): string {
     }
 
     return value;
-  });
+  }));
 }
 
-export function deserialize(valueToDeserialize: string): unknown {
-  return JSON.parse(valueToDeserialize, (_, value) => {
+export function deserialize(valueToDeserialize: Uint8Array): unknown {
+  return JSON.parse(u8ArrayToLatin1(valueToDeserialize), (_, value) => {
     if (
       value !== null &&
       typeof value === "object" &&
