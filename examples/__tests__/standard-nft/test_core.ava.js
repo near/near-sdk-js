@@ -31,7 +31,16 @@ test.beforeEach(async (t) => {
   let token_metadata = {
     title: "Olympus Mons",
     description: "The tallest mountain in the charted solar system",
+    media: null,
+    media_hash: null,
     copies: 1,
+    issued_at: null,
+    expires_at: null,
+    starts_at: null,
+    updated_at: null,
+    extra: null,
+    reference: null,
+    reference_hash: null,
   };
   await nftOwner.call(
     nft,

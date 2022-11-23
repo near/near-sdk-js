@@ -5,8 +5,16 @@ async function helper_mint(nft, nftOwner, id, title, description) {
   let token_metadata = {
     title,
     description,
-
+    media: null,
+    media_hash: null,
     copies: 1,
+    issued_at: null,
+    expires_at: null,
+    starts_at: null,
+    updated_at: null,
+    extra: null,
+    reference: null,
+    reference_hash: null,
   };
   await nftOwner.call(
     nft,
