@@ -251,16 +251,107 @@ export declare function promiseResult(promiseIndex: PromiseIndex): Bytes;
  * @param promiseIndex - The index of the promise to execute.
  */
 export declare function promiseReturn(promiseIndex: PromiseIndex): void;
+/**
+ * Returns sha256 hash of given value
+ * @param value - value to be hashed, in Bytes
+ * @returns hash result in Bytes
+ */
 export declare function sha256(value: Bytes): Bytes;
+/**
+ * Returns keccak256 hash of given value
+ * @param value - value to be hashed, in Bytes
+ * @returns hash result in Bytes
+ */
 export declare function keccak256(value: Bytes): Bytes;
+/**
+ * Returns keccak512 hash of given value
+ * @param value - value to be hashed, in Bytes
+ * @returns hash result in Bytes
+ */
 export declare function keccak512(value: Bytes): Bytes;
+/**
+ * Returns ripemd160 hash of given value
+ * @param value - value to be hashed, in Bytes
+ * @returns hash result in Bytes
+ */
 export declare function ripemd160(value: Bytes): Bytes;
+/**
+ * Recovers an ECDSA signer address from a 32-byte message hash and a corresponding
+ * signature along with v recovery byte. Takes in an additional flag to check for
+ * malleability of the signature which is generally only ideal for transactions.
+ *
+ * @param hash - 32-byte message hash
+ * @param sig - signature
+ * @param v - number of recovery byte
+ * @param malleabilityFlag - whether to check malleability
+ * @returns 64 bytes representing the public key if the recovery was successful.
+ */
 export declare function ecrecover(hash: Bytes, sig: Bytes, v: number, malleabilityFlag: number): Bytes | null;
+/**
+ * Panic the transaction execution with given message
+ * @param msg - panic message in raw bytes, which should be a valid UTF-8 sequence
+ */
 export declare function panicUtf8(msg: Bytes): never;
+/**
+ * Log the message in transaction logs
+ * @param msg - message in raw bytes, which should be a valid UTF-8 sequence
+ */
 export declare function logUtf8(msg: Bytes): void;
+/**
+ * Log the message in transaction logs
+ * @param msg - message in raw bytes, which should be a valid UTF-16 sequence
+ */
 export declare function logUtf16(msg: Bytes): void;
+/**
+ * Returns the number of staked NEAR of given validator, in yoctoNEAR
+ * @param accountId - validator's AccountID
+ * @returns - staked amount
+ */
 export declare function validatorStake(accountId: Bytes): bigint;
+/**
+ * Returns the number of staked NEAR of all validators, in yoctoNEAR
+ * @returns total staked amount
+ */
 export declare function validatorTotalStake(): bigint;
+/**
+ * Computes multiexp on alt_bn128 curve using Pippenger's algorithm \sum_i
+ * mul_i g_{1 i} should be equal result.
+ *
+ * @param value - equence of (g1:G1, fr:Fr), where
+ * G1 is point (x:Fq, y:Fq) on alt_bn128,
+ * alt_bn128 is Y^2 = X^3 + 3 curve over Fq.
+ * `value` is encoded as packed, little-endian
+ * `[((u256, u256), u256)]` slice.
+ *
+ * @returns multi exp sum
+ */
 export declare function altBn128G1Multiexp(value: Bytes): Bytes;
+/**
+ * Computes sum for signed g1 group elements on alt_bn128 curve \sum_i
+ * (-1)^{sign_i} g_{1 i} should be equal result.
+ *
+ * @param value - sequence of (sign:bool, g1:G1), where
+ * G1 is point (x:Fq, y:Fq) on alt_bn128,
+ * alt_bn128 is Y^2 = X^3 + 3 curve over Fq.
+ * value` is encoded a as packed, little-endian
+ * `[((u256, u256), ((u256, u256), (u256, u256)))]` slice.
+ *
+ * @returns sum over Fq.
+ */
 export declare function altBn128G1Sum(value: Bytes): Bytes;
+/**
+ * Computes pairing check on alt_bn128 curve.
+ * \sum_i e(g_{1 i}, g_{2 i}) should be equal one (in additive notation), e(g1, g2) is Ate pairing
+ *
+ * @param value - sequence of (g1:G1, g2:G2), where
+ * G2 is Fr-ordered subgroup point (x:Fq2, y:Fq2) on alt_bn128 twist,
+ * alt_bn128 twist is Y^2 = X^3 + 3/(i+9) curve over Fq2
+ * Fq2 is complex field element (re: Fq, im: Fq)
+ * G1 is point (x:Fq, y:Fq) on alt_bn128,
+ * alt_bn128 is Y^2 = X^3 + 3 curve over Fq
+ * `value` is encoded a as packed, little-endian
+ * `[((u256, u256), ((u256, u256), (u256, u256)))]` slice.
+ *
+ * @returns whether pairing check pass
+ */
 export declare function altBn128PairingCheck(value: Bytes): boolean;
