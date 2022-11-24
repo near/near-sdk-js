@@ -9,7 +9,7 @@ const NO_ARGS = "";
 const THIRTY_TGAS = BigInt("30" + "0".repeat(12));
 
 @NearBindgen({})
-class LoopXCC {
+export class LoopXCC {
   constructor() {
     this.count = 0;
   }
