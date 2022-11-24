@@ -18,12 +18,11 @@ class LoopXCC {
   @call({})
   incrementCount() {
     let callCount = 0;
-    const promise = NearPromise.new(CONTRACTS[0]);
-    promise.functionCall("getCount", NO_ARGS, BigInt(0), THIRTY_TGAS);
+    let promise = NearPromise.new(CONTRACTS[0]).functionCall("getCount", NO_ARGS, BigInt(0), THIRTY_TGAS);
     callCount++;
     near.log(`Call count is now ${callCount}`);
     for (let i = 1; i < CONTRACTS.length; i++) {
-      promise.then(
+      promise = promise.and(
         NearPromise.new(CONTRACTS[i]).functionCall(
           "getCount",
           NO_ARGS,
@@ -34,7 +33,7 @@ class LoopXCC {
       callCount++;
       near.log(`Call count is now ${callCount}`);
     }
-    promise.then(
+    promise = promise.then(
       NearPromise.new(near.currentAccountId()).functionCall(
         "_incrementCountCallback",
         serialize({ callCount }),
@@ -42,9 +41,8 @@ class LoopXCC {
         THIRTY_TGAS
       )
     );
-    near.log(`Exiting incrementCount`);
-    promise.asReturn();
     near.log(`Finished incrementCount with callCount: ${callCount}`);
+    return promise.asReturn();
   }
 
   @call({ privateFunction: true })
@@ -56,6 +54,7 @@ class LoopXCC {
       this.count += result;
       near.log(`Count is now ${this.count}`);
     }
+    return this.count;
   }
 
   @view({})

@@ -35,13 +35,14 @@ test.afterEach.always(async (t) => {
 
 test("should have a count of 3 after calling incrementCount", async (t) => {
   const { xccLoop, alice } = t.context.accounts;
-  await alice.call(
+  const expected = 3;
+  const callbackResult = await alice.call(
     xccLoop,
     "incrementCount",
     {},
     { gas: "300" + "0".repeat(12) }
   );
+  t.is(callbackResult, 3);
   const result = await xccLoop.view("getCount");
-  const expected = 3;
   t.deepEqual(result, expected);
 });
