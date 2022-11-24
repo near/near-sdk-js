@@ -18,7 +18,12 @@ class LoopXCC {
   @call({})
   incrementCount() {
     let callCount = 0;
-    let promise = NearPromise.new(CONTRACTS[0]).functionCall("getCount", NO_ARGS, BigInt(0), THIRTY_TGAS);
+    let promise = NearPromise.new(CONTRACTS[0]).functionCall(
+      "getCount",
+      NO_ARGS,
+      BigInt(0),
+      THIRTY_TGAS
+    );
     callCount++;
     near.log(`Call count is now ${callCount}`);
     for (let i = 1; i < CONTRACTS.length; i++) {
