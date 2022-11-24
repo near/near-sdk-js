@@ -58,11 +58,13 @@ macro_rules! impl_fungible_token_core {
     };
 }
 
-/// Ensures that when fungible token storage grows by collections adding entries,
-/// the storage is be paid by the caller. This ensures that storage cannot grow to a point
-/// that the FT contract runs out of Ⓝ.
-/// Takes name of the Contract struct, the inner field for the token and optional method name to
-/// call when the account was closed.
+/**
+ * Ensures that when fungible token storage grows by collections adding entries,
+ * the storage is be paid by the caller. This ensures that storage cannot grow to a point
+ * that the FT contract runs out of Ⓝ.
+ * Takes name of the Contract struct, the inner field for the token and optional method name to
+ * call when the account was closed.
+ */
 #[macro_export]
 macro_rules! impl_fungible_token_storage {
     ($contract: ident, $token: ident $(, $on_account_closed_fn:ident)?) => {

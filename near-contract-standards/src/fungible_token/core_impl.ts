@@ -22,23 +22,24 @@ const GAS_FOR_RESOLVE_TRANSFER: Gas = 5_000_000_000_000;
 const GAS_FOR_FT_TRANSFER_CALL: Gas = 25_000_000_000_000 + GAS_FOR_RESOLVE_TRANSFER;
 const ERR_TOTAL_SUPPLY_OVERFLOW: string = "Total supply overflow";
 
-/// Implementation of a FungibleToken standard.
-/// Allows to include NEP-141 compatible token to any contract.
-/// There are next traits that any contract may implement:
-///     - FungibleTokenCore -- interface with ft_transfer methods. FungibleToken provides methods for it.
-///     - FungibleTokenMetaData -- return metadata for the token in NEP-148, up to contract to implement.
-///     - StorageManager -- interface for NEP-145 for allocating storage per account. FungibleToken provides methods for it.
-///     - AccountRegistrar -- interface for an account to register and unregister
-///
-/// For example usage, see examples/fungible-token/src/lib.rs.
+/** Implementation of a FungibleToken standard
+ * Allows to include NEP-141 compatible token to any contract.
+ * There are next traits that any contract may implement:
+ *     - FungibleTokenCore -- interface with ft_transfer methods. FungibleToken provides methods for it.
+ *     - FungibleTokenMetaData -- return metadata for the token in NEP-148, up to contract to implement.
+ *     - StorageManager -- interface for NEP-145 for allocating storage per account. FungibleToken provides methods for it.
+ *     - AccountRegistrar -- interface for an account to register and unregister
+ *
+ * For example usage, see examples/fungible-token/src/lib.rs.
+ */
 class FungibleToken implements FungibleTokenCore, StorageManagement, FungibleTokenResolver {
-    /// AccountID -> Account balance.
+    // AccountID -> Account balance.
     accounts: LookupMap<Balance>;
 
-    /// Total supply of the all token.
+    // Total supply of the all token.
     total_supply: Balance;
 
-    /// The storage size in bytes for one account.
+    // The storage size in bytes for one account.
     account_storage_usage: StorageUsage;
 
     new<S>(prefix: S) : Self
@@ -121,9 +122,10 @@ class FungibleToken implements FungibleTokenCore, StorageManagement, FungibleTok
         }
     }
 
-    /// Internal method that returns the amount of burned tokens in a corner case when the sender
-    /// has deleted (unregistered) their account while the `ft_transfer_call` was still in flight.
-    /// Returns (Used token amount, Burned token amount)
+    /** Internal method that returns the amount of burned tokens in a corner case when the sender
+     * has deleted (unregistered) their account while the `ft_transfer_call` was still in flight.
+     * Returns (Used token amount, Burned token amount)
+     */
     internal_ft_resolve_transfer(
         sender_id: AccountId,
         receiver_id: AccountId,
@@ -192,7 +194,7 @@ class FungibleToken implements FungibleTokenCore, StorageManagement, FungibleTok
         (amount, 0)
     }
 
-    // Implementation of FungibleTokenCore
+    /** Implementation of FungibleTokenCore */
     @call({})
     ft_transfer(receiver_id: AccountId, amount: number, memo: Option<String>) {
         assert_one_yocto();
@@ -239,9 +241,10 @@ class FungibleToken implements FungibleTokenCore, StorageManagement, FungibleTok
         this.accounts.get(&account_id).unwrap_or(0).into()
     }
 
-    // Implementation of storage
-    /// Internal method that returns the Account ID and the balance in case the account was
-    /// unregistered.
+    /** Implementation of storage
+     * Internal method that returns the Account ID and the balance in case the account was
+     * unregistered.
+     */
     internal_storage_unregister(
         force: Option<bool>,
     ) : Option<(AccountId, Balance)> {
@@ -274,8 +277,9 @@ class FungibleToken implements FungibleTokenCore, StorageManagement, FungibleTok
         }
     }
 
-    // Implementation of StorageManagement
-    // `registration_only` doesn't affect the implementation for vanilla fungible token.
+    /** Implementation of StorageManagement
+     * @param registration_only doesn't affect the implementation for vanilla fungible token.
+     */
     @call({})
     storage_deposit(
         account_id: Option<AccountId>,
@@ -303,12 +307,14 @@ class FungibleToken implements FungibleTokenCore, StorageManagement, FungibleTok
         this.internal_storage_balance_of(&account_id).unwrap()
     }
 
-    /// While storage_withdraw normally allows the caller to retrieve `available` balance, the basic
-    /// Fungible Token implementation sets storage_balance_bounds.min == storage_balance_bounds.max,
-    /// which means available balance will always be 0. So this implementation:
-    /// * panics if `amount > 0`
-    /// * never transfers Ⓝ to caller
-    /// * returns a `storage_balance` struct if `amount` is 0
+    /**
+     * While storage_withdraw normally allows the caller to retrieve `available` balance, the basic
+     * Fungible Token implementation sets storage_balance_bounds.min == storage_balance_bounds.max,
+     * which means available balance will always be 0. So this implementation:
+     * - panics if `amount > 0`
+     * - never transfers Ⓝ to caller
+     * - returns a `storage_balance` struct if `amount` is 0
+     */
     @view({})
     storage_withdraw(amount: Option<number>) : StorageBalance {
         assert_one_yocto();
@@ -347,7 +353,7 @@ class FungibleToken implements FungibleTokenCore, StorageManagement, FungibleTok
         this.internal_storage_balance_of(&account_id)
     }
 
-    // Implementation of FungibleTokenResolver
+    /** Implementation of FungibleTokenResolver */
     @call({})
     ft_resolve_transfer(
         sender_id: AccountId,
