@@ -1,5 +1,4 @@
-import { call, NearBindgen, NearPromise, view, near } from "near-sdk-js";
-import { serialize } from "near-sdk-js/lib/utils";
+import { call, near, NearBindgen, NearPromise, view } from "near-sdk-js";
 
 const CONTRACTS = [
   "first-contract.test.near",
@@ -17,15 +16,12 @@ class LoopXCC {
 
   @call({})
   incrementCount() {
-    let callCount = 0;
     let promise = NearPromise.new(CONTRACTS[0]).functionCall(
       "getCount",
       NO_ARGS,
       BigInt(0),
       THIRTY_TGAS
     );
-    callCount++;
-    near.log(`Call count is now ${callCount}`);
     for (let i = 1; i < CONTRACTS.length; i++) {
       promise = promise.and(
         NearPromise.new(CONTRACTS[i]).functionCall(
@@ -35,29 +31,25 @@ class LoopXCC {
           THIRTY_TGAS
         )
       );
-      callCount++;
-      near.log(`Call count is now ${callCount}`);
     }
     promise = promise.then(
       NearPromise.new(near.currentAccountId()).functionCall(
         "_incrementCountCallback",
-        serialize({ callCount }),
+        NO_ARGS,
         BigInt(0),
         THIRTY_TGAS
       )
     );
-    near.log(`Finished incrementCount with callCount: ${callCount}`);
     return promise.asReturn();
   }
 
   @call({ privateFunction: true })
-  _incrementCountCallback({ callCount }) {
-    near.log(`Entered _incrementCallback with callCount: ${callCount}`);
+  _incrementCountCallback() {
+    const callCount = near.promiseResultsCount();
     for (let i = 0; i < callCount; i++) {
       const promiseResult = near.promiseResult(i);
       const result = JSON.parse(promiseResult);
       this.count += result;
-      near.log(`Count is now ${this.count}`);
     }
     return this.count;
   }
