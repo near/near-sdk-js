@@ -141,7 +141,7 @@ test("Simple approve", async (t) => {
       msg: null,
     },
     {
-      attachedDeposit: "450000000000000000000",
+      attachedDeposit: "550000000000000000000",
     }
   );
   t.assert(res.result.status.SuccessValue);
@@ -165,7 +165,7 @@ test("Approve call", async (t) => {
       account_id: approvalReceiver.accountId,
       msg: "return-now",
     },
-    { attachedDeposit: "450000000000000000000", gas: "300 Tgas" }
+    { attachedDeposit: "550000000000000000000", gas: "300 Tgas" }
   );
   t.is(res, "cool");
 

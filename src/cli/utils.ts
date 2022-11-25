@@ -18,22 +18,26 @@ export async function executeCommand(
     signale.info(`Running command: ${command}`);
   }
 
-  try {
-    const { stdout, stderr } = await exec(command);
-
+  let stdout, stderr, code = 0;
+    try {
+        ({ stdout, stderr } = await exec(command));
+    } catch (error) {
+        ({ stdout, stderr, code} = error);
+    }
+    if(code != 0) {
+        signale.error(`Command failed: ${command}`);
+    }
     if (stderr && verbose) {
-      signale.error(stderr);
+        signale.error(`Command stderr: ${stderr}`);
     }
-
     if (verbose) {
-      signale.info(`Command output: ${stdout}`);
+        signale.info(`Command stdout: ${stdout}`);
     }
-
+    if(code != 0){
+        process.exit(1);
+    }
     return stdout.trim();
-  } catch (error) {
-    signale.error(error);
-    process.exit(1);
-  }
+    
 }
 
 export async function download(url: string, verbose = false) {
