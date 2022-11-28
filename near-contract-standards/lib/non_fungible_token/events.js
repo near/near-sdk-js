@@ -50,6 +50,7 @@ export class NftBurn {
     constructor(owner_id, token_ids, authorized_id, memo) {
         this.owner_id = owner_id;
         this.token_ids = token_ids;
+        this.authorized_id = authorized_id;
         this.memo = memo;
     }
     /** Logs the event to the host. This is required to ensure that the event is triggered

@@ -103,15 +103,15 @@ export class NonFungibleToken
     from_index,
     limit,
   }: {
-    from_index: number | null;
-    limit: number | null;
+    from_index?: number;
+    limit?: number;
   }): Token[] {
-    const start_index = from_index === null ? 0 : from_index;
+    const start_index = from_index === undefined ? 0 : from_index;
     assert(
       this.owner_by_id.length >= start_index,
       "Out of bounds, please use a smaller from_index."
     );
-    let l = limit === null ? 2 ** 32 : limit;
+    let l = limit === undefined ? 2 ** 32 : limit;
     assert(l > 0, "limit must be greater than 0.");
     l = Math.min(l, this.owner_by_id.length - start_index);
     const ret: Token[] = [];
@@ -142,12 +142,12 @@ export class NonFungibleToken
     limit,
   }: {
     account_id: AccountId;
-    from_index: number;
-    limit: number;
+    from_index?: number;
+    limit?: number;
   }): Token[] {
     const tokens_per_owner = this.tokens_per_owner;
     assert(
-      tokens_per_owner !== null,
+      tokens_per_owner !== undefined,
       "Could not find tokens_per_owner when calling a method on the enumeration standard."
     );
     const token_set = tokens_per_owner.get(account_id, {
@@ -155,12 +155,12 @@ export class NonFungibleToken
     });
     assert(token_set !== null, "Token set is empty");
 
-    const start_index = from_index === null ? 0 : from_index;
+    const start_index = from_index === undefined ? 0 : from_index;
     assert(
       token_set.length >= start_index,
       "Out of bounds, please use a smaller from_index."
     );
-    let l = limit === null ? 2 ** 32 : limit;
+    let l = limit === undefined ? 2 ** 32 : limit;
     assert(l > 0, "limit must be greater than 0.");
     l = Math.min(l, token_set.length - start_index);
 
@@ -295,7 +295,7 @@ export class NonFungibleToken
   }: {
     token_id: TokenId;
     approved_account_id: AccountId;
-    approval_id: Option<bigint>;
+    approval_id?: bigint;
   }): boolean {
     expect_token_found(this.owner_by_id.get(token_id));
 
@@ -323,9 +323,9 @@ export class NonFungibleToken
   init(
     owner_by_id_prefix: IntoStorageKey,
     owner_id: AccountId,
-    token_metadata_prefix: Option<IntoStorageKey>,
-    enumeration_prefix: Option<IntoStorageKey>,
-    approval_prefix: Option<IntoStorageKey>
+    token_metadata_prefix?: IntoStorageKey,
+    enumeration_prefix?: IntoStorageKey,
+    approval_prefix?: IntoStorageKey
   ) {
     let approvals_by_id: Option<LookupMap<{ [approvals: AccountId]: bigint }>>;
     let next_approval_id_by_id: Option<LookupMap<bigint>>;
@@ -344,9 +344,9 @@ export class NonFungibleToken
     this.token_metadata_by_id = token_metadata_prefix
       ? new LookupMap(token_metadata_prefix.into_storage_key())
       : null;
-    this.tokens_per_owner = new LookupMap(
-      enumeration_prefix.into_storage_key()
-    );
+    this.tokens_per_owner = enumeration_prefix
+      ? new LookupMap(enumeration_prefix.into_storage_key())
+      : null;
     this.approvals_by_id = approvals_by_id;
     this.next_approval_id_by_id = next_approval_id_by_id;
     this.measure_min_token_storage_cost();
@@ -479,9 +479,9 @@ export class NonFungibleToken
     sender_id: AccountId,
     receiver_id: AccountId,
     token_id: TokenId,
-    approval_id: Option<bigint>,
-    memo: Option<string>
-  ): [AccountId, { [approvals: AccountId]: bigint } | null] {
+    approval_id?: bigint,
+    memo?: string
+  ): [AccountId, Option<{ [approvals: AccountId]: bigint }>] {
     const owner_id = this.owner_by_id.get(token_id);
     if (owner_id == null) {
       throw new Error("Token not found");
@@ -489,7 +489,7 @@ export class NonFungibleToken
 
     const approved_account_ids = this.approvals_by_id?.remove(token_id);
 
-    let sender_id_authorized: Option<string>;
+    let sender_id_authorized: string | undefined;
     if (sender_id != owner_id) {
       if (!approved_account_ids) {
         throw new Error("Unauthorized");
@@ -501,12 +501,12 @@ export class NonFungibleToken
       }
 
       assert(
-        approval_id == null || approval_id == actual_approval_id,
+        approval_id === undefined || approval_id == actual_approval_id,
         `The actual approval_id ${actual_approval_id} is different from the given ${approval_id}`
       );
       sender_id_authorized = sender_id;
     } else {
-      sender_id_authorized = null;
+      sender_id_authorized = undefined;
     }
     assert(owner_id != receiver_id, "Current and next owner must differ");
     this.internal_transfer_unguarded(token_id, owner_id, receiver_id);
@@ -524,14 +524,14 @@ export class NonFungibleToken
     owner_id: AccountId,
     receiver_id: AccountId,
     token_id: TokenId,
-    sender_id: Option<AccountId>,
-    memo: Option<string>
+    sender_id?: AccountId,
+    memo?: string
   ) {
     new NftTransfer(
       owner_id,
       receiver_id,
       [token_id],
-      sender_id && sender_id == owner_id ? sender_id : null,
+      sender_id && sender_id == owner_id ? sender_id : undefined,
       memo
     ).emit();
   }
@@ -539,7 +539,7 @@ export class NonFungibleToken
   internal_mint(
     token_id: TokenId,
     token_owner_id: AccountId,
-    token_metadata: Option<TokenMetadata>
+    token_metadata?: TokenMetadata
   ): Token {
     const token = this.internal_mint_with_refund(
       token_id,
@@ -547,21 +547,21 @@ export class NonFungibleToken
       token_metadata,
       near.predecessorAccountId()
     );
-    new NftMint(token.owner_id, [token.token_id], null).emit();
+    new NftMint(token.owner_id, [token.token_id]).emit();
     return token;
   }
 
   internal_mint_with_refund(
     token_id: TokenId,
     token_owner_id: AccountId,
-    token_metadata: Option<TokenMetadata>,
-    refund_id: Option<string>
+    token_metadata?: TokenMetadata,
+    refund_id?: string
   ): Token {
     let initial_storage_usage: Option<[string, bigint]> = null;
     if (refund_id) {
       initial_storage_usage = [refund_id, near.storageUsage()];
     }
-    if (this.token_metadata_by_id && token_metadata == null) {
+    if (this.token_metadata_by_id && token_metadata === undefined) {
       throw new Error("Must provide metadata");
     }
     if (this.owner_by_id.get(token_id)) {
@@ -584,7 +584,7 @@ export class NonFungibleToken
       this.tokens_per_owner.set(owner_id, token_ids);
     }
 
-    const approved_account_ids = this.approvals_by_id ? {} : null;
+    const approved_account_ids = this.approvals_by_id ? {} : undefined;
     if (initial_storage_usage) {
       const [id, storage_usage] = initial_storage_usage;
       refund_deposit_to_account(near.storageUsage() - storage_usage, id);
@@ -600,8 +600,8 @@ export class NonFungibleToken
   }: {
     receiver_id: AccountId;
     token_id: TokenId;
-    approval_id: Option<bigint>;
-    memo: Option<string>;
+    approval_id?: bigint;
+    memo?: string;
   }) {
     assert_at_least_one_yocto();
     const sender_id = near.predecessorAccountId();
@@ -617,8 +617,8 @@ export class NonFungibleToken
   }: {
     receiver_id: AccountId;
     token_id: TokenId;
-    approval_id: Option<bigint>;
-    memo: Option<string>;
+    approval_id?: bigint;
+    memo?: string;
     msg: string;
   }) {
     assert_at_least_one_yocto();
@@ -683,7 +683,7 @@ export class NonFungibleToken
     previous_owner_id: AccountId;
     receiver_id: AccountId;
     token_id: TokenId;
-    approved_account_ids: Option<{ [approvals: AccountId]: bigint }>;
+    approved_account_ids?: { [approvals: AccountId]: bigint };
   }): boolean {
     let must_revert = false;
     let p: Bytes;

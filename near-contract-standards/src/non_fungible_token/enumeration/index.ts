@@ -16,8 +16,8 @@ export interface NonFungibleTokenEnumeration {
     from_index,
     limit,
   }: {
-    from_index: number | null; // default: "0"
-    limit: number | null; // default: unlimited (could fail due to gas limit)
+    from_index?: number; // default: "0"
+    limit?: number; // default: unlimited (could fail due to gas limit)
   }): Token[];
 
   /** Get number of tokens owned by a given account
@@ -40,7 +40,7 @@ export interface NonFungibleTokenEnumeration {
     limit,
   }: {
     account_id: AccountId;
-    from_index: number; // default: "0"
-    limit: number; // default: unlimited (could fail due to gas limit)
+    from_index?: number; // default: "0"
+    limit?: number; // default: unlimited (could fail due to gas limit)
   }): Token[];
 }
