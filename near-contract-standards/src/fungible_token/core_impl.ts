@@ -339,7 +339,7 @@ class FungibleToken implements FungibleTokenCore, StorageManagement, FungibleTok
     }
 
     view({})
-    storage_balance_bounds(&self) : StorageBalanceBounds {
+    storage_balance_bounds() : StorageBalanceBounds {
         let required_storage_balance =
             Balance::from(this.account_storage_usage) * env::storage_byte_cost();
         StorageBalanceBounds {

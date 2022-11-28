@@ -1,6 +1,6 @@
 import {
-    require,
-    Base64VecU8,
+    Bytes,
+    assert,
 } from "near-sdk-js";
 
 import { Option } from "../non_fungible_token/utils";
@@ -13,14 +13,16 @@ export class FungibleTokenMetadata {
     symbol: string;
     icon: Option<string>;
     reference: Option<string>;
-    reference_hash: Option<Base64VecU8>;
-    decimals: u8;
+    reference_hash: Option<Bytes>;
+    decimals: Bytes;
 
-    assert_valid(&self) {
-        require!(this.spec == FT_METADATA_SPEC);
-        require!(this.reference.is_some() == this.reference_hash.is_some());
-        if let Some(reference_hash) = &this.reference_hash {
-            require!(reference_hash.0.len() == 32, "Hash has to be 32 bytes");
+    assert_valid() {
+        assert(this.spec == FT_METADATA_SPEC, "Invalid FT_METADATA_SPEC");
+        const isReferenceProvided = this.reference ? true : false;
+        const isReferenceHashProvided = this.reference_hash ? true : false;
+        assert(isReferenceHashProvided === isReferenceProvided, "reference and reference_hash must be either both provided or not");
+        if (this.reference_hash) {
+            assert(this.reference_hash.length === 32, "reference_hash must be 32 bytes");
         }
     }
 }
