@@ -55,7 +55,7 @@ program
       .argument("[source]", "Contract to build.", "src/index.js")
       .argument("[target]", "Target file path and name. The default corresponds to contract.js", "build/contract.wasm")
       .option("--verbose", "Whether to print more verbose output.", false)
-      .action(createJsFileWithRullupCom)
+      .action(createJsFileWithRollupCom)
   )
   .addCommand(
     new Command("transpileJsAndBuildWasm")
@@ -83,7 +83,7 @@ function getRollupTarget(target: string): string {
   return `${getTargetDir(target)}/${getTargetFileName(target)}.js`
 }
 
-function getQjscTarget(target:string): string {
+function getQjscTarget(target: string): string {
   return `${getTargetDir(target)}/${getTargetFileName(target)}.h`;
 }
 
@@ -112,50 +112,59 @@ function ensureTargetDirExists(target: string): void {
   fs.mkdirSync(targetDir, {});
 }
 
-export async function validateCom(source: string, { verbose = false}: {verbose: boolean}): Promise<void> {
-  signal.await(`Validating ${source} contract...`);
+export async function validateCom(source: string, { verbose = false }: { verbose: boolean }): Promise<void> {
+  const signale = new Signale({ scope: "validate", interactive: !verbose });
+
+  signale.await(`Validating ${source} contract...`);
+
   if (!await validateContract(source, verbose)) {
     process.exit(1);
   }
 }
 
-export async function checkTypescriptCom(source: string, { verbose = false}: {verbose: boolean}): Promise<void> {
+export async function checkTypescriptCom(source: string, { verbose = false }: { verbose: boolean }): Promise<void> {
+  const signale = new Signale({ scope: "checkTypescript", interactive: !verbose });
+
   const sourceExt = source.split(".").pop();
   if (sourceExt !== "ts") {
-    signal.info(`Source file is not a typescript file ${source}`)
+    signale.info(`Source file is not a typescript file ${source}`)
     return;
   }
 
-  signal.await(`Typechecking ${source} with tsc...`);
+  signale.await(`Typechecking ${source} with tsc...`);
   await checkTsBuildWithTsc(source, verbose);
 }
 
-export async function createJsFileWithRullupCom(source: string, target: string, { verbose = false}: {verbose: boolean}): Promise<void> {
+export async function createJsFileWithRollupCom(source: string, target: string, { verbose = false }: { verbose: boolean }): Promise<void> {
+  const signale = new Signale({ scope: "createJsFileWithRollup", interactive: !verbose });
+
   requireTargetExt(target);
   ensureTargetDirExists(target);
 
-  signal.await(`Creating ${source} file with Rollup...`);
+  signale.await(`Creating ${source} file with Rollup...`);
   await createJsFileWithRullup(source, getRollupTarget(target), verbose);
 }
 
 
-export async function transpileJsAndBuildWasmCom(target: string, { verbose = false}: {verbose: boolean}): Promise<void> {
+export async function transpileJsAndBuildWasmCom(target: string, { verbose = false }: { verbose: boolean }): Promise<void> {
+  const signale = new Signale({ scope: "transpileJsAndBuildWasm", interactive: !verbose });
+
   requireTargetExt(target);
   ensureTargetDirExists(target);
 
-  signal.await(`Creating ${getQjscTarget(target)} file with QJSC...`);
+  signale.await(`Creating ${getQjscTarget(target)} file with QJSC...`);
   await createHeaderFileWithQjsc(getRollupTarget(target), getQjscTarget(target), verbose);
 
-  signal.await("Generating methods.h file...");
+  signale.await("Generating methods.h file...");
   await createMethodsHeaderFile(getRollupTarget(target), verbose);
 
-  signal.await(`Creating ${getContractTarget(target)} contract...`);
+  signale.await(`Creating ${getContractTarget(target)} contract...`);
   await createWasmContract(getQjscTarget(target), getContractTarget(target), verbose);
 
-  signal.await("Executing wasi-stub...");
+  signale.await("Executing wasi-stub...");
   await wasiStubContract(getContractTarget(target), verbose);
 
-  signal.success(`Generated ${getContractTarget(target)} contract successfully!`);
+  signale.success(`Generated ${getContractTarget(target)} contract successfully!`);
 }
 
 export async function buildCom(
@@ -163,9 +172,11 @@ export async function buildCom(
   target: string,
   { verbose = false }: { verbose: boolean }
 ): Promise<void> {
+  const signale = new Signale({ scope: "build", interactive: !verbose });
+
   requireTargetExt(target);
 
-  signal.await(`Building ${source} contract...`);
+  signale.await(`Building ${source} contract...`);
 
   await checkTypescriptCom(source, { verbose });
 
@@ -173,7 +184,7 @@ export async function buildCom(
 
   await validateCom(source, { verbose });
 
-  await createJsFileWithRullupCom(source, target, { verbose });
+  await createJsFileWithRollupCom(source, target, { verbose });
 
   await transpileJsAndBuildWasmCom(target, { verbose });
 }

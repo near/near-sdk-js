@@ -27,6 +27,5 @@
     "src/build-tools/include-bytes.ts",
     "src/cli/cli.ts",
     "src/cli/post-install.ts"
-  ],
-  "exclude": ["src/cli/**/*"]
+  ]
 }

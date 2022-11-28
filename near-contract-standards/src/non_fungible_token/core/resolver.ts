@@ -1,6 +1,5 @@
 import { AccountId } from "near-sdk-js";
 import { TokenId } from "../token";
-import { Option } from "../utils";
 
 /** Used when an NFT is transferred using `nft_transfer_call`. This is the method that's called after `nft_on_transfer`. This interface is implemented on the NFT contract. */
 export interface NonFungibleTokenResolver {
@@ -39,6 +38,6 @@ export interface NonFungibleTokenResolver {
     previous_owner_id: AccountId;
     receiver_id: AccountId;
     token_id: TokenId;
-    approved_account_ids: Option<{ [approval: AccountId]: bigint }>;
+    approved_account_ids?: { [approval: AccountId]: bigint };
   }): boolean;
 }

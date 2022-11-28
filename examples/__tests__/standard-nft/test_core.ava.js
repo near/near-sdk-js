@@ -83,7 +83,6 @@ test("Simple transfer", async (t) => {
     {
       receiver_id: ali.accountId,
       token_id: "0",
-      approval_id: null,
       memo: "simple transfer",
     },
     { attachedDeposit: "1" }
@@ -105,7 +104,6 @@ test("Transfer call fast return to sender", async (t) => {
     {
       receiver_id: nftReceiver.accountId,
       token_id: "0",
-      approval_id: null,
       memo: "transfer & call",
       msg: "return-it-now",
     },
@@ -129,7 +127,6 @@ test("Transfer call slow return to sender", async (t) => {
     {
       receiver_id: nftReceiver.accountId,
       token_id: "0",
-      approval_id: null,
       memo: "transfer & call",
       msg: "return-it-later",
     },
@@ -153,7 +150,6 @@ test("Transfer call fast keep with sender", async (t) => {
     {
       receiver_id: nftReceiver.accountId,
       token_id: "0",
-      approval_id: null,
       memo: "transfer & call",
       msg: "keep-it-now",
     },
@@ -177,7 +173,6 @@ test("Transfer call slow keep with sender", async (t) => {
     {
       receiver_id: nftReceiver.accountId,
       token_id: "0",
-      approval_id: null,
       memo: "transfer & call",
       msg: "keep-it-later",
     },
@@ -201,7 +196,6 @@ test("Transfer call receiver panics", async (t) => {
     {
       receiver_id: nftReceiver.accountId,
       token_id: "0",
-      approval_id: null,
       memo: "transfer & call",
       msg: "incorrect message",
     },
@@ -227,7 +221,6 @@ test("Transfer call receiver panics and nft_resolve_transfer produces no log if 
     {
       receiver_id: nftReceiver.accountId,
       token_id: "0",
-      approval_id: null,
       memo: "transfer & call",
       msg: "incorrect message",
     },
@@ -254,7 +247,6 @@ test("Simple transfer no logs on failure", async (t) => {
     {
       receiver_id: nftOwner.accountId,
       token_id: "0",
-      approval_id: null,
       memo: "simple transfer",
     },
     { attachedDeposit: "1" }

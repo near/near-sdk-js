@@ -35,8 +35,8 @@ export interface NonFungibleTokenCore {
     nft_transfer({ receiver_id, token_id, approval_id, memo, }: {
         receiver_id: AccountId;
         token_id: TokenId;
-        approval_id: Option<bigint>;
-        memo: Option<string>;
+        approval_id?: bigint;
+        memo?: string;
     }): any;
     /** Transfer token and call a method on a receiver contract. A successful
      * workflow will end in a success execution outcome to the callback on the NFT
@@ -74,8 +74,8 @@ export interface NonFungibleTokenCore {
     nft_transfer_call({ receiver_id, token_id, approval_id, memo, }: {
         receiver_id: AccountId;
         token_id: TokenId;
-        approval_id: Option<bigint>;
-        memo: Option<string>;
+        approval_id?: bigint;
+        memo?: string;
         msg: string;
     }): any;
     /** Returns the token with the given `token_id` or `null` if no such token. */
