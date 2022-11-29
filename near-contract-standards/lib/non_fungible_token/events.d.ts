@@ -16,7 +16,6 @@
 import { AccountId } from "near-sdk-js";
 import { NearEvent } from "../event";
 import { TokenId } from "./token";
-import { Option } from "./utils";
 export declare type Nep171EventKind = NftMint[] | NftTransfer[] | NftBurn[];
 export declare class Nep171Event extends NearEvent {
     version: string;
@@ -27,8 +26,8 @@ export declare class Nep171Event extends NearEvent {
 export declare class NftMint {
     owner_id: AccountId;
     token_ids: TokenId[];
-    memo: Option<string>;
-    constructor(owner_id: AccountId, token_ids: TokenId[], memo: Option<string>);
+    memo?: string;
+    constructor(owner_id: AccountId, token_ids: TokenId[], memo?: string);
     /** Logs the event to the host. This is required to ensure that the event is triggered
      * and to consume the event. */
     emit(): void;
@@ -42,9 +41,9 @@ export declare class NftTransfer {
     old_owner_id: AccountId;
     new_owner_id: AccountId;
     token_ids: TokenId[];
-    authorized_id: Option<AccountId>;
-    memo: Option<string>;
-    constructor(old_owner_id: AccountId, new_owner_id: AccountId, token_ids: TokenId[], authorized_id: Option<AccountId>, memo: Option<string>);
+    authorized_id?: AccountId;
+    memo?: string;
+    constructor(old_owner_id: AccountId, new_owner_id: AccountId, token_ids: TokenId[], authorized_id?: AccountId, memo?: string);
     /** Logs the event to the host. This is required to ensure that the event is triggered
      * and to consume the event. */
     emit(): void;
@@ -56,8 +55,9 @@ export declare class NftTransfer {
 export declare class NftBurn {
     owner_id: AccountId;
     token_ids: TokenId[];
-    memo: Option<string>;
-    constructor(owner_id: AccountId, token_ids: TokenId[], authorized_id: Option<string>, memo: Option<string>);
+    authorized_id?: string;
+    memo?: string;
+    constructor(owner_id: AccountId, token_ids: TokenId[], authorized_id?: string, memo?: string);
     /** Logs the event to the host. This is required to ensure that the event is triggered
      * and to consume the event. */
     emit(): void;

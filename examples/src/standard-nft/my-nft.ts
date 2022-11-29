@@ -82,8 +82,8 @@ export class MyNFT
     from_index,
     limit,
   }: {
-    from_index: number;
-    limit: number;
+    from_index?: number;
+    limit?: number;
   }): Token[] {
     return this.tokens.nft_tokens({ from_index, limit });
   }
@@ -100,8 +100,8 @@ export class MyNFT
     limit,
   }: {
     account_id: string;
-    from_index: number;
-    limit: number;
+    from_index?: number;
+    limit?: number;
   }): Token[] {
     return this.tokens.nft_tokens_for_owner({ account_id, from_index, limit });
   }
@@ -114,7 +114,7 @@ export class MyNFT
   }: {
     token_id: string;
     account_id: string;
-    msg: string;
+    msg?: string;
   }): Option<NearPromise> {
     return this.tokens.nft_approve({ token_id, account_id, msg });
   }
@@ -143,7 +143,7 @@ export class MyNFT
   }: {
     token_id: string;
     approved_account_id: string;
-    approval_id: bigint;
+    approval_id?: bigint;
   }): boolean {
     return this.tokens.nft_is_approved({
       token_id,
@@ -162,7 +162,7 @@ export class MyNFT
     previous_owner_id: string;
     receiver_id: string;
     token_id: string;
-    approved_account_ids: { [approval: string]: bigint };
+    approved_account_ids?: { [approval: string]: bigint };
   }): boolean {
     return this.tokens.nft_resolve_transfer({
       previous_owner_id,
@@ -187,8 +187,8 @@ export class MyNFT
   }: {
     receiver_id: string;
     token_id: string;
-    approval_id: bigint;
-    memo: string;
+    approval_id?: bigint;
+    memo?: string;
   }) {
     this.tokens.nft_transfer({ receiver_id, token_id, approval_id, memo });
   }
@@ -203,8 +203,8 @@ export class MyNFT
   }: {
     receiver_id: string;
     token_id: string;
-    approval_id: bigint;
-    memo: string;
+    approval_id?: bigint;
+    memo?: string;
     msg: string;
   }): PromiseOrValue<boolean> {
     return this.tokens.nft_transfer_call({

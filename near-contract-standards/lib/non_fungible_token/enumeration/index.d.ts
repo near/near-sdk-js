@@ -11,8 +11,8 @@ export interface NonFungibleTokenEnumeration {
      * @returns - An array of Token objects, as described in Core standard
      */
     nft_tokens({ from_index, limit, }: {
-        from_index: number | null;
-        limit: number | null;
+        from_index?: number;
+        limit?: number;
     }): Token[];
     /** Get number of tokens owned by a given account
      *
@@ -31,7 +31,7 @@ export interface NonFungibleTokenEnumeration {
      */
     nft_tokens_for_owner({ account_id, from_index, limit, }: {
         account_id: AccountId;
-        from_index: number;
-        limit: number;
+        from_index?: number;
+        limit?: number;
     }): Token[];
 }

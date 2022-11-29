@@ -44,3 +44,5 @@ jobs:
         run: cd examples && yarn build-nft && yarn test:nft
       - name: programmatic-update
         run: cd examples && yarn build:programmatic-update && yarn test:programmatic-update
+      - name: cross-contract-call-loop
+        run: cd examples && yarn build:cross-contract-call-loop && yarn test:cross-contract-call-loop

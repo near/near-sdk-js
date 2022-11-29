@@ -30,16 +30,16 @@ export declare class NonFungibleToken implements NonFungibleTokenCore, NonFungib
     nft_total_supply(): number;
     private enum_get_token;
     nft_tokens({ from_index, limit, }: {
-        from_index: number | null;
-        limit: number | null;
+        from_index?: number;
+        limit?: number;
     }): Token[];
     nft_supply_for_owner({ account_id }: {
         account_id: AccountId;
     }): number;
     nft_tokens_for_owner({ account_id, from_index, limit, }: {
         account_id: AccountId;
-        from_index: number;
-        limit: number;
+        from_index?: number;
+        limit?: number;
     }): Token[];
     nft_approve({ token_id, account_id, msg, }: {
         token_id: TokenId;
@@ -56,29 +56,29 @@ export declare class NonFungibleToken implements NonFungibleTokenCore, NonFungib
     nft_is_approved({ token_id, approved_account_id, approval_id, }: {
         token_id: TokenId;
         approved_account_id: AccountId;
-        approval_id: Option<bigint>;
+        approval_id?: bigint;
     }): boolean;
-    init(owner_by_id_prefix: IntoStorageKey, owner_id: AccountId, token_metadata_prefix: Option<IntoStorageKey>, enumeration_prefix: Option<IntoStorageKey>, approval_prefix: Option<IntoStorageKey>): void;
+    init(owner_by_id_prefix: IntoStorageKey, owner_id: AccountId, token_metadata_prefix?: IntoStorageKey, enumeration_prefix?: IntoStorageKey, approval_prefix?: IntoStorageKey): void;
     static reconstruct(data: NonFungibleToken): NonFungibleToken;
     measure_min_token_storage_cost(): void;
     internal_transfer_unguarded(token_id: TokenId, from: AccountId, to: AccountId): void;
-    internal_transfer(sender_id: AccountId, receiver_id: AccountId, token_id: TokenId, approval_id: Option<bigint>, memo: Option<string>): [AccountId, {
+    internal_transfer(sender_id: AccountId, receiver_id: AccountId, token_id: TokenId, approval_id?: bigint, memo?: string): [AccountId, Option<{
         [approvals: AccountId]: bigint;
-    } | null];
-    static emit_transfer(owner_id: AccountId, receiver_id: AccountId, token_id: TokenId, sender_id: Option<AccountId>, memo: Option<string>): void;
-    internal_mint(token_id: TokenId, token_owner_id: AccountId, token_metadata: Option<TokenMetadata>): Token;
-    internal_mint_with_refund(token_id: TokenId, token_owner_id: AccountId, token_metadata: Option<TokenMetadata>, refund_id: Option<string>): Token;
+    }>];
+    static emit_transfer(owner_id: AccountId, receiver_id: AccountId, token_id: TokenId, sender_id?: AccountId, memo?: string): void;
+    internal_mint(token_id: TokenId, token_owner_id: AccountId, token_metadata?: TokenMetadata): Token;
+    internal_mint_with_refund(token_id: TokenId, token_owner_id: AccountId, token_metadata?: TokenMetadata, refund_id?: string): Token;
     nft_transfer({ receiver_id, token_id, approval_id, memo, }: {
         receiver_id: AccountId;
         token_id: TokenId;
-        approval_id: Option<bigint>;
-        memo: Option<string>;
+        approval_id?: bigint;
+        memo?: string;
     }): void;
     nft_transfer_call({ receiver_id, token_id, approval_id, memo, msg, }: {
         receiver_id: AccountId;
         token_id: TokenId;
-        approval_id: Option<bigint>;
-        memo: Option<string>;
+        approval_id?: bigint;
+        memo?: string;
         msg: string;
     }): NearPromise;
     nft_token({ token_id }: {
@@ -88,9 +88,9 @@ export declare class NonFungibleToken implements NonFungibleTokenCore, NonFungib
         previous_owner_id: AccountId;
         receiver_id: AccountId;
         token_id: TokenId;
-        approved_account_ids: Option<{
+        approved_account_ids?: {
             [approvals: AccountId]: bigint;
-        }>;
+        };
     }): boolean;
 }
 export declare type StorageKey = TokensPerOwner | TokenPerOwnerInner;

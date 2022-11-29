@@ -41,8 +41,8 @@ export interface NonFungibleTokenCore {
   }: {
     receiver_id: AccountId;
     token_id: TokenId;
-    approval_id: Option<bigint>;
-    memo: Option<string>;
+    approval_id?: bigint;
+    memo?: string;
   });
 
   /** Transfer token and call a method on a receiver contract. A successful
@@ -86,8 +86,8 @@ export interface NonFungibleTokenCore {
   }: {
     receiver_id: AccountId;
     token_id: TokenId;
-    approval_id: Option<bigint>;
-    memo: Option<string>;
+    approval_id?: bigint;
+    memo?: string;
     msg: string;
   });
 
