@@ -1,30 +1,35 @@
 import {
   assert,
-  Bytes,
   ERR_INCONSISTENT_STATE,
   getValueWithOptions,
+  latin1ToU8Array,
   Mutable,
   serializeValueWithOptions,
+  u8ArrayConcat,
 } from "../utils";
 import { Vector, VectorIterator } from "./vector";
 import { LookupMap } from "./lookup-map";
 import { GetOptions } from "../types/collections";
 
-type ValueAndIndex = [value: string, index: number];
+type ValueAndIndex = [value: Uint8Array, index: number];
 
 /**
  * An unordered map that stores data in NEAR storage.
  */
 export class UnorderedMap<DataType> {
-  readonly keys: Vector<Bytes>;
+  readonly keys: Vector<Uint8Array>;
   readonly values: LookupMap<ValueAndIndex>;
 
   /**
    * @param prefix - The byte prefix to use when storing elements inside this collection.
    */
-  constructor(readonly prefix: Bytes) {
-    this.keys = new Vector<Bytes>(`${prefix}u`); // intentional different prefix with old UnorderedMap
-    this.values = new LookupMap<ValueAndIndex>(`${prefix}m`);
+  constructor(readonly prefix: Uint8Array) {
+    this.keys = new Vector<Uint8Array>(
+      u8ArrayConcat(prefix, latin1ToU8Array("u"))
+    ); // intentional different prefix with old UnorderedMap
+    this.values = new LookupMap<ValueAndIndex>(
+      u8ArrayConcat(prefix, latin1ToU8Array("m"))
+    );
   }
 
   /**
@@ -48,7 +53,7 @@ export class UnorderedMap<DataType> {
    * @param options - Options for retrieving the data.
    */
   get(
-    key: Bytes,
+    key: Uint8Array,
     options?: Omit<GetOptions<DataType>, "serializer">
   ): DataType | null {
     const valueAndIndex = this.values.get(key);
@@ -70,7 +75,7 @@ export class UnorderedMap<DataType> {
    * @param options - Options for retrieving and storing the data.
    */
   set(
-    key: Bytes,
+    key: Uint8Array,
     value: DataType,
     options?: GetOptions<DataType>
   ): DataType | null {
@@ -99,7 +104,7 @@ export class UnorderedMap<DataType> {
    * @param options - Options for retrieving the data.
    */
   remove(
-    key: Bytes,
+    key: Uint8Array,
     options?: Omit<GetOptions<DataType>, "serializer">
   ): DataType | null {
     const oldValueAndIndex = this.values.remove(key);
@@ -160,7 +165,7 @@ export class UnorderedMap<DataType> {
    *
    * @param options - Options for retrieving and storing the data.
    */
-  toArray(options?: GetOptions<DataType>): [Bytes, DataType][] {
+  toArray(options?: GetOptions<DataType>): [Uint8Array, DataType][] {
     const array = [];
 
     const iterator = options ? this.createIteratorWithOptions(options) : this;
@@ -177,7 +182,7 @@ export class UnorderedMap<DataType> {
    *
    * @param keyValuePairs - The key-value pairs to extend the collection with.
    */
-  extend(keyValuePairs: [Bytes, DataType][]) {
+  extend(keyValuePairs: [Uint8Array, DataType][]) {
     for (const [key, value] of keyValuePairs) {
       this.set(key, value);
     }
@@ -188,7 +193,7 @@ export class UnorderedMap<DataType> {
    *
    * @param options - Options for storing the data.
    */
-  serialize(options?: Pick<GetOptions<DataType>, "serializer">): string {
+  serialize(options?: Pick<GetOptions<DataType>, "serializer">): Uint8Array {
     return serializeValueWithOptions(this, options);
   }
 
@@ -205,10 +210,12 @@ export class UnorderedMap<DataType> {
     const map = new UnorderedMap(data.prefix) as MutableUnorderedMap;
 
     // reconstruct keys Vector
-    map.keys = new Vector(`${data.prefix}u`);
+    map.keys = new Vector(u8ArrayConcat(data.prefix, latin1ToU8Array("u")));
     map.keys.length = data.keys.length;
     // reconstruct values LookupMap
-    map.values = new LookupMap(`${data.prefix}m`);
+    map.values = new LookupMap(
+      u8ArrayConcat(data.prefix, latin1ToU8Array("m"))
+    );
 
     return map as UnorderedMap<DataType>;
   }
@@ -218,7 +225,7 @@ export class UnorderedMap<DataType> {
  * An iterator for the UnorderedMap collection.
  */
 class UnorderedMapIterator<DataType> {
-  private keys: VectorIterator<Bytes>;
+  private keys: VectorIterator<Uint8Array>;
   private map: LookupMap<ValueAndIndex>;
 
   /**
@@ -233,7 +240,7 @@ class UnorderedMapIterator<DataType> {
     this.map = unorderedMap.values;
   }
 
-  next(): { value: [Bytes | null, DataType | null]; done: boolean } {
+  next(): { value: [Uint8Array | null, DataType | null]; done: boolean } {
     const key = this.keys.next();
 
     if (key.done) {

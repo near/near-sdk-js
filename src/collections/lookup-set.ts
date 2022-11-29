@@ -1,6 +1,6 @@
 import * as near from "../api";
 import { GetOptions } from "../types/collections";
-import { Bytes, serializeValueWithOptions } from "../utils";
+import { serializeValueWithOptions, u8ArrayConcat } from "../utils";
 
 /**
  * A lookup set collection that stores entries in NEAR storage.
@@ -9,7 +9,7 @@ export class LookupSet<DataType> {
   /**
    * @param keyPrefix - The byte prefix to use when storing elements inside this collection.
    */
-  constructor(readonly keyPrefix: Bytes) {}
+  constructor(readonly keyPrefix: Uint8Array) {}
 
   /**
    * Checks whether the collection contains the value.
@@ -18,10 +18,13 @@ export class LookupSet<DataType> {
    * @param options - Options for storing data.
    */
   contains(
-    key: DataType,
+    key: Uint8Array,
     options?: Pick<GetOptions<DataType>, "serializer">
   ): boolean {
-    const storageKey = this.keyPrefix + serializeValueWithOptions(key, options);
+    const storageKey = u8ArrayConcat(
+      this.keyPrefix,
+      serializeValueWithOptions(key, options)
+    );
     return near.storageHasKey(storageKey);
   }
 
@@ -35,7 +38,10 @@ export class LookupSet<DataType> {
     key: DataType,
     options?: Pick<GetOptions<DataType>, "serializer">
   ): boolean {
-    const storageKey = this.keyPrefix + serializeValueWithOptions(key, options);
+    const storageKey = u8ArrayConcat(
+      this.keyPrefix,
+      serializeValueWithOptions(key, options)
+    );
     return near.storageRemove(storageKey);
   }
 
@@ -50,8 +56,11 @@ export class LookupSet<DataType> {
     key: DataType,
     options?: Pick<GetOptions<DataType>, "serializer">
   ): boolean {
-    const storageKey = this.keyPrefix + serializeValueWithOptions(key, options);
-    return !near.storageWrite(storageKey, "");
+    const storageKey = u8ArrayConcat(
+      this.keyPrefix,
+      serializeValueWithOptions(key, options)
+    );
+    return !near.storageWrite(storageKey, new Uint8Array());
   }
 
   /**
@@ -72,7 +81,7 @@ export class LookupSet<DataType> {
    *
    * @param options - Options for storing the data.
    */
-  serialize(options?: Pick<GetOptions<DataType>, "serializer">): string {
+  serialize(options?: Pick<GetOptions<DataType>, "serializer">): Uint8Array {
     return serializeValueWithOptions(this, options);
   }
 

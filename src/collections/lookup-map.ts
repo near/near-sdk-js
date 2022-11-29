@@ -1,9 +1,9 @@
 import * as near from "../api";
 import { GetOptions } from "../types/collections";
 import {
-  Bytes,
   getValueWithOptions,
   serializeValueWithOptions,
+  u8ArrayConcat,
 } from "../utils";
 
 /**
@@ -13,15 +13,15 @@ export class LookupMap<DataType> {
   /**
    * @param keyPrefix - The byte prefix to use when storing elements inside this collection.
    */
-  constructor(readonly keyPrefix: Bytes) {}
+  constructor(readonly keyPrefix: Uint8Array) {}
 
   /**
    * Checks whether the collection contains the value.
    *
    * @param key - The value for which to check the presence.
    */
-  containsKey(key: Bytes): boolean {
-    const storageKey = this.keyPrefix + key;
+  containsKey(key: Uint8Array): boolean {
+    const storageKey = u8ArrayConcat(this.keyPrefix, key);
     return near.storageHasKey(storageKey);
   }
 
@@ -32,10 +32,10 @@ export class LookupMap<DataType> {
    * @param options - Options for retrieving the data.
    */
   get(
-    key: Bytes,
+    key: Uint8Array,
     options?: Omit<GetOptions<DataType>, "serializer">
   ): DataType | null {
-    const storageKey = this.keyPrefix + key;
+    const storageKey = u8ArrayConcat(this.keyPrefix, key);
     const value = near.storageRead(storageKey);
 
     return getValueWithOptions(value, options);
@@ -48,10 +48,10 @@ export class LookupMap<DataType> {
    * @param options - Options for retrieving the data.
    */
   remove(
-    key: Bytes,
+    key: Uint8Array,
     options?: Omit<GetOptions<DataType>, "serializer">
   ): DataType | null {
-    const storageKey = this.keyPrefix + key;
+    const storageKey = u8ArrayConcat(this.keyPrefix, key);
 
     if (!near.storageRemove(storageKey)) {
       return options?.defaultValue ?? null;
@@ -70,11 +70,11 @@ export class LookupMap<DataType> {
    * @param options - Options for retrieving and storing the data.
    */
   set(
-    key: Bytes,
+    key: Uint8Array,
     newValue: DataType,
     options?: GetOptions<DataType>
   ): DataType | null {
-    const storageKey = this.keyPrefix + key;
+    const storageKey = u8ArrayConcat(this.keyPrefix, key);
     const storageValue = serializeValueWithOptions(newValue, options);
 
     if (!near.storageWrite(storageKey, storageValue)) {
@@ -93,7 +93,7 @@ export class LookupMap<DataType> {
    * @param options - Options for storing the data.
    */
   extend(
-    keyValuePairs: [Bytes, DataType][],
+    keyValuePairs: [Uint8Array, DataType][],
     options?: GetOptions<DataType>
   ): void {
     for (const [key, value] of keyValuePairs) {
@@ -106,7 +106,7 @@ export class LookupMap<DataType> {
    *
    * @param options - Options for storing the data.
    */
-  serialize(options?: Pick<GetOptions<DataType>, "serializer">): string {
+  serialize(options?: Pick<GetOptions<DataType>, "serializer">): Uint8Array {
     return serializeValueWithOptions(this, options);
   }
 

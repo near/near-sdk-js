@@ -1,17 +1,16 @@
-import { Bytes } from "../utils";
 import { Vector, VectorIterator } from "./vector";
 import { GetOptions } from "../types/collections";
 /**
  * An unordered set that stores data in NEAR storage.
  */
 export declare class UnorderedSet<DataType> {
-    readonly prefix: Bytes;
-    readonly elementIndexPrefix: Bytes;
+    readonly prefix: Uint8Array;
+    readonly elementIndexPrefix: Uint8Array;
     readonly elements: Vector<DataType>;
     /**
      * @param prefix - The byte prefix to use when storing elements inside this collection.
      */
-    constructor(prefix: Bytes);
+    constructor(prefix: Uint8Array);
     /**
      * The number of elements stored in the collection.
      */
@@ -70,7 +69,7 @@ export declare class UnorderedSet<DataType> {
      *
      * @param options - Options for storing the data.
      */
-    serialize(options?: Pick<GetOptions<DataType>, "serializer">): string;
+    serialize(options?: Pick<GetOptions<DataType>, "serializer">): Uint8Array;
     /**
      * Converts the deserialized data from storage to a JavaScript instance of the collection.
      *

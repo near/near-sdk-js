@@ -1,21 +1,19 @@
 import * as near from "../api";
 import {
   assert,
-  Bytes,
   getValueWithOptions,
-  u8ArrayToBytes,
   serializeValueWithOptions,
   ERR_INCONSISTENT_STATE,
   ERR_INDEX_OUT_OF_BOUNDS,
+  u8ArrayConcat,
 } from "../utils";
 import { GetOptions } from "../types/collections";
 
-function indexToKey(prefix: Bytes, index: number): Bytes {
+function indexToKey(prefix: Uint8Array, index: number): Uint8Array {
   const data = new Uint32Array([index]);
   const array = new Uint8Array(data.buffer);
-  const key = u8ArrayToBytes(array);
 
-  return prefix + key;
+  return u8ArrayConcat(prefix, array);
 }
 
 /**
@@ -27,7 +25,7 @@ export class Vector<DataType> {
    * @param prefix - The byte prefix to use when storing elements inside this collection.
    * @param length - The initial length of the collection. By default 0.
    */
-  constructor(readonly prefix: Bytes, public length = 0) {}
+  constructor(readonly prefix: Uint8Array, public length = 0) {}
 
   /**
    * Checks whether the collection is empty.
@@ -208,7 +206,7 @@ export class Vector<DataType> {
    *
    * @param options - Options for storing the data.
    */
-  serialize(options?: Pick<GetOptions<DataType>, "serializer">): string {
+  serialize(options?: Pick<GetOptions<DataType>, "serializer">): Uint8Array {
     return serializeValueWithOptions(this, options);
   }
 

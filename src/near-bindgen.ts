@@ -1,5 +1,10 @@
 import * as near from "./api";
-import { deserialize, latin1ToU8Array, serialize, u8ArrayToLatin1 } from "./utils";
+import {
+  deserialize,
+  latin1ToU8Array,
+  serialize,
+  u8ArrayToLatin1,
+} from "./utils";
 
 type EmptyParameterObject = Record<never, never>;
 type AnyObject = Record<string, unknown>;
@@ -171,7 +176,10 @@ export function NearBindgen({
       }
 
       static _saveToStorage(objectToSave: unknown): void {
-        near.storageWrite(latin1ToU8Array("STATE"), this._serialize(objectToSave));
+        near.storageWrite(
+          latin1ToU8Array("STATE"),
+          this._serialize(objectToSave)
+        );
       }
 
       static _getArgs(): unknown {
@@ -180,9 +188,11 @@ export function NearBindgen({
 
       static _serialize(value: unknown, forReturn = false): Uint8Array {
         if (forReturn) {
-          return latin1ToU8Array(JSON.stringify(value, (_, value) =>
-            typeof value === "bigint" ? `${value}` : value
-          ));
+          return latin1ToU8Array(
+            JSON.stringify(value, (_, value) =>
+              typeof value === "bigint" ? `${value}` : value
+            )
+          );
         }
 
         return serializer(value);

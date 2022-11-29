@@ -37,7 +37,7 @@ const ACCOUNT_ID_REGEX =
  */
 export function u8ArrayToLatin1(array: Uint8Array): string {
   let ret = "";
-  for (let e of array) {
+  for (const e of array) {
     ret += String.fromCharCode(e);
   }
   return ret;
@@ -49,9 +49,9 @@ export function u8ArrayToLatin1(array: Uint8Array): string {
  * @returns result Uint8Array
  */
 export function latin1ToU8Array(latin1: string): Uint8Array {
-  let ret = new Uint8Array(latin1.length);
+  const ret = new Uint8Array(latin1.length);
   for (let i = 0; i < latin1.length; i++) {
-    let code = latin1.charCodeAt(i);
+    const code = latin1.charCodeAt(i);
     if (code > 255) {
       throw new Error(
         `string at index ${i}: ${latin1[i]} is not a valid latin1 char`
@@ -61,18 +61,21 @@ export function latin1ToU8Array(latin1: string): Uint8Array {
   }
   return ret;
 }
-  
+
 /**
  * Concat two Uint8Array
- * @param array1 
- * @param array2 
+ * @param array1
+ * @param array2
  * @returns the concatenation of two array
  */
-export function u8ArrayConcat(array1: Uint8Array, array2: Uint8Array): Uint8Array {
-  let mergedArray = new Uint8Array(array1.length + array2.length);
+export function u8ArrayConcat(
+  array1: Uint8Array,
+  array2: Uint8Array
+): Uint8Array {
+  const mergedArray = new Uint8Array(array1.length + array2.length);
   mergedArray.set(array1);
   mergedArray.set(array2, array1.length);
-  return mergedArray
+  return mergedArray;
 }
 
 /**
@@ -121,27 +124,29 @@ export function serializeValueWithOptions<DataType>(
 }
 
 export function serialize(valueToSerialize: unknown): Uint8Array {
-  return latin1ToU8Array(JSON.stringify(valueToSerialize, function (key, value) {
-    if (typeof value === "bigint") {
-      return {
-        value: value.toString(),
-        [TYPE_KEY]: TypeBrand.BIGINT,
-      };
-    }
+  return latin1ToU8Array(
+    JSON.stringify(valueToSerialize, function (key, value) {
+      if (typeof value === "bigint") {
+        return {
+          value: value.toString(),
+          [TYPE_KEY]: TypeBrand.BIGINT,
+        };
+      }
 
-    if (
-      typeof this[key] === "object" &&
-      this[key] !== null &&
-      this[key] instanceof Date
-    ) {
-      return {
-        value: this[key].toISOString(),
-        [TYPE_KEY]: TypeBrand.DATE,
-      };
-    }
+      if (
+        typeof this[key] === "object" &&
+        this[key] !== null &&
+        this[key] instanceof Date
+      ) {
+        return {
+          value: this[key].toISOString(),
+          [TYPE_KEY]: TypeBrand.DATE,
+        };
+      }
 
-    return value;
-  }));
+      return value;
+    })
+  );
 }
 
 export function deserialize(valueToDeserialize: Uint8Array): unknown {

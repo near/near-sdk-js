@@ -1,11 +1,10 @@
 import * as near from "../api";
 import {
-  u8ArrayToBytes,
-  bytesToU8Array,
-  Bytes,
   assert,
   serializeValueWithOptions,
   ERR_INCONSISTENT_STATE,
+  u8ArrayConcat,
+  latin1ToU8Array,
 } from "../utils";
 import { Vector, VectorIterator } from "./vector";
 import { Mutable } from "../utils";
@@ -15,12 +14,11 @@ function serializeIndex(index: number) {
   const data = new Uint32Array([index]);
   const array = new Uint8Array(data.buffer);
 
-  return u8ArrayToBytes(array);
+  return array;
 }
 
-function deserializeIndex(rawIndex: Bytes): number {
-  const array = bytesToU8Array(rawIndex);
-  const [data] = new Uint32Array(array.buffer);
+function deserializeIndex(rawIndex: Uint8Array): number {
+  const [data] = new Uint32Array(rawIndex.buffer);
 
   return data;
 }
@@ -29,15 +27,15 @@ function deserializeIndex(rawIndex: Bytes): number {
  * An unordered set that stores data in NEAR storage.
  */
 export class UnorderedSet<DataType> {
-  readonly elementIndexPrefix: Bytes;
+  readonly elementIndexPrefix: Uint8Array;
   readonly elements: Vector<DataType>;
 
   /**
    * @param prefix - The byte prefix to use when storing elements inside this collection.
    */
-  constructor(readonly prefix: Bytes) {
-    this.elementIndexPrefix = `${prefix}i`;
-    this.elements = new Vector(`${prefix}e`);
+  constructor(readonly prefix: Uint8Array) {
+    this.elementIndexPrefix = u8ArrayConcat(prefix, latin1ToU8Array("i"));
+    this.elements = new Vector(u8ArrayConcat(prefix, latin1ToU8Array("e")));
   }
 
   /**
@@ -64,8 +62,10 @@ export class UnorderedSet<DataType> {
     element: DataType,
     options?: Pick<GetOptions<DataType>, "serializer">
   ): boolean {
-    const indexLookup =
-      this.elementIndexPrefix + serializeValueWithOptions(element, options);
+    const indexLookup = u8ArrayConcat(
+      this.elementIndexPrefix,
+      serializeValueWithOptions(element, options)
+    );
     return near.storageHasKey(indexLookup);
   }
 
@@ -80,9 +80,10 @@ export class UnorderedSet<DataType> {
     element: DataType,
     options?: Pick<GetOptions<DataType>, "serializer">
   ): boolean {
-    const indexLookup =
-      this.elementIndexPrefix + serializeValueWithOptions(element, options);
-
+    const indexLookup = u8ArrayConcat(
+      this.elementIndexPrefix,
+      serializeValueWithOptions(element, options)
+    );
     if (near.storageRead(indexLookup)) {
       return false;
     }
@@ -102,8 +103,11 @@ export class UnorderedSet<DataType> {
    * @param options - Options for retrieving and storing data.
    */
   remove(element: DataType, options?: GetOptions<DataType>): boolean {
-    const indexLookup =
-      this.elementIndexPrefix + serializeValueWithOptions(element, options);
+    const indexLookup = u8ArrayConcat(
+      this.elementIndexPrefix,
+      serializeValueWithOptions(element, options)
+    );
+
     const indexRaw = near.storageRead(indexLookup);
 
     if (!indexRaw) {
@@ -132,9 +136,11 @@ export class UnorderedSet<DataType> {
     // If the removed element was the last element from keys, then we don't need to
     // reinsert the lookup back.
     if (lastElement !== element) {
-      const lastLookupElement =
-        this.elementIndexPrefix +
-        serializeValueWithOptions(lastElement, options);
+      const lastLookupElement = u8ArrayConcat(
+        this.elementIndexPrefix,
+        serializeValueWithOptions(lastElement, options)
+      );
+
       near.storageWrite(lastLookupElement, indexRaw);
     }
 
@@ -149,8 +155,10 @@ export class UnorderedSet<DataType> {
    */
   clear(options?: Pick<GetOptions<DataType>, "serializer">): void {
     for (const element of this.elements) {
-      const indexLookup =
-        this.elementIndexPrefix + serializeValueWithOptions(element, options);
+      const indexLookup = u8ArrayConcat(
+        this.elementIndexPrefix,
+        serializeValueWithOptions(element, options)
+      );
       near.storageRemove(indexLookup);
     }
 
@@ -207,7 +215,7 @@ export class UnorderedSet<DataType> {
    *
    * @param options - Options for storing the data.
    */
-  serialize(options?: Pick<GetOptions<DataType>, "serializer">): string {
+  serialize(options?: Pick<GetOptions<DataType>, "serializer">): Uint8Array {
     return serializeValueWithOptions(this, options);
   }
 
@@ -223,7 +231,8 @@ export class UnorderedSet<DataType> {
     type MutableUnorderedSet = Mutable<UnorderedSet<DataType>>;
     const set = new UnorderedSet(data.prefix) as MutableUnorderedSet;
     // reconstruct Vector
-    const elementsPrefix = data.prefix + "e";
+    const elementsPrefix = u8ArrayConcat(data.prefix, latin1ToU8Array("e"));
+
     set.elements = new Vector(elementsPrefix);
     set.elements.length = data.elements.length;
 
