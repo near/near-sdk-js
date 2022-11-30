@@ -2,7 +2,11 @@ import { near, bytes } from "near-sdk-js";
 
 export function test_storage_write() {
   near.valueReturn(
-    near.storageWrite(bytes("\x00tesdsst\xff"), bytes("\x00\x01\xff"))
+    bytes(
+      near
+        .storageWrite(bytes("\x00tesdsst\xff"), bytes("\x00\x01\xff"))
+        .toString()
+    )
   );
 }
 
@@ -11,11 +15,15 @@ export function test_storage_read() {
 }
 
 export function test_storage_remove() {
-  near.valueReturn(near.storageRemove(bytes("\x00tesdsst\xff")));
+  near.valueReturn(
+    bytes(near.storageRemove(bytes("\x00tesdsst\xff")).toString())
+  );
 }
 
 export function test_storage_has_key() {
-  near.valueReturn(near.storageHasKey(bytes("\x00tesdsst\xff")));
+  near.valueReturn(
+    bytes(near.storageHasKey(bytes("\x00tesdsst\xff")).toString())
+  );
 }
 
 export function test_storage_get_evicted() {

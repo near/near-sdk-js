@@ -63,6 +63,13 @@ export function latin1ToU8Array(latin1: string): Uint8Array {
 }
 
 /**
+ * Alias to latin1ToU8Array
+ */
+export function bytes(s: string): Uint8Array {
+  return latin1ToU8Array(s);
+}
+
+/**
  * Concat two Uint8Array
  * @param array1
  * @param array2

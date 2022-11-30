@@ -10,9 +10,9 @@ export function just_panic() {
 
 export function write_some_state() {
   // Attempt to write something in state. If this one is successfully executed and not revoked, these should be in state
-  near.storageWrite("aaa", "bbb");
-  near.storageWrite("ccc", "ddd");
-  near.storageWrite("eee", "fff");
+  near.storageWrite(bytes("aaa"), bytes("bbb"));
+  near.storageWrite(bytes("ccc"), bytes("ddd"));
+  near.storageWrite(bytes("eee"), bytes("fff"));
 }
 
 function callingData() {

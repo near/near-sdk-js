@@ -33,20 +33,11 @@ test("Log expected types work", async (t) => {
     "abc",
     "水",
     "333",
-    "\x00\x01\xff",
-    "\xe6\xb0\xb4",
+    '{"0":0,"1":1,"2":255}',
+    '{"0":230,"1":176,"2":180}',
     "水",
     "水",
   ]);
-});
-
-test("Log unexpected types not logging", async (t) => {
-  const { ali, testContract } = t.context.accounts;
-
-  let r = await ali.callRaw(testContract, "log_unexpected_input_tests", "");
-  // logUtf8 and logUtf16 only works with bytes, trying to log it with string is unexpected and behavior is undefined
-  // in this specific case, it logs nothing
-  t.deepEqual(r.result.receipts_outcome[0].outcome.logs, ["", ""]);
 });
 
 test("Log invalid utf-8 sequence panic", async (t) => {

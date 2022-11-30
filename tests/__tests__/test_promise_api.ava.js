@@ -92,7 +92,7 @@ test("promise then", async (t) => {
       currentAccountId: calleeContract.accountId,
       signerAccountId: ali.accountId,
       predecessorAccountId: callerContract.accountId,
-      input: "abc",
+      input: { 0: 97, 1: 98, 2: 99 },
     }
   );
 
