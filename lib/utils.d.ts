@@ -31,7 +31,10 @@ export declare function latin1ToU8Array(latin1: string): Uint8Array;
 /**
  * Alias to latin1ToU8Array
  */
-export declare function bytes(s: string): Uint8Array;
+/**
+ * Alias to u8ArrayToLatin1
+ */
+export declare function str(a: Uint8Array): string;
 /**
  * Concat two Uint8Array
  * @param array1

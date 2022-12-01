@@ -1,4 +1,4 @@
-import { near, bytes } from "near-sdk-js";
+import { near, str, bytes } from "near-sdk-js";
 
 function arrayN(n) {
   return [...Array(Number(n)).keys()];
@@ -20,7 +20,7 @@ function callingData() {
     currentAccountId: near.currentAccountId(),
     signerAccountId: near.signerAccountId(),
     predecessorAccountId: near.predecessorAccountId(),
-    input: near.input(),
+    input: str(near.input()),
   };
 }
 
@@ -38,7 +38,7 @@ export function cross_contract_callback() {
       JSON.stringify({
         ...callingData(),
         promiseResults: arrayN(near.promiseResultsCount()).map((i) =>
-          near.promiseResult(i)
+          str(near.promiseResult(i))
         ),
       })
     )

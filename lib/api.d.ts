@@ -355,3 +355,13 @@ export declare function altBn128G1Sum(value: Uint8Array): Uint8Array;
  * @returns whether pairing check pass
  */
 export declare function altBn128PairingCheck(value: Uint8Array): boolean;
+export declare class TextEncoder {
+    constructor();
+    encode(s: string): Uint8Array;
+}
+export declare class TextDecoder {
+    encoding: string;
+    constructor(encoding?: string);
+    decode(a: Uint8Array): string;
+}
+export declare function bytes(s: string): Uint8Array;

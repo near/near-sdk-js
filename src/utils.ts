@@ -65,8 +65,15 @@ export function latin1ToU8Array(latin1: string): Uint8Array {
 /**
  * Alias to latin1ToU8Array
  */
-export function bytes(s: string): Uint8Array {
-  return latin1ToU8Array(s);
+// export function bytes(s: string): Uint8Array {
+//   return latin1ToU8Array(s);
+// }
+
+/**
+ * Alias to u8ArrayToLatin1
+ */
+export function str(a: Uint8Array): string {
+  return u8ArrayToLatin1(a)
 }
 
 /**

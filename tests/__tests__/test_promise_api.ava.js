@@ -92,7 +92,7 @@ test("promise then", async (t) => {
       currentAccountId: calleeContract.accountId,
       signerAccountId: ali.accountId,
       predecessorAccountId: callerContract.accountId,
-      input: { 0: 97, 1: 98, 2: 99 },
+      input: "abc",
     }
   );
 
@@ -232,8 +232,10 @@ test("promise batch deploy contract and call", async (t) => {
     caller2Contract,
     "test_promise_batch_deploy_call",
     "",
-    { gas: "200 Tgas" }
+    { gas: "300 Tgas" }
   );
+  console.log(JSON.stringify(r, null, 2))
+
   let deployed = caller2Contract.getSubAccount("b");
   t.deepEqual(JSON.parse(Buffer.from(r.result.status.SuccessValue, "base64")), {
     currentAccountId: deployed.accountId,

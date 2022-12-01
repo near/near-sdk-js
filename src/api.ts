@@ -140,6 +140,11 @@ interface Env {
   promise_results_count(): bigint;
   promise_result(promiseIndex: bigint, register: Register): PromiseResult;
   promise_return(promiseIndex: bigint): void;
+
+  uint8array_to_latin1_string(a: Uint8Array): string;
+  uint8array_to_utf8_string(a: Uint8Array): string; 
+  latin1_string_to_uint8array(s: string): Uint8Array;
+  utf8_string_to_uint8array(s: string): Uint8Array;
 }
 
 declare const env: Env;
@@ -833,4 +838,30 @@ export function altBn128G1Sum(value: Uint8Array): Uint8Array {
  */
 export function altBn128PairingCheck(value: Uint8Array): boolean {
   return env.alt_bn128_pairing_check(value) === 1n;
+}
+
+export class TextEncoder {
+  constructor() {}
+
+  encode(s: string): Uint8Array {
+    return env.utf8_string_to_uint8array(s)
+  }
+}
+
+export class TextDecoder {
+  constructor(public encoding: string = 'utf-8') {}
+  
+  decode(a: Uint8Array): string {
+    if (this.encoding == 'utf-8') {
+      return env.uint8array_to_utf8_string(a)
+    } else if (this.encoding == 'latin1') {
+      return env.uint8array_to_latin1_string(a)
+    } else {
+      throw new Error('unsupported encoding: ' + this.encoding)
+    }
+  }
+}
+
+export function bytes(s: string): Uint8Array {
+  return env.latin1_string_to_uint8array(s)
 }

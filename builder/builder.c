@@ -1006,6 +1006,56 @@ static JSValue near_validator_total_stake(JSContext *ctx, JSValueConst this_val,
   return u128_to_quickjs(ctx, stake_ptr);
 }
 
+static JSValue near_utf8_string_to_uint8array(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+  char *data;
+  size_t len;
+  JSValue arraybuffer;
+
+  data = JS_ToCStringLen(ctx, &len, argv[0]);
+
+  arraybuffer = JS_NewArrayBuffer(ctx, data, len, NULL, NULL, TRUE);
+  return JS_CallConstructor(ctx, JS_GetPropertyStr(ctx, JS_GetGlobalObject(ctx), "Uint8Array"), 1, (JSValueConst *)&arraybuffer);
+}
+
+static JSValue near_latin1_string_to_uint8array(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+  char *data;
+  size_t len;
+  JSValue arraybuffer;
+
+  data = JS_ToCStringLenRaw(ctx, &len, argv[0]);
+
+  arraybuffer = JS_NewArrayBuffer(ctx, data, len, NULL, NULL, TRUE);
+  return JS_CallConstructor(ctx, JS_GetPropertyStr(ctx, JS_GetGlobalObject(ctx), "Uint8Array"), 1, (JSValueConst *)&arraybuffer);
+}
+
+static JSValue near_uint8array_to_latin1_string(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+  uint8_t *data_ptr;
+  size_t data_len;
+
+  data_ptr = JS_Uint8Array_to_C(ctx, argv[0], &data_len);
+  if (data_ptr == NULL) {
+    return JS_ThrowTypeError(ctx, "Expect Uint8Array");
+  }
+
+  return JS_NewStringLenRaw(ctx, data_ptr, data_len);
+}
+
+static JSValue near_uint8array_to_utf8_string(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
+{
+  uint8_t *data_ptr;
+  size_t data_len;
+
+  data_ptr = JS_Uint8Array_to_C(ctx, argv[0], &data_len);
+  if (data_ptr == NULL) {
+    return JS_ThrowTypeError(ctx, "Expect Uint8Array");
+  }
+  
+  return JS_NewStringLen(ctx, data_ptr, data_len);
+}
+
 #ifdef NIGHTLY
 static JSValue near_alt_bn128_g1_multiexp(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
 {
@@ -1124,6 +1174,11 @@ static void js_add_near_host_functions(JSContext* ctx) {
   JS_SetPropertyStr(ctx, env, "alt_bn128_g1_sum", JS_NewCFunction(ctx, near_alt_bn128_g1_sum, "alt_bn128_g1_sum", 2));
   JS_SetPropertyStr(ctx, env, "alt_bn128_pairing_check", JS_NewCFunction(ctx, near_alt_bn128_pairing_check, "alt_bn128_pairing_check", 1));
   #endif
+
+  JS_SetPropertyStr(ctx, env, "latin1_string_to_uint8array", JS_NewCFunction(ctx, near_latin1_string_to_uint8array, "latin1_string_to_uint8array", 1));
+  JS_SetPropertyStr(ctx, env, "utf8_string_to_uint8array", JS_NewCFunction(ctx, near_utf8_string_to_uint8array, "utf8_string_to_uint8array", 1));
+  JS_SetPropertyStr(ctx, env, "uint8array_to_latin1_string", JS_NewCFunction(ctx, near_uint8array_to_latin1_string, "uint8array_to_latin1_string", 1));
+  JS_SetPropertyStr(ctx, env, "uint8array_to_utf8_string", JS_NewCFunction(ctx, near_uint8array_to_utf8_string, "uint8array_to_utf8_string", 1));
 
   JS_SetPropertyStr(ctx, global_obj, "env", env);
 }

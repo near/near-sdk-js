@@ -56,6 +56,9 @@
   },
   "author": "Near Inc <hello@nearprotocol.com>",
   "license": "Apache-2.0",
+  "dependencies": {
+    "near-sdk-js": "file:../"
+  },
   "devDependencies": {
     "ava": "^4.2.0",
     "near-workspaces": "3.2.1",
