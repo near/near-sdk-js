@@ -6,8 +6,6 @@ import {
     near,
     AccountId,
     LookupMap,
-    PromiseOrValue,
-    assert_one_yocto,
     Balance,
     Gas,
     PromiseOrValue,
@@ -18,10 +16,11 @@ import {
     assert,
 } from "near-sdk-js";
 
-import { IntoStorageKey } from "../non_fungible_token/utils";
+// TODO: move to the main SDK package
+import { IntoStorageKey, assert_one_yocto } from "../non_fungible_token/utils";
 
-const GAS_FOR_RESOLVE_TRANSFER: Gas = 5_000_000_000_000;
-const GAS_FOR_FT_TRANSFER_CALL: Gas = 25_000_000_000_000 + GAS_FOR_RESOLVE_TRANSFER;
+const GAS_FOR_RESOLVE_TRANSFER: Gas = 5_000_000_000_000n;
+const GAS_FOR_FT_TRANSFER_CALL: Gas = 25_000_000_000_000n + GAS_FOR_RESOLVE_TRANSFER;
 const ERR_TOTAL_SUPPLY_OVERFLOW: string = "Total supply overflow";
 
 /** Implementation of a FungibleToken standard
