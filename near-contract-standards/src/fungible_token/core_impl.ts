@@ -10,7 +10,6 @@ import {
     assert_one_yocto,
     Balance,
     Gas,
-    IntoStorageKey,
     PromiseOrValue,
     PromiseResult,
     StorageUsage,
@@ -18,6 +17,8 @@ import {
     view,
     assert,
 } from "near-sdk-js";
+
+import { IntoStorageKey } from "../non_fungible_token/utils";
 
 const GAS_FOR_RESOLVE_TRANSFER: Gas = 5_000_000_000_000;
 const GAS_FOR_FT_TRANSFER_CALL: Gas = 25_000_000_000_000 + GAS_FOR_RESOLVE_TRANSFER;
