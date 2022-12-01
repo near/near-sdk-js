@@ -43,12 +43,10 @@ class FungibleToken implements FungibleTokenCore, StorageManagement, FungibleTok
     // The storage size in bytes for one account.
     account_storage_usage: StorageUsage;
 
-    new<S>(prefix: S) : Self
-    where
-        S: IntoStorageKey,
+    //TODO: why is it called init in NFT standard implementation? And why it does not return anything??
+    new(prefix: IntoStorageKey) : FungibleToken
     {
-        let mut this =
-            Self { accounts: LookupMap::new(prefix), total_supply: 0, account_storage_usage: 0 };
+        let mut this = Self { accounts: LookupMap::new(prefix), total_supply: 0, account_storage_usage: 0 };
         this.measure_account_storage_usage();
         this
     }
