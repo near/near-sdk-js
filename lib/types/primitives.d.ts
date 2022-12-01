@@ -18,3 +18,15 @@ export declare type Balance = bigint;
  * A large integer representing the nonce.
  */
 export declare type Nonce = bigint;
+/**
+ * The amount of Gas Weight in integers - whole numbers.
+ */
+export declare type GasWeight = bigint;
+/**
+ * One yoctoNEAR. 10^-24 NEAR.
+ */
+export declare const ONE_YOCTO: Balance;
+/**
+ * One NEAR. 1 NEAR = 10^24 yoctoNEAR.
+ */
+export declare const ONE_NEAR: Balance;
