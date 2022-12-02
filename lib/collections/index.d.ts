@@ -1,6 +1,5 @@
-import { LookupMap } from "./lookup-map";
-import { Vector } from "./vector";
-import { LookupSet } from "./lookup-set";
-import { UnorderedMap } from "./unordered-map";
-import { UnorderedSet } from "./unordered-set";
-export { LookupMap, Vector, LookupSet, UnorderedMap, UnorderedSet };
+export * from "./lookup-map";
+export * from "./lookup-set";
+export * from "./unordered-map";
+export * from "./unordered-set";
+export * from "./vector";
