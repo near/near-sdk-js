@@ -1,6 +1,6 @@
 import * as near from "../api";
 import { GetOptions } from "../types/collections";
-import { serializeValueWithOptions, u8ArrayConcat } from "../utils";
+import { serializeValueWithOptions, concat } from "../utils";
 
 /**
  * A lookup set collection that stores entries in NEAR storage.
@@ -21,7 +21,7 @@ export class LookupSet<DataType> {
     key: Uint8Array,
     options?: Pick<GetOptions<DataType>, "serializer">
   ): boolean {
-    const storageKey = u8ArrayConcat(
+    const storageKey = concat(
       this.keyPrefix,
       serializeValueWithOptions(key, options)
     );
@@ -38,7 +38,7 @@ export class LookupSet<DataType> {
     key: DataType,
     options?: Pick<GetOptions<DataType>, "serializer">
   ): boolean {
-    const storageKey = u8ArrayConcat(
+    const storageKey = concat(
       this.keyPrefix,
       serializeValueWithOptions(key, options)
     );
@@ -56,7 +56,7 @@ export class LookupSet<DataType> {
     key: DataType,
     options?: Pick<GetOptions<DataType>, "serializer">
   ): boolean {
-    const storageKey = u8ArrayConcat(
+    const storageKey = concat(
       this.keyPrefix,
       serializeValueWithOptions(key, options)
     );

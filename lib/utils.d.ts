@@ -1,4 +1,10 @@
 import { GetOptions } from "./types/collections";
+export interface Env {
+    uint8array_to_latin1_string(a: Uint8Array): string;
+    uint8array_to_utf8_string(a: Uint8Array): string;
+    latin1_string_to_uint8array(s: string): Uint8Array;
+    utf8_string_to_uint8array(s: string): Uint8Array;
+}
 declare enum PromiseIndexBrand {
     _ = -1
 }
@@ -17,31 +23,12 @@ export declare type Register = number | bigint;
 export declare const ERR_INCONSISTENT_STATE = "The collection is an inconsistent state. Did previous smart contract execution terminate unexpectedly?";
 export declare const ERR_INDEX_OUT_OF_BOUNDS = "Index out of bounds";
 /**
- * Convert a Uint8Array to string, use Latin1 encoding
- * @param array - Uint8Array to convert
- * @returns result string
- */
-export declare function u8ArrayToLatin1(array: Uint8Array): string;
-/**
- * Convert a Latin1 string to Uint8Array
- * @param latin1 - string that with only Latin1 character to convert
- * @returns result Uint8Array
- */
-export declare function latin1ToU8Array(latin1: string): Uint8Array;
-/**
- * Alias to latin1ToU8Array
- */
-/**
- * Alias to u8ArrayToLatin1
- */
-export declare function str(a: Uint8Array): string;
-/**
  * Concat two Uint8Array
  * @param array1
  * @param array2
  * @returns the concatenation of two array
  */
-export declare function u8ArrayConcat(array1: Uint8Array, array2: Uint8Array): Uint8Array;
+export declare function concat(array1: Uint8Array, array2: Uint8Array): Uint8Array;
 /**
  * Asserts that the expression passed to the function is truthy, otherwise throws a new Error with the provided message.
  *
@@ -63,4 +50,43 @@ export declare function deserialize(valueToDeserialize: Uint8Array): unknown;
  * @param accountId - The Account ID string you want to validate.
  */
 export declare function validateAccountId(accountId: string): boolean;
+/**
+ * A subset of NodeJS TextEncoder API
+ */
+export declare class TextEncoder {
+    constructor();
+    encode(s: string): Uint8Array;
+}
+/**
+ * A subset of NodeJS TextDecoder API. Only support utf-8 and latin1 encoding.
+ */
+export declare class TextDecoder {
+    encoding: string;
+    constructor(encoding?: string);
+    decode(a: Uint8Array): string;
+}
+/**
+ * Convert a string to Uint8Array, each character must have a char code between 0-255.
+ * @param s - string that with only Latin1 character to convert
+ * @returns result Uint8Array
+ */
+export declare function bytes(s: string): Uint8Array;
+/**
+ * Convert a Uint8Array to string, each uint8 to the single character of that char code
+ * @param a - Uint8Array to convert
+ * @returns result string
+ */
+export declare function str(a: Uint8Array): string;
+/**
+ * Encode the string to Uint8Array with UTF-8 encoding
+ * @param s - String to encode
+ * @returns result Uint8Array
+ */
+export declare function encode(s: string): Uint8Array;
+/**
+ * Decode the Uint8Array to string in UTF-8 encoding
+ * @param a - array to decode
+ * @returns result string
+ */
+export declare function decode(a: Uint8Array): string;
 export {};

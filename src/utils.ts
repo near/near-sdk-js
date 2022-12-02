@@ -1,5 +1,14 @@
 import { GetOptions } from "./types/collections";
 
+export interface Env {
+  uint8array_to_latin1_string(a: Uint8Array): string;
+  uint8array_to_utf8_string(a: Uint8Array): string; 
+  latin1_string_to_uint8array(s: string): Uint8Array;
+  utf8_string_to_uint8array(s: string): Uint8Array;
+}
+
+declare const env: Env;
+
 // make PromiseIndex a nominal typing
 enum PromiseIndexBrand {
   _ = -1,
@@ -31,58 +40,12 @@ const ACCOUNT_ID_REGEX =
   /^(([a-z\d]+[-_])*[a-z\d]+\.)*([a-z\d]+[-_])*[a-z\d]+$/;
 
 /**
- * Convert a Uint8Array to string, use Latin1 encoding
- * @param array - Uint8Array to convert
- * @returns result string
- */
-export function u8ArrayToLatin1(array: Uint8Array): string {
-  let ret = "";
-  for (const e of array) {
-    ret += String.fromCharCode(e);
-  }
-  return ret;
-}
-
-/**
- * Convert a Latin1 string to Uint8Array
- * @param latin1 - string that with only Latin1 character to convert
- * @returns result Uint8Array
- */
-export function latin1ToU8Array(latin1: string): Uint8Array {
-  const ret = new Uint8Array(latin1.length);
-  for (let i = 0; i < latin1.length; i++) {
-    const code = latin1.charCodeAt(i);
-    if (code > 255) {
-      throw new Error(
-        `string at index ${i}: ${latin1[i]} is not a valid latin1 char`
-      );
-    }
-    ret[i] = code;
-  }
-  return ret;
-}
-
-/**
- * Alias to latin1ToU8Array
- */
-// export function bytes(s: string): Uint8Array {
-//   return latin1ToU8Array(s);
-// }
-
-/**
- * Alias to u8ArrayToLatin1
- */
-export function str(a: Uint8Array): string {
-  return u8ArrayToLatin1(a)
-}
-
-/**
  * Concat two Uint8Array
  * @param array1
  * @param array2
  * @returns the concatenation of two array
  */
-export function u8ArrayConcat(
+export function concat(
   array1: Uint8Array,
   array2: Uint8Array
 ): Uint8Array {
@@ -138,7 +101,7 @@ export function serializeValueWithOptions<DataType>(
 }
 
 export function serialize(valueToSerialize: unknown): Uint8Array {
-  return latin1ToU8Array(
+  return bytes(
     JSON.stringify(valueToSerialize, function (key, value) {
       if (typeof value === "bigint") {
         return {
@@ -164,7 +127,7 @@ export function serialize(valueToSerialize: unknown): Uint8Array {
 }
 
 export function deserialize(valueToDeserialize: Uint8Array): unknown {
-  return JSON.parse(u8ArrayToLatin1(valueToDeserialize), (_, value) => {
+  return JSON.parse(str(valueToDeserialize), (_, value) => {
     if (
       value !== null &&
       typeof value === "object" &&
@@ -195,4 +158,68 @@ export function validateAccountId(accountId: string): boolean {
     accountId.length <= 64 &&
     ACCOUNT_ID_REGEX.test(accountId)
   );
+}
+
+/**
+ * A subset of NodeJS TextEncoder API
+ */
+ export class TextEncoder {
+  constructor() {}
+
+  encode(s: string): Uint8Array {
+    return env.utf8_string_to_uint8array(s)
+  }
+}
+
+/**
+ * A subset of NodeJS TextDecoder API. Only support utf-8 and latin1 encoding.
+ */
+export class TextDecoder {
+  constructor(public encoding: string = 'utf-8') {}
+  
+  decode(a: Uint8Array): string {
+    if (this.encoding == 'utf-8') {
+      return env.uint8array_to_utf8_string(a)
+    } else if (this.encoding == 'latin1') {
+      return env.uint8array_to_latin1_string(a)
+    } else {
+      throw new Error('unsupported encoding: ' + this.encoding)
+    }
+  }
+}
+
+/**
+ * Convert a string to Uint8Array, each character must have a char code between 0-255. 
+ * @param s - string that with only Latin1 character to convert
+ * @returns result Uint8Array
+ */
+export function bytes(s: string): Uint8Array {
+  return env.latin1_string_to_uint8array(s)
+}
+
+/**
+ * Convert a Uint8Array to string, each uint8 to the single character of that char code
+ * @param a - Uint8Array to convert
+ * @returns result string
+ */
+export function str(a: Uint8Array): string {
+  return env.uint8array_to_latin1_string(a);
+}
+
+/**
+ * Encode the string to Uint8Array with UTF-8 encoding
+ * @param s - String to encode
+ * @returns result Uint8Array
+ */
+export function encode(s: string): Uint8Array {
+  return env.utf8_string_to_uint8array(s);
+}
+
+/**
+ * Decode the Uint8Array to string in UTF-8 encoding
+ * @param a - array to decode
+ * @returns result string
+ */
+export function decode(a: Uint8Array): string {
+  return env.uint8array_to_utf8_string(a);
 }

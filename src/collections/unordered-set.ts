@@ -3,8 +3,8 @@ import {
   assert,
   serializeValueWithOptions,
   ERR_INCONSISTENT_STATE,
-  u8ArrayConcat,
-  latin1ToU8Array,
+  concat,
+  bytes
 } from "../utils";
 import { Vector, VectorIterator } from "./vector";
 import { Mutable } from "../utils";
@@ -34,8 +34,8 @@ export class UnorderedSet<DataType> {
    * @param prefix - The byte prefix to use when storing elements inside this collection.
    */
   constructor(readonly prefix: Uint8Array) {
-    this.elementIndexPrefix = u8ArrayConcat(prefix, latin1ToU8Array("i"));
-    this.elements = new Vector(u8ArrayConcat(prefix, latin1ToU8Array("e")));
+    this.elementIndexPrefix = concat(prefix, bytes("i"));
+    this.elements = new Vector(concat(prefix, bytes("e")));
   }
 
   /**
@@ -62,7 +62,7 @@ export class UnorderedSet<DataType> {
     element: DataType,
     options?: Pick<GetOptions<DataType>, "serializer">
   ): boolean {
-    const indexLookup = u8ArrayConcat(
+    const indexLookup = concat(
       this.elementIndexPrefix,
       serializeValueWithOptions(element, options)
     );
@@ -80,7 +80,7 @@ export class UnorderedSet<DataType> {
     element: DataType,
     options?: Pick<GetOptions<DataType>, "serializer">
   ): boolean {
-    const indexLookup = u8ArrayConcat(
+    const indexLookup = concat(
       this.elementIndexPrefix,
       serializeValueWithOptions(element, options)
     );
@@ -103,7 +103,7 @@ export class UnorderedSet<DataType> {
    * @param options - Options for retrieving and storing data.
    */
   remove(element: DataType, options?: GetOptions<DataType>): boolean {
-    const indexLookup = u8ArrayConcat(
+    const indexLookup = concat(
       this.elementIndexPrefix,
       serializeValueWithOptions(element, options)
     );
@@ -136,7 +136,7 @@ export class UnorderedSet<DataType> {
     // If the removed element was the last element from keys, then we don't need to
     // reinsert the lookup back.
     if (lastElement !== element) {
-      const lastLookupElement = u8ArrayConcat(
+      const lastLookupElement = concat(
         this.elementIndexPrefix,
         serializeValueWithOptions(lastElement, options)
       );
@@ -155,7 +155,7 @@ export class UnorderedSet<DataType> {
    */
   clear(options?: Pick<GetOptions<DataType>, "serializer">): void {
     for (const element of this.elements) {
-      const indexLookup = u8ArrayConcat(
+      const indexLookup = concat(
         this.elementIndexPrefix,
         serializeValueWithOptions(element, options)
       );
@@ -231,7 +231,7 @@ export class UnorderedSet<DataType> {
     type MutableUnorderedSet = Mutable<UnorderedSet<DataType>>;
     const set = new UnorderedSet(data.prefix) as MutableUnorderedSet;
     // reconstruct Vector
-    const elementsPrefix = u8ArrayConcat(data.prefix, latin1ToU8Array("e"));
+    const elementsPrefix = concat(data.prefix, bytes("e"));
 
     set.elements = new Vector(elementsPrefix);
     set.elements.length = data.elements.length;

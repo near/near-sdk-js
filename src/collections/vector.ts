@@ -5,7 +5,7 @@ import {
   serializeValueWithOptions,
   ERR_INCONSISTENT_STATE,
   ERR_INDEX_OUT_OF_BOUNDS,
-  u8ArrayConcat,
+  concat,
 } from "../utils";
 import { GetOptions } from "../types/collections";
 
@@ -13,7 +13,7 @@ function indexToKey(prefix: Uint8Array, index: number): Uint8Array {
   const data = new Uint32Array([index]);
   const array = new Uint8Array(data.buffer);
 
-  return u8ArrayConcat(prefix, array);
+  return concat(prefix, array);
 }
 
 /**

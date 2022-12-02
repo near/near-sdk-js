@@ -1,5 +1,5 @@
 import { base58 } from "@scure/base";
-import { u8ArrayConcat } from "../utils";
+import { concat } from "../utils";
 
 export enum CurveType {
   ED25519 = 0,
@@ -121,6 +121,6 @@ export class PublicKey {
       throw new Base58Error(error.message);
     }
 
-    return new PublicKey(u8ArrayConcat(new Uint8Array([curve]), data));
+    return new PublicKey(concat(new Uint8Array([curve]), data));
   }
 }

@@ -3,7 +3,7 @@ import { GetOptions } from "../types/collections";
 import {
   getValueWithOptions,
   serializeValueWithOptions,
-  u8ArrayConcat,
+  concat,
 } from "../utils";
 
 /**
@@ -21,7 +21,7 @@ export class LookupMap<DataType> {
    * @param key - The value for which to check the presence.
    */
   containsKey(key: Uint8Array): boolean {
-    const storageKey = u8ArrayConcat(this.keyPrefix, key);
+    const storageKey = concat(this.keyPrefix, key);
     return near.storageHasKey(storageKey);
   }
 
@@ -35,7 +35,7 @@ export class LookupMap<DataType> {
     key: Uint8Array,
     options?: Omit<GetOptions<DataType>, "serializer">
   ): DataType | null {
-    const storageKey = u8ArrayConcat(this.keyPrefix, key);
+    const storageKey = concat(this.keyPrefix, key);
     const value = near.storageRead(storageKey);
 
     return getValueWithOptions(value, options);
@@ -51,7 +51,7 @@ export class LookupMap<DataType> {
     key: Uint8Array,
     options?: Omit<GetOptions<DataType>, "serializer">
   ): DataType | null {
-    const storageKey = u8ArrayConcat(this.keyPrefix, key);
+    const storageKey = concat(this.keyPrefix, key);
 
     if (!near.storageRemove(storageKey)) {
       return options?.defaultValue ?? null;
@@ -74,7 +74,7 @@ export class LookupMap<DataType> {
     newValue: DataType,
     options?: GetOptions<DataType>
   ): DataType | null {
-    const storageKey = u8ArrayConcat(this.keyPrefix, key);
+    const storageKey = concat(this.keyPrefix, key);
     const storageValue = serializeValueWithOptions(newValue, options);
 
     if (!near.storageWrite(storageKey, storageValue)) {

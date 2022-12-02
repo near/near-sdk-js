@@ -2,10 +2,10 @@ import {
   assert,
   ERR_INCONSISTENT_STATE,
   getValueWithOptions,
-  latin1ToU8Array,
+  bytes,
   Mutable,
   serializeValueWithOptions,
-  u8ArrayConcat,
+  concat,
 } from "../utils";
 import { Vector, VectorIterator } from "./vector";
 import { LookupMap } from "./lookup-map";
@@ -25,10 +25,10 @@ export class UnorderedMap<DataType> {
    */
   constructor(readonly prefix: Uint8Array) {
     this.keys = new Vector<Uint8Array>(
-      u8ArrayConcat(prefix, latin1ToU8Array("u"))
+      concat(prefix, bytes("u"))
     ); // intentional different prefix with old UnorderedMap
     this.values = new LookupMap<ValueAndIndex>(
-      u8ArrayConcat(prefix, latin1ToU8Array("m"))
+      concat(prefix, bytes("m"))
     );
   }
 
@@ -210,11 +210,11 @@ export class UnorderedMap<DataType> {
     const map = new UnorderedMap(data.prefix) as MutableUnorderedMap;
 
     // reconstruct keys Vector
-    map.keys = new Vector(u8ArrayConcat(data.prefix, latin1ToU8Array("u")));
+    map.keys = new Vector(concat(data.prefix, bytes("u")));
     map.keys.length = data.keys.length;
     // reconstruct values LookupMap
     map.values = new LookupMap(
-      u8ArrayConcat(data.prefix, latin1ToU8Array("m"))
+      concat(data.prefix, bytes("m"))
     );
 
     return map as UnorderedMap<DataType>;

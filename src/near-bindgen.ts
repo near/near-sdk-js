@@ -1,9 +1,9 @@
 import * as near from "./api";
 import {
   deserialize,
-  latin1ToU8Array,
   serialize,
-  u8ArrayToLatin1,
+  bytes,
+  str
 } from "./utils";
 
 type EmptyParameterObject = Record<never, never>;
@@ -171,24 +171,24 @@ export function NearBindgen({
       }
 
       static _getState(): unknown | null {
-        const rawState = near.storageRead(latin1ToU8Array("STATE"));
+        const rawState = near.storageRead(bytes("STATE"));
         return rawState ? this._deserialize(rawState) : null;
       }
 
       static _saveToStorage(objectToSave: unknown): void {
         near.storageWrite(
-          latin1ToU8Array("STATE"),
+          bytes("STATE"),
           this._serialize(objectToSave)
         );
       }
 
       static _getArgs(): unknown {
-        return JSON.parse(u8ArrayToLatin1(near.input()) || "{}");
+        return JSON.parse(str(near.input()) || "{}");
       }
 
       static _serialize(value: unknown, forReturn = false): Uint8Array {
         if (forReturn) {
-          return latin1ToU8Array(
+          return bytes(
             JSON.stringify(value, (_, value) =>
               typeof value === "bigint" ? `${value}` : value
             )

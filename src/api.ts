@@ -3,7 +3,7 @@ import {
   NearAmount,
   PromiseIndex,
   Register,
-  u8ArrayToLatin1,
+  str,
 } from "./utils";
 import { GasWeight, PromiseResult } from "./types";
 
@@ -178,7 +178,7 @@ export function log(...params: unknown[]): void {
  */
 export function signerAccountId(): string {
   env.signer_account_id(0);
-  return u8ArrayToLatin1(env.read_register(0));
+  return str(env.read_register(0));
 }
 
 /**
@@ -196,7 +196,7 @@ export function signerAccountPk(): Uint8Array {
  */
 export function predecessorAccountId(): string {
   env.predecessor_account_id(0);
-  return u8ArrayToLatin1(env.read_register(0));
+  return str(env.read_register(0));
 }
 
 /**
@@ -204,7 +204,7 @@ export function predecessorAccountId(): string {
  */
 export function currentAccountId(): string {
   env.current_account_id(0);
-  return u8ArrayToLatin1(env.read_register(0));
+  return str(env.read_register(0));
 }
 
 /**
@@ -838,30 +838,4 @@ export function altBn128G1Sum(value: Uint8Array): Uint8Array {
  */
 export function altBn128PairingCheck(value: Uint8Array): boolean {
   return env.alt_bn128_pairing_check(value) === 1n;
-}
-
-export class TextEncoder {
-  constructor() {}
-
-  encode(s: string): Uint8Array {
-    return env.utf8_string_to_uint8array(s)
-  }
-}
-
-export class TextDecoder {
-  constructor(public encoding: string = 'utf-8') {}
-  
-  decode(a: Uint8Array): string {
-    if (this.encoding == 'utf-8') {
-      return env.uint8array_to_utf8_string(a)
-    } else if (this.encoding == 'latin1') {
-      return env.uint8array_to_latin1_string(a)
-    } else {
-      throw new Error('unsupported encoding: ' + this.encoding)
-    }
-  }
-}
-
-export function bytes(s: string): Uint8Array {
-  return env.latin1_string_to_uint8array(s)
 }
