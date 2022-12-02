@@ -41,7 +41,7 @@ export interface NonFungibleTokenApproval {
   }: {
     token_id: TokenId;
     account_id: AccountId;
-    msg: Option<string>;
+    msg?: string;
   }): Option<NearPromise>;
 
   /** Revoke an approved account for a specific token.
@@ -93,6 +93,6 @@ export interface NonFungibleTokenApproval {
   }: {
     token_id: TokenId;
     approved_account_id: AccountId;
-    approval_id: Option<bigint>;
+    approval_id?: bigint;
   }): boolean;
 }
