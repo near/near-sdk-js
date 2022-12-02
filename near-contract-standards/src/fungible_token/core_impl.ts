@@ -43,13 +43,15 @@ class FungibleToken implements FungibleTokenCore, StorageManagement, FungibleTok
     // The storage size in bytes for one account.
     account_storage_usage: StorageUsage;
 
-    //TODO: why is it called init in NFT standard implementation? And why it does not return anything??
-    new(prefix: IntoStorageKey) : FungibleToken
-    {
-        let mut this = Self { accounts: LookupMap::new(prefix), total_supply: 0, account_storage_usage: 0 };
+    // TODO: constructor is used instead of new in Rust, check if it's ok. In NFT it's called init, why?.
+    constructor(prefix: IntoStorageKey) {
+        const storage_prefix = prefix.into_storage_key();
+        this.accounts = new LookupMap<Balance>(storage_prefix);
+        this.total_supply = 0n;
+        this.account_storage_usage = 0n;
         this.measure_account_storage_usage();
-        this
     }
+
 
     @call({})
     measure_account_storage_usage() {
