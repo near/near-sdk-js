@@ -3,18 +3,18 @@ import { GetOptions } from "../types/collections";
  * A lookup set collection that stores entries in NEAR storage.
  */
 export declare class LookupSet<DataType> {
-    readonly keyPrefix: Uint8Array;
+    readonly keyPrefix: string;
     /**
      * @param keyPrefix - The byte prefix to use when storing elements inside this collection.
      */
-    constructor(keyPrefix: Uint8Array);
+    constructor(keyPrefix: string);
     /**
      * Checks whether the collection contains the value.
      *
      * @param key - The value for which to check the presence.
      * @param options - Options for storing data.
      */
-    contains(key: Uint8Array, options?: Pick<GetOptions<DataType>, "serializer">): boolean;
+    contains(key: DataType, options?: Pick<GetOptions<DataType>, "serializer">): boolean;
     /**
      * Returns true if the element was present in the set.
      *

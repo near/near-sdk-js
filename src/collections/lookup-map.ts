@@ -3,7 +3,7 @@ import { GetOptions } from "../types/collections";
 import {
   getValueWithOptions,
   serializeValueWithOptions,
-  concat,
+  encode
 } from "../utils";
 
 /**
@@ -13,16 +13,16 @@ export class LookupMap<DataType> {
   /**
    * @param keyPrefix - The byte prefix to use when storing elements inside this collection.
    */
-  constructor(readonly keyPrefix: Uint8Array) {}
+  constructor(readonly keyPrefix: string) {}
 
   /**
    * Checks whether the collection contains the value.
    *
    * @param key - The value for which to check the presence.
    */
-  containsKey(key: Uint8Array): boolean {
-    const storageKey = concat(this.keyPrefix, key);
-    return near.storageHasKey(storageKey);
+  containsKey(key: string): boolean {
+    const storageKey = this.keyPrefix + key;
+    return near.storageHasKey(encode(storageKey));
   }
 
   /**
@@ -32,11 +32,11 @@ export class LookupMap<DataType> {
    * @param options - Options for retrieving the data.
    */
   get(
-    key: Uint8Array,
+    key: string,
     options?: Omit<GetOptions<DataType>, "serializer">
   ): DataType | null {
-    const storageKey = concat(this.keyPrefix, key);
-    const value = near.storageRead(storageKey);
+    const storageKey = this.keyPrefix + key;
+    const value = near.storageRead(encode(storageKey));
 
     return getValueWithOptions(value, options);
   }
@@ -48,12 +48,12 @@ export class LookupMap<DataType> {
    * @param options - Options for retrieving the data.
    */
   remove(
-    key: Uint8Array,
+    key: string,
     options?: Omit<GetOptions<DataType>, "serializer">
   ): DataType | null {
-    const storageKey = concat(this.keyPrefix, key);
+    const storageKey = this.keyPrefix + key;
 
-    if (!near.storageRemove(storageKey)) {
+    if (!near.storageRemove(encode(storageKey))) {
       return options?.defaultValue ?? null;
     }
 
@@ -70,14 +70,14 @@ export class LookupMap<DataType> {
    * @param options - Options for retrieving and storing the data.
    */
   set(
-    key: Uint8Array,
+    key: string,
     newValue: DataType,
     options?: GetOptions<DataType>
   ): DataType | null {
-    const storageKey = concat(this.keyPrefix, key);
+    const storageKey = this.keyPrefix + key;
     const storageValue = serializeValueWithOptions(newValue, options);
 
-    if (!near.storageWrite(storageKey, storageValue)) {
+    if (!near.storageWrite(encode(storageKey), storageValue)) {
       return options?.defaultValue ?? null;
     }
 
@@ -93,7 +93,7 @@ export class LookupMap<DataType> {
    * @param options - Options for storing the data.
    */
   extend(
-    keyValuePairs: [Uint8Array, DataType][],
+    keyValuePairs: [string, DataType][],
     options?: GetOptions<DataType>
   ): void {
     for (const [key, value] of keyValuePairs) {

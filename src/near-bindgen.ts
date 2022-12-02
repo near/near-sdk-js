@@ -3,7 +3,8 @@ import {
   deserialize,
   serialize,
   bytes,
-  str
+  encode,
+  decode,
 } from "./utils";
 
 type EmptyParameterObject = Record<never, never>;
@@ -183,12 +184,12 @@ export function NearBindgen({
       }
 
       static _getArgs(): unknown {
-        return JSON.parse(str(near.input()) || "{}");
+        return JSON.parse(decode(near.input()) || "{}");
       }
 
       static _serialize(value: unknown, forReturn = false): Uint8Array {
         if (forReturn) {
-          return bytes(
+          return encode(
             JSON.stringify(value, (_, value) =>
               typeof value === "bigint" ? `${value}` : value
             )

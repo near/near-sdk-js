@@ -1,4 +1,4 @@
-import { NearBindgen, call, NearPromise, near, bytes } from "near-sdk-js";
+import { NearBindgen, call, NearPromise, near, bytes, str } from "near-sdk-js";
 import { PublicKey } from "near-sdk-js";
 
 function callingData() {
@@ -6,7 +6,7 @@ function callingData() {
     currentAccountId: near.currentAccountId(),
     signerAccountId: near.signerAccountId(),
     predecessorAccountId: near.predecessorAccountId(),
-    input: near.input(),
+    input: str(near.input()),
   };
 }
 
@@ -120,7 +120,7 @@ export class HighlevelPromiseContract {
     return {
       ...callingData(),
       promiseResults: arrayN(near.promiseResultsCount()).map((i) =>
-        near.promiseResult(i)
+        str(near.promiseResult(i))
       ),
       callbackArg1,
     };
@@ -129,9 +129,9 @@ export class HighlevelPromiseContract {
   @call({})
   cross_contract_callback_write_state() {
     // Attempt to write something in state. If this one is successfully executed and not revoked, these should be in state
-    near.storageWrite("aaa", "bbb");
-    near.storageWrite("ccc", "ddd");
-    near.storageWrite("eee", "fff");
+    near.storageWrite(bytes("aaa"), bytes("bbb"));
+    near.storageWrite(bytes("ccc"), bytes("ddd"));
+    near.storageWrite(bytes("eee"), bytes("fff"));
   }
 
   @call({})
@@ -213,7 +213,7 @@ export class HighlevelPromiseContract {
           2 * Math.pow(10, 13)
         )
       );
-    near.storageWrite("aaa", "bbb");
+    near.storageWrite(bytes("aaa"), bytes("bbb"));
     return promise;
   }
 

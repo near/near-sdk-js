@@ -168,6 +168,8 @@ test("cross contract call success then call a panic method", async (t) => {
     }
   );
   // the last promise fail, cause the transaction fail
+  console.log(
+    r.result.status.Failure.ActionError.kind.FunctionCallError.ExecutionError)
   t.assert(
     r.result.status.Failure.ActionError.kind.FunctionCallError.ExecutionError.includes(
       "Smart contract panicked: it just panic"

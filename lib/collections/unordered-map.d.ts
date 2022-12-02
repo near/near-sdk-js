@@ -1,18 +1,18 @@
 import { Vector } from "./vector";
 import { LookupMap } from "./lookup-map";
 import { GetOptions } from "../types/collections";
-declare type ValueAndIndex = [value: Uint8Array, index: number];
+declare type ValueAndIndex = [value: string, index: number];
 /**
  * An unordered map that stores data in NEAR storage.
  */
 export declare class UnorderedMap<DataType> {
-    readonly prefix: Uint8Array;
-    readonly keys: Vector<Uint8Array>;
+    readonly prefix: string;
+    readonly keys: Vector<string>;
     readonly values: LookupMap<ValueAndIndex>;
     /**
      * @param prefix - The byte prefix to use when storing elements inside this collection.
      */
-    constructor(prefix: Uint8Array);
+    constructor(prefix: string);
     /**
      * The number of elements stored in the collection.
      */
@@ -27,7 +27,7 @@ export declare class UnorderedMap<DataType> {
      * @param key - The key at which to look for the data.
      * @param options - Options for retrieving the data.
      */
-    get(key: Uint8Array, options?: Omit<GetOptions<DataType>, "serializer">): DataType | null;
+    get(key: string, options?: Omit<GetOptions<DataType>, "serializer">): DataType | null;
     /**
      * Store a new value at the provided key.
      *
@@ -35,14 +35,14 @@ export declare class UnorderedMap<DataType> {
      * @param value - The value to store in the collection.
      * @param options - Options for retrieving and storing the data.
      */
-    set(key: Uint8Array, value: DataType, options?: GetOptions<DataType>): DataType | null;
+    set(key: string, value: DataType, options?: GetOptions<DataType>): DataType | null;
     /**
      * Removes and retrieves the element with the provided key.
      *
      * @param key - The key at which to remove data.
      * @param options - Options for retrieving the data.
      */
-    remove(key: Uint8Array, options?: Omit<GetOptions<DataType>, "serializer">): DataType | null;
+    remove(key: string, options?: Omit<GetOptions<DataType>, "serializer">): DataType | null;
     /**
      * Remove all of the elements stored within the collection.
      */
@@ -59,13 +59,13 @@ export declare class UnorderedMap<DataType> {
      *
      * @param options - Options for retrieving and storing the data.
      */
-    toArray(options?: GetOptions<DataType>): [Uint8Array, DataType][];
+    toArray(options?: GetOptions<DataType>): [string, DataType][];
     /**
      * Extends the current collection with the passed in array of key-value pairs.
      *
      * @param keyValuePairs - The key-value pairs to extend the collection with.
      */
-    extend(keyValuePairs: [Uint8Array, DataType][]): void;
+    extend(keyValuePairs: [string, DataType][]): void;
     /**
      * Serialize the collection.
      *
@@ -92,7 +92,7 @@ declare class UnorderedMapIterator<DataType> {
      */
     constructor(unorderedMap: UnorderedMap<DataType>, options?: GetOptions<DataType>);
     next(): {
-        value: [Uint8Array | null, DataType | null];
+        value: [string | null, DataType | null];
         done: boolean;
     };
 }

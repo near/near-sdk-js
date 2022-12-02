@@ -4,13 +4,13 @@ import { GetOptions } from "../types/collections";
  * Uses the following map: index -> element
  */
 export declare class Vector<DataType> {
-    readonly prefix: Uint8Array;
+    readonly prefix: string;
     length: number;
     /**
      * @param prefix - The byte prefix to use when storing elements inside this collection.
      * @param length - The initial length of the collection. By default 0.
      */
-    constructor(prefix: Uint8Array, length?: number);
+    constructor(prefix: string, length?: number);
     /**
      * Checks whether the collection is empty.
      */

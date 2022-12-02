@@ -5,15 +5,17 @@ import {
   serializeValueWithOptions,
   ERR_INCONSISTENT_STATE,
   ERR_INDEX_OUT_OF_BOUNDS,
-  concat,
+  str,
+  bytes
 } from "../utils";
 import { GetOptions } from "../types/collections";
 
-function indexToKey(prefix: Uint8Array, index: number): Uint8Array {
+function indexToKey(prefix: string, index: number): string {
   const data = new Uint32Array([index]);
   const array = new Uint8Array(data.buffer);
+  const key = str(array);
 
-  return concat(prefix, array);
+  return prefix + key;
 }
 
 /**
@@ -25,7 +27,7 @@ export class Vector<DataType> {
    * @param prefix - The byte prefix to use when storing elements inside this collection.
    * @param length - The initial length of the collection. By default 0.
    */
-  constructor(readonly prefix: Uint8Array, public length = 0) {}
+  constructor(readonly prefix: string, public length = 0) {}
 
   /**
    * Checks whether the collection is empty.
@@ -49,7 +51,7 @@ export class Vector<DataType> {
     }
 
     const storageKey = indexToKey(this.prefix, index);
-    const value = near.storageRead(storageKey);
+    const value = near.storageRead(bytes(storageKey));
 
     return getValueWithOptions(value, options);
   }
@@ -73,7 +75,7 @@ export class Vector<DataType> {
     const last = this.pop(options);
 
     assert(
-      near.storageWrite(key, serializeValueWithOptions(last, options)),
+      near.storageWrite(bytes(key), serializeValueWithOptions(last, options)),
       ERR_INCONSISTENT_STATE
     );
 
@@ -95,7 +97,7 @@ export class Vector<DataType> {
     const key = indexToKey(this.prefix, this.length);
     this.length += 1;
 
-    near.storageWrite(key, serializeValueWithOptions(element, options));
+    near.storageWrite(bytes(key), serializeValueWithOptions(element, options));
   }
 
   /**
@@ -112,7 +114,7 @@ export class Vector<DataType> {
     const lastKey = indexToKey(this.prefix, lastIndex);
     this.length -= 1;
 
-    assert(near.storageRemove(lastKey), ERR_INCONSISTENT_STATE);
+    assert(near.storageRemove(bytes(lastKey)), ERR_INCONSISTENT_STATE);
 
     const value = near.storageGetEvicted();
 
@@ -135,7 +137,7 @@ export class Vector<DataType> {
     const key = indexToKey(this.prefix, index);
 
     assert(
-      near.storageWrite(key, serializeValueWithOptions(element, options)),
+      near.storageWrite(bytes(key), serializeValueWithOptions(element, options)),
       ERR_INCONSISTENT_STATE
     );
 
@@ -195,7 +197,7 @@ export class Vector<DataType> {
   clear(): void {
     for (let index = 0; index < this.length; index++) {
       const key = indexToKey(this.prefix, index);
-      near.storageRemove(key);
+      near.storageRemove(bytes(key));
     }
 
     this.length = 0;

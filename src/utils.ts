@@ -73,11 +73,15 @@ export function assert(
 export type Mutable<T> = { -readonly [P in keyof T]: T[P] };
 
 export function getValueWithOptions<DataType>(
-  value: Uint8Array,
+  value: Uint8Array | null,
   options: Omit<GetOptions<DataType>, "serializer"> = {
     deserializer: deserialize,
   }
 ): DataType | null {
+  if (value === null) {
+    return options?.defaultValue ?? null;
+  }
+  
   const deserialized = deserialize(value);
 
   if (deserialized === undefined || deserialized === null) {
@@ -101,7 +105,7 @@ export function serializeValueWithOptions<DataType>(
 }
 
 export function serialize(valueToSerialize: unknown): Uint8Array {
-  return bytes(
+  return encode(
     JSON.stringify(valueToSerialize, function (key, value) {
       if (typeof value === "bigint") {
         return {
@@ -127,7 +131,7 @@ export function serialize(valueToSerialize: unknown): Uint8Array {
 }
 
 export function deserialize(valueToDeserialize: Uint8Array): unknown {
-  return JSON.parse(str(valueToDeserialize), (_, value) => {
+  return JSON.parse(decode(valueToDeserialize), (_, value) => {
     if (
       value !== null &&
       typeof value === "object" &&

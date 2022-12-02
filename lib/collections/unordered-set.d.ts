@@ -4,13 +4,13 @@ import { GetOptions } from "../types/collections";
  * An unordered set that stores data in NEAR storage.
  */
 export declare class UnorderedSet<DataType> {
-    readonly prefix: Uint8Array;
-    readonly elementIndexPrefix: Uint8Array;
+    readonly prefix: string;
+    readonly elementIndexPrefix: string;
     readonly elements: Vector<DataType>;
     /**
      * @param prefix - The byte prefix to use when storing elements inside this collection.
      */
-    constructor(prefix: Uint8Array);
+    constructor(prefix: string);
     /**
      * The number of elements stored in the collection.
      */
