@@ -159,19 +159,25 @@ export function runAbiCompilerPlugin(
                     );
                 } else if (methodDeclaration.parameters.length === 1) {
                     const jsonObjectParameter = methodDeclaration.parameters[0];
-                    if (jsonObjectParameter.name.kind !== ts.SyntaxKind.ObjectBindingPattern) {
+                    if (jsonObjectParameter.type.kind !== ts.SyntaxKind.TypeLiteral) {
                         throw Error(
-                            "Expected NEAR function to have a single object binding parameter"
+                            "Expected NEAR function to have a single object binding parameter, e.g. `{ id }: { id: string }`"
                         );
                     }
 
-                    const objectBinding = jsonObjectParameter.name as ts.ObjectBindingPattern;
-                    abiParams = objectBinding.elements.map((parameter) => {
-                        const nodeType = tc.getTypeAtLocation(parameter);
+                    const typeLiteral = jsonObjectParameter.type as ts.TypeLiteralNode;
+                    abiParams = typeLiteral.members.map((member) => {
+                        if (member.kind !== ts.SyntaxKind.PropertySignature) {
+                            throw Error(
+                                "Expected NEAR function to have a single object binding parameter, e.g. `{ id }: { id: string }`"
+                            );
+                        }
+                        const propertySignature = member as ts.PropertySignature;
+                        const nodeType = tc.getTypeAtLocation(propertySignature.type);
                         const schema = generator.getTypeDefinition(nodeType, true);
                         const abiParameter: abi.AbiJsonParameter = {
                             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                            name: (parameter.name as any).text,
+                            name: (propertySignature.name as any).text,
                             type_schema: schema as JSONSchema7
                         };
 
