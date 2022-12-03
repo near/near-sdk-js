@@ -2,7 +2,7 @@ import { Bytes } from "../utils";
 import { Vector } from "./vector";
 import { LookupMap } from "./lookup-map";
 import { GetOptions } from "../types/collections";
-declare type ValueAndIndex = [value: string, index: number];
+type ValueAndIndex = [value: string, index: number];
 /**
  * An unordered map that stores data in NEAR storage.
  */

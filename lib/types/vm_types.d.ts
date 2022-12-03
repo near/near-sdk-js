@@ -1,11 +1,11 @@
 /**
  * The index for NEAR receipts.
  */
-export declare type ReceiptIndex = bigint;
+export type ReceiptIndex = bigint;
 /**
  * The index for iterators.
  */
-export declare type IteratorIndex = bigint;
+export type IteratorIndex = bigint;
 /**
  * A Promise result in near can be one of:
  * - NotReady = 0 - the promise you are specifying is still not ready, not yet failed nor successful.

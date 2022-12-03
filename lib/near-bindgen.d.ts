@@ -1,5 +1,5 @@
-declare type EmptyParameterObject = Record<never, never>;
-declare type DecoratorFunction = <AnyFunction extends (...args: any) => any>(target: object, key: string | symbol, descriptor: TypedPropertyDescriptor<AnyFunction>) => void;
+type EmptyParameterObject = Record<never, never>;
+type DecoratorFunction = <AnyFunction extends (...args: any) => any>(target: object, key: string | symbol, descriptor: TypedPropertyDescriptor<AnyFunction>) => void;
 /**
  * Tells the SDK to use this function as the initialization function of the contract.
  *

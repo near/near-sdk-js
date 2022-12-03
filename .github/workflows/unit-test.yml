@@ -19,11 +19,11 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v2.2.2
         with:
-         version: 7
+          version: 7
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
-         node-version: 16.x
-         cache: pnpm
+          node-version: 16.x
+          cache: pnpm
       - name: Run unit tests
         run: pnpm test:unit

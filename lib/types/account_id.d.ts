@@ -1,4 +1,4 @@
 /**
  * A string that represents a NEAR account ID.
  */
-export declare type AccountId = string;
+export type AccountId = string;
