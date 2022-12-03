@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "postinstall": "cd .. && pnpm link && cd examples && pnpm link near-sdk-js",
+    "postinstall": "pnpm link --global near-sdk-js",
     "build": "run-s build:*",
     "build:status-message": "near-sdk-js build src/status-message.js build/status-message.wasm",
     "build:clean-state": "near-sdk-js build src/clean-state.js build/clean-state.wasm",
@@ -46,14 +46,14 @@
   "license": "Apache-2.0",
   "dependencies": {
     "lodash-es": "^4.17.21",
-    "near-sdk-js": "file:../",
-    "near-contract-standards": "file:../near-contract-standards/"
+    "near-contract-standards": "file:../near-contract-standards/",
+    "near-sdk-js": "^0.6.0"
   },
   "devDependencies": {
     "@types/lodash-es": "^4.17.6",
     "ava": "^4.2.0",
     "near-workspaces": "3.2.1",
-    "typescript": "^4.7.4",
-    "npm-run-all": "^4.1.5"
+    "npm-run-all": "^4.1.5",
+    "typescript": "^4.7.4"
   }
 }
