@@ -26,8 +26,8 @@
     "test": "run-s test:*",
     "lint": "eslint --fix .",
     "format": "prettier --write .",
-    "test:unit": "pnpm && cd tests && pnpm && pnpm build && pnpm test && cd ..",
-    "test:examples": "pnpm && cd examples && pnpm && pnpm build && pnpm test && cd ..",
+    "test:unit": "pnpm install && cd tests && pnpm install && pnpm build && pnpm test && cd ..",
+    "test:examples": "pnpm install && cd examples && pnpm install && pnpm build && pnpm test && cd ..",
     "preinstall": "npx only-allow pnpm",
     "postinstall": "node lib/cli/post-install.js && pnpm link --global"
   },
