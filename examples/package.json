@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "postinstall": "cd .. && yarn link && cd examples && yarn link near-sdk-js",
+    "postinstall": "cd .. && pnpm link && cd examples && pnpm link near-sdk-js",
     "build": "run-s build:*",
     "build:status-message": "near-sdk-js build src/status-message.js build/status-message.wasm",
     "build:clean-state": "near-sdk-js build src/clean-state.js build/clean-state.wasm",
@@ -25,7 +25,7 @@
     "build:nft-contract": "near-sdk-js build src/standard-nft/my-nft.ts build/my-nft.wasm",
     "build:nft-receiver": "near-sdk-js build src/standard-nft/test-token-receiver.ts build/nft-receiver.wasm",
     "build:nft-approval-receiver": "near-sdk-js build src/standard-nft/test-approval-receiver.ts build/nft-approval-receiver.wasm",
-    "test": "ava && yarn test:counter-lowlevel && yarn test:counter-ts",
+    "test": "ava && pnpm test:counter-lowlevel && pnpm test:counter-ts",
     "test:nft": "ava __tests__/standard-nft/*",
     "test:status-message": "ava __tests__/test-status-message.ava.js",
     "test:clean-state": "ava __tests__/test-clean-state.ava.js",

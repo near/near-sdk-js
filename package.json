@@ -22,19 +22,21 @@
   "license": "(MIT AND Apache-2.0)",
   "scripts": {
     "build": "tsc -p ./tsconfig.json",
-    "pretest": "yarn build",
+    "pretest": "pnpm build",
     "test": "run-s test:*",
     "lint": "eslint --fix .",
     "format": "prettier --write .",
-    "test:unit": "yarn && cd tests && yarn && yarn build && yarn test && cd ..",
-    "test:examples": "yarn && cd examples && yarn && yarn build && yarn test && cd ..",
+    "test:unit": "pnpm && cd tests && pnpm && pnpm build && pnpm test && cd ..",
+    "test:examples": "pnpm && cd examples && pnpm && pnpm build && pnpm test && cd ..",
+    "preinstall": "npx only-allow pnpm",
     "postinstall": "node lib/cli/post-install.js"
   },
   "bin": {
     "near-sdk-js": "lib/cli/cli.js"
   },
   "engines": {
-    "node": ">=14 <16.6.0 || >16.6.0"
+    "node": ">=14 <16.6.0 || >16.6.0",
+    "pnpm": ">=7"
   },
   "author": "Near Inc <hello@nearprotocol.com>",
   "dependencies": {
