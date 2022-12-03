@@ -3,4 +3,5 @@ build
 node_modules
 lib
 cli
+pnpm-lock.yaml
 
