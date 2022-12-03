@@ -2761,6 +2761,7 @@ packages:
       '@babel/core': 7.20.5
       '@babel/plugin-proposal-decorators': 7.20.5_@babel+core@7.20.5
       '@babel/preset-typescript': 7.18.6_@babel+core@7.20.5
+      '@babel/types': 7.20.5
       '@rollup/plugin-babel': 5.3.1_opjstonlpkhafnz76jsxdwq25a
       '@rollup/plugin-commonjs': 21.1.0_rollup@2.79.1
       '@rollup/plugin-node-resolve': 13.3.0_rollup@2.79.1
