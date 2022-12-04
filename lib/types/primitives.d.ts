@@ -1,27 +1,27 @@
 /**
  * The amount of storage used in yoctoNEAR.
  */
-export type StorageUsage = bigint;
+export declare type StorageUsage = bigint;
 /**
  * A large integer representing the block height.
  */
-export type BlockHeight = bigint;
+export declare type BlockHeight = bigint;
 /**
  * A large integer representing the epoch height.
  */
-export type EpochHeight = bigint;
+export declare type EpochHeight = bigint;
 /**
  * The amount of tokens in yoctoNEAR.
  */
-export type Balance = bigint;
+export declare type Balance = bigint;
 /**
  * A large integer representing the nonce.
  */
-export type Nonce = bigint;
+export declare type Nonce = bigint;
 /**
  * The amount of Gas Weight in integers - whole numbers.
  */
-export type GasWeight = bigint;
+export declare type GasWeight = bigint;
 /**
  * One yoctoNEAR. 10^-24 NEAR.
  */

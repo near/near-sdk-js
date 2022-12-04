@@ -178,7 +178,7 @@ export declare class PromiseJoint {
     constructor(promiseA: NearPromise, promiseB: NearPromise, promiseIndex: PromiseIndex | null);
     constructRecursively(): PromiseIndex;
 }
-type PromiseSubtype = PromiseSingle | PromiseJoint;
+declare type PromiseSubtype = PromiseSingle | PromiseJoint;
 /**
  * A high level class to construct and work with NEAR promises.
  */
@@ -312,5 +312,5 @@ export declare class NearPromise {
      */
     onReturn(): void;
 }
-export type PromiseOrValue<T> = NearPromise | T;
+export declare type PromiseOrValue<T> = NearPromise | T;
 export {};

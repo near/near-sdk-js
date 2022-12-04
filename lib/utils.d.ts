@@ -2,22 +2,22 @@ import { GetOptions } from "./types/collections";
 /**
  * A string containing byte characters. Can be safely used in NEAR calls.
  */
-export type Bytes = string;
+export declare type Bytes = string;
 declare enum PromiseIndexBrand {
     _ = -1
 }
 /**
  * A PromiseIndex which represents the ID of a NEAR Promise.
  */
-export type PromiseIndex = (number | bigint) & PromiseIndexBrand;
+export declare type PromiseIndex = (number | bigint) & PromiseIndexBrand;
 /**
  * A number that specifies the amount of NEAR in yoctoNEAR.
  */
-export type NearAmount = number | bigint;
+export declare type NearAmount = number | bigint;
 /**
  * A number that specifies the ID of a register in the NEAR WASM virtual machine.
  */
-export type Register = number | bigint;
+export declare type Register = number | bigint;
 export declare const ERR_INCONSISTENT_STATE = "The collection is an inconsistent state. Did previous smart contract execution terminate unexpectedly?";
 export declare const ERR_INDEX_OUT_OF_BOUNDS = "Index out of bounds";
 export declare function u8ArrayToBytes(array: Uint8Array): Bytes;
@@ -36,7 +36,7 @@ export declare function bytes(stringOrU8Array: string | Uint8Array): Bytes;
  * @param message - The error message to be printed.
  */
 export declare function assert(expression: unknown, message: string): asserts expression;
-export type Mutable<T> = {
+export declare type Mutable<T> = {
     -readonly [P in keyof T]: T[P];
 };
 export declare function getValueWithOptions<DataType>(value: string, options?: Omit<GetOptions<DataType>, "serializer">): DataType | null;

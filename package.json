@@ -56,7 +56,8 @@
     "signale": "^1.4.0",
     "ts-morph": "^16.0.0",
     "typescript": "~4.7.2",
-    "near-typescript-json-schema": "0.55.0"
+    "near-typescript-json-schema": "0.55.0",
+    "json-schema": "0.4.0"
   },
   "files": [
     "builder",
