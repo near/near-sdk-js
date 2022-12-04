@@ -20,4 +20,3 @@ jobs:
         run: yarn
       - name: Run exempes tests
         run: yarn test:examples
-
