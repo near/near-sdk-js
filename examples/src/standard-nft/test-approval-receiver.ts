@@ -6,6 +6,8 @@ import {
   PromiseOrValue,
   assert,
   call,
+  bytes,
+  serialize,
 } from "near-sdk-js";
 import { AccountId } from "near-sdk-js";
 import { NonFungibleTokenApprovalReceiver } from "near-contract-standards/lib/non_fungible_token/approval/approval_receiver";
@@ -15,7 +17,7 @@ const PROMISE_CALL = 20_000_000_000_000n;
 const GAS_FOR_NFT_ON_APPROVE = BASE_GAS + PROMISE_CALL;
 
 interface ValueReturnInterface {
-  ok_go(msg: string): PromiseOrValue<string>;
+  ok_go({ msg }: { msg: string }): PromiseOrValue<string>;
 }
 
 @NearBindgen({ requireInit: true })
@@ -56,7 +58,7 @@ export class ApprovalReceiver
         const account_id = near.currentAccountId();
         return NearPromise.new(account_id).functionCall(
           "ok_go",
-          JSON.stringify(msg),
+          bytes(serialize({ msg })),
           0n,
           prepaid_gas - GAS_FOR_NFT_ON_APPROVE
         );
@@ -65,7 +67,7 @@ export class ApprovalReceiver
   }
 
   @call({})
-  ok_go(msg: string): PromiseOrValue<string> {
+  ok_go({ msg }: { msg: string }): PromiseOrValue<string> {
     near.log(`in ok_go, msg=${msg}`);
     return msg;
   }
