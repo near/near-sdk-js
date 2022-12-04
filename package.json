@@ -50,10 +50,13 @@
     "@scure/base": "^1.1.1",
     "@types/estree": "^1.0.0",
     "commander": "^9.4.1",
+    "near-abi": "^0.1.0",
     "rollup": "^2.61.1",
     "rollup-plugin-sourcemaps": "^0.6.3",
     "signale": "^1.4.0",
-    "ts-morph": "^16.0.0"
+    "ts-morph": "^16.0.0",
+    "typescript": "~4.7.2",
+    "near-typescript-json-schema": "0.55.0"
   },
   "files": [
     "builder",
