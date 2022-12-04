@@ -12,7 +12,6 @@ import {
 } from "near-sdk-js";
 import {
   NFTContractMetadata,
-  NonFungibleTokenMetadataProvider,
   TokenMetadata,
 } from "near-contract-standards/lib/non_fungible_token/metadata";
 import {
@@ -20,14 +19,10 @@ import {
   Option,
 } from "near-contract-standards/lib/non_fungible_token/utils";
 import { AccountId } from "near-sdk-js";
-import { NonFungibleTokenCore } from "near-contract-standards/lib/non_fungible_token/core";
 import {
   Token,
   TokenId,
 } from "near-contract-standards/lib/non_fungible_token/token";
-import { NonFungibleTokenResolver } from "near-contract-standards/lib/non_fungible_token/core/resolver";
-import { NonFungibleTokenApproval } from "near-contract-standards/lib/non_fungible_token/approval";
-import { NonFungibleTokenEnumeration } from "near-contract-standards/lib/non_fungible_token/enumeration";
 
 class StorageKey {}
 
@@ -56,14 +51,7 @@ class StorageKeyApproval extends StorageKey implements IntoStorageKey {
 }
 
 @NearBindgen({ requireInit: true })
-export class MyNFT
-  implements
-    NonFungibleTokenCore,
-    NonFungibleTokenMetadataProvider,
-    NonFungibleTokenResolver,
-    NonFungibleTokenApproval,
-    NonFungibleTokenEnumeration
-{
+export class MyNFT {
   tokens: NonFungibleToken;
   metadata: Option<NFTContractMetadata>;
 
