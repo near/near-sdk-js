@@ -1,6 +1,7 @@
-import { near, call } from "near-sdk-js";
+import { near, NearBindgen, call } from "near-sdk-js";
 import { Counter } from "./counter";
 
+@NearBindgen({})
 export class CounterWithReset extends Counter {
     @call({})
     reset() {

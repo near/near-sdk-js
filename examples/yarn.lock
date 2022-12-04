@@ -1986,7 +1986,7 @@ near-api-js@^0.44.1:
   version "1.0.0"
   dependencies:
     lodash-es "^4.17.21"
-    near-sdk-js "file:../../../../.cache/yarn/v6/npm-near-contract-standards-1.0.0-44ba4407-9321-422d-9b66-26dc109d51f6-1669093810887/node_modules"
+    near-sdk-js "file:../../../../Library/Caches/Yarn/v6/npm-near-contract-standards-1.0.0-2ae17a81-d14a-4d52-9193-4a013dd46b97-1670160866905/node_modules"
 
 near-sandbox@^0.0.13:
   version "0.0.13"
@@ -2008,17 +2008,17 @@ near-sandbox@^0.0.13:
     "@scure/base" "^1.1.1"
     commander "^9.4.1"
     near-abi "^0.1.0"
-    near-typescript-json-schema "0.54.1"
+    near-typescript-json-schema "0.55.0"
     rollup "^2.61.1"
     rollup-plugin-sourcemaps "^0.6.3"
     signale "^1.4.0"
     ts-morph "^16.0.0"
     typescript "~4.7.2"
 
-near-typescript-json-schema@0.54.1:
-  version "0.54.1"
-  resolved "https://registry.yarnpkg.com/near-typescript-json-schema/-/near-typescript-json-schema-0.54.1.tgz#0ece6bf683539f6521255c383b5c5cfa81d283e1"
-  integrity sha512-rFhVb4s0LRVLRBiORAG78tWvd6nvj609mrl0um8Lwdfzm4DEkHK0ey3CMeXGT4EHIPDROQSLGm8VJbvOUTIgLg==
+near-typescript-json-schema@0.55.0:
+  version "0.55.0"
+  resolved "https://registry.yarnpkg.com/near-typescript-json-schema/-/near-typescript-json-schema-0.55.0.tgz#386cd6c7e37214fdeed4dfc05d5d5f00a18905dc"
+  integrity sha512-3AFYm89FHB3Bn3+Usow5iP7avF9QIkxh6PP5qCgr66/IT9SIQSG0PGPBtNDcj+WLZCL4yHzLmW7TkdK7nDzy1A==
   dependencies:
     "@types/json-schema" "^7.0.9"
     "@types/node" "^16.9.2"
