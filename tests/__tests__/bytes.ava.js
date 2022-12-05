@@ -43,9 +43,9 @@ test("Log unexpected types not logging", async (t) => {
   const { ali, bytesContract } = t.context.accounts;
 
   let r = await ali.callRaw(bytesContract, "log_unexpected_input_tests", "");
-  // logUtf8 and logUtf16 only works with bytes, trying to log it with string is unexpected and behavior is undefined
-  // in this specific case, it logs nothing
-  t.deepEqual(r.result.receipts_outcome[0].outcome.logs, ["", ""]);
+  // logUtf8 and logUtf16 only works with bytes, trying to log it with string is error
+  t.assert(r.result.status.Failure.ActionError.kind.FunctionCallError.ExecutionError.startsWith('Smart contract panicked: Expect Uint8Array for message'))
+  t.deepEqual(r.result.receipts_outcome[0].outcome.logs, []);
 });
 
 test("Log invalid utf-8 sequence panic", async (t) => {
@@ -108,24 +108,15 @@ test("storage write bytes tests", async (t) => {
   );
 });
 
-test("storage write unexpected types tests", async (t) => {
+test("storage write utf8 tests", async (t) => {
   const { ali, bytesContract } = t.context.accounts;
 
-  await ali.call(bytesContract, "storage_write_unexpected_input", "");
-  let stateMap = new Map();
-  // viewState doesn't work, because it tries to convert key to utf-8 string, which is not
-  let state = await bytesContract.viewStateRaw();
-  for (let { key, value } of state) {
-    stateMap.set(key, value);
-  }
-
-  t.deepEqual(
-    stateMap.get(encodeStateKey("123")),
-    Buffer.from("456").toString("base64")
+  await ali.call(bytesContract, "storage_write_utf8", "");
+  let r = await bytesContract.viewRaw(
+    "storage_read_utf8",
+    ""
   );
-  // pass in utf-8 string instead of bytes, key and value become empty
-  t.deepEqual(stateMap.get(encodeStateKey([0xe6, 0xb0, 0xb4])), undefined);
-  t.deepEqual(stateMap.get(encodeStateKey([])), "");
+  t.deepEqual(r.result, [...Buffer.from('😂', 'utf-8')]);
 });
 
 test("Storage read bytes tests", async (t) => {

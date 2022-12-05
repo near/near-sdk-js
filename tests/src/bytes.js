@@ -1,4 +1,4 @@
-import { near, bytes } from "near-sdk-js";
+import { near, bytes, encode } from "near-sdk-js";
 
 export function log_expected_input_tests() {
   // log ascii string
@@ -8,9 +8,9 @@ export function log_expected_input_tests() {
   // log number
   near.log(333);
   // log aribrary byte sequence
-  near.log(bytes("\x00\x01\xff"));
+  near.log("\x00\x01\xff");
   // log valid utf8 seqence
-  near.log(bytes("\xe6\xb0\xb4"));
+  near.log("\xe6\xb0\xb4");
 
   // log valid utf8 sequence
   near.logUtf8(bytes("\xe6\xb0\xb4"));
@@ -39,9 +39,12 @@ export function storage_write_bytes() {
   near.storageWrite(bytes("\xe6\xb0\xb4"), bytes("\x00ab"));
 }
 
-export function storage_write_unexpected_input() {
-  near.storageWrite("水", "水");
-  near.storageWrite(123, 456);
+export function storage_write_utf8() {
+  near.storageWrite(encode("水"), encode("😂"));
+}
+
+export function storage_read_utf8() {
+  near.valueReturn(near.storageRead(encode("水")))
 }
 
 export function storage_read_ascii_bytes() {
