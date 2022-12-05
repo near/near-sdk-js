@@ -19,7 +19,7 @@ test.beforeEach(async (t) => {
       counterContract = "./build/counter-ts.wasm";
       break;
     }
-    case "COUNTER_JS":{
+    case "COUNTER_JS": {
       counterContract = "./build/counter.wasm";
       break;
     }
@@ -27,7 +27,8 @@ test.beforeEach(async (t) => {
       counterContract = "./build/counter-extended.wasm";
       break;
     }
-    default: throw Error("Unknown COUNTER_CONTRACT_TYPE");
+    default:
+      throw Error("Unknown COUNTER_CONTRACT_TYPE");
   }
 
   // Deploy the counter contract.
