@@ -5,7 +5,7 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "postinstall": "cd .. && yarn link && cd tests && yarn link near-sdk-js",
+    "postinstall": "pnpm link --global near-sdk-js",
     "build": "run-s build:*",
     "build:context-api": "near-sdk-js build src/context_api.js build/context_api.wasm",
     "build:math-api": "near-sdk-js build src/math_api.js build/math_api.wasm",
@@ -59,7 +59,10 @@
   "devDependencies": {
     "ava": "^4.2.0",
     "near-workspaces": "3.2.1",
-    "typescript": "^4.7.4",
     "npm-run-all": "^4.1.5"
+  },
+  "dependencies": {
+    "typescript": "^4.7.4",
+    "near-sdk-js": "^0.6.0"
   }
 }
