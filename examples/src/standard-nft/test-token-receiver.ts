@@ -7,6 +7,8 @@ import {
   NearBindgen,
   NearPromise,
   PromiseOrValue,
+  bytes,
+  serialize,
 } from "near-sdk-js";
 import { AccountId } from "near-sdk-js";
 
@@ -15,7 +17,7 @@ const PROMISE_CALL = 10_000_000_000_000n;
 const GAS_FOR_NFT_ON_TRANSFER = BASE_GAS + PROMISE_CALL;
 
 interface ValueReturnInterface {
-  ok_go(return_it: boolean): PromiseOrValue<boolean>;
+  ok_go({ return_it }: { return_it: boolean }): PromiseOrValue<boolean>;
 }
 
 @NearBindgen({ requireInit: true })
@@ -64,7 +66,7 @@ export class TokenReceiver
         const account_id = near.currentAccountId();
         return NearPromise.new(account_id).functionCall(
           "ok_go",
-          JSON.stringify(true),
+          bytes(serialize({ return_it: true })),
           0n,
           prepaid_gas - GAS_FOR_NFT_ON_TRANSFER
         );
@@ -76,7 +78,7 @@ export class TokenReceiver
         const account_id = near.currentAccountId();
         return NearPromise.new(account_id).functionCall(
           "ok_go",
-          JSON.stringify(false),
+          bytes(serialize({ return_it: false })),
           0n,
           prepaid_gas - GAS_FOR_NFT_ON_TRANSFER
         );
@@ -87,7 +89,7 @@ export class TokenReceiver
   }
 
   @call({})
-  ok_go(return_it: boolean): PromiseOrValue<boolean> {
+  ok_go({ return_it }: { return_it: boolean }): PromiseOrValue<boolean> {
     near.log(`in ok_go, return_it=${return_it}`);
     return return_it;
   }

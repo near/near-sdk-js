@@ -11,7 +11,7 @@ export class Contract {
   }
 
   @call({})
-  add({ id, text }) {
+  add({ id, text }: { id: string; text: string }) {
     const innerMap = this.outerMap.get(id, {
       reconstructor: UnorderedMap.reconstruct,
       defaultValue: new UnorderedMap<string>("i_" + id + "_"),
@@ -21,7 +21,7 @@ export class Contract {
   }
 
   @view({})
-  get({ id, accountId }) {
+  get({ id, accountId }: { id: string; accountId: string }) {
     const innerMap = this.outerMap.get(id, {
       reconstructor: UnorderedMap.reconstruct,
     });
@@ -32,7 +32,15 @@ export class Contract {
   }
 
   @call({})
-  add_to_group({ group, id, text }) {
+  add_to_group({
+    group,
+    id,
+    text,
+  }: {
+    group: string;
+    id: string;
+    text: string;
+  }) {
     const groupMap = this.groups.get(group, {
       reconstructor: UnorderedMap.reconstruct,
       defaultValue: new UnorderedMap<UnorderedMap<string>>("g_" + group + "_"),
@@ -47,7 +55,15 @@ export class Contract {
   }
 
   @view({})
-  get_from_group({ group, id, accountId }) {
+  get_from_group({
+    group,
+    id,
+    accountId,
+  }: {
+    group: string;
+    id: string;
+    accountId: string;
+  }) {
     const groupMap = this.groups.get(group, {
       reconstructor: UnorderedMap.reconstruct,
     });

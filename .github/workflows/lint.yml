@@ -14,16 +14,21 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-      - name: Setup Node.js
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2.2.2
+        with:
+          version: 7
+      - name: Setup Node
         uses: actions/setup-node@v3
         with:
-          node-version: "16"
+          node-version: 16.x
+          cache: pnpm
       - name: Install modules
-        run: yarn
+        run: pnpm install
       - name: Run lint
-        run: yarn lint
+        run: pnpm lint
       - name: Format code
-        run: yarn format
+        run: pnpm format
       - name: Run git status
         run: git status
       - name: Check that lints where commited
