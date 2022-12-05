@@ -34,6 +34,7 @@ module.exports = {
     },
   ],
   ignorePatterns: [
+    "pnpm-lock.yaml",
     "./**/node_modules",
     "node_modules",
     "./**/lib",
