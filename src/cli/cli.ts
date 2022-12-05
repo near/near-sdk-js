@@ -11,6 +11,7 @@ import { Command } from "commander";
 import signal from "signale";
 
 import { executeCommand, validateContract } from "./utils.js";
+import { runAbiCompilerPlugin } from "./abi.js";
 
 const { Signale } = signal;
 const PROJECT_DIR = process.cwd();
@@ -29,6 +30,8 @@ program
       .description("Build NEAR JS Smart-contract")
       .argument("[source]", "Contract to build.", "src/index.js")
       .argument("[target]", "Target file path and name.", "build/contract.wasm")
+      .argument("[packageJson]", "Target file path and name.", "package.json")
+      .argument("[tsConfig]", "Target file path and name.", "tsconfig.json")
       .option("--verbose", "Whether to print more verbose output.", false)
       .action(buildCom)
   )
@@ -91,6 +94,10 @@ function getContractTarget(target: string): string {
   return `${getTargetDir(target)}/${getTargetFileName(target)}.wasm`;
 }
 
+function getContractAbi(target: string): string {
+  return `${getTargetDir(target)}/${getTargetFileName(target)}-abi.json`;
+}
+
 function requireTargetExt(target: string): void {
   if (getTargetExt(target) === "wasm") {
     return;
@@ -135,6 +142,21 @@ export async function checkTypescriptCom(source: string, { verbose = false }: { 
   await checkTsBuildWithTsc(source, verbose);
 }
 
+export async function generateAbi(source: string, target: string, packageJson: string, tsConfig: string, { verbose = false }: { verbose: boolean }): Promise<void> {
+  const signale = new Signale({ scope: "generateAbi", interactive: !verbose });
+
+  const sourceExt = source.split(".").pop();
+  if (sourceExt !== "ts") {
+    signale.info(`Skipping ABI generation as source file is not a typescript file ${source}`)
+    return;
+  }
+
+  signale.await("Generating ABI...");
+  const abi = runAbiCompilerPlugin(source, packageJson, tsConfig);
+  fs.writeFileSync(getContractAbi(target), JSON.stringify(abi, null, 2));
+  signale.success(`Generated ${getContractAbi(target)} ABI successfully!`);
+}
+
 export async function createJsFileWithRollupCom(source: string, target: string, { verbose = false }: { verbose: boolean }): Promise<void> {
   const signale = new Signale({ scope: "createJsFileWithRollup", interactive: !verbose });
 
@@ -170,6 +192,8 @@ export async function transpileJsAndBuildWasmCom(target: string, { verbose = fal
 export async function buildCom(
   source: string,
   target: string,
+  packageJson: string,
+  tsConfig: string,
   { verbose = false }: { verbose: boolean }
 ): Promise<void> {
   const signale = new Signale({ scope: "build", interactive: !verbose });
@@ -179,6 +203,8 @@ export async function buildCom(
   signale.await(`Building ${source} contract...`);
 
   await checkTypescriptCom(source, { verbose });
+
+  await generateAbi(source, target, packageJson, tsConfig, { verbose });
 
   ensureTargetDirExists(target);
 

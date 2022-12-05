@@ -5,9 +5,9 @@ This tests the functionality of high level APIs of NEAR-SDK-JS. Currently, it di
 # Run tests
 
 ```
-yarn
-yarn build
-yarn test
+pnpm install
+pnpm build
+pnpm test
 ```
 
 # Add a new test
