@@ -39,7 +39,7 @@ There are a couple of contract examples in the project:
 - [Status message board with unique messages](https://github.com/near/near-sdk-js/tree/develop/examples/src/status-message-collections.js)
 - [Programmatic Update After Locking The Contract](https://github.com/near/near-sdk-js/tree/develop/examples/src/programmatic-update.js)
 
-To build all examples, run `yarn build` in `examples/`. To test all examples, run `yarn test`. You can also build and test one specific example with `yarn build:<example-name>` and `yarn test:<example-name>`, see `examples/package.json`.
+To build all examples, run `pnpm build` in `examples/`. To test all examples, run `pnpm test`. You can also build and test one specific example with `pnpm build:<example-name>` and `pnpm test:<example-name>`, see `examples/package.json`.
 
 To deploy and call a contract on a NEAR node, use near-cli's `near deploy` and `near call`.
 
@@ -75,7 +75,7 @@ To use nightly host functions, such as `altBn128G1Sum`, your contract need to be
 
 ```
 export NEAR_NIGHTLY=1
-yarn build
+pnpm build
 ```
 
 ### About Type

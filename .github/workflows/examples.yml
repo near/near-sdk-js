@@ -13,10 +13,16 @@ jobs:
     runs-on: ${{ matrix.platform }}
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2.2.2
         with:
-          node-version: "16"
+          version: 7
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+          cache: pnpm
       - name: Install dependencies
-        run: yarn
+        run: pnpm install
       - name: Run exempes tests
-        run: yarn test:examples
+        run: pnpm test:examples
