@@ -93,7 +93,7 @@ export declare class NonFungibleToken implements NonFungibleTokenCore, NonFungib
         };
     }): boolean;
 }
-export declare type StorageKey = TokensPerOwner | TokenPerOwnerInner;
+export type StorageKey = TokensPerOwner | TokenPerOwnerInner;
 export declare class TokensPerOwner implements IntoStorageKey {
     account_hash: Bytes;
     constructor(account_hash: Bytes);

@@ -195,7 +195,9 @@ export class NonFungibleToken {
         this.token_metadata_by_id = token_metadata_prefix
             ? new LookupMap(token_metadata_prefix.into_storage_key())
             : null;
-        this.tokens_per_owner = enumeration_prefix ? new LookupMap(enumeration_prefix.into_storage_key()) : null;
+        this.tokens_per_owner = enumeration_prefix
+            ? new LookupMap(enumeration_prefix.into_storage_key())
+            : null;
         this.approvals_by_id = approvals_by_id;
         this.next_approval_id_by_id = next_approval_id_by_id;
         this.measure_min_token_storage_cost();

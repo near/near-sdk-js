@@ -7,10 +7,10 @@ export class NFTContractMetadata {
         this.spec = NFT_METADATA_SPEC;
         this.name = "";
         this.symbol = "";
-        this.icon = undefined;
-        this.base_uri = undefined;
-        this.reference = undefined;
-        this.reference_hash = undefined;
+        this.icon = null;
+        this.base_uri = null;
+        this.reference = null;
+        this.reference_hash = null;
     }
     init(spec, name, symbol, icon, base_uri, reference, reference_hash) {
         this.spec = spec;
@@ -23,8 +23,8 @@ export class NFTContractMetadata {
     }
     assert_valid() {
         assert(this.spec == NFT_METADATA_SPEC, "Spec is not NFT metadata");
-        assert((this.reference !== undefined) == (this.reference_hash !== undefined), "Reference and reference hash must be present");
-        if (this.reference_hash !== undefined) {
+        assert((this.reference != null) == (this.reference_hash != null), "Reference and reference hash must be present");
+        if (this.reference_hash != null) {
             assert(this.reference_hash.length == 32, "Hash has to be 32 bytes");
         }
     }
@@ -63,12 +63,12 @@ export class TokenMetadata {
         this.reference_hash = reference_hash;
     }
     assert_valid() {
-        assert((this.media !== undefined) == (this.media_hash !== undefined), "Media and media hash must be present");
-        if (this.media_hash !== undefined) {
+        assert((this.media != null) == (this.media_hash != null), "Media and media hash must be present");
+        if (this.media_hash != null) {
             assert(this.media_hash.length == 32, "Media hash has to be 32 bytes");
         }
-        assert((this.reference !== undefined) == (this.reference_hash !== undefined), "Reference and reference hash must be present");
-        if (this.reference_hash !== undefined) {
+        assert((this.reference != null) == (this.reference_hash != null), "Reference and reference hash must be present");
+        if (this.reference_hash != null) {
             assert(this.reference_hash.length == 32, "Reference hash has to be 32 bytes");
         }
     }

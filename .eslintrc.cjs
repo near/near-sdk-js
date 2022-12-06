@@ -43,8 +43,6 @@ module.exports = {
     "build",
     "./**/deps",
     "deps",
-    "cli/**/*.ts",
-    "cli/**/*.js",
   ],
   rules: {},
 };

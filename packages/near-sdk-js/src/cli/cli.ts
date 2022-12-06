@@ -244,8 +244,8 @@ async function createJsFileWithRullup(
         extensions: [".ts", ".js", ".jsx", ".es6", ".es", ".mjs"],
         presets: ["@babel/preset-typescript"],
         plugins: [
-          "near-sdk-js/lib/build-tools/include-bytes.js",
-          ["near-sdk-js/lib/build-tools/near-bindgen-exporter.js", { verbose }],
+          "near-sdk-js/lib/cli/build-tools/include-bytes.js",
+          ["near-sdk-js/lib/cli/build-tools/near-bindgen-exporter.js", { verbose }],
           ["@babel/plugin-proposal-decorators", { version: "legacy" }],
         ],
       }),
