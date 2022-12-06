@@ -12,7 +12,7 @@ process.chdir("lib/cli");
 const DEPS = "deps";
 fs.rmSync(DEPS, { recursive: true, force: true });
 fs.mkdirSync(DEPS);
-process.chdir(DEPS)
+process.chdir(DEPS);
 
 const PLATFORM = os.platform();
 const ARCH = os.arch();
@@ -37,13 +37,16 @@ const BINARYEN_VERSION = `0.1.10`;
 const BINARYEN_VERSION_TAG = `v${BINARYEN_VERSION}`;
 
 const BINARYEN_SYSTEM_NAME =
-  PLATFORM === "linux" ? "Linux" :
-  PLATFORM === "darwin" ? "macOS" :
-  PLATFORM === "win32" ? "windows" : "other";
+  PLATFORM === "linux"
+    ? "Linux"
+    : PLATFORM === "darwin"
+    ? "macOS"
+    : PLATFORM === "win32"
+    ? "windows"
+    : "other";
 
 const BINARYEN_ARCH_NAME =
-  ARCH === "x64" ? "X64" :
-  ARCH === "arm64" ? "arm64" : "other";
+  ARCH === "x64" ? "X64" : ARCH === "arm64" ? "arm64" : "other";
 
 const BINARYEN_TAR_NAME = `binaryen-${BINARYEN_SYSTEM_NAME}-${BINARYEN_ARCH_NAME}.tar.gz`;
 
@@ -62,13 +65,16 @@ const QUICK_JS_VERSION = `0.1.3`;
 const QUICK_JS_VERSION_TAG = `v${QUICK_JS_VERSION}`;
 
 const QUICK_JS_SYSTEM_NAME =
-  PLATFORM === "linux" ? "Linux" :
-  PLATFORM === "darwin"? "macOS":
-  PLATFORM === "win32" ? "windows" : "other";
+  PLATFORM === "linux"
+    ? "Linux"
+    : PLATFORM === "darwin"
+    ? "macOS"
+    : PLATFORM === "win32"
+    ? "windows"
+    : "other";
 
 const QUICK_JS_ARCH_NAME =
-  ARCH === "x64" ? "X64" :
-  ARCH === "arm64" ? "arm64" : "other";
+  ARCH === "x64" ? "X64" : ARCH === "arm64" ? "arm64" : "other";
 
 const QUICK_JS_TAR_NAME = `${QUICK_JS_VERSION_TAG}.tar.gz`;
 const QUICK_JS_DOWNLOADED_FOLDER_NAME = `quickjs-${QUICK_JS_VERSION}`;
@@ -105,9 +111,13 @@ const WASI_SDK_MAJOR_VER = 11;
 const WASI_SDK_MINOR_VER = 0;
 const WASI_SDK_DOWNLOADED_FOLDER_NAME = `wasi-sdk-${WASI_SDK_MAJOR_VER}.${WASI_SDK_MINOR_VER}`;
 const WASI_SDK_SYSTEM_NAME =
-  PLATFORM === "linux" ? "linux" :
-  PLATFORM === "darwin" ? "macos" :
-  PLATFORM === "win32" ? "windows" : "other";
+  PLATFORM === "linux"
+    ? "linux"
+    : PLATFORM === "darwin"
+    ? "macos"
+    : PLATFORM === "win32"
+    ? "windows"
+    : "other";
 const WASI_SDK_TAR_NAME = `${WASI_SDK_DOWNLOADED_FOLDER_NAME}-${WASI_SDK_SYSTEM_NAME}.tar.gz`;
 
 // Download WASI SDK
@@ -122,6 +132,6 @@ await executeCommand(`tar xvf ${WASI_SDK_TAR_NAME}`);
 fs.rmSync(WASI_SDK_TAR_NAME);
 
 // Delete version from folder name
-fs.renameSync(WASI_SDK_DOWNLOADED_FOLDER_NAME, 'wasi-sdk');
+fs.renameSync(WASI_SDK_DOWNLOADED_FOLDER_NAME, "wasi-sdk");
 
 signale.success("Successfully finished postinstall script!");

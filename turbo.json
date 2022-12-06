@@ -12,6 +12,10 @@
     "lint": {
       "inputs": [],
       "outputs": []
+    },
+    "format": {
+      "inputs": [],
+      "outputs": []
     }
   }
 }

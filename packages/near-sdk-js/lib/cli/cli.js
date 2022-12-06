@@ -92,12 +92,15 @@ function ensureTargetDirExists(target) {
 export async function validateCom(source, { verbose = false }) {
     const signale = new Signale({ scope: "validate", interactive: !verbose });
     signale.await(`Validating ${source} contract...`);
-    if (!await validateContract(source, verbose)) {
+    if (!(await validateContract(source, verbose))) {
         process.exit(1);
     }
 }
 export async function checkTypescriptCom(source, { verbose = false }) {
-    const signale = new Signale({ scope: "checkTypescript", interactive: !verbose });
+    const signale = new Signale({
+        scope: "checkTypescript",
+        interactive: !verbose,
+    });
     const sourceExt = source.split(".").pop();
     if (sourceExt !== "ts") {
         signale.info(`Source file is not a typescript file ${source}`);
@@ -119,14 +122,20 @@ export async function generateAbi(source, target, packageJson, tsConfig, { verbo
     signale.success(`Generated ${getContractAbi(target)} ABI successfully!`);
 }
 export async function createJsFileWithRollupCom(source, target, { verbose = false }) {
-    const signale = new Signale({ scope: "createJsFileWithRollup", interactive: !verbose });
+    const signale = new Signale({
+        scope: "createJsFileWithRollup",
+        interactive: !verbose,
+    });
     requireTargetExt(target);
     ensureTargetDirExists(target);
     signale.await(`Creating ${source} file with Rollup...`);
     await createJsFileWithRullup(source, getRollupTarget(target), verbose);
 }
 export async function transpileJsAndBuildWasmCom(target, { verbose = false }) {
-    const signale = new Signale({ scope: "transpileJsAndBuildWasm", interactive: !verbose });
+    const signale = new Signale({
+        scope: "transpileJsAndBuildWasm",
+        interactive: !verbose,
+    });
     requireTargetExt(target);
     ensureTargetDirExists(target);
     signale.await(`Creating ${getQjscTarget(target)} file with QJSC...`);
@@ -169,7 +178,10 @@ async function createJsFileWithRullup(sourceFileWithPath, rollupTarget, verbose 
                 presets: ["@babel/preset-typescript"],
                 plugins: [
                     "near-sdk-js/lib/cli/build-tools/include-bytes.js",
-                    ["near-sdk-js/lib/cli/build-tools/near-bindgen-exporter.js", { verbose }],
+                    [
+                        "near-sdk-js/lib/cli/build-tools/near-bindgen-exporter.js",
+                        { verbose },
+                    ],
                     ["@babel/plugin-proposal-decorators", { version: "legacy" }],
                 ],
             }),

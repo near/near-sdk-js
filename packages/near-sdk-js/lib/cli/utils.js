@@ -62,7 +62,9 @@ export async function validateContract(contractPath, verbose = false) {
                 return true;
             }
             if (!hasConstructor && propertiesToBeInited.length > 0) {
-                signale.error(chalk.redBright(`${UNINITIALIZED_PARAMETERS_ERROR} ${propertiesToBeInited.map(({ name }) => name).join(", ")}`));
+                signale.error(chalk.redBright(`${UNINITIALIZED_PARAMETERS_ERROR} ${propertiesToBeInited
+                    .map(({ name }) => name)
+                    .join(", ")}`));
                 return false;
             }
             const [constructor] = constructors;

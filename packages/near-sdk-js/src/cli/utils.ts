@@ -1,6 +1,6 @@
 import childProcess from "child_process";
 import { promisify } from "util";
-import signal from "signale"
+import signal from "signale";
 import { Project } from "ts-morph";
 import chalk from "chalk";
 
@@ -12,39 +12,41 @@ export async function executeCommand(
   command: string,
   verbose = false
 ): Promise<string> {
-  const signale = new Signale({ scope: "exec", interactive: !verbose })
+  const signale = new Signale({ scope: "exec", interactive: !verbose });
 
   if (verbose) {
     signale.info(`Running command: ${command}`);
   }
 
-  let stdout, stderr, code = 0;
-    try {
-        ({ stdout, stderr } = await exec(command));
-    } catch (error) {
-        ({ stdout, stderr, code} = error);
-    }
-    if(code != 0) {
-        signale.error(`Command failed: ${command}`);
-    }
-    if (stderr && verbose) {
-        signale.error(`Command stderr: ${stderr}`);
-    }
-    if (verbose) {
-        signale.info(`Command stdout: ${stdout}`);
-    }
-    if(code != 0){
-        process.exit(1);
-    }
-    return stdout.trim();
-    
+  let stdout,
+    stderr,
+    code = 0;
+  try {
+    ({ stdout, stderr } = await exec(command));
+  } catch (error) {
+    ({ stdout, stderr, code } = error);
+  }
+  if (code != 0) {
+    signale.error(`Command failed: ${command}`);
+  }
+  if (stderr && verbose) {
+    signale.error(`Command stderr: ${stderr}`);
+  }
+  if (verbose) {
+    signale.info(`Command stdout: ${stdout}`);
+  }
+  if (code != 0) {
+    process.exit(1);
+  }
+  return stdout.trim();
 }
 
 export async function download(url: string, verbose = false) {
   await executeCommand(`curl -LOf ${url}`, verbose);
 }
 
-const UNINITIALIZED_PARAMETERS_ERROR = "All parameters must be initialized in the constructor. Uninitialized parameters:";
+const UNINITIALIZED_PARAMETERS_ERROR =
+  "All parameters must be initialized in the constructor. Uninitialized parameters:";
 
 /**
  * Validates the contract by checking that all parameters are initialized in the constructor. Works only for contracts written in TypeScript.
@@ -52,7 +54,10 @@ const UNINITIALIZED_PARAMETERS_ERROR = "All parameters must be initialized in th
  * @param contractPath - Path to the contract.
  * @param verbose - Whether to print verbose output.
  **/
-export async function validateContract(contractPath: string, verbose = false): Promise<boolean> {
+export async function validateContract(
+  contractPath: string,
+  verbose = false
+): Promise<boolean> {
   const signale = new Signale({ scope: "validate-contract" });
 
   const project = new Project();
@@ -70,19 +75,27 @@ export async function validateContract(contractPath: string, verbose = false): P
 
     if (hasNearBindgen) {
       if (verbose) {
-        signale.info(`Validating ${name} class...`)
+        signale.info(`Validating ${name} class...`);
       }
 
       const constructors = classDeclaration.getConstructors();
       const hasConstructor = constructors.length > 0;
-      const propertiesToBeInited = properties.filter(({ initializer }) => !initializer);
+      const propertiesToBeInited = properties.filter(
+        ({ initializer }) => !initializer
+      );
 
       if (!hasConstructor && propertiesToBeInited.length === 0) {
         return true;
       }
 
       if (!hasConstructor && propertiesToBeInited.length > 0) {
-        signale.error(chalk.redBright(`${UNINITIALIZED_PARAMETERS_ERROR} ${propertiesToBeInited.map(({ name }) => name).join(", ")}`));
+        signale.error(
+          chalk.redBright(
+            `${UNINITIALIZED_PARAMETERS_ERROR} ${propertiesToBeInited
+              .map(({ name }) => name)
+              .join(", ")}`
+          )
+        );
         return false;
       }
 
@@ -93,17 +106,25 @@ export async function validateContract(contractPath: string, verbose = false): P
         signale.info("Checking for non initialized properties...");
       }
 
-      const nonInitedProperties = propertiesToBeInited.reduce((properties, { name }) => {
-        if (constructorContent.includes(`this.${name}`)) {
-          return properties;
-        }
+      const nonInitedProperties = propertiesToBeInited.reduce(
+        (properties, { name }) => {
+          if (constructorContent.includes(`this.${name}`)) {
+            return properties;
+          }
 
-        return [...properties, name]
-      }, [] as string[]);
-
+          return [...properties, name];
+        },
+        [] as string[]
+      );
 
       if (nonInitedProperties.length > 0) {
-        signale.error(chalk.redBright(`${UNINITIALIZED_PARAMETERS_ERROR} ${nonInitedProperties.join(", ")}`));
+        signale.error(
+          chalk.redBright(
+            `${UNINITIALIZED_PARAMETERS_ERROR} ${nonInitedProperties.join(
+              ", "
+            )}`
+          )
+        );
         return false;
       }
     }

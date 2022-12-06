@@ -49,7 +49,10 @@
     "ts-morph": "^16.0.0",
     "typescript": "~4.7.2",
     "near-typescript-json-schema": "0.55.0",
-    "json-schema": "0.4.0"
+    "json-schema": "0.4.0",
+    "@typescript-eslint/eslint-plugin": "^5.31.0",
+    "@typescript-eslint/parser": "^5.31.0",
+    "eslint": "^8.20.0"
   },
   "files": [
     "builder",

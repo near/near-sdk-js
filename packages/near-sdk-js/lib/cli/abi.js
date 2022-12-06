@@ -4,7 +4,7 @@ import * as TJS from "near-typescript-json-schema";
 import * as fs from "fs";
 import { LIB_VERSION } from "../version.js";
 function parseMetadata(packageJsonPath) {
-    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
+    const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf8"));
     let authors = [];
     if (packageJson["author"])
         authors.push(packageJson["author"]);
@@ -15,8 +15,8 @@ function parseMetadata(packageJsonPath) {
         authors,
         build: {
             compiler: "tsc " + ts.version,
-            builder: "near-sdk-js " + LIB_VERSION
-        }
+            builder: "near-sdk-js " + LIB_VERSION,
+        },
     };
 }
 function getProgramFromFiles(files, jsonCompilerOptions, basePath = "./") {
@@ -50,7 +50,7 @@ function validateNearClass(node) {
     }
 }
 export function runAbiCompilerPlugin(tsFile, packageJsonPath, tsConfigJsonPath) {
-    const tsConfig = JSON.parse(fs.readFileSync(tsConfigJsonPath, 'utf8'));
+    const tsConfig = JSON.parse(fs.readFileSync(tsConfigJsonPath, "utf8"));
     const program = getProgramFromFiles([tsFile], tsConfig["compilerOptions"]);
     const typeChecker = program.getTypeChecker();
     const diagnostics = ts.getPreEmitDiagnostics(program);
@@ -76,7 +76,8 @@ export function runAbiCompilerPlugin(tsFile, packageJsonPath, tsConfigJsonPath) 
         function inspect(node, tc) {
             if (node.kind === ts.SyntaxKind.MethodDeclaration) {
                 const methodDeclaration = node;
-                const decorators = methodDeclaration.decorators || [];
+                const decorators = methodDeclaration.decorators ||
+                    [];
                 let isCall = false;
                 let isView = false;
                 let isInit = false;
@@ -110,7 +111,8 @@ export function runAbiCompilerPlugin(tsFile, packageJsonPath, tsConfigJsonPath) 
                                         // Do nothing
                                     }
                                     else {
-                                        throw Error("Unexpected initializer for `privateFunction`: kind " + init.kind);
+                                        throw Error("Unexpected initializer for `privateFunction`: kind " +
+                                            init.kind);
                                     }
                                 }
                                 if (propName === "payableFunction") {
@@ -125,7 +127,8 @@ export function runAbiCompilerPlugin(tsFile, packageJsonPath, tsConfigJsonPath) 
                                         // Do nothing
                                     }
                                     else {
-                                        throw Error("Unexpected initializer for `publicFunction`: kind " + init.kind);
+                                        throw Error("Unexpected initializer for `publicFunction`: kind " +
+                                            init.kind);
                                     }
                                 }
                             });
@@ -146,7 +149,8 @@ export function runAbiCompilerPlugin(tsFile, packageJsonPath, tsConfigJsonPath) 
                 validateNearClass(node.parent);
                 let abiParams = [];
                 if (methodDeclaration.parameters.length > 1) {
-                    throw Error("Expected NEAR function to have a single object parameter, but got " + methodDeclaration.parameters.length);
+                    throw Error("Expected NEAR function to have a single object parameter, but got " +
+                        methodDeclaration.parameters.length);
                 }
                 else if (methodDeclaration.parameters.length === 1) {
                     const jsonObjectParameter = methodDeclaration.parameters[0];
@@ -167,7 +171,7 @@ export function runAbiCompilerPlugin(tsFile, packageJsonPath, tsConfigJsonPath) 
                         const abiParameter = {
                             // eslint-disable-next-line @typescript-eslint/no-explicit-any
                             name: propertySignature.name.text,
-                            type_schema: schema
+                            type_schema: schema,
                         };
                         return abiParameter;
                     });
@@ -179,7 +183,7 @@ export function runAbiCompilerPlugin(tsFile, packageJsonPath, tsConfigJsonPath) 
                     const schema = generator.getTypeDefinition(nodeType, true);
                     abiResult = {
                         serialization_type: abi.AbiSerializationType.Json,
-                        type_schema: schema
+                        type_schema: schema,
                     };
                 }
                 const abiFunction = {
@@ -189,9 +193,9 @@ export function runAbiCompilerPlugin(tsFile, packageJsonPath, tsConfigJsonPath) 
                     modifiers: abiModifiers,
                     params: {
                         serialization_type: abi.AbiSerializationType.Json,
-                        args: abiParams
+                        args: abiParams,
                     },
-                    result: abiResult
+                    result: abiResult,
                 };
                 abiFunctions.push(abiFunction);
             }
@@ -206,8 +210,8 @@ export function runAbiCompilerPlugin(tsFile, packageJsonPath, tsConfigJsonPath) 
         metadata: parseMetadata(packageJsonPath),
         body: {
             functions: abiFunctions,
-            root_schema: generator.getSchemaForSymbol("String", true, false)
-        }
+            root_schema: generator.getSchemaForSymbol("String", true, false),
+        },
     };
     return abiRoot;
 }

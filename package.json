@@ -7,14 +7,11 @@
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "build": "turbo run build",
+    "test": "turbo run test",
     "lint": "turbo run lint",
-    "test": "turbo run test"
+    "format": "turbo run format"
   },
   "devDependencies": {
-    "typescript": "^4.7.4",
-    "@typescript-eslint/eslint-plugin": "^5.31.0",
-    "@typescript-eslint/parser": "^5.31.0",
-    "eslint": "^8.20.0",
     "turbo": "^1.4.5"
   }
 }

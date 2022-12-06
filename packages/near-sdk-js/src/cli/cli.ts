@@ -38,7 +38,9 @@ program
   .addCommand(
     new Command("validateContract")
       .usage("[source]")
-      .description("Validate a NEAR JS Smart-contract. Validates the contract by checking that all parameters are initialized in the constructor. Works only for typescript.")
+      .description(
+        "Validate a NEAR JS Smart-contract. Validates the contract by checking that all parameters are initialized in the constructor. Works only for typescript."
+      )
       .argument("[source]", "Contract to validate.", "src/index.ts")
       .option("--verbose", "Whether to print more verbose output.", false)
       .action(validateCom)
@@ -46,7 +48,9 @@ program
   .addCommand(
     new Command("checkTypescript")
       .usage("[source]")
-      .description("Run TSC with some cli flags - warning - ignores tsconfig.json.")
+      .description(
+        "Run TSC with some cli flags - warning - ignores tsconfig.json."
+      )
       .argument("[source]", "Typescript file to validate", "src/index.ts")
       .option("--verbose", "Whether to print more verbose output.", false)
       .action(checkTypescriptCom)
@@ -54,17 +58,29 @@ program
   .addCommand(
     new Command("createJsFileWithRullup")
       .usage("[source] [target]")
-      .description("Create intermediate javascript file for later processing with QJSC")
+      .description(
+        "Create intermediate javascript file for later processing with QJSC"
+      )
       .argument("[source]", "Contract to build.", "src/index.js")
-      .argument("[target]", "Target file path and name. The default corresponds to contract.js", "build/contract.wasm")
+      .argument(
+        "[target]",
+        "Target file path and name. The default corresponds to contract.js",
+        "build/contract.wasm"
+      )
       .option("--verbose", "Whether to print more verbose output.", false)
       .action(createJsFileWithRollupCom)
   )
   .addCommand(
     new Command("transpileJsAndBuildWasm")
       .usage("[source] [target]")
-      .description("Transpiles the target javascript file into .c and .h using QJSC then compiles that into wasm using clang")
-      .argument("[target]", "Target file path and name. The js file must correspond to the same path with the js extension.", "build/contract.wasm")
+      .description(
+        "Transpiles the target javascript file into .c and .h using QJSC then compiles that into wasm using clang"
+      )
+      .argument(
+        "[target]",
+        "Target file path and name. The js file must correspond to the same path with the js extension.",
+        "build/contract.wasm"
+      )
       .option("--verbose", "Whether to print more verbose output.", false)
       .action(transpileJsAndBuildWasmCom)
   )
@@ -83,7 +99,7 @@ function getTargetFileName(target: string): string {
 }
 
 function getRollupTarget(target: string): string {
-  return `${getTargetDir(target)}/${getTargetFileName(target)}.js`
+  return `${getTargetDir(target)}/${getTargetFileName(target)}.js`;
 }
 
 function getQjscTarget(target: string): string {
@@ -104,7 +120,9 @@ function requireTargetExt(target: string): void {
   }
 
   signal.error(
-    `Unsupported target ${getTargetExt(target)}, make sure target ends with .wasm!`
+    `Unsupported target ${getTargetExt(
+      target
+    )}, make sure target ends with .wasm!`
   );
   process.exit(1);
 }
@@ -119,22 +137,31 @@ function ensureTargetDirExists(target: string): void {
   fs.mkdirSync(targetDir, {});
 }
 
-export async function validateCom(source: string, { verbose = false }: { verbose: boolean }): Promise<void> {
+export async function validateCom(
+  source: string,
+  { verbose = false }: { verbose: boolean }
+): Promise<void> {
   const signale = new Signale({ scope: "validate", interactive: !verbose });
 
   signale.await(`Validating ${source} contract...`);
 
-  if (!await validateContract(source, verbose)) {
+  if (!(await validateContract(source, verbose))) {
     process.exit(1);
   }
 }
 
-export async function checkTypescriptCom(source: string, { verbose = false }: { verbose: boolean }): Promise<void> {
-  const signale = new Signale({ scope: "checkTypescript", interactive: !verbose });
+export async function checkTypescriptCom(
+  source: string,
+  { verbose = false }: { verbose: boolean }
+): Promise<void> {
+  const signale = new Signale({
+    scope: "checkTypescript",
+    interactive: !verbose,
+  });
 
   const sourceExt = source.split(".").pop();
   if (sourceExt !== "ts") {
-    signale.info(`Source file is not a typescript file ${source}`)
+    signale.info(`Source file is not a typescript file ${source}`);
     return;
   }
 
@@ -142,12 +169,20 @@ export async function checkTypescriptCom(source: string, { verbose = false }: { 
   await checkTsBuildWithTsc(source, verbose);
 }
 
-export async function generateAbi(source: string, target: string, packageJson: string, tsConfig: string, { verbose = false }: { verbose: boolean }): Promise<void> {
+export async function generateAbi(
+  source: string,
+  target: string,
+  packageJson: string,
+  tsConfig: string,
+  { verbose = false }: { verbose: boolean }
+): Promise<void> {
   const signale = new Signale({ scope: "generateAbi", interactive: !verbose });
 
   const sourceExt = source.split(".").pop();
   if (sourceExt !== "ts") {
-    signale.info(`Skipping ABI generation as source file is not a typescript file ${source}`)
+    signale.info(
+      `Skipping ABI generation as source file is not a typescript file ${source}`
+    );
     return;
   }
 
@@ -157,8 +192,15 @@ export async function generateAbi(source: string, target: string, packageJson: s
   signale.success(`Generated ${getContractAbi(target)} ABI successfully!`);
 }
 
-export async function createJsFileWithRollupCom(source: string, target: string, { verbose = false }: { verbose: boolean }): Promise<void> {
-  const signale = new Signale({ scope: "createJsFileWithRollup", interactive: !verbose });
+export async function createJsFileWithRollupCom(
+  source: string,
+  target: string,
+  { verbose = false }: { verbose: boolean }
+): Promise<void> {
+  const signale = new Signale({
+    scope: "createJsFileWithRollup",
+    interactive: !verbose,
+  });
 
   requireTargetExt(target);
   ensureTargetDirExists(target);
@@ -167,26 +209,41 @@ export async function createJsFileWithRollupCom(source: string, target: string, 
   await createJsFileWithRullup(source, getRollupTarget(target), verbose);
 }
 
-
-export async function transpileJsAndBuildWasmCom(target: string, { verbose = false }: { verbose: boolean }): Promise<void> {
-  const signale = new Signale({ scope: "transpileJsAndBuildWasm", interactive: !verbose });
+export async function transpileJsAndBuildWasmCom(
+  target: string,
+  { verbose = false }: { verbose: boolean }
+): Promise<void> {
+  const signale = new Signale({
+    scope: "transpileJsAndBuildWasm",
+    interactive: !verbose,
+  });
 
   requireTargetExt(target);
   ensureTargetDirExists(target);
 
   signale.await(`Creating ${getQjscTarget(target)} file with QJSC...`);
-  await createHeaderFileWithQjsc(getRollupTarget(target), getQjscTarget(target), verbose);
+  await createHeaderFileWithQjsc(
+    getRollupTarget(target),
+    getQjscTarget(target),
+    verbose
+  );
 
   signale.await("Generating methods.h file...");
   await createMethodsHeaderFile(getRollupTarget(target), verbose);
 
   signale.await(`Creating ${getContractTarget(target)} contract...`);
-  await createWasmContract(getQjscTarget(target), getContractTarget(target), verbose);
+  await createWasmContract(
+    getQjscTarget(target),
+    getContractTarget(target),
+    verbose
+  );
 
   signale.await("Executing wasi-stub...");
   await wasiStubContract(getContractTarget(target), verbose);
 
-  signale.success(`Generated ${getContractTarget(target)} contract successfully!`);
+  signale.success(
+    `Generated ${getContractTarget(target)} contract successfully!`
+  );
 }
 
 export async function buildCom(
@@ -245,7 +302,10 @@ async function createJsFileWithRullup(
         presets: ["@babel/preset-typescript"],
         plugins: [
           "near-sdk-js/lib/cli/build-tools/include-bytes.js",
-          ["near-sdk-js/lib/cli/build-tools/near-bindgen-exporter.js", { verbose }],
+          [
+            "near-sdk-js/lib/cli/build-tools/near-bindgen-exporter.js",
+            { verbose },
+          ],
           ["@babel/plugin-proposal-decorators", { version: "legacy" }],
         ],
       }),
@@ -274,9 +334,7 @@ async function createMethodsHeaderFile(rollupTarget: string, verbose = false) {
   const buildPath = path.dirname(rollupTarget);
 
   if (verbose) {
-    new Signale({ scope: "method-header" }).info(
-      rollupTarget
-    )
+    new Signale({ scope: "method-header" }).info(rollupTarget);
   }
 
   const mod = await import(`${PROJECT_DIR}/${rollupTarget}`);
@@ -315,7 +373,8 @@ async function createWasmContract(
   fs.renameSync(qjscTarget, "build/code.h");
 
   await executeCommand(
-    `${CC} --target=wasm32-wasi -nostartfiles -Oz -flto ${DEFS} ${INCLUDES} ${SOURCES} ${LIBS} -Wl,--no-entry -Wl,--allow-undefined -Wl,-z,stack-size=${256 * 1024
+    `${CC} --target=wasm32-wasi -nostartfiles -Oz -flto ${DEFS} ${INCLUDES} ${SOURCES} ${LIBS} -Wl,--no-entry -Wl,--allow-undefined -Wl,-z,stack-size=${
+      256 * 1024
     } -Wl,--lto-O3 -o ${contractTarget}`,
     verbose
   );
