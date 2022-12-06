@@ -44,7 +44,7 @@ export function storage_write_utf8() {
 }
 
 export function storage_read_utf8() {
-  near.valueReturn(near.storageRead(encode("水")))
+  near.valueReturn(near.storageRead(encode("水")));
 }
 
 export function storage_read_ascii_bytes() {
@@ -92,63 +92,66 @@ export function panicUtf8_invalid_utf8_sequence() {
 }
 
 const areEqual = (first, second) =>
-    first.length === second.length && first.every((value, index) => value === second[index]);
+  first.length === second.length &&
+  first.every((value, index) => value === second[index]);
 
 export function utf8_string_to_uint8array_tests() {
-  let utf8chars = '水😂'
-  let withUtf8CharCodeSeq = '\xe6\xb0\xb4'
-  let withArbitraryLatinSeq = '\x00\x01\xff'
+  let utf8chars = "水😂";
+  let withUtf8CharCodeSeq = "\xe6\xb0\xb4";
+  let withArbitraryLatinSeq = "\x00\x01\xff";
 
-  assert(areEqual(encode(utf8chars), new Uint8Array([
-    230, 176, 180,
-    240, 159, 152,
-    130
-  ])))
-  assert(areEqual(encode(withUtf8CharCodeSeq), new Uint8Array(
-    [ 195, 166, 194, 176, 194, 180 ]
-  )))
-  assert(areEqual(encode(withArbitraryLatinSeq), new Uint8Array([ 0, 1, 195, 191 ])))
+  assert(
+    areEqual(
+      encode(utf8chars),
+      new Uint8Array([230, 176, 180, 240, 159, 152, 130])
+    )
+  );
+  assert(
+    areEqual(
+      encode(withUtf8CharCodeSeq),
+      new Uint8Array([195, 166, 194, 176, 194, 180])
+    )
+  );
+  assert(
+    areEqual(encode(withArbitraryLatinSeq), new Uint8Array([0, 1, 195, 191]))
+  );
 
-  assert(decode(encode(utf8chars)) == utf8chars)
-  assert(decode(encode(withUtf8CharCodeSeq)) == withUtf8CharCodeSeq)
-  assert(decode(encode(withArbitraryLatinSeq)) == withArbitraryLatinSeq)
+  assert(decode(encode(utf8chars)) == utf8chars);
+  assert(decode(encode(withUtf8CharCodeSeq)) == withUtf8CharCodeSeq);
+  assert(decode(encode(withArbitraryLatinSeq)) == withArbitraryLatinSeq);
 }
 
 export function uint8array_to_utf8_string_tests() {
-  let validUtf8SeqArray = new Uint8Array([
-    230, 176, 180,
-    240, 159, 152,
-    130
-  ])
-  let escapedUtf8SeqArray = new Uint8Array(
-    [ 195, 166, 194, 176, 194, 180 ]
-  )
-  let invalidUtf8Seq = new Uint8Array([ 0, 1, 255 ])
+  let validUtf8SeqArray = new Uint8Array([230, 176, 180, 240, 159, 152, 130]);
+  let escapedUtf8SeqArray = new Uint8Array([195, 166, 194, 176, 194, 180]);
+  let invalidUtf8Seq = new Uint8Array([0, 1, 255]);
 
-  assert(decode(validUtf8SeqArray) == '水😂')
-  assert(decode(escapedUtf8SeqArray) == '\xe6\xb0\xb4')
+  assert(decode(validUtf8SeqArray) == "水😂");
+  assert(decode(escapedUtf8SeqArray) == "\xe6\xb0\xb4");
   // same behavior as nodejs
-  assert(decode(invalidUtf8Seq) == '\x00\x01\ufffd')
+  assert(decode(invalidUtf8Seq) == "\x00\x01\ufffd");
 
-  assert(areEqual(encode(decode(validUtf8SeqArray)), validUtf8SeqArray))
-  assert(areEqual(encode(decode(escapedUtf8SeqArray)), escapedUtf8SeqArray))
+  assert(areEqual(encode(decode(validUtf8SeqArray)), validUtf8SeqArray));
+  assert(areEqual(encode(decode(escapedUtf8SeqArray)), escapedUtf8SeqArray));
   // same behavior as nodejs
-  assert(areEqual(encode(decode(invalidUtf8Seq)), new Uint8Array([0,1,239,191,189]))) 
+  assert(
+    areEqual(
+      encode(decode(invalidUtf8Seq)),
+      new Uint8Array([0, 1, 239, 191, 189])
+    )
+  );
 }
 
 export function uint8array_to_latin1_string_tests() {
-  let happensToBeUtf8Seq = new Uint8Array([
-    230, 176, 180,
-  ])
-  let validLatin1InvalidUtf8 = new Uint8Array([ 0, 1, 255 ])
-  let ascii = new Uint8Array([65, 66, 67])
+  let happensToBeUtf8Seq = new Uint8Array([230, 176, 180]);
+  let validLatin1InvalidUtf8 = new Uint8Array([0, 1, 255]);
+  let ascii = new Uint8Array([65, 66, 67]);
 
-  assert(str(happensToBeUtf8Seq) ==  '\xe6\xb0\xb4')
-  assert(str(validLatin1InvalidUtf8) == '\x00\x01\xff')
-  assert(str(ascii) == '\x41\x42\x43')
+  assert(str(happensToBeUtf8Seq) == "\xe6\xb0\xb4");
+  assert(str(validLatin1InvalidUtf8) == "\x00\x01\xff");
+  assert(str(ascii) == "\x41\x42\x43");
 
-  assert(areEqual(bytes(str(happensToBeUtf8Seq)), happensToBeUtf8Seq))
-  assert(areEqual(bytes(str(validLatin1InvalidUtf8)), validLatin1InvalidUtf8))
-  assert(areEqual(bytes(str(ascii)), ascii))
-
+  assert(areEqual(bytes(str(happensToBeUtf8Seq)), happensToBeUtf8Seq));
+  assert(areEqual(bytes(str(validLatin1InvalidUtf8)), validLatin1InvalidUtf8));
+  assert(areEqual(bytes(str(ascii)), ascii));
 }

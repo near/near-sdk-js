@@ -45,7 +45,11 @@ test("Log unexpected types not logging", async (t) => {
 
   let r = await ali.callRaw(bytesContract, "log_unexpected_input_tests", "");
   // logUtf8 and logUtf16 only works with bytes, trying to log it with string is error
-  t.assert(r.result.status.Failure.ActionError.kind.FunctionCallError.ExecutionError.startsWith('Smart contract panicked: Expect Uint8Array for message'))
+  t.assert(
+    r.result.status.Failure.ActionError.kind.FunctionCallError.ExecutionError.startsWith(
+      "Smart contract panicked: Expect Uint8Array for message"
+    )
+  );
   t.deepEqual(r.result.receipts_outcome[0].outcome.logs, []);
 });
 
@@ -113,11 +117,8 @@ test("storage write utf8, utf8 string convert to Uint8Array tests", async (t) =>
   const { ali, bytesContract } = t.context.accounts;
 
   await ali.call(bytesContract, "storage_write_utf8", "");
-  let r = await bytesContract.viewRaw(
-    "storage_read_utf8",
-    ""
-  );
-  t.deepEqual(r.result, [...Buffer.from('😂', 'utf-8')]);
+  let r = await bytesContract.viewRaw("storage_read_utf8", "");
+  t.deepEqual(r.result, [...Buffer.from("😂", "utf-8")]);
 });
 
 test("Storage read bytes tests", async (t) => {
@@ -203,20 +204,32 @@ test("panic tests", async (t) => {
 test("utf8 string can be convert to Uint8Array correctly", async (t) => {
   const { bob, bytesContract } = t.context.accounts;
 
-  let res = await bob.callRaw(bytesContract, "utf8_string_to_uint8array_tests", "");
-  t.is(res.result.status.SuccessValue, '')
-})
+  let res = await bob.callRaw(
+    bytesContract,
+    "utf8_string_to_uint8array_tests",
+    ""
+  );
+  t.is(res.result.status.SuccessValue, "");
+});
 
 test("valid utf8 sequence can be convert to string correctly", async (t) => {
   const { bob, bytesContract } = t.context.accounts;
 
-  let res = await bob.callRaw(bytesContract, "uint8array_to_utf8_string_tests", "");
-  t.is(res.result.status.SuccessValue, '')
-})
+  let res = await bob.callRaw(
+    bytesContract,
+    "uint8array_to_utf8_string_tests",
+    ""
+  );
+  t.is(res.result.status.SuccessValue, "");
+});
 
 test("latin1 sequence can be convert to string correctly", async (t) => {
   const { bob, bytesContract } = t.context.accounts;
 
-  let res = await bob.callRaw(bytesContract, "uint8array_to_latin1_string_tests", "");
-  t.is(res.result.status.SuccessValue, '')
-})
+  let res = await bob.callRaw(
+    bytesContract,
+    "uint8array_to_latin1_string_tests",
+    ""
+  );
+  t.is(res.result.status.SuccessValue, "");
+});

@@ -6,7 +6,7 @@ import {
   ERR_INCONSISTENT_STATE,
   ERR_INDEX_OUT_OF_BOUNDS,
   str,
-  bytes
+  bytes,
 } from "../utils";
 import { GetOptions } from "../types/collections";
 
@@ -137,7 +137,10 @@ export class Vector<DataType> {
     const key = indexToKey(this.prefix, index);
 
     assert(
-      near.storageWrite(bytes(key), serializeValueWithOptions(element, options)),
+      near.storageWrite(
+        bytes(key),
+        serializeValueWithOptions(element, options)
+      ),
       ERR_INCONSISTENT_STATE
     );
 

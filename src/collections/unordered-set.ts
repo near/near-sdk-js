@@ -3,7 +3,7 @@ import {
   assert,
   serializeValueWithOptions,
   ERR_INCONSISTENT_STATE,
-  encode
+  encode,
 } from "../utils";
 import { Vector, VectorIterator } from "./vector";
 import { Mutable } from "../utils";
@@ -13,7 +13,7 @@ function serializeIndex(index: number) {
   const data = new Uint32Array([index]);
   const array = new Uint8Array(data.buffer);
 
-  return array
+  return array;
 }
 
 function deserializeIndex(rawIndex: Uint8Array): number {

@@ -2,7 +2,7 @@ import { GetOptions } from "./types/collections";
 
 export interface Env {
   uint8array_to_latin1_string(a: Uint8Array): string;
-  uint8array_to_utf8_string(a: Uint8Array): string; 
+  uint8array_to_utf8_string(a: Uint8Array): string;
   latin1_string_to_uint8array(s: string): Uint8Array;
   utf8_string_to_uint8array(s: string): Uint8Array;
 }
@@ -45,10 +45,7 @@ const ACCOUNT_ID_REGEX =
  * @param array2
  * @returns the concatenation of two array
  */
-export function concat(
-  array1: Uint8Array,
-  array2: Uint8Array
-): Uint8Array {
+export function concat(array1: Uint8Array, array2: Uint8Array): Uint8Array {
   const mergedArray = new Uint8Array(array1.length + array2.length);
   mergedArray.set(array1);
   mergedArray.set(array2, array1.length);
@@ -81,7 +78,7 @@ export function getValueWithOptions<DataType>(
   if (value === null) {
     return options?.defaultValue ?? null;
   }
-  
+
   const deserialized = deserialize(value);
 
   if (deserialized === undefined || deserialized === null) {
@@ -167,11 +164,9 @@ export function validateAccountId(accountId: string): boolean {
 /**
  * A subset of NodeJS TextEncoder API
  */
- export class TextEncoder {
-  constructor() {}
-
+export class TextEncoder {
   encode(s: string): Uint8Array {
-    return env.utf8_string_to_uint8array(s)
+    return env.utf8_string_to_uint8array(s);
   }
 }
 
@@ -179,26 +174,26 @@ export function validateAccountId(accountId: string): boolean {
  * A subset of NodeJS TextDecoder API. Only support utf-8 and latin1 encoding.
  */
 export class TextDecoder {
-  constructor(public encoding: string = 'utf-8') {}
-  
+  constructor(public encoding: string = "utf-8") {}
+
   decode(a: Uint8Array): string {
-    if (this.encoding == 'utf-8') {
-      return env.uint8array_to_utf8_string(a)
-    } else if (this.encoding == 'latin1') {
-      return env.uint8array_to_latin1_string(a)
+    if (this.encoding == "utf-8") {
+      return env.uint8array_to_utf8_string(a);
+    } else if (this.encoding == "latin1") {
+      return env.uint8array_to_latin1_string(a);
     } else {
-      throw new Error('unsupported encoding: ' + this.encoding)
+      throw new Error("unsupported encoding: " + this.encoding);
     }
   }
 }
 
 /**
- * Convert a string to Uint8Array, each character must have a char code between 0-255. 
+ * Convert a string to Uint8Array, each character must have a char code between 0-255.
  * @param s - string that with only Latin1 character to convert
  * @returns result Uint8Array
  */
 export function bytes(s: string): Uint8Array {
-  return env.latin1_string_to_uint8array(s)
+  return env.latin1_string_to_uint8array(s);
 }
 
 /**

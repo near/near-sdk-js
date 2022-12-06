@@ -5,7 +5,7 @@ import {
   Mutable,
   serializeValueWithOptions,
   encode,
-  decode
+  decode,
 } from "../utils";
 import { Vector, VectorIterator } from "./vector";
 import { LookupMap } from "./lookup-map";
@@ -247,7 +247,10 @@ class UnorderedMapIterator<DataType> {
 
     return {
       done: key.done,
-      value: [key.value, getValueWithOptions(encode(valueAndIndex[0]), this.options)],
+      value: [
+        key.value,
+        getValueWithOptions(encode(valueAndIndex[0]), this.options),
+      ],
     };
   }
 }

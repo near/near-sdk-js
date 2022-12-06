@@ -3,7 +3,7 @@ import { GetOptions } from "../types/collections";
 import {
   getValueWithOptions,
   serializeValueWithOptions,
-  encode
+  encode,
 } from "../utils";
 
 /**

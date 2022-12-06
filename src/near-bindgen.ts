@@ -1,11 +1,5 @@
 import * as near from "./api";
-import {
-  deserialize,
-  serialize,
-  bytes,
-  encode,
-  decode,
-} from "./utils";
+import { deserialize, serialize, bytes, encode, decode } from "./utils";
 
 type EmptyParameterObject = Record<never, never>;
 type AnyObject = Record<string, unknown>;
@@ -177,10 +171,7 @@ export function NearBindgen({
       }
 
       static _saveToStorage(objectToSave: unknown): void {
-        near.storageWrite(
-          bytes("STATE"),
-          this._serialize(objectToSave)
-        );
+        near.storageWrite(bytes("STATE"), this._serialize(objectToSave));
       }
 
       static _getArgs(): unknown {

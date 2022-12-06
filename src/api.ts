@@ -1,10 +1,4 @@
-import {
-  assert,
-  NearAmount,
-  PromiseIndex,
-  Register,
-  str,
-} from "./utils";
+import { assert, NearAmount, PromiseIndex, Register, str } from "./utils";
 import { GasWeight, PromiseResult } from "./types";
 
 const U64_MAX = 2n ** 64n - 1n;
@@ -142,7 +136,7 @@ interface Env {
   promise_return(promiseIndex: bigint): void;
 
   uint8array_to_latin1_string(a: Uint8Array): string;
-  uint8array_to_utf8_string(a: Uint8Array): string; 
+  uint8array_to_utf8_string(a: Uint8Array): string;
   latin1_string_to_uint8array(s: string): Uint8Array;
   utf8_string_to_uint8array(s: string): Uint8Array;
 }

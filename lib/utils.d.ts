@@ -54,7 +54,6 @@ export declare function validateAccountId(accountId: string): boolean;
  * A subset of NodeJS TextEncoder API
  */
 export declare class TextEncoder {
-    constructor();
     encode(s: string): Uint8Array;
 }
 /**
