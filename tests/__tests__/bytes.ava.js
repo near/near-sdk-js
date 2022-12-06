@@ -12,10 +12,11 @@ test.beforeEach(async (t) => {
   const bytesContract = await root.devDeploy("build/bytes.wasm");
   // Test users
   const ali = await root.createSubAccount("ali");
+  const bob = await root.createSubAccount("bob");
 
   // Save state for test runs
   t.context.worker = worker;
-  t.context.accounts = { root, bytesContract, ali };
+  t.context.accounts = { root, bytesContract, ali, bob };
 });
 
 test.afterEach.always(async (t) => {
@@ -83,7 +84,7 @@ function encodeStateKey(k) {
   return Buffer.from(k).toString("base64");
 }
 
-test("storage write bytes tests", async (t) => {
+test("storage write bytes tests. Any latin1 string: ascii, valid or invalid utf-8 sequence can be convert to Uint8Array correctly", async (t) => {
   const { ali, bytesContract } = t.context.accounts;
 
   await ali.call(bytesContract, "storage_write_bytes", "");
@@ -108,7 +109,7 @@ test("storage write bytes tests", async (t) => {
   );
 });
 
-test("storage write utf8 tests", async (t) => {
+test("storage write utf8, utf8 string convert to Uint8Array tests", async (t) => {
   const { ali, bytesContract } = t.context.accounts;
 
   await ali.call(bytesContract, "storage_write_utf8", "");
@@ -198,3 +199,24 @@ test("panic tests", async (t) => {
     "String encoding is bad UTF-8 sequence."
   );
 });
+
+test("utf8 string can be convert to Uint8Array correctly", async (t) => {
+  const { bob, bytesContract } = t.context.accounts;
+
+  let res = await bob.callRaw(bytesContract, "utf8_string_to_uint8array_tests", "");
+  t.is(res.result.status.SuccessValue, '')
+})
+
+test("valid utf8 sequence can be convert to string correctly", async (t) => {
+  const { bob, bytesContract } = t.context.accounts;
+
+  let res = await bob.callRaw(bytesContract, "uint8array_to_utf8_string_tests", "");
+  t.is(res.result.status.SuccessValue, '')
+})
+
+test("latin1 sequence can be convert to string correctly", async (t) => {
+  const { bob, bytesContract } = t.context.accounts;
+
+  let res = await bob.callRaw(bytesContract, "uint8array_to_latin1_string_tests", "");
+  t.is(res.result.status.SuccessValue, '')
+})

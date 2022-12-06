@@ -92,3 +92,22 @@ test("LookupMap allows you to use the same key for the second time", async (t) =
 
   t.is(await lookupMapContract.view("get", { key: "hello" }), "world");
 });
+
+test.only("UTF-8 in arguments, store in collections & state, return in returns", async (t) => {
+  const {ali, lookupMapContract} = t.context.accounts;
+
+  let data = {
+    "utf8emoji": "😂",
+    "utf8char": "水",
+    // this is the byte sequence of above utf8 char, it will be escaped in js contract
+    // so it won't be mis-recorgnized as above utf8 char.
+    "utf8char_charcode_seq": "\xe6\xb0\xb4",
+    // this and above shows arbitrary binary data can be put in arguments, state and return
+    // default serialization and deserialization works
+    "latin1_charcode_seq": "\xc2\x00\x01\xff"
+  }
+  let res = await ali.callRaw(lookupMapContract, "set", {key: "utf8test", value: data})
+  t.is(res.result.status.SuccessValue, '')
+
+  t.deepEqual(await lookupMapContract.view("get", { key: "utf8test" }), data);
+})
