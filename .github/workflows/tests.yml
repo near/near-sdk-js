@@ -1,4 +1,4 @@
-name: Lint
+name: Test
 on:
   pull_request:
   push:
@@ -6,14 +6,13 @@ on:
       - master
       - develop
 jobs:
-  lint:
+  tests:
     strategy:
       matrix:
-        platform: [ubuntu-latest]
+        platform: [ubuntu-latest, macos-latest]
     runs-on: ${{ matrix.platform }}
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
       - name: Setup pnpm
         uses: pnpm/action-setup@v2.2.2
         with:
@@ -23,9 +22,9 @@ jobs:
         with:
           node-version: 16.x
           cache: pnpm
-      - name: Install modules
+      - name: Install dependencies
         run: pnpm install
-      - name: Run lint
+      - name: Lint code
         run: pnpm lint
       - name: Format code
         run: pnpm format
@@ -33,3 +32,9 @@ jobs:
         run: git status
       - name: Check that lints where commited
         run: test -z "$(git status --porcelain)"
+      - name: Build
+        run: pnpm build
+      - name: Check that all build artifacts where commited
+        run: test -z "$(git status --porcelain)"
+      - name: Run tests
+        run: pnpm test
