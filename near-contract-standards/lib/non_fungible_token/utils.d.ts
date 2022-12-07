@@ -10,5 +10,5 @@ export declare function assert_at_least_one_yocto(): void;
 export declare function assert_one_yocto(): void;
 export declare type Option<T> = T | null;
 export interface IntoStorageKey {
-    into_storage_key(): Bytes;
+    into_storage_key(): Uint8Array;
 }
