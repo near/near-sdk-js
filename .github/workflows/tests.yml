@@ -1,0 +1,40 @@
+name: Test
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+      - develop
+jobs:
+  tests:
+    strategy:
+      matrix:
+        platform: [ubuntu-latest, macos-latest]
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2.2.2
+        with:
+          version: 7
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install
+      - name: Lint code
+        run: pnpm lint
+      - name: Format code
+        run: pnpm format
+      - name: Run git status
+        run: git status
+      - name: Check that lints where commited
+        run: test -z "$(git status --porcelain)"
+      - name: Build
+        run: pnpm build
+      - name: Check that all build artifacts where commited
+        run: test -z "$(git status --porcelain)"
+      - name: Run tests
+        run: pnpm test
