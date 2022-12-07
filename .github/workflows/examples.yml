@@ -23,32 +23,6 @@ jobs:
           node-version: 16.x
           cache: pnpm
       - name: Install dependencies
-        run: pnpm install && cd examples && pnpm install
-      - name: clean-state
-        run: cd examples && pnpm build:clean-state && pnpm test:clean-state
-      - name: counter
-        run: cd examples && pnpm build:counter && pnpm test:counter
-      - name: counter-lowlevel
-        run: cd examples && pnpm build:counter-lowlevel && pnpm test:counter-lowlevel
-      - name: counter-ts
-        run: cd examples && pnpm build:counter-ts && pnpm test:counter-ts
-      - name: cross-contract-call
-        run: cd examples && pnpm build:cross-contract-call && pnpm test:cross-contract-call
-      - name: fungible-token-lockable
-        run: cd examples && pnpm build:fungible-token-lockable && pnpm test:fungible-token-lockable
-      - name: fungible-token
-        run: cd examples && pnpm build:fungible-token && pnpm test:fungible-token
-      - name: non-fungible-token
-        run: cd examples && pnpm build:non-fungible-token && pnpm test:non-fungible-token
-      - name: status-message-collections
-        run: cd examples && pnpm build:status-message-collections && pnpm test:status-message-collections
-      - name: status-message
-        run: cd examples && pnpm build:status-message && pnpm test:status-message
-      - name: parking-lot
-        run: cd examples && pnpm build:parking-lot && pnpm test:parking-lot
-      - name: standard nft
-        run: cd examples && pnpm build-nft && pnpm test:nft
-      - name: programmatic-update
-        run: cd examples && pnpm build:programmatic-update && pnpm test:programmatic-update
-      - name: cross-contract-call-loop
-        run: cd examples && pnpm build:cross-contract-call-loop && pnpm test:cross-contract-call-loop
+        run: pnpm install
+      - name: Run examples tests
+        run: pnpm test:examples
