@@ -1,4 +1,4 @@
-import { NearBindgen, near, initialize, assert, view } from "near-sdk-js";
+import { NearBindgen, near, initialize, assert, view, bytes, str } from "near-sdk-js";
 
 @NearBindgen({ requireInit: true })
 export class ProgrammaticUpdateBefore {
@@ -7,7 +7,7 @@ export class ProgrammaticUpdateBefore {
   @initialize({ privateFunction: true })
   init({ manager }: { manager: string }) {
     near.log(`Setting manager to be ${manager}`);
-    near.storageWrite("MANAGER", manager);
+    near.storageWrite(bytes("MANAGER"), bytes(manager));
   }
 
   @view({}) // This method will be renamed after update and will return "Hi" if greeting is "Hello"
@@ -17,7 +17,7 @@ export class ProgrammaticUpdateBefore {
 }
 
 export function updateContract() {
-  const manager = near.storageRead("MANAGER");
+  const manager = str(near.storageRead(bytes("MANAGER")));
   assert(
     near.predecessorAccountId() === manager,
     "Only the manager can update the code"

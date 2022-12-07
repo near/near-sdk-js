@@ -1,11 +1,11 @@
-import { call, near, NearBindgen, NearPromise, view } from "near-sdk-js";
+import { call, near, NearBindgen, NearPromise, view, decode } from "near-sdk-js";
 
 const CONTRACTS = [
   "first-contract.test.near",
   "second-contract.test.near",
   "third-contract.test.near",
 ];
-const NO_ARGS = "";
+const NO_ARGS = new Uint8Array();
 const THIRTY_TGAS = BigInt("30" + "0".repeat(12));
 
 @NearBindgen({})
@@ -48,7 +48,7 @@ export class LoopXCC {
     const callCount = near.promiseResultsCount();
     for (let i = 0; i < callCount; i++) {
       const promiseResult = near.promiseResult(i);
-      const result = JSON.parse(promiseResult);
+      const result = JSON.parse(decode(promiseResult));
       this.count += result;
     }
     return this.count;
