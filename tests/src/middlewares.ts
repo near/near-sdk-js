@@ -1,5 +1,11 @@
-import { NearBindgen, near, call, view } from "near-sdk-js";
-import { initialize, middleware } from "../../lib/near-bindgen";
+import {
+  NearBindgen,
+  near,
+  call,
+  view,
+  initialize,
+  middleware
+} from "near-sdk-js";
 
 @NearBindgen({ requireInit: true })
 export class Contract {

@@ -5,7 +5,6 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "postinstall": "pnpm link --global near-sdk-js",
     "build": "run-s build:*",
     "build:context-api": "near-sdk-js build src/context_api.js build/context_api.wasm",
     "build:math-api": "near-sdk-js build src/math_api.js build/math_api.wasm",
@@ -63,6 +62,6 @@
   },
   "dependencies": {
     "typescript": "^4.7.4",
-    "near-sdk-js": "^0.6.0"
+    "near-sdk-js": "workspace:*"
   }
 }
