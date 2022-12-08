@@ -7,7 +7,7 @@ import {
   LookupMap,
   assert,
   validateAccountId,
-  encode
+  encode,
 } from "near-sdk-js";
 
 @NearBindgen({ requireInit: true })

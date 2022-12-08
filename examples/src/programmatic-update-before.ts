@@ -1,4 +1,12 @@
-import { NearBindgen, near, initialize, assert, view, bytes, str } from "near-sdk-js";
+import {
+  NearBindgen,
+  near,
+  initialize,
+  assert,
+  view,
+  bytes,
+  str,
+} from "near-sdk-js";
 
 @NearBindgen({ requireInit: true })
 export class ProgrammaticUpdateBefore {

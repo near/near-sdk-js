@@ -16,8 +16,8 @@ export class CleanState {
   get({ key }) {
     let raw = near.storageRead(encode(key));
     if (raw !== null) {
-      return decode(raw)
+      return decode(raw);
     }
-    return null
+    return null;
   }
 }

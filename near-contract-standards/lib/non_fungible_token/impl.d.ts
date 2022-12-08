@@ -1,4 +1,4 @@
-import { AccountId, UnorderedMap, LookupMap, Bytes, UnorderedSet, NearPromise } from "near-sdk-js";
+import { AccountId, UnorderedMap, LookupMap, UnorderedSet, NearPromise } from "near-sdk-js";
 import { TokenMetadata } from "./metadata";
 import { IntoStorageKey, Option } from "./utils";
 import { NonFungibleTokenResolver } from "./core/resolver";
@@ -95,12 +95,12 @@ export declare class NonFungibleToken implements NonFungibleTokenCore, NonFungib
 }
 export declare type StorageKey = TokensPerOwner | TokenPerOwnerInner;
 export declare class TokensPerOwner implements IntoStorageKey {
-    account_hash: Bytes;
-    constructor(account_hash: Bytes);
-    into_storage_key(): Bytes;
+    account_hash: Uint8Array;
+    constructor(account_hash: Uint8Array);
+    into_storage_key(): Uint8Array;
 }
 export declare class TokenPerOwnerInner implements IntoStorageKey {
-    account_id_hash: Bytes;
-    constructor(account_id_hash: Bytes);
-    into_storage_key(): Bytes;
+    account_id_hash: Uint8Array;
+    constructor(account_id_hash: Uint8Array);
+    into_storage_key(): Uint8Array;
 }

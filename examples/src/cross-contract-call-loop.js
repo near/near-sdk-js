@@ -1,4 +1,11 @@
-import { call, near, NearBindgen, NearPromise, view, decode } from "near-sdk-js";
+import {
+  call,
+  near,
+  NearBindgen,
+  NearPromise,
+  view,
+  decode,
+} from "near-sdk-js";
 
 const CONTRACTS = [
   "first-contract.test.near",

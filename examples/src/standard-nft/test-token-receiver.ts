@@ -7,7 +7,6 @@ import {
   NearBindgen,
   NearPromise,
   PromiseOrValue,
-  bytes,
   serialize,
 } from "near-sdk-js";
 import { AccountId } from "near-sdk-js";
@@ -66,7 +65,7 @@ export class TokenReceiver
         const account_id = near.currentAccountId();
         return NearPromise.new(account_id).functionCall(
           "ok_go",
-          bytes(serialize({ return_it: true })),
+          serialize({ return_it: true }),
           0n,
           prepaid_gas - GAS_FOR_NFT_ON_TRANSFER
         );
@@ -78,7 +77,7 @@ export class TokenReceiver
         const account_id = near.currentAccountId();
         return NearPromise.new(account_id).functionCall(
           "ok_go",
-          bytes(serialize({ return_it: false })),
+          serialize({ return_it: false }),
           0n,
           prepaid_gas - GAS_FOR_NFT_ON_TRANSFER
         );

@@ -1,4 +1,12 @@
-import { NearBindgen, call, view, initialize, near, bytes } from "near-sdk-js";
+import {
+  NearBindgen,
+  call,
+  view,
+  initialize,
+  near,
+  bytes,
+  str,
+} from "near-sdk-js";
 
 @NearBindgen({ requireInit: true })
 export class OnCall {
@@ -37,7 +45,7 @@ export class OnCall {
   @call({ privateFunction: true })
   _set_person_on_call_private({ accountId }) {
     near.log(`_set_person_on_call_private called, accountId ${accountId}`);
-    const status = JSON.parse(near.promiseResult(0));
+    const status = JSON.parse(str(near.promiseResult(0)));
     near.log(`${accountId} status is ${status}`);
     if (status === "AVAILABLE") {
       this.personOnCall = accountId;

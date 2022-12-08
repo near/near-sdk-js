@@ -7,6 +7,7 @@ import {
   LookupMap,
   bytes,
   assert,
+  str,
 } from "near-sdk-js";
 
 class Token {
@@ -103,7 +104,7 @@ export class NftContract {
     near.log(
       `_nftResolveTransfer called, receiver_id ${receiver_id}, token_id ${token_id}`
     );
-    const isTokenTransfered = JSON.parse(near.promiseResult(0));
+    const isTokenTransfered = JSON.parse(str(near.promiseResult(0)));
     near.log(
       `${token_id} ${
         isTokenTransfered ? "was transfered" : "was NOT transfered"
