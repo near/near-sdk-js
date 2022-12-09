@@ -87,12 +87,15 @@ class FungibleToken implements FungibleTokenCore, StorageManagement, FungibleTok
 
     internal_withdraw(account_id: AccountId, amount: Balance) {
         let balance = this.internal_unwrap_balance_of(account_id);
-        if let Some(new_balance) = balance.checked_sub(amount) {
-            this.accounts.insert(account_id, &new_balance);
-            this.total_supply = self
-                .total_supply
-                .checked_sub(amount)
-                .unwrap_or_else(|| throw Error(ERR_TOTAL_SUPPLY_OVERFLOW));
+        let new_balance = balance - amount;
+        // TODO: is it the right check?
+        if (!Number.isSafeInteger(new_balance)) {
+            this.accounts.insert(account_id, new_balance);
+            let new_total_supply = this.total_supply - amount;
+            if (!Number.isSafeInteger(new_total_supply)) {
+                throw Error(ERR_TOTAL_SUPPLY_OVERFLOW);
+            }
+            this.total_supply = new_total_supply;
         } else {
             throw Error("The account doesn't have enough balance");
         }
