@@ -56,33 +56,33 @@ class FungibleToken implements FungibleTokenCore, StorageManagement, FungibleTok
     @call({})
     measure_account_storage_usage() {
         let initial_storage_usage = near.storageUsage();
-        let tmp_account_id = AccountId::new_unchecked("a".repeat(64));
-        this.accounts.insert(&tmp_account_id, &0number);
+        let tmp_account_id = "a".repeat(64);
+        this.accounts.insert(tmp_account_id, 0n);
         this.account_storage_usage = near.storageUsage() - initial_storage_usage;
         this.accounts.remove(tmp_account_id);
     }
 
     @view({})
     internal_unwrap_balance_of(account_id: AccountId) : Balance {
-        match this.accounts.get(account_id) {
-            Some(balance) => balance,
-            None => {
-                throw Error(`The account ${account_id} is not registered`);
-            }
+        let balance = this.accounts.get(account_id);
+        if (balance === null) {
+            throw Error(`The account ${account_id} is not registered`);
         }
+        return balance;
     }
 
     internal_deposit(account_id: AccountId, amount: Balance) {
         let balance = this.internal_unwrap_balance_of(account_id);
-        if let Some(new_balance) = balance.checked_add(amount) {
-            this.accounts.insert(account_id, &new_balance);
-            this.total_supply = self
-                .total_supply
-                .checked_add(amount)
-                .unwrap_or_else(|| throw Error(ERR_TOTAL_SUPPLY_OVERFLOW));
-        } else {
+        let new_balance = balance + amount;
+        if (!Number.isSafeInteger(new_balance)) {
             throw Error("Balance overflow");
         }
+        this.accounts.insert(account_id, new_balance);
+        let new_total_supply = this.total_supply + amount;
+        if (!Number.isSafeInteger(new_total_supply)) {
+            throw Error(ERR_TOTAL_SUPPLY_OVERFLOW);
+        }
+        this.total_supply = new_total_supply;
     }
 
     internal_withdraw(account_id: AccountId, amount: Balance) {
