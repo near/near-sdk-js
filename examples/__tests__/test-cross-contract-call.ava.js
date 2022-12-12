@@ -52,13 +52,12 @@ test("Person can be set on-call if AVAILABLE", async (t) => {
   // Ali set her status as AVAILABLE
   await ali.call(statusMessage, "set_status", { message: "AVAILABLE" });
   // Bob sets Ali on-call
-  let r = await bob.callRaw(
+  await bob.call(
     onCall,
     "set_person_on_call",
     { accountId: ali.accountId },
     { gas: 120000000000000 }
   );
-  console.log(JSON.stringify(r, null, 2));
 
   // Check that Ali is on-call
   t.is(await onCall.view("person_on_call", {}), ali.accountId);

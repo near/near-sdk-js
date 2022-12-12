@@ -234,7 +234,6 @@ test("promise batch deploy contract and call", async (t) => {
     "",
     { gas: "300 Tgas" }
   );
-  console.log(JSON.stringify(r, null, 2));
 
   let deployed = caller2Contract.getSubAccount("b");
   t.deepEqual(JSON.parse(Buffer.from(r.result.status.SuccessValue, "base64")), {

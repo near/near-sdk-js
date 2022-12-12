@@ -135,6 +135,7 @@ interface Env {
   promise_result(promiseIndex: bigint, register: Register): PromiseResult;
   promise_return(promiseIndex: bigint): void;
 
+  // These are exported C functions that not part of NEAR VM Logic (host functions)
   uint8array_to_latin1_string(a: Uint8Array): string;
   uint8array_to_utf8_string(a: Uint8Array): string;
   latin1_string_to_uint8array(s: string): Uint8Array;
