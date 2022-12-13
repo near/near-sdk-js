@@ -63,7 +63,7 @@ export class UnorderedSet<DataType> {
   ): boolean {
     const indexLookup =
       this.elementIndexPrefix + serializeValueWithOptions(element, options);
-    return near.storageHasKey(encode(indexLookup));
+    return near.storageHasKey(indexLookup);
   }
 
   /**
@@ -80,13 +80,13 @@ export class UnorderedSet<DataType> {
     const indexLookup =
       this.elementIndexPrefix + serializeValueWithOptions(element, options);
 
-    if (near.storageRead(encode(indexLookup))) {
+    if (near.storageRead(indexLookup)) {
       return false;
     }
 
     const nextIndex = this.length;
     const nextIndexRaw = serializeIndex(nextIndex);
-    near.storageWrite(encode(indexLookup), nextIndexRaw);
+    near.storageWriteRaw(encode(indexLookup), nextIndexRaw);
     this.elements.push(element, options);
 
     return true;
@@ -101,7 +101,7 @@ export class UnorderedSet<DataType> {
   remove(element: DataType, options?: GetOptions<DataType>): boolean {
     const indexLookup =
       this.elementIndexPrefix + serializeValueWithOptions(element, options);
-    const indexRaw = near.storageRead(encode(indexLookup));
+    const indexRaw = near.storageReadRaw(encode(indexLookup));
 
     if (!indexRaw) {
       return false;
@@ -110,7 +110,7 @@ export class UnorderedSet<DataType> {
     // If there is only one element then swap remove simply removes it without
     // swapping with the last element.
     if (this.length === 1) {
-      near.storageRemove(encode(indexLookup));
+      near.storageRemove(indexLookup);
 
       const index = deserializeIndex(indexRaw);
       this.elements.swapRemove(index);
@@ -124,7 +124,7 @@ export class UnorderedSet<DataType> {
 
     assert(!!lastElement, ERR_INCONSISTENT_STATE);
 
-    near.storageRemove(encode(indexLookup));
+    near.storageRemove(indexLookup);
 
     // If the removed element was the last element from keys, then we don't need to
     // reinsert the lookup back.
@@ -132,7 +132,7 @@ export class UnorderedSet<DataType> {
       const lastLookupElement =
         this.elementIndexPrefix +
         serializeValueWithOptions(lastElement, options);
-      near.storageWrite(encode(lastLookupElement), indexRaw);
+      near.storageWriteRaw(encode(lastLookupElement), indexRaw);
     }
 
     const index = deserializeIndex(indexRaw);
@@ -148,7 +148,7 @@ export class UnorderedSet<DataType> {
     for (const element of this.elements) {
       const indexLookup =
         this.elementIndexPrefix + serializeValueWithOptions(element, options);
-      near.storageRemove(encode(indexLookup));
+      near.storageRemove(indexLookup);
     }
 
     this.elements.clear();

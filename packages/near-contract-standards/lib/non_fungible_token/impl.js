@@ -1,4 +1,4 @@
-import { UnorderedMap, LookupMap, near, UnorderedSet, assert, NearPromise, bytes, serialize, str, concat, } from "near-sdk-js";
+import { UnorderedMap, LookupMap, near, UnorderedSet, assert, NearPromise, bytes, serialize, str, } from "near-sdk-js";
 import { TokenMetadata } from "./metadata";
 import { refund_storage_deposit, refund_deposit, refund_deposit_to_account, assert_at_least_one_yocto, assert_one_yocto, } from "./utils";
 import { NftMint, NftTransfer } from "./events";
@@ -114,7 +114,7 @@ export class NonFungibleToken {
         const storage_used = new_approved_account_ids_size - old_approved_account_ids_size;
         refund_deposit(BigInt(storage_used));
         if (msg) {
-            return NearPromise.new(account_id).functionCall("nft_on_approve", serialize({ token_id, owner_id, approval_id, msg }), 0n, near.prepaidGas() - GAS_FOR_NFT_APPROVE);
+            return NearPromise.new(account_id).functionCallRaw("nft_on_approve", serialize({ token_id, owner_id, approval_id, msg }), 0n, near.prepaidGas() - GAS_FOR_NFT_APPROVE);
         }
         return null;
     }
@@ -182,8 +182,8 @@ export class NonFungibleToken {
         let next_approval_id_by_id;
         if (approval_prefix) {
             const prefix = approval_prefix.into_storage_key();
-            approvals_by_id = new LookupMap(str(prefix));
-            next_approval_id_by_id = new LookupMap(str(prefix) + "n");
+            approvals_by_id = new LookupMap(prefix);
+            next_approval_id_by_id = new LookupMap(prefix + "n");
         }
         else {
             approvals_by_id = null;
@@ -191,12 +191,12 @@ export class NonFungibleToken {
         }
         this.owner_id = owner_id;
         this.extra_storage_in_bytes_per_token = 0n;
-        this.owner_by_id = new UnorderedMap(str(owner_by_id_prefix.into_storage_key()));
+        this.owner_by_id = new UnorderedMap(owner_by_id_prefix.into_storage_key());
         this.token_metadata_by_id = token_metadata_prefix
-            ? new LookupMap(str(token_metadata_prefix.into_storage_key()))
+            ? new LookupMap(token_metadata_prefix.into_storage_key())
             : null;
         this.tokens_per_owner = enumeration_prefix
-            ? new LookupMap(str(enumeration_prefix.into_storage_key()))
+            ? new LookupMap(enumeration_prefix.into_storage_key())
             : null;
         this.approvals_by_id = approvals_by_id;
         this.next_approval_id_by_id = next_approval_id_by_id;
@@ -231,7 +231,7 @@ export class NonFungibleToken {
             this.token_metadata_by_id.set(tmp_token_id, new TokenMetadata(repeat("a", 64), repeat("a", 64), repeat("a", 64), repeat("a", 64), 1n, null, null, null, null, null, null, null));
         }
         if (this.tokens_per_owner) {
-            const u = new UnorderedSet(str(new TokensPerOwner(near.sha256(bytes(tmp_owner_id))).into_storage_key()));
+            const u = new UnorderedSet(new TokensPerOwner(near.sha256(bytes(tmp_owner_id))).into_storage_key());
             u.set(tmp_token_id);
             this.tokens_per_owner.set(tmp_owner_id, u);
         }
@@ -284,7 +284,7 @@ export class NonFungibleToken {
                 reconstructor: UnorderedSet.reconstruct,
             });
             if (receiver_tokens_set === null) {
-                receiver_tokens_set = new UnorderedSet(str(new TokensPerOwner(near.sha256(bytes(to))).into_storage_key()));
+                receiver_tokens_set = new UnorderedSet(new TokensPerOwner(near.sha256(bytes(to))).into_storage_key());
             }
             receiver_tokens_set.set(token_id);
             this.tokens_per_owner.set(to, receiver_tokens_set);
@@ -343,7 +343,7 @@ export class NonFungibleToken {
                 reconstructor: UnorderedSet.reconstruct,
             });
             if (token_ids === null) {
-                token_ids = new UnorderedSet(str(new TokensPerOwner(near.sha256(bytes(owner_id))).into_storage_key()));
+                token_ids = new UnorderedSet(new TokensPerOwner(near.sha256(bytes(owner_id))).into_storage_key());
             }
             token_ids.set(token_id);
             this.tokens_per_owner.set(owner_id, token_ids);
@@ -366,13 +366,13 @@ export class NonFungibleToken {
         const sender_id = near.predecessorAccountId();
         const [previous_owner_id, approved_account_ids] = this.internal_transfer(sender_id, receiver_id, token_id, approval_id, memo);
         const promise = NearPromise.new(receiver_id)
-            .functionCall("nft_on_transfer", bytes(JSON.stringify({ sender_id, previous_owner_id, token_id, msg })), 0n, near.prepaidGas() - GAS_FOR_NFT_TRANSFER_CALL)
-            .then(NearPromise.new(near.currentAccountId()).functionCall("nft_resolve_transfer", bytes(JSON.stringify({
+            .functionCall("nft_on_transfer", JSON.stringify({ sender_id, previous_owner_id, token_id, msg }), 0n, near.prepaidGas() - GAS_FOR_NFT_TRANSFER_CALL)
+            .then(NearPromise.new(near.currentAccountId()).functionCall("nft_resolve_transfer", JSON.stringify({
             previous_owner_id,
             receiver_id,
             token_id,
             approved_account_ids,
-        })), 0n, GAS_FOR_RESOLVE_TRANSFER));
+        }), 0n, GAS_FOR_RESOLVE_TRANSFER));
         return promise;
     }
     nft_token({ token_id }) {
@@ -390,7 +390,7 @@ export class NonFungibleToken {
         let must_revert = false;
         let p;
         try {
-            p = str(near.promiseResult(0));
+            p = near.promiseResult(0);
         }
         catch (e) {
             if (e.message.includes("Not Ready")) {
@@ -448,7 +448,7 @@ export class TokensPerOwner {
         this.account_hash = account_hash;
     }
     into_storage_key() {
-        return concat(bytes("\x00"), this.account_hash);
+        return "\x00" + str(this.account_hash);
     }
 }
 export class TokenPerOwnerInner {
@@ -456,6 +456,6 @@ export class TokenPerOwnerInner {
         this.account_id_hash = account_id_hash;
     }
     into_storage_key() {
-        return concat(bytes("\x01"), this.account_id_hash);
+        return "\x01" + str(this.account_id_hash);
     }
 }

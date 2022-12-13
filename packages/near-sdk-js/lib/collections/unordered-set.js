@@ -42,7 +42,7 @@ export class UnorderedSet {
      */
     contains(element, options) {
         const indexLookup = this.elementIndexPrefix + serializeValueWithOptions(element, options);
-        return near.storageHasKey(encode(indexLookup));
+        return near.storageHasKey(indexLookup);
     }
     /**
      * If the set did not have this value present, `true` is returned.
@@ -53,12 +53,12 @@ export class UnorderedSet {
      */
     set(element, options) {
         const indexLookup = this.elementIndexPrefix + serializeValueWithOptions(element, options);
-        if (near.storageRead(encode(indexLookup))) {
+        if (near.storageRead(indexLookup)) {
             return false;
         }
         const nextIndex = this.length;
         const nextIndexRaw = serializeIndex(nextIndex);
-        near.storageWrite(encode(indexLookup), nextIndexRaw);
+        near.storageWriteRaw(encode(indexLookup), nextIndexRaw);
         this.elements.push(element, options);
         return true;
     }
@@ -70,14 +70,14 @@ export class UnorderedSet {
      */
     remove(element, options) {
         const indexLookup = this.elementIndexPrefix + serializeValueWithOptions(element, options);
-        const indexRaw = near.storageRead(encode(indexLookup));
+        const indexRaw = near.storageReadRaw(encode(indexLookup));
         if (!indexRaw) {
             return false;
         }
         // If there is only one element then swap remove simply removes it without
         // swapping with the last element.
         if (this.length === 1) {
-            near.storageRemove(encode(indexLookup));
+            near.storageRemove(indexLookup);
             const index = deserializeIndex(indexRaw);
             this.elements.swapRemove(index);
             return true;
@@ -86,13 +86,13 @@ export class UnorderedSet {
         // element.
         const lastElement = this.elements.get(this.length - 1, options);
         assert(!!lastElement, ERR_INCONSISTENT_STATE);
-        near.storageRemove(encode(indexLookup));
+        near.storageRemove(indexLookup);
         // If the removed element was the last element from keys, then we don't need to
         // reinsert the lookup back.
         if (lastElement !== element) {
             const lastLookupElement = this.elementIndexPrefix +
                 serializeValueWithOptions(lastElement, options);
-            near.storageWrite(encode(lastLookupElement), indexRaw);
+            near.storageWriteRaw(encode(lastLookupElement), indexRaw);
         }
         const index = deserializeIndex(indexRaw);
         this.elements.swapRemove(index);
@@ -104,7 +104,7 @@ export class UnorderedSet {
     clear(options) {
         for (const element of this.elements) {
             const indexLookup = this.elementIndexPrefix + serializeValueWithOptions(element, options);
-            near.storageRemove(encode(indexLookup));
+            near.storageRemove(indexLookup);
         }
         this.elements.clear();
     }

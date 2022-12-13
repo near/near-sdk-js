@@ -63,7 +63,7 @@ export class TokenReceiver
       case "return-it-later": {
         const prepaid_gas = near.prepaidGas();
         const account_id = near.currentAccountId();
-        return NearPromise.new(account_id).functionCall(
+        return NearPromise.new(account_id).functionCallRaw(
           "ok_go",
           serialize({ return_it: true }),
           0n,
@@ -75,7 +75,7 @@ export class TokenReceiver
       case "keep-it-later": {
         const prepaid_gas = near.prepaidGas();
         const account_id = near.currentAccountId();
-        return NearPromise.new(account_id).functionCall(
+        return NearPromise.new(account_id).functionCallRaw(
           "ok_go",
           serialize({ return_it: false }),
           0n,

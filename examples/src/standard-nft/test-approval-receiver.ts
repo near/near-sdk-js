@@ -55,7 +55,7 @@ export class ApprovalReceiver
       default: {
         const prepaid_gas = near.prepaidGas();
         const account_id = near.currentAccountId();
-        return NearPromise.new(account_id).functionCall(
+        return NearPromise.new(account_id).functionCallRaw(
           "ok_go",
           serialize({ msg }),
           0n,

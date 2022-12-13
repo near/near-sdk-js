@@ -9,7 +9,6 @@ import {
   bytes,
   serialize,
   str,
-  concat,
 } from "near-sdk-js";
 import { TokenMetadata } from "./metadata";
 import {
@@ -213,7 +212,7 @@ export class NonFungibleToken
     refund_deposit(BigInt(storage_used));
 
     if (msg) {
-      return NearPromise.new(account_id).functionCall(
+      return NearPromise.new(account_id).functionCallRaw(
         "nft_on_approve",
         serialize({ token_id, owner_id, approval_id, msg }),
         0n,
@@ -332,8 +331,8 @@ export class NonFungibleToken
     let next_approval_id_by_id: Option<LookupMap<bigint>>;
     if (approval_prefix) {
       const prefix = approval_prefix.into_storage_key();
-      approvals_by_id = new LookupMap(str(prefix));
-      next_approval_id_by_id = new LookupMap(str(prefix) + "n");
+      approvals_by_id = new LookupMap(prefix);
+      next_approval_id_by_id = new LookupMap(prefix + "n");
     } else {
       approvals_by_id = null;
       next_approval_id_by_id = null;
@@ -342,13 +341,13 @@ export class NonFungibleToken
     this.owner_id = owner_id;
     this.extra_storage_in_bytes_per_token = 0n;
     this.owner_by_id = new UnorderedMap(
-      str(owner_by_id_prefix.into_storage_key())
+      owner_by_id_prefix.into_storage_key()
     );
     this.token_metadata_by_id = token_metadata_prefix
-      ? new LookupMap(str(token_metadata_prefix.into_storage_key()))
+      ? new LookupMap(token_metadata_prefix.into_storage_key())
       : null;
     this.tokens_per_owner = enumeration_prefix
-      ? new LookupMap(str(enumeration_prefix.into_storage_key()))
+      ? new LookupMap(enumeration_prefix.into_storage_key())
       : null;
     this.approvals_by_id = approvals_by_id;
     this.next_approval_id_by_id = next_approval_id_by_id;
@@ -407,11 +406,9 @@ export class NonFungibleToken
     }
     if (this.tokens_per_owner) {
       const u = new UnorderedSet<AccountId>(
-        str(
           new TokensPerOwner(
             near.sha256(bytes(tmp_owner_id))
           ).into_storage_key()
-        )
       );
       u.set(tmp_token_id);
       this.tokens_per_owner.set(tmp_owner_id, u);
@@ -474,7 +471,7 @@ export class NonFungibleToken
       });
       if (receiver_tokens_set === null) {
         receiver_tokens_set = new UnorderedSet<TokenId>(
-          str(new TokensPerOwner(near.sha256(bytes(to))).into_storage_key())
+          new TokensPerOwner(near.sha256(bytes(to))).into_storage_key()
         );
       }
       receiver_tokens_set.set(token_id);
@@ -584,9 +581,7 @@ export class NonFungibleToken
       });
       if (token_ids === null) {
         token_ids = new UnorderedSet(
-          str(
             new TokensPerOwner(near.sha256(bytes(owner_id))).into_storage_key()
-          )
         );
       }
       token_ids.set(token_id);
@@ -647,21 +642,19 @@ export class NonFungibleToken
     const promise = NearPromise.new(receiver_id)
       .functionCall(
         "nft_on_transfer",
-        bytes(JSON.stringify({ sender_id, previous_owner_id, token_id, msg })),
+        JSON.stringify({ sender_id, previous_owner_id, token_id, msg }),
         0n,
         near.prepaidGas() - GAS_FOR_NFT_TRANSFER_CALL
       )
       .then(
         NearPromise.new(near.currentAccountId()).functionCall(
           "nft_resolve_transfer",
-          bytes(
             JSON.stringify({
               previous_owner_id,
               receiver_id,
               token_id,
               approved_account_ids,
-            })
-          ),
+            }),
           0n,
           GAS_FOR_RESOLVE_TRANSFER
         )
@@ -697,7 +690,7 @@ export class NonFungibleToken
     let must_revert = false;
     let p: string;
     try {
-      p = str(near.promiseResult(0));
+      p = near.promiseResult(0);
     } catch (e) {
       if (e.message.includes("Not Ready")) {
         throw new Error();
@@ -767,15 +760,15 @@ export type StorageKey = TokensPerOwner | TokenPerOwnerInner;
 export class TokensPerOwner implements IntoStorageKey {
   constructor(public account_hash: Uint8Array) {}
 
-  into_storage_key(): Uint8Array {
-    return concat(bytes("\x00"), this.account_hash);
+  into_storage_key(): string {
+    return "\x00" + str(this.account_hash);
   }
 }
 
 export class TokenPerOwnerInner implements IntoStorageKey {
   constructor(public account_id_hash: Uint8Array) {}
 
-  into_storage_key(): Uint8Array {
-    return concat(bytes("\x01"), this.account_id_hash);
+  into_storage_key(): string {
+    return "\x01" + str(this.account_id_hash);
   }
 }

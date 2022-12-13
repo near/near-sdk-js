@@ -17,7 +17,7 @@ export class LookupMap {
      */
     containsKey(key) {
         const storageKey = this.keyPrefix + key;
-        return near.storageHasKey(encode(storageKey));
+        return near.storageHasKey(storageKey);
     }
     /**
      * Get the data stored at the provided key.
@@ -27,7 +27,7 @@ export class LookupMap {
      */
     get(key, options) {
         const storageKey = this.keyPrefix + key;
-        const value = near.storageRead(encode(storageKey));
+        const value = near.storageReadRaw(encode(storageKey));
         return getValueWithOptions(value, options);
     }
     /**
@@ -38,10 +38,10 @@ export class LookupMap {
      */
     remove(key, options) {
         const storageKey = this.keyPrefix + key;
-        if (!near.storageRemove(encode(storageKey))) {
+        if (!near.storageRemove(storageKey)) {
             return options?.defaultValue ?? null;
         }
-        const value = near.storageGetEvicted();
+        const value = near.storageGetEvictedRaw();
         return getValueWithOptions(value, options);
     }
     /**
@@ -54,10 +54,10 @@ export class LookupMap {
     set(key, newValue, options) {
         const storageKey = this.keyPrefix + key;
         const storageValue = serializeValueWithOptions(newValue, options);
-        if (!near.storageWrite(encode(storageKey), storageValue)) {
+        if (!near.storageWriteRaw(encode(storageKey), storageValue)) {
             return options?.defaultValue ?? null;
         }
-        const value = near.storageGetEvicted();
+        const value = near.storageGetEvictedRaw();
         return getValueWithOptions(value, options);
     }
     /**

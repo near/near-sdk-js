@@ -1,6 +1,6 @@
 import * as near from "../api";
 import { GetOptions } from "../types/collections";
-import { serializeValueWithOptions, encode } from "../utils";
+import { serializeValueWithOptions } from "../utils";
 
 /**
  * A lookup set collection that stores entries in NEAR storage.
@@ -22,7 +22,7 @@ export class LookupSet<DataType> {
     options?: Pick<GetOptions<DataType>, "serializer">
   ): boolean {
     const storageKey = this.keyPrefix + serializeValueWithOptions(key, options);
-    return near.storageHasKey(encode(storageKey));
+    return near.storageHasKey(storageKey);
   }
 
   /**
@@ -36,7 +36,7 @@ export class LookupSet<DataType> {
     options?: Pick<GetOptions<DataType>, "serializer">
   ): boolean {
     const storageKey = this.keyPrefix + serializeValueWithOptions(key, options);
-    return near.storageRemove(encode(storageKey));
+    return near.storageRemove(storageKey);
   }
 
   /**
@@ -51,7 +51,7 @@ export class LookupSet<DataType> {
     options?: Pick<GetOptions<DataType>, "serializer">
   ): boolean {
     const storageKey = this.keyPrefix + serializeValueWithOptions(key, options);
-    return !near.storageWrite(encode(storageKey), new Uint8Array());
+    return !near.storageWrite(storageKey, "");
   }
 
   /**

@@ -97,10 +97,10 @@ export type StorageKey = TokensPerOwner | TokenPerOwnerInner;
 export declare class TokensPerOwner implements IntoStorageKey {
     account_hash: Uint8Array;
     constructor(account_hash: Uint8Array);
-    into_storage_key(): Uint8Array;
+    into_storage_key(): string;
 }
 export declare class TokenPerOwnerInner implements IntoStorageKey {
     account_id_hash: Uint8Array;
     constructor(account_id_hash: Uint8Array);
-    into_storage_key(): Uint8Array;
+    into_storage_key(): string;
 }

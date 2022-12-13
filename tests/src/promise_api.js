@@ -1,4 +1,4 @@
-import { near, str, bytes } from "near-sdk-js";
+import { near, bytes } from "near-sdk-js";
 
 function arrayN(n) {
   return [...Array(Number(n)).keys()];
@@ -10,9 +10,9 @@ export function just_panic() {
 
 export function write_some_state() {
   // Attempt to write something in state. If this one is successfully executed and not revoked, these should be in state
-  near.storageWrite(bytes("aaa"), bytes("bbb"));
-  near.storageWrite(bytes("ccc"), bytes("ddd"));
-  near.storageWrite(bytes("eee"), bytes("fff"));
+  near.storageWrite("aaa", "bbb");
+  near.storageWrite("ccc", "ddd");
+  near.storageWrite("eee", "fff");
 }
 
 function callingData() {
@@ -20,7 +20,7 @@ function callingData() {
     currentAccountId: near.currentAccountId(),
     signerAccountId: near.signerAccountId(),
     predecessorAccountId: near.predecessorAccountId(),
-    input: str(near.input()),
+    input: near.input(),
   };
 }
 
@@ -38,7 +38,7 @@ export function cross_contract_callback() {
       JSON.stringify({
         ...callingData(),
         promiseResults: arrayN(near.promiseResultsCount()).map((i) =>
-          str(near.promiseResult(i))
+          near.promiseResult(i)
         ),
       })
     )

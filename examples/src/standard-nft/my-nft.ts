@@ -32,26 +32,26 @@ import { NonFungibleTokenEnumeration } from "near-contract-standards/lib/non_fun
 class StorageKey {}
 
 class StorageKeyNonFungibleToken extends StorageKey implements IntoStorageKey {
-  into_storage_key(): Uint8Array {
-    return bytes("NFT_");
+  into_storage_key(): string {
+    return "NFT_";
   }
 }
 
 class StorageKeyTokenMetadata extends StorageKey implements IntoStorageKey {
-  into_storage_key(): Uint8Array {
-    return bytes("TOKEN_METADATA_");
+  into_storage_key(): string {
+    return "TOKEN_METADATA_";
   }
 }
 
 class StorageKeyTokenEnumeration extends StorageKey implements IntoStorageKey {
-  into_storage_key(): Uint8Array {
-    return bytes("TOKEN_ENUMERATION_");
+  into_storage_key(): string {
+    return "TOKEN_ENUMERATION_";
   }
 }
 
 class StorageKeyApproval extends StorageKey implements IntoStorageKey {
-  into_storage_key(): Uint8Array {
-    return bytes("APPROVAL1_");
+  into_storage_key(): string {
+    return "APPROVAL1_";
   }
 }
 

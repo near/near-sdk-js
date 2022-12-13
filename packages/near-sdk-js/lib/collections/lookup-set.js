@@ -1,5 +1,5 @@
 import * as near from "../api";
-import { serializeValueWithOptions, encode } from "../utils";
+import { serializeValueWithOptions } from "../utils";
 /**
  * A lookup set collection that stores entries in NEAR storage.
  */
@@ -18,7 +18,7 @@ export class LookupSet {
      */
     contains(key, options) {
         const storageKey = this.keyPrefix + serializeValueWithOptions(key, options);
-        return near.storageHasKey(encode(storageKey));
+        return near.storageHasKey(storageKey);
     }
     /**
      * Returns true if the element was present in the set.
@@ -28,7 +28,7 @@ export class LookupSet {
      */
     remove(key, options) {
         const storageKey = this.keyPrefix + serializeValueWithOptions(key, options);
-        return near.storageRemove(encode(storageKey));
+        return near.storageRemove(storageKey);
     }
     /**
      * If the set did not have this value present, `true` is returned.
@@ -39,7 +39,7 @@ export class LookupSet {
      */
     set(key, options) {
         const storageKey = this.keyPrefix + serializeValueWithOptions(key, options);
-        return !near.storageWrite(encode(storageKey), new Uint8Array());
+        return !near.storageWrite(storageKey, "");
     }
     /**
      * Extends the current collection with the passed in array of elements.

@@ -22,7 +22,7 @@ export class LookupMap<DataType> {
    */
   containsKey(key: string): boolean {
     const storageKey = this.keyPrefix + key;
-    return near.storageHasKey(encode(storageKey));
+    return near.storageHasKey(storageKey);
   }
 
   /**
@@ -36,7 +36,7 @@ export class LookupMap<DataType> {
     options?: Omit<GetOptions<DataType>, "serializer">
   ): DataType | null {
     const storageKey = this.keyPrefix + key;
-    const value = near.storageRead(encode(storageKey));
+    const value = near.storageReadRaw(encode(storageKey));
 
     return getValueWithOptions(value, options);
   }
@@ -53,11 +53,11 @@ export class LookupMap<DataType> {
   ): DataType | null {
     const storageKey = this.keyPrefix + key;
 
-    if (!near.storageRemove(encode(storageKey))) {
+    if (!near.storageRemove(storageKey)) {
       return options?.defaultValue ?? null;
     }
 
-    const value = near.storageGetEvicted();
+    const value = near.storageGetEvictedRaw();
 
     return getValueWithOptions(value, options);
   }
@@ -77,11 +77,11 @@ export class LookupMap<DataType> {
     const storageKey = this.keyPrefix + key;
     const storageValue = serializeValueWithOptions(newValue, options);
 
-    if (!near.storageWrite(encode(storageKey), storageValue)) {
+    if (!near.storageWriteRaw(encode(storageKey), storageValue)) {
       return options?.defaultValue ?? null;
     }
 
-    const value = near.storageGetEvicted();
+    const value = near.storageGetEvictedRaw();
 
     return getValueWithOptions(value, options);
   }

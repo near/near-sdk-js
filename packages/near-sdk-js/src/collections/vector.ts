@@ -51,7 +51,7 @@ export class Vector<DataType> {
     }
 
     const storageKey = indexToKey(this.prefix, index);
-    const value = near.storageRead(bytes(storageKey));
+    const value = near.storageReadRaw(bytes(storageKey));
 
     return getValueWithOptions(value, options);
   }
@@ -75,11 +75,14 @@ export class Vector<DataType> {
     const last = this.pop(options);
 
     assert(
-      near.storageWrite(bytes(key), serializeValueWithOptions(last, options)),
+      near.storageWriteRaw(
+        bytes(key),
+        serializeValueWithOptions(last, options)
+      ),
       ERR_INCONSISTENT_STATE
     );
 
-    const value = near.storageGetEvicted();
+    const value = near.storageGetEvictedRaw();
 
     return getValueWithOptions(value, options);
   }
@@ -97,7 +100,10 @@ export class Vector<DataType> {
     const key = indexToKey(this.prefix, this.length);
     this.length += 1;
 
-    near.storageWrite(bytes(key), serializeValueWithOptions(element, options));
+    near.storageWriteRaw(
+      bytes(key),
+      serializeValueWithOptions(element, options)
+    );
   }
 
   /**
@@ -114,9 +120,9 @@ export class Vector<DataType> {
     const lastKey = indexToKey(this.prefix, lastIndex);
     this.length -= 1;
 
-    assert(near.storageRemove(bytes(lastKey)), ERR_INCONSISTENT_STATE);
+    assert(near.storageRemoveRaw(bytes(lastKey)), ERR_INCONSISTENT_STATE);
 
-    const value = near.storageGetEvicted();
+    const value = near.storageGetEvictedRaw();
 
     return getValueWithOptions(value, options);
   }
@@ -137,14 +143,14 @@ export class Vector<DataType> {
     const key = indexToKey(this.prefix, index);
 
     assert(
-      near.storageWrite(
+      near.storageWriteRaw(
         bytes(key),
         serializeValueWithOptions(element, options)
       ),
       ERR_INCONSISTENT_STATE
     );
 
-    const value = near.storageGetEvicted();
+    const value = near.storageGetEvictedRaw();
 
     return getValueWithOptions(value, options);
   }
@@ -200,7 +206,7 @@ export class Vector<DataType> {
   clear(): void {
     for (let index = 0; index < this.length; index++) {
       const key = indexToKey(this.prefix, index);
-      near.storageRemove(bytes(key));
+      near.storageRemoveRaw(bytes(key));
     }
 
     this.length = 0;

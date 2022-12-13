@@ -1,23 +1,19 @@
-import { NearBindgen, call, view, near, encode, decode } from "near-sdk-js";
+import { NearBindgen, call, view, near } from "near-sdk-js";
 
 @NearBindgen({})
 export class CleanState {
   @call({})
   clean({ keys }) {
-    keys.forEach((key) => near.storageRemove(encode(key)));
+    keys.forEach((key) => near.storageRemove(key));
   }
 
   @call({})
   put({ key, value }) {
-    near.storageWrite(encode(key), encode(value));
+    near.storageWrite(key, value);
   }
 
   @view({})
   get({ key }) {
-    let raw = near.storageRead(encode(key));
-    if (raw !== null) {
-      return decode(raw);
-    }
-    return null;
+    return near.storageRead(key);
   }
 }

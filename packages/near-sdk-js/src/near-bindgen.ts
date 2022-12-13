@@ -1,5 +1,5 @@
 import * as near from "./api";
-import { deserialize, serialize, bytes, encode, decode } from "./utils";
+import { deserialize, serialize, bytes, encode } from "./utils";
 
 type EmptyParameterObject = Record<never, never>;
 type AnyObject = Record<string, unknown>;
@@ -166,16 +166,16 @@ export function NearBindgen({
       }
 
       static _getState(): unknown | null {
-        const rawState = near.storageRead(bytes("STATE"));
+        const rawState = near.storageReadRaw(bytes("STATE"));
         return rawState ? this._deserialize(rawState) : null;
       }
 
       static _saveToStorage(objectToSave: unknown): void {
-        near.storageWrite(bytes("STATE"), this._serialize(objectToSave));
+        near.storageWriteRaw(bytes("STATE"), this._serialize(objectToSave));
       }
 
       static _getArgs(): unknown {
-        return JSON.parse(decode(near.input()) || "{}");
+        return JSON.parse(near.input() || "{}");
       }
 
       static _serialize(value: unknown, forReturn = false): Uint8Array {

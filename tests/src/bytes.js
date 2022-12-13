@@ -34,29 +34,29 @@ export function log_invalid_utf16_sequence_test() {
 }
 
 export function storage_write_bytes() {
-  near.storageWrite(bytes("abc"), bytes("def"));
-  near.storageWrite(bytes("\x00\x01\xff"), bytes("\xe6\xb0\xb4"));
-  near.storageWrite(bytes("\xe6\xb0\xb4"), bytes("\x00ab"));
+  near.storageWriteRaw(bytes("abc"), bytes("def"));
+  near.storageWriteRaw(bytes("\x00\x01\xff"), bytes("\xe6\xb0\xb4"));
+  near.storageWriteRaw(bytes("\xe6\xb0\xb4"), bytes("\x00ab"));
 }
 
 export function storage_write_utf8() {
-  near.storageWrite(encode("水"), encode("😂"));
+  near.storageWrite("水", "😂");
 }
 
 export function storage_read_utf8() {
-  near.valueReturn(near.storageRead(encode("水")));
+  near.valueReturn(near.storageRead("水"));
 }
 
 export function storage_read_ascii_bytes() {
-  near.valueReturn(near.storageRead(bytes("abc")));
+  near.valueReturn(near.storageRead("abc"));
 }
 
 export function storage_read_arbitrary_bytes_key_utf8_sequence_bytes_value() {
-  near.valueReturn(near.storageRead(bytes("\x00\x01\xff")));
+  near.valueReturnRaw(near.storageReadRaw(bytes("\x00\x01\xff")));
 }
 
 export function storage_read_utf8_sequence_bytes_key_arbitrary_bytes_value() {
-  near.valueReturn(near.storageRead(bytes("\xe6\xb0\xb4")));
+  near.valueReturnRaw(near.storageReadRaw(bytes("\xe6\xb0\xb4")));
 }
 
 export function panic_test() {

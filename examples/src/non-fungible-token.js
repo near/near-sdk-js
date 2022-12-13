@@ -7,7 +7,6 @@ import {
   LookupMap,
   bytes,
   assert,
-  str,
 } from "near-sdk-js";
 
 class Token {
@@ -78,14 +77,12 @@ export class NftContract {
     near.promiseBatchActionFunctionCall(
       promise,
       "nftOnTransfer",
-      bytes(
         JSON.stringify({
           senderId: sender_id,
           previousOwnerId: old_owner_id,
           tokenId: token_id,
           msg: msg,
-        })
-      ),
+        }),
       0,
       30000000000000
     );
@@ -93,7 +90,7 @@ export class NftContract {
       promise,
       near.currentAccountId(),
       "_nftResolveTransfer",
-      bytes(JSON.stringify({ sender_id, receiver_id, token_id })),
+      JSON.stringify({ sender_id, receiver_id, token_id }),
       0,
       30000000000000
     );
@@ -104,7 +101,7 @@ export class NftContract {
     near.log(
       `_nftResolveTransfer called, receiver_id ${receiver_id}, token_id ${token_id}`
     );
-    const isTokenTransfered = JSON.parse(str(near.promiseResult(0)));
+    const isTokenTransfered = JSON.parse(near.promiseResult(0));
     near.log(
       `${token_id} ${
         isTokenTransfered ? "was transfered" : "was NOT transfered"

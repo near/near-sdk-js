@@ -7,7 +7,6 @@ import {
   LookupMap,
   assert,
   validateAccountId,
-  encode,
 } from "near-sdk-js";
 
 @NearBindgen({ requireInit: true })
@@ -210,7 +209,7 @@ export class FungibleToken {
     near.promiseBatchActionFunctionCall(
       promise,
       "ft_on_transfer",
-      encode(JSON.stringify(params)),
+      JSON.stringify(params),
       0,
       30000000000000
     );

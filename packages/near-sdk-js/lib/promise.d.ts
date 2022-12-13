@@ -40,6 +40,25 @@ export declare class DeployContract extends PromiseAction {
  */
 export declare class FunctionCall extends PromiseAction {
     functionName: string;
+    args: string;
+    amount: Balance;
+    gas: Gas;
+    /**
+     * @param functionName - The name of the function to be called.
+     * @param args - The utf-8 string arguments to be passed to the function.
+     * @param amount - The amount of NEAR to attach to the call.
+     * @param gas - The amount of Gas to attach to the call.
+     */
+    constructor(functionName: string, args: string, amount: Balance, gas: Gas);
+    add(promiseIndex: PromiseIndex): void;
+}
+/**
+ * A function call raw promise action.
+ *
+ * @extends {PromiseAction}
+ */
+export declare class FunctionCallRaw extends PromiseAction {
+    functionName: string;
     args: Uint8Array;
     amount: Balance;
     gas: Gas;
@@ -58,6 +77,27 @@ export declare class FunctionCall extends PromiseAction {
  * @extends {PromiseAction}
  */
 export declare class FunctionCallWeight extends PromiseAction {
+    functionName: string;
+    args: string;
+    amount: Balance;
+    gas: Gas;
+    weight: GasWeight;
+    /**
+     * @param functionName - The name of the function to be called.
+     * @param args - The utf-8 string arguments to be passed to the function.
+     * @param amount - The amount of NEAR to attach to the call.
+     * @param gas - The amount of Gas to attach to the call.
+     * @param weight - The weight of unused Gas to use.
+     */
+    constructor(functionName: string, args: string, amount: Balance, gas: Gas, weight: GasWeight);
+    add(promiseIndex: PromiseIndex): void;
+}
+/**
+ * A function call weight raw promise action.
+ *
+ * @extends {PromiseAction}
+ */
+export declare class FunctionCallWeightRaw extends PromiseAction {
     functionName: string;
     args: Uint8Array;
     amount: Balance;
@@ -211,13 +251,32 @@ export declare class NearPromise {
      * Creates a function call promise action and adds it to the current promise.
      *
      * @param functionName - The name of the function to be called.
+     * @param args - The utf-8 string arguments to be passed to the function.
+     * @param amount - The amount of NEAR to attach to the call.
+     * @param gas - The amount of Gas to attach to the call.
+     */
+    functionCall(functionName: string, args: string, amount: Balance, gas: Gas): NearPromise;
+    /**
+     * Creates a function call raw promise action and adds it to the current promise.
+     *
+     * @param functionName - The name of the function to be called.
      * @param args - The arguments to be passed to the function.
      * @param amount - The amount of NEAR to attach to the call.
      * @param gas - The amount of Gas to attach to the call.
      */
-    functionCall(functionName: string, args: Uint8Array, amount: Balance, gas: Gas): NearPromise;
+    functionCallRaw(functionName: string, args: Uint8Array, amount: Balance, gas: Gas): NearPromise;
     /**
      * Creates a function call weight promise action and adds it to the current promise.
+     *
+     * @param functionName - The name of the function to be called.
+     * @param args - The utf-8 string arguments to be passed to the function.
+     * @param amount - The amount of NEAR to attach to the call.
+     * @param gas - The amount of Gas to attach to the call.
+     * @param weight - The weight of unused Gas to use.
+     */
+    functionCallWeight(functionName: string, args: string, amount: Balance, gas: Gas, weight: GasWeight): NearPromise;
+    /**
+     * Creates a function call weight raw promise action and adds it to the current promise.
      *
      * @param functionName - The name of the function to be called.
      * @param args - The arguments to be passed to the function.
@@ -225,7 +284,7 @@ export declare class NearPromise {
      * @param gas - The amount of Gas to attach to the call.
      * @param weight - The weight of unused Gas to use.
      */
-    functionCallWeight(functionName: string, args: Uint8Array, amount: Balance, gas: Gas, weight: GasWeight): NearPromise;
+    functionCallWeightRaw(functionName: string, args: Uint8Array, amount: Balance, gas: Gas, weight: GasWeight): NearPromise;
     /**
      * Creates a transfer promise action and adds it to the current promise.
      *

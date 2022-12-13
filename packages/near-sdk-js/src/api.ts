@@ -1,4 +1,12 @@
-import { assert, NearAmount, PromiseIndex, Register, str } from "./utils";
+import {
+  assert,
+  NearAmount,
+  PromiseIndex,
+  Register,
+  str,
+  encode,
+  decode,
+} from "./utils";
 import { GasWeight, PromiseResult } from "./types";
 
 const U64_MAX = 2n ** 64n - 1n;
@@ -271,7 +279,7 @@ export function accountLockedBalance(): bigint {
  *
  * @param key - The key to read from storage.
  */
-export function storageRead(key: Uint8Array): Uint8Array | null {
+export function storageReadRaw(key: Uint8Array): Uint8Array | null {
   const returnValue = env.storage_read(key, 0);
 
   if (returnValue !== 1n) {
@@ -282,19 +290,48 @@ export function storageRead(key: Uint8Array): Uint8Array | null {
 }
 
 /**
+ * Reads the utf-8 string value from NEAR storage that is stored under the provided key.
+ *
+ * @param key - The utf-8 string key to read from storage.
+ */
+export function storageRead(key: string): string | null {
+  const ret = storageReadRaw(encode(key));
+  if (ret !== null) {
+    return decode(ret);
+  }
+  return null;
+}
+
+/**
  * Checks for the existance of a value under the provided key in NEAR storage.
  *
  * @param key - The key to check for in storage.
  */
-export function storageHasKey(key: Uint8Array): boolean {
+export function storageHasKeyRaw(key: Uint8Array): boolean {
   return env.storage_has_key(key) === 1n;
+}
+
+/**
+ * Checks for the existance of a value under the provided utf-8 string key in NEAR storage.
+ *
+ * @param key - The utf-8 string key to check for in storage.
+ */
+export function storageHasKey(key: string): boolean {
+  return storageHasKeyRaw(encode(key));
 }
 
 /**
  * Get the last written or removed value from NEAR storage.
  */
-export function storageGetEvicted(): Uint8Array {
+export function storageGetEvictedRaw(): Uint8Array {
   return env.read_register(EVICTED_REGISTER);
+}
+
+/**
+ * Get the last written or removed value from NEAR storage as utf-8 string.
+ */
+export function storageGetEvicted(): string {
+  return decode(storageGetEvictedRaw());
 }
 
 /**
@@ -310,8 +347,18 @@ export function storageUsage(): bigint {
  * @param key - The key under which to store the value.
  * @param value - The value to store.
  */
-export function storageWrite(key: Uint8Array, value: Uint8Array): boolean {
+export function storageWriteRaw(key: Uint8Array, value: Uint8Array): boolean {
   return env.storage_write(key, value, EVICTED_REGISTER) === 1n;
+}
+
+/**
+ * Writes the provided utf-8 string to NEAR storage under the provided key.
+ *
+ * @param key - The utf-8 string key under which to store the value.
+ * @param value - The utf-8 string value to store.
+ */
+export function storageWrite(key: string, value: string): boolean {
+  return storageWriteRaw(encode(key), encode(value));
 }
 
 /**
@@ -319,8 +366,17 @@ export function storageWrite(key: Uint8Array, value: Uint8Array): boolean {
  *
  * @param key - The key to be removed.
  */
-export function storageRemove(key: Uint8Array): boolean {
+export function storageRemoveRaw(key: Uint8Array): boolean {
   return env.storage_remove(key, EVICTED_REGISTER) === 1n;
+}
+
+/**
+ * Removes the value of the provided utf-8 string key from NEAR storage.
+ *
+ * @param key - The utf-8 string key to be removed.
+ */
+export function storageRemove(key: string): boolean {
+  return storageRemoveRaw(encode(key));
 }
 
 /**
@@ -333,9 +389,16 @@ export function storageByteCost(): bigint {
 /**
  * Returns the arguments passed to the current smart contract call.
  */
-export function input(): Uint8Array {
+export function inputRaw(): Uint8Array {
   env.input(0);
   return env.read_register(0);
+}
+
+/**
+ * Returns the arguments passed to the current smart contract call as utf-8 string.
+ */
+export function input(): string {
+  return decode(inputRaw());
 }
 
 /**
@@ -343,8 +406,17 @@ export function input(): Uint8Array {
  *
  * @param value - The value to return.
  */
-export function valueReturn(value: Uint8Array): void {
+export function valueReturnRaw(value: Uint8Array): void {
   env.value_return(value);
+}
+
+/**
+ * Returns the utf-8 string value from the NEAR WASM virtual machine.
+ *
+ * @param value - The utf-8 string value to return.
+ */
+export function valueReturn(value: string): void {
+  valueReturnRaw(encode(value));
 }
 
 /**
@@ -364,7 +436,7 @@ export function randomSeed(): Uint8Array {
  * @param amount - The amount of NEAR attached to the call.
  * @param gas - The amount of Gas attached to the call.
  */
-export function promiseCreate(
+export function promiseCreateRaw(
   accountId: string,
   methodName: string,
   args: Uint8Array,
@@ -381,6 +453,25 @@ export function promiseCreate(
 }
 
 /**
+ * Create a NEAR promise call to a contract on the blockchain.
+ *
+ * @param accountId - The account ID of the target contract.
+ * @param methodName - The name of the method to be called.
+ * @param args - The utf-8 string arguments to call the method with.
+ * @param amount - The amount of NEAR attached to the call.
+ * @param gas - The amount of Gas attached to the call.
+ */
+export function promiseCreate(
+  accountId: string,
+  methodName: string,
+  args: string,
+  amount: NearAmount,
+  gas: NearAmount
+): PromiseIndex {
+  return promiseCreateRaw(accountId, methodName, encode(args), amount, gas);
+}
+
+/**
  * Attach a callback NEAR promise to be executed after a provided promise.
  *
  * @param promiseIndex - The promise after which to call the callback.
@@ -390,7 +481,7 @@ export function promiseCreate(
  * @param amount - The amount of NEAR to attach to the call.
  * @param gas - The amount of Gas to attach to the call.
  */
-export function promiseThen(
+export function promiseThenRaw(
   promiseIndex: PromiseIndex,
   accountId: string,
   methodName: string,
@@ -406,6 +497,34 @@ export function promiseThen(
     amount,
     gas
   ) as unknown as PromiseIndex;
+}
+
+/**
+ * Attach a callback NEAR promise to be executed after a provided promise.
+ *
+ * @param promiseIndex - The promise after which to call the callback.
+ * @param accountId - The account ID of the contract to perform the callback on.
+ * @param methodName - The name of the method to call.
+ * @param args - The utf-8 string arguments to call the method with.
+ * @param amount - The amount of NEAR to attach to the call.
+ * @param gas - The amount of Gas to attach to the call.
+ */
+export function promiseThen(
+  promiseIndex: PromiseIndex,
+  accountId: string,
+  methodName: string,
+  args: string,
+  amount: NearAmount,
+  gas: NearAmount
+): PromiseIndex {
+  return promiseThenRaw(
+    promiseIndex,
+    accountId,
+    methodName,
+    encode(args),
+    amount,
+    gas
+  );
 }
 
 /**
@@ -480,7 +599,7 @@ export function promiseBatchActionDeployContract(
  * @param amount - The amount of NEAR to attach to the call.
  * @param gas - The amount of Gas to attach to the call.
  */
-export function promiseBatchActionFunctionCall(
+export function promiseBatchActionFunctionCallRaw(
   promiseIndex: PromiseIndex,
   methodName: string,
   args: Uint8Array,
@@ -491,6 +610,31 @@ export function promiseBatchActionFunctionCall(
     promiseIndex as unknown as bigint,
     methodName,
     args,
+    amount,
+    gas
+  );
+}
+
+/**
+ * Attach a function call promise action to the NEAR promise index with the provided promise index.
+ *
+ * @param promiseIndex - The index of the promise to attach a function call action to.
+ * @param methodName - The name of the method to be called.
+ * @param args - The utf-8 string arguments to call the method with.
+ * @param amount - The amount of NEAR to attach to the call.
+ * @param gas - The amount of Gas to attach to the call.
+ */
+export function promiseBatchActionFunctionCall(
+  promiseIndex: PromiseIndex,
+  methodName: string,
+  args: string,
+  amount: NearAmount,
+  gas: NearAmount
+): void {
+  promiseBatchActionFunctionCallRaw(
+    promiseIndex,
+    methodName,
+    encode(args),
     amount,
     gas
   );
@@ -617,7 +761,7 @@ export function promiseBatchActionDeleteAccount(
  * @param gas - The amount of Gas to attach to the call.
  * @param weight - The weight of unused Gas to use.
  */
-export function promiseBatchActionFunctionCallWeight(
+export function promiseBatchActionFunctionCallWeightRaw(
   promiseIndex: PromiseIndex,
   methodName: string,
   args: Uint8Array,
@@ -636,6 +780,34 @@ export function promiseBatchActionFunctionCallWeight(
 }
 
 /**
+ * Attach a function call with weight promise action to the NEAR promise index with the provided promise index.
+ *
+ * @param promiseIndex - The index of the promise to attach a function call with weight action to.
+ * @param methodName - The name of the method to be called.
+ * @param args - The utf-8 string arguments to call the method with.
+ * @param amount - The amount of NEAR to attach to the call.
+ * @param gas - The amount of Gas to attach to the call.
+ * @param weight - The weight of unused Gas to use.
+ */
+export function promiseBatchActionFunctionCallWeight(
+  promiseIndex: PromiseIndex,
+  methodName: string,
+  args: string,
+  amount: NearAmount,
+  gas: NearAmount,
+  weight: GasWeight
+): void {
+  env.promise_batch_action_function_call_weight(
+    promiseIndex as unknown as bigint,
+    methodName,
+    encode(args),
+    amount,
+    gas,
+    weight
+  );
+}
+
+/**
  * The number of promise results available.
  */
 export function promiseResultsCount(): bigint {
@@ -647,7 +819,7 @@ export function promiseResultsCount(): bigint {
  *
  * @param promiseIndex - The index of the promise to return the result for.
  */
-export function promiseResult(promiseIndex: PromiseIndex): Uint8Array {
+export function promiseResultRaw(promiseIndex: PromiseIndex): Uint8Array {
   const status = env.promise_result(promiseIndex as unknown as bigint, 0);
 
   assert(
@@ -662,6 +834,15 @@ export function promiseResult(promiseIndex: PromiseIndex): Uint8Array {
   );
 
   return env.read_register(0);
+}
+
+/**
+ * Returns the result of the NEAR promise for the passed promise index as utf-8 string
+ *
+ * @param promiseIndex - The index of the promise to return the result for.
+ */
+export function promiseResult(promiseIndex: PromiseIndex): string {
+  return decode(promiseResultRaw(promiseIndex));
 }
 
 /**

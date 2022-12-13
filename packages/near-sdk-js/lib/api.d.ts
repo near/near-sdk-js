@@ -67,17 +67,33 @@ export declare function accountLockedBalance(): bigint;
  *
  * @param key - The key to read from storage.
  */
-export declare function storageRead(key: Uint8Array): Uint8Array | null;
+export declare function storageReadRaw(key: Uint8Array): Uint8Array | null;
+/**
+ * Reads the utf-8 string value from NEAR storage that is stored under the provided key.
+ *
+ * @param key - The utf-8 string key to read from storage.
+ */
+export declare function storageRead(key: string): string | null;
 /**
  * Checks for the existance of a value under the provided key in NEAR storage.
  *
  * @param key - The key to check for in storage.
  */
-export declare function storageHasKey(key: Uint8Array): boolean;
+export declare function storageHasKeyRaw(key: Uint8Array): boolean;
+/**
+ * Checks for the existance of a value under the provided utf-8 string key in NEAR storage.
+ *
+ * @param key - The utf-8 string key to check for in storage.
+ */
+export declare function storageHasKey(key: string): boolean;
 /**
  * Get the last written or removed value from NEAR storage.
  */
-export declare function storageGetEvicted(): Uint8Array;
+export declare function storageGetEvictedRaw(): Uint8Array;
+/**
+ * Get the last written or removed value from NEAR storage as utf-8 string.
+ */
+export declare function storageGetEvicted(): string;
 /**
  * Returns the current accounts NEAR storage usage.
  */
@@ -88,13 +104,26 @@ export declare function storageUsage(): bigint;
  * @param key - The key under which to store the value.
  * @param value - The value to store.
  */
-export declare function storageWrite(key: Uint8Array, value: Uint8Array): boolean;
+export declare function storageWriteRaw(key: Uint8Array, value: Uint8Array): boolean;
+/**
+ * Writes the provided utf-8 string to NEAR storage under the provided key.
+ *
+ * @param key - The utf-8 string key under which to store the value.
+ * @param value - The utf-8 string value to store.
+ */
+export declare function storageWrite(key: string, value: string): boolean;
 /**
  * Removes the value of the provided key from NEAR storage.
  *
  * @param key - The key to be removed.
  */
-export declare function storageRemove(key: Uint8Array): boolean;
+export declare function storageRemoveRaw(key: Uint8Array): boolean;
+/**
+ * Removes the value of the provided utf-8 string key from NEAR storage.
+ *
+ * @param key - The utf-8 string key to be removed.
+ */
+export declare function storageRemove(key: string): boolean;
 /**
  * Returns the cost of storing 0 Byte on NEAR storage.
  */
@@ -102,13 +131,23 @@ export declare function storageByteCost(): bigint;
 /**
  * Returns the arguments passed to the current smart contract call.
  */
-export declare function input(): Uint8Array;
+export declare function inputRaw(): Uint8Array;
+/**
+ * Returns the arguments passed to the current smart contract call as utf-8 string.
+ */
+export declare function input(): string;
 /**
  * Returns the value from the NEAR WASM virtual machine.
  *
  * @param value - The value to return.
  */
-export declare function valueReturn(value: Uint8Array): void;
+export declare function valueReturnRaw(value: Uint8Array): void;
+/**
+ * Returns the utf-8 string value from the NEAR WASM virtual machine.
+ *
+ * @param value - The utf-8 string value to return.
+ */
+export declare function valueReturn(value: string): void;
 /**
  * Returns a random string of bytes.
  */
@@ -122,7 +161,17 @@ export declare function randomSeed(): Uint8Array;
  * @param amount - The amount of NEAR attached to the call.
  * @param gas - The amount of Gas attached to the call.
  */
-export declare function promiseCreate(accountId: string, methodName: string, args: Uint8Array, amount: NearAmount, gas: NearAmount): PromiseIndex;
+export declare function promiseCreateRaw(accountId: string, methodName: string, args: Uint8Array, amount: NearAmount, gas: NearAmount): PromiseIndex;
+/**
+ * Create a NEAR promise call to a contract on the blockchain.
+ *
+ * @param accountId - The account ID of the target contract.
+ * @param methodName - The name of the method to be called.
+ * @param args - The utf-8 string arguments to call the method with.
+ * @param amount - The amount of NEAR attached to the call.
+ * @param gas - The amount of Gas attached to the call.
+ */
+export declare function promiseCreate(accountId: string, methodName: string, args: string, amount: NearAmount, gas: NearAmount): PromiseIndex;
 /**
  * Attach a callback NEAR promise to be executed after a provided promise.
  *
@@ -133,7 +182,18 @@ export declare function promiseCreate(accountId: string, methodName: string, arg
  * @param amount - The amount of NEAR to attach to the call.
  * @param gas - The amount of Gas to attach to the call.
  */
-export declare function promiseThen(promiseIndex: PromiseIndex, accountId: string, methodName: string, args: Uint8Array, amount: NearAmount, gas: NearAmount): PromiseIndex;
+export declare function promiseThenRaw(promiseIndex: PromiseIndex, accountId: string, methodName: string, args: Uint8Array, amount: NearAmount, gas: NearAmount): PromiseIndex;
+/**
+ * Attach a callback NEAR promise to be executed after a provided promise.
+ *
+ * @param promiseIndex - The promise after which to call the callback.
+ * @param accountId - The account ID of the contract to perform the callback on.
+ * @param methodName - The name of the method to call.
+ * @param args - The utf-8 string arguments to call the method with.
+ * @param amount - The amount of NEAR to attach to the call.
+ * @param gas - The amount of Gas to attach to the call.
+ */
+export declare function promiseThen(promiseIndex: PromiseIndex, accountId: string, methodName: string, args: string, amount: NearAmount, gas: NearAmount): PromiseIndex;
 /**
  * Join an arbitrary array of NEAR promises.
  *
@@ -175,7 +235,17 @@ export declare function promiseBatchActionDeployContract(promiseIndex: PromiseIn
  * @param amount - The amount of NEAR to attach to the call.
  * @param gas - The amount of Gas to attach to the call.
  */
-export declare function promiseBatchActionFunctionCall(promiseIndex: PromiseIndex, methodName: string, args: Uint8Array, amount: NearAmount, gas: NearAmount): void;
+export declare function promiseBatchActionFunctionCallRaw(promiseIndex: PromiseIndex, methodName: string, args: Uint8Array, amount: NearAmount, gas: NearAmount): void;
+/**
+ * Attach a function call promise action to the NEAR promise index with the provided promise index.
+ *
+ * @param promiseIndex - The index of the promise to attach a function call action to.
+ * @param methodName - The name of the method to be called.
+ * @param args - The utf-8 string arguments to call the method with.
+ * @param amount - The amount of NEAR to attach to the call.
+ * @param gas - The amount of Gas to attach to the call.
+ */
+export declare function promiseBatchActionFunctionCall(promiseIndex: PromiseIndex, methodName: string, args: string, amount: NearAmount, gas: NearAmount): void;
 /**
  * Attach a transfer promise action to the NEAR promise index with the provided promise index.
  *
@@ -234,7 +304,18 @@ export declare function promiseBatchActionDeleteAccount(promiseIndex: PromiseInd
  * @param gas - The amount of Gas to attach to the call.
  * @param weight - The weight of unused Gas to use.
  */
-export declare function promiseBatchActionFunctionCallWeight(promiseIndex: PromiseIndex, methodName: string, args: Uint8Array, amount: NearAmount, gas: NearAmount, weight: GasWeight): void;
+export declare function promiseBatchActionFunctionCallWeightRaw(promiseIndex: PromiseIndex, methodName: string, args: Uint8Array, amount: NearAmount, gas: NearAmount, weight: GasWeight): void;
+/**
+ * Attach a function call with weight promise action to the NEAR promise index with the provided promise index.
+ *
+ * @param promiseIndex - The index of the promise to attach a function call with weight action to.
+ * @param methodName - The name of the method to be called.
+ * @param args - The utf-8 string arguments to call the method with.
+ * @param amount - The amount of NEAR to attach to the call.
+ * @param gas - The amount of Gas to attach to the call.
+ * @param weight - The weight of unused Gas to use.
+ */
+export declare function promiseBatchActionFunctionCallWeight(promiseIndex: PromiseIndex, methodName: string, args: string, amount: NearAmount, gas: NearAmount, weight: GasWeight): void;
 /**
  * The number of promise results available.
  */
@@ -244,7 +325,13 @@ export declare function promiseResultsCount(): bigint;
  *
  * @param promiseIndex - The index of the promise to return the result for.
  */
-export declare function promiseResult(promiseIndex: PromiseIndex): Uint8Array;
+export declare function promiseResultRaw(promiseIndex: PromiseIndex): Uint8Array;
+/**
+ * Returns the result of the NEAR promise for the passed promise index as utf-8 string
+ *
+ * @param promiseIndex - The index of the promise to return the result for.
+ */
+export declare function promiseResult(promiseIndex: PromiseIndex): string;
 /**
  * Executes the promise in the NEAR WASM virtual machine.
  *
