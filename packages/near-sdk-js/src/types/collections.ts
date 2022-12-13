@@ -17,11 +17,11 @@ export interface GetOptions<DataType> {
    *
    * @param valueToSerialize - The value that will be serialized - either the `DataType` or a unknown value.
    */
-  serializer?(valueToSerialize: unknown): string;
+  serializer?(valueToSerialize: unknown): Uint8Array;
   /**
    * A deserializer function to customize the deserialization of values after reading from NEAR storage for this call.
    *
-   * @param valueToDeserialize - The string retrieved from NEAR storage to deserialize.
+   * @param valueToDeserialize - The Uint8Array retrieved from NEAR storage to deserialize.
    */
-  deserializer?(valueToDeserialize: string): unknown;
+  deserializer?(valueToDeserialize: Uint8Array): unknown;
 }

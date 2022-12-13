@@ -1,5 +1,5 @@
-import { bytes } from "../utils";
 import { base58 } from "@scure/base";
+import { concat } from "../utils";
 export var CurveType;
 (function (CurveType) {
     CurveType[CurveType["ED25519"] = 0] = "ED25519";
@@ -81,11 +81,11 @@ export class PublicKey {
      * @param data - The string you want to create a PublicKey from.
      */
     constructor(data) {
-        const curveLenght = dataLength(data.charCodeAt(0));
+        const curveLenght = dataLength(data[0]);
         if (data.length !== curveLenght + 1) {
             throw new InvalidLengthError(data.length, curveLenght + 1);
         }
-        this.type = getCurveType(data.charCodeAt(0));
+        this.type = getCurveType(data[0]);
         this.data = data;
     }
     /**
@@ -103,11 +103,11 @@ export class PublicKey {
         const [curve, keyData] = splitKeyTypeData(publicKeyString);
         let data;
         try {
-            data = bytes(base58.decode(keyData));
+            data = base58.decode(keyData);
         }
         catch (error) {
             throw new Base58Error(error.message);
         }
-        return new PublicKey(`${String.fromCharCode(curve)}${data}`);
+        return new PublicKey(concat(new Uint8Array([curve]), data));
     }
 }

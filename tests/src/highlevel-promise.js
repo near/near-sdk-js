@@ -1,4 +1,4 @@
-import { NearBindgen, call, NearPromise, near, bytes } from "near-sdk-js";
+import { NearBindgen, call, NearPromise, near } from "near-sdk-js";
 import { PublicKey } from "near-sdk-js";
 
 function callingData() {
@@ -71,14 +71,14 @@ export class HighlevelPromiseContract {
     let promise = NearPromise.new("callee-contract.test.near")
       .functionCall(
         "cross_contract_callee",
-        bytes("abc"),
+        "abc",
         0,
         2 * Math.pow(10, 13)
       )
       .then(
         NearPromise.new("highlevel-promise.test.near").functionCall(
           "cross_contract_callback",
-          bytes(JSON.stringify({ callbackArg1: "def" })),
+          JSON.stringify({ callbackArg1: "def" }),
           0,
           2 * Math.pow(10, 13)
         )
@@ -90,13 +90,13 @@ export class HighlevelPromiseContract {
   test_promise_and() {
     let promise = NearPromise.new("callee-contract.test.near").functionCall(
       "cross_contract_callee",
-      bytes("abc"),
+      "abc",
       0,
       2 * Math.pow(10, 13)
     );
     let promise2 = NearPromise.new("callee-contract.test.near").functionCall(
       "cross_contract_callee",
-      bytes("def"),
+      "def",
       0,
       2 * Math.pow(10, 13)
     );
@@ -105,7 +105,7 @@ export class HighlevelPromiseContract {
       .then(
         NearPromise.new("highlevel-promise.test.near").functionCall(
           "cross_contract_callback",
-          bytes(JSON.stringify({ callbackArg1: "ghi" })),
+          JSON.stringify({ callbackArg1: "ghi" }),
           0,
           3 * Math.pow(10, 13)
         )
@@ -138,7 +138,7 @@ export class HighlevelPromiseContract {
   callee_panic() {
     let promise = NearPromise.new("callee-contract.test.near").functionCall(
       "just_panic",
-      bytes(""),
+      "",
       0,
       2 * Math.pow(10, 13)
     );
@@ -150,7 +150,7 @@ export class HighlevelPromiseContract {
     near.log("log before call the callee");
     let promise = NearPromise.new("callee-contract.test.near").functionCall(
       "just_panic",
-      bytes(""),
+      "",
       0,
       2 * Math.pow(10, 13)
     );
@@ -161,11 +161,11 @@ export class HighlevelPromiseContract {
   @call({})
   callee_panic_then() {
     let promise = NearPromise.new("callee-contract.test.near")
-      .functionCall("just_panic", bytes(""), 0, 2 * Math.pow(10, 13))
+      .functionCall("just_panic", "", 0, 2 * Math.pow(10, 13))
       .then(
         NearPromise.new("highlevel-promise.test.near").functionCall(
           "cross_contract_callback_write_state",
-          bytes(""),
+          "",
           0,
           2 * Math.pow(10, 13)
         )
@@ -177,13 +177,13 @@ export class HighlevelPromiseContract {
   callee_panic_and() {
     let promise = NearPromise.new("callee-contract.test.near").functionCall(
       "just_panic",
-      bytes(""),
+      "",
       0,
       2 * Math.pow(10, 13)
     );
     let promise2 = NearPromise.new("callee-contract.test.near").functionCall(
       "write_some_state",
-      bytes(""),
+      "",
       0,
       2 * Math.pow(10, 13)
     );
@@ -192,7 +192,7 @@ export class HighlevelPromiseContract {
       .then(
         NearPromise.new("highlevel-promise.test.near").functionCall(
           "cross_contract_callback_write_state",
-          bytes(""),
+          "",
           0,
           3 * Math.pow(10, 13)
         )
@@ -204,11 +204,11 @@ export class HighlevelPromiseContract {
   @call({})
   callee_success_then_panic() {
     let promise = NearPromise.new("callee-contract.test.near")
-      .functionCall("write_some_state", bytes("abc"), 0, 2 * Math.pow(10, 13))
+      .functionCall("write_some_state", "abc", 0, 2 * Math.pow(10, 13))
       .then(
         NearPromise.new("callee-contract.test.near").functionCall(
           "just_panic",
-          bytes(""),
+          "",
           0,
           2 * Math.pow(10, 13)
         )
@@ -234,11 +234,11 @@ export class HighlevelPromiseContract {
   @call({})
   handle_error_in_promise_then() {
     let promise = NearPromise.new("callee-contract.test.near")
-      .functionCall("just_panic", bytes(""), 0, 2 * Math.pow(10, 13))
+      .functionCall("just_panic", "", 0, 2 * Math.pow(10, 13))
       .then(
         NearPromise.new("highlevel-promise.test.near").functionCall(
           "handler",
-          bytes(JSON.stringify({ promiseId: 0 })),
+          JSON.stringify({ promiseId: 0 }),
           0,
           2 * Math.pow(10, 13)
         )
@@ -251,14 +251,14 @@ export class HighlevelPromiseContract {
     let promise = NearPromise.new("callee-contract.test.near")
       .functionCall(
         "cross_contract_callee",
-        bytes("abc"),
+        "abc",
         0,
         2 * Math.pow(10, 13)
       )
       .and(
         NearPromise.new("callee-contract.test.near").functionCall(
           "just_panic",
-          bytes(""),
+          "",
           0,
           2 * Math.pow(10, 13)
         )
@@ -266,7 +266,7 @@ export class HighlevelPromiseContract {
       .then(
         NearPromise.new("highlevel-promise.test.near").functionCall(
           "handler",
-          bytes(JSON.stringify({ promiseId: 1 })),
+          JSON.stringify({ promiseId: 1 }),
           0,
           2 * Math.pow(10, 13)
         )

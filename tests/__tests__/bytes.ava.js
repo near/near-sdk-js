@@ -12,10 +12,11 @@ test.beforeEach(async (t) => {
   const bytesContract = await root.devDeploy("build/bytes.wasm");
   // Test users
   const ali = await root.createSubAccount("ali");
+  const bob = await root.createSubAccount("bob");
 
   // Save state for test runs
   t.context.worker = worker;
-  t.context.accounts = { root, bytesContract, ali };
+  t.context.accounts = { root, bytesContract, ali, bob };
 });
 
 test.afterEach.always(async (t) => {
@@ -43,9 +44,13 @@ test("Log unexpected types not logging", async (t) => {
   const { ali, bytesContract } = t.context.accounts;
 
   let r = await ali.callRaw(bytesContract, "log_unexpected_input_tests", "");
-  // logUtf8 and logUtf16 only works with bytes, trying to log it with string is unexpected and behavior is undefined
-  // in this specific case, it logs nothing
-  t.deepEqual(r.result.receipts_outcome[0].outcome.logs, ["", ""]);
+  // logUtf8 and logUtf16 only works with bytes, trying to log it with string is error
+  t.assert(
+    r.result.status.Failure.ActionError.kind.FunctionCallError.ExecutionError.startsWith(
+      "Smart contract panicked: Expect Uint8Array for message"
+    )
+  );
+  t.deepEqual(r.result.receipts_outcome[0].outcome.logs, []);
 });
 
 test("Log invalid utf-8 sequence panic", async (t) => {
@@ -83,7 +88,7 @@ function encodeStateKey(k) {
   return Buffer.from(k).toString("base64");
 }
 
-test("storage write bytes tests", async (t) => {
+test("storage write bytes tests. Any latin1 string: ascii, valid or invalid utf-8 sequence can be convert to Uint8Array correctly", async (t) => {
   const { ali, bytesContract } = t.context.accounts;
 
   await ali.call(bytesContract, "storage_write_bytes", "");
@@ -108,24 +113,12 @@ test("storage write bytes tests", async (t) => {
   );
 });
 
-test("storage write unexpected types tests", async (t) => {
+test("storage write utf8, utf8 string convert to Uint8Array tests", async (t) => {
   const { ali, bytesContract } = t.context.accounts;
 
-  await ali.call(bytesContract, "storage_write_unexpected_input", "");
-  let stateMap = new Map();
-  // viewState doesn't work, because it tries to convert key to utf-8 string, which is not
-  let state = await bytesContract.viewStateRaw();
-  for (let { key, value } of state) {
-    stateMap.set(key, value);
-  }
-
-  t.deepEqual(
-    stateMap.get(encodeStateKey("123")),
-    Buffer.from("456").toString("base64")
-  );
-  // pass in utf-8 string instead of bytes, key and value become empty
-  t.deepEqual(stateMap.get(encodeStateKey([0xe6, 0xb0, 0xb4])), undefined);
-  t.deepEqual(stateMap.get(encodeStateKey([])), "");
+  await ali.call(bytesContract, "storage_write_utf8", "");
+  let r = await bytesContract.viewRaw("storage_read_utf8", "");
+  t.deepEqual(r.result, [...Buffer.from("😂", "utf-8")]);
 });
 
 test("Storage read bytes tests", async (t) => {
@@ -206,4 +199,37 @@ test("panic tests", async (t) => {
       .FunctionCallError.ExecutionError,
     "String encoding is bad UTF-8 sequence."
   );
+});
+
+test("utf8 string can be convert to Uint8Array correctly", async (t) => {
+  const { bob, bytesContract } = t.context.accounts;
+
+  let res = await bob.callRaw(
+    bytesContract,
+    "utf8_string_to_uint8array_tests",
+    ""
+  );
+  t.is(res.result.status.SuccessValue, "");
+});
+
+test("valid utf8 sequence can be convert to string correctly", async (t) => {
+  const { bob, bytesContract } = t.context.accounts;
+
+  let res = await bob.callRaw(
+    bytesContract,
+    "uint8array_to_utf8_string_tests",
+    ""
+  );
+  t.is(res.result.status.SuccessValue, "");
+});
+
+test("latin1 sequence can be convert to string correctly", async (t) => {
+  const { bob, bytesContract } = t.context.accounts;
+
+  let res = await bob.callRaw(
+    bytesContract,
+    "uint8array_to_latin1_string_tests",
+    ""
+  );
+  t.is(res.result.status.SuccessValue, "");
 });

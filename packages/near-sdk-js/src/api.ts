@@ -1,4 +1,12 @@
-import { assert, Bytes, NearAmount, PromiseIndex, Register } from "./utils";
+import {
+  assert,
+  NearAmount,
+  PromiseIndex,
+  Register,
+  str,
+  encode,
+  decode,
+} from "./utils";
 import { GasWeight, PromiseResult } from "./types";
 
 const U64_MAX = 2n ** 64n - 1n;
@@ -7,21 +15,21 @@ const EVICTED_REGISTER = U64_MAX - 1n;
 // Interface available in QuickJS
 interface Env {
   // Panic
-  panic_utf8(message: Bytes): never;
+  panic_utf8(message: Uint8Array): never;
 
   // Logging
-  log(message: Bytes): void;
-  log_utf8(message: Bytes): void;
-  log_utf16(message: Bytes): void;
+  log(message: string): void;
+  log_utf8(message: Uint8Array): void;
+  log_utf16(message: Uint8Array): void;
 
   // Read from register
-  read_register(register: Register): string;
+  read_register(register: Register): Uint8Array;
 
   // Storage
-  storage_read(key: Bytes, register: Register): bigint;
-  storage_has_key(key: Bytes): bigint;
-  storage_write(key: Bytes, value: Bytes, register: Register): bigint;
-  storage_remove(key: Bytes, register: Register): bigint;
+  storage_read(key: Uint8Array, register: Register): bigint;
+  storage_has_key(key: Uint8Array): bigint;
+  storage_write(key: Uint8Array, value: Uint8Array, register: Register): bigint;
+  storage_remove(key: Uint8Array, register: Register): bigint;
   storage_usage(): bigint;
 
   // Caller methods
@@ -35,7 +43,7 @@ interface Env {
   account_balance(): bigint;
   account_locked_balance(): bigint;
   current_account_id(register: Register): void;
-  validator_stake(accountId: Bytes): bigint;
+  validator_stake(accountId: string): bigint;
   validator_total_stake(): bigint;
 
   // Blockchain info
@@ -48,48 +56,51 @@ interface Env {
   used_gas(): bigint;
 
   // Helper methods and cryptography
-  value_return(value: Bytes): void;
+  value_return(value: Uint8Array): void;
   random_seed(register: Register): void;
-  sha256(value: Bytes, register: Register): void;
-  keccak256(value: Bytes, register: Register): void;
-  keccak512(value: Bytes, register: Register): void;
-  ripemd160(value: Bytes, register: Register): void;
+  sha256(value: Uint8Array, register: Register): void;
+  keccak256(value: Uint8Array, register: Register): void;
+  keccak512(value: Uint8Array, register: Register): void;
+  ripemd160(value: Uint8Array, register: Register): void;
   ecrecover(
-    hash: Bytes,
-    sig: Bytes,
+    hash: Uint8Array,
+    sig: Uint8Array,
     v: number,
     malleabilityFlag: number,
     register: Register
   ): bigint;
-  alt_bn128_g1_multiexp(value: Bytes, register: Register): void;
-  alt_bn128_g1_sum(value: Bytes, register: Register): void;
-  alt_bn128_pairing_check(value: Bytes): bigint;
+  alt_bn128_g1_multiexp(value: Uint8Array, register: Register): void;
+  alt_bn128_g1_sum(value: Uint8Array, register: Register): void;
+  alt_bn128_pairing_check(value: Uint8Array): bigint;
 
   // Promises
   promise_create(
-    accountId: Bytes,
-    methodName: Bytes,
-    args: Bytes,
+    accountId: string,
+    methodName: string,
+    args: Uint8Array,
     amount: NearAmount,
     gas: NearAmount
   ): bigint;
   promise_then(
     promiseIndex: bigint,
-    accountId: Bytes,
-    methodName: Bytes,
-    args: Bytes,
+    accountId: string,
+    methodName: string,
+    args: Uint8Array,
     amount: NearAmount,
     gas: NearAmount
   ): bigint;
   promise_and(...promiseIndexes: bigint[]): bigint;
-  promise_batch_create(accountId: Bytes): bigint;
-  promise_batch_then(promiseIndex: bigint, accountId: Bytes): bigint;
+  promise_batch_create(accountId: string): bigint;
+  promise_batch_then(promiseIndex: bigint, accountId: string): bigint;
   promise_batch_action_create_account(promiseIndex: bigint): void;
-  promise_batch_action_deploy_contract(promiseIndex: bigint, code: Bytes): void;
+  promise_batch_action_deploy_contract(
+    promiseIndex: bigint,
+    code: Uint8Array
+  ): void;
   promise_batch_action_function_call(
     promiseIndex: bigint,
-    methodName: Bytes,
-    args: Bytes,
+    methodName: string,
+    args: Uint8Array,
     amount: NearAmount,
     gas: NearAmount
   ): void;
@@ -97,30 +108,33 @@ interface Env {
   promise_batch_action_stake(
     promiseIndex: bigint,
     amount: NearAmount,
-    publicKey: Bytes
+    publicKey: Uint8Array
   ): void;
   promise_batch_action_add_key_with_full_access(
     promiseIndex: bigint,
-    publicKey: Bytes,
+    publicKey: Uint8Array,
     nonce: number | bigint
   ): void;
   promise_batch_action_add_key_with_function_call(
     promiseIndex: bigint,
-    publicKey: Bytes,
+    publicKey: Uint8Array,
     nonce: number | bigint,
     allowance: NearAmount,
-    receiverId: Bytes,
-    methodNames: Bytes
+    receiverId: string,
+    methodNames: string
   ): void;
-  promise_batch_action_delete_key(promiseIndex: bigint, publicKey: Bytes): void;
+  promise_batch_action_delete_key(
+    promiseIndex: bigint,
+    publicKey: Uint8Array
+  ): void;
   promise_batch_action_delete_account(
     promiseIndex: bigint,
-    beneficiaryId: Bytes
+    beneficiaryId: string
   ): void;
   promise_batch_action_function_call_weight(
     promiseIndex: bigint,
-    methodName: Bytes,
-    args: Bytes,
+    methodName: string,
+    args: Uint8Array,
     amount: NearAmount,
     gas: NearAmount,
     weight: GasWeight
@@ -128,6 +142,12 @@ interface Env {
   promise_results_count(): bigint;
   promise_result(promiseIndex: bigint, register: Register): PromiseResult;
   promise_return(promiseIndex: bigint): void;
+
+  // These are exported C functions that not part of NEAR VM Logic (host functions)
+  uint8array_to_latin1_string(a: Uint8Array): string;
+  uint8array_to_utf8_string(a: Uint8Array): string;
+  latin1_string_to_uint8array(s: string): Uint8Array;
+  utf8_string_to_uint8array(s: string): Uint8Array;
 }
 
 declare const env: Env;
@@ -159,16 +179,16 @@ export function log(...params: unknown[]): void {
  * Returns the account ID of the account that signed the transaction.
  * Can only be called in a call or initialize function.
  */
-export function signerAccountId(): Bytes {
+export function signerAccountId(): string {
   env.signer_account_id(0);
-  return env.read_register(0);
+  return str(env.read_register(0));
 }
 
 /**
  * Returns the public key of the account that signed the transaction.
  * Can only be called in a call or initialize function.
  */
-export function signerAccountPk(): Bytes {
+export function signerAccountPk(): Uint8Array {
   env.signer_account_pk(0);
   return env.read_register(0);
 }
@@ -177,17 +197,17 @@ export function signerAccountPk(): Bytes {
  * Returns the account ID of the account that called the function.
  * Can only be called in a call or initialize function.
  */
-export function predecessorAccountId(): Bytes {
+export function predecessorAccountId(): string {
   env.predecessor_account_id(0);
-  return env.read_register(0);
+  return str(env.read_register(0));
 }
 
 /**
  * Returns the account ID of the current contract - the contract that is being executed.
  */
-export function currentAccountId(): Bytes {
+export function currentAccountId(): string {
   env.current_account_id(0);
-  return env.read_register(0);
+  return str(env.read_register(0));
 }
 
 /**
@@ -259,7 +279,7 @@ export function accountLockedBalance(): bigint {
  *
  * @param key - The key to read from storage.
  */
-export function storageRead(key: Bytes): Bytes | null {
+export function storageReadRaw(key: Uint8Array): Uint8Array | null {
   const returnValue = env.storage_read(key, 0);
 
   if (returnValue !== 1n) {
@@ -270,19 +290,48 @@ export function storageRead(key: Bytes): Bytes | null {
 }
 
 /**
+ * Reads the utf-8 string value from NEAR storage that is stored under the provided key.
+ *
+ * @param key - The utf-8 string key to read from storage.
+ */
+export function storageRead(key: string): string | null {
+  const ret = storageReadRaw(encode(key));
+  if (ret !== null) {
+    return decode(ret);
+  }
+  return null;
+}
+
+/**
  * Checks for the existance of a value under the provided key in NEAR storage.
  *
  * @param key - The key to check for in storage.
  */
-export function storageHasKey(key: Bytes): boolean {
+export function storageHasKeyRaw(key: Uint8Array): boolean {
   return env.storage_has_key(key) === 1n;
+}
+
+/**
+ * Checks for the existance of a value under the provided utf-8 string key in NEAR storage.
+ *
+ * @param key - The utf-8 string key to check for in storage.
+ */
+export function storageHasKey(key: string): boolean {
+  return storageHasKeyRaw(encode(key));
 }
 
 /**
  * Get the last written or removed value from NEAR storage.
  */
-export function storageGetEvicted(): Bytes {
+export function storageGetEvictedRaw(): Uint8Array {
   return env.read_register(EVICTED_REGISTER);
+}
+
+/**
+ * Get the last written or removed value from NEAR storage as utf-8 string.
+ */
+export function storageGetEvicted(): string {
+  return decode(storageGetEvictedRaw());
 }
 
 /**
@@ -298,8 +347,18 @@ export function storageUsage(): bigint {
  * @param key - The key under which to store the value.
  * @param value - The value to store.
  */
-export function storageWrite(key: Bytes, value: Bytes): boolean {
+export function storageWriteRaw(key: Uint8Array, value: Uint8Array): boolean {
   return env.storage_write(key, value, EVICTED_REGISTER) === 1n;
+}
+
+/**
+ * Writes the provided utf-8 string to NEAR storage under the provided key.
+ *
+ * @param key - The utf-8 string key under which to store the value.
+ * @param value - The utf-8 string value to store.
+ */
+export function storageWrite(key: string, value: string): boolean {
+  return storageWriteRaw(encode(key), encode(value));
 }
 
 /**
@@ -307,8 +366,17 @@ export function storageWrite(key: Bytes, value: Bytes): boolean {
  *
  * @param key - The key to be removed.
  */
-export function storageRemove(key: Bytes): boolean {
+export function storageRemoveRaw(key: Uint8Array): boolean {
   return env.storage_remove(key, EVICTED_REGISTER) === 1n;
+}
+
+/**
+ * Removes the value of the provided utf-8 string key from NEAR storage.
+ *
+ * @param key - The utf-8 string key to be removed.
+ */
+export function storageRemove(key: string): boolean {
+  return storageRemoveRaw(encode(key));
 }
 
 /**
@@ -321,9 +389,16 @@ export function storageByteCost(): bigint {
 /**
  * Returns the arguments passed to the current smart contract call.
  */
-export function input(): Bytes {
+export function inputRaw(): Uint8Array {
   env.input(0);
   return env.read_register(0);
+}
+
+/**
+ * Returns the arguments passed to the current smart contract call as utf-8 string.
+ */
+export function input(): string {
+  return decode(inputRaw());
 }
 
 /**
@@ -331,14 +406,23 @@ export function input(): Bytes {
  *
  * @param value - The value to return.
  */
-export function valueReturn(value: Bytes): void {
+export function valueReturnRaw(value: Uint8Array): void {
   env.value_return(value);
+}
+
+/**
+ * Returns the utf-8 string value from the NEAR WASM virtual machine.
+ *
+ * @param value - The utf-8 string value to return.
+ */
+export function valueReturn(value: string): void {
+  valueReturnRaw(encode(value));
 }
 
 /**
  * Returns a random string of bytes.
  */
-export function randomSeed(): Bytes {
+export function randomSeed(): Uint8Array {
   env.random_seed(0);
   return env.read_register(0);
 }
@@ -352,14 +436,61 @@ export function randomSeed(): Bytes {
  * @param amount - The amount of NEAR attached to the call.
  * @param gas - The amount of Gas attached to the call.
  */
-export function promiseCreate(
-  accountId: Bytes,
-  methodName: Bytes,
-  args: Bytes,
+export function promiseCreateRaw(
+  accountId: string,
+  methodName: string,
+  args: Uint8Array,
   amount: NearAmount,
   gas: NearAmount
 ): PromiseIndex {
   return env.promise_create(
+    accountId,
+    methodName,
+    args,
+    amount,
+    gas
+  ) as unknown as PromiseIndex;
+}
+
+/**
+ * Create a NEAR promise call to a contract on the blockchain.
+ *
+ * @param accountId - The account ID of the target contract.
+ * @param methodName - The name of the method to be called.
+ * @param args - The utf-8 string arguments to call the method with.
+ * @param amount - The amount of NEAR attached to the call.
+ * @param gas - The amount of Gas attached to the call.
+ */
+export function promiseCreate(
+  accountId: string,
+  methodName: string,
+  args: string,
+  amount: NearAmount,
+  gas: NearAmount
+): PromiseIndex {
+  return promiseCreateRaw(accountId, methodName, encode(args), amount, gas);
+}
+
+/**
+ * Attach a callback NEAR promise to be executed after a provided promise.
+ *
+ * @param promiseIndex - The promise after which to call the callback.
+ * @param accountId - The account ID of the contract to perform the callback on.
+ * @param methodName - The name of the method to call.
+ * @param args - The arguments to call the method with.
+ * @param amount - The amount of NEAR to attach to the call.
+ * @param gas - The amount of Gas to attach to the call.
+ */
+export function promiseThenRaw(
+  promiseIndex: PromiseIndex,
+  accountId: string,
+  methodName: string,
+  args: Uint8Array,
+  amount: NearAmount,
+  gas: NearAmount
+): PromiseIndex {
+  return env.promise_then(
+    promiseIndex as unknown as bigint,
     accountId,
     methodName,
     args,
@@ -374,26 +505,26 @@ export function promiseCreate(
  * @param promiseIndex - The promise after which to call the callback.
  * @param accountId - The account ID of the contract to perform the callback on.
  * @param methodName - The name of the method to call.
- * @param args - The arguments to call the method with.
+ * @param args - The utf-8 string arguments to call the method with.
  * @param amount - The amount of NEAR to attach to the call.
  * @param gas - The amount of Gas to attach to the call.
  */
 export function promiseThen(
   promiseIndex: PromiseIndex,
-  accountId: Bytes,
-  methodName: Bytes,
-  args: Bytes,
+  accountId: string,
+  methodName: string,
+  args: string,
   amount: NearAmount,
   gas: NearAmount
 ): PromiseIndex {
-  return env.promise_then(
-    promiseIndex as unknown as bigint,
+  return promiseThenRaw(
+    promiseIndex,
     accountId,
     methodName,
-    args,
+    encode(args),
     amount,
     gas
-  ) as unknown as PromiseIndex;
+  );
 }
 
 /**
@@ -412,7 +543,7 @@ export function promiseAnd(...promiseIndexes: PromiseIndex[]): PromiseIndex {
  *
  * @param accountId - The account ID of the target contract.
  */
-export function promiseBatchCreate(accountId: Bytes): PromiseIndex {
+export function promiseBatchCreate(accountId: string): PromiseIndex {
   return env.promise_batch_create(accountId) as unknown as PromiseIndex;
 }
 
@@ -424,7 +555,7 @@ export function promiseBatchCreate(accountId: Bytes): PromiseIndex {
  */
 export function promiseBatchThen(
   promiseIndex: PromiseIndex,
-  accountId: Bytes
+  accountId: string
 ): PromiseIndex {
   return env.promise_batch_then(
     promiseIndex as unknown as bigint,
@@ -451,7 +582,7 @@ export function promiseBatchActionCreateAccount(
  */
 export function promiseBatchActionDeployContract(
   promiseIndex: PromiseIndex,
-  code: Bytes
+  code: Uint8Array
 ): void {
   env.promise_batch_action_deploy_contract(
     promiseIndex as unknown as bigint,
@@ -468,10 +599,10 @@ export function promiseBatchActionDeployContract(
  * @param amount - The amount of NEAR to attach to the call.
  * @param gas - The amount of Gas to attach to the call.
  */
-export function promiseBatchActionFunctionCall(
+export function promiseBatchActionFunctionCallRaw(
   promiseIndex: PromiseIndex,
-  methodName: Bytes,
-  args: Bytes,
+  methodName: string,
+  args: Uint8Array,
   amount: NearAmount,
   gas: NearAmount
 ): void {
@@ -479,6 +610,31 @@ export function promiseBatchActionFunctionCall(
     promiseIndex as unknown as bigint,
     methodName,
     args,
+    amount,
+    gas
+  );
+}
+
+/**
+ * Attach a function call promise action to the NEAR promise index with the provided promise index.
+ *
+ * @param promiseIndex - The index of the promise to attach a function call action to.
+ * @param methodName - The name of the method to be called.
+ * @param args - The utf-8 string arguments to call the method with.
+ * @param amount - The amount of NEAR to attach to the call.
+ * @param gas - The amount of Gas to attach to the call.
+ */
+export function promiseBatchActionFunctionCall(
+  promiseIndex: PromiseIndex,
+  methodName: string,
+  args: string,
+  amount: NearAmount,
+  gas: NearAmount
+): void {
+  promiseBatchActionFunctionCallRaw(
+    promiseIndex,
+    methodName,
+    encode(args),
     amount,
     gas
   );
@@ -507,7 +663,7 @@ export function promiseBatchActionTransfer(
 export function promiseBatchActionStake(
   promiseIndex: PromiseIndex,
   amount: NearAmount,
-  publicKey: Bytes
+  publicKey: Uint8Array
 ): void {
   env.promise_batch_action_stake(
     promiseIndex as unknown as bigint,
@@ -525,7 +681,7 @@ export function promiseBatchActionStake(
  */
 export function promiseBatchActionAddKeyWithFullAccess(
   promiseIndex: PromiseIndex,
-  publicKey: Bytes,
+  publicKey: Uint8Array,
   nonce: number | bigint
 ): void {
   env.promise_batch_action_add_key_with_full_access(
@@ -547,11 +703,11 @@ export function promiseBatchActionAddKeyWithFullAccess(
  */
 export function promiseBatchActionAddKeyWithFunctionCall(
   promiseIndex: PromiseIndex,
-  publicKey: Bytes,
+  publicKey: Uint8Array,
   nonce: number | bigint,
   allowance: NearAmount,
-  receiverId: Bytes,
-  methodNames: Bytes
+  receiverId: string,
+  methodNames: string
 ): void {
   env.promise_batch_action_add_key_with_function_call(
     promiseIndex as unknown as bigint,
@@ -571,7 +727,7 @@ export function promiseBatchActionAddKeyWithFunctionCall(
  */
 export function promiseBatchActionDeleteKey(
   promiseIndex: PromiseIndex,
-  publicKey: Bytes
+  publicKey: Uint8Array
 ): void {
   env.promise_batch_action_delete_key(
     promiseIndex as unknown as bigint,
@@ -587,7 +743,7 @@ export function promiseBatchActionDeleteKey(
  */
 export function promiseBatchActionDeleteAccount(
   promiseIndex: PromiseIndex,
-  beneficiaryId: Bytes
+  beneficiaryId: string
 ): void {
   env.promise_batch_action_delete_account(
     promiseIndex as unknown as bigint,
@@ -605,10 +761,10 @@ export function promiseBatchActionDeleteAccount(
  * @param gas - The amount of Gas to attach to the call.
  * @param weight - The weight of unused Gas to use.
  */
-export function promiseBatchActionFunctionCallWeight(
+export function promiseBatchActionFunctionCallWeightRaw(
   promiseIndex: PromiseIndex,
-  methodName: Bytes,
-  args: Bytes,
+  methodName: string,
+  args: Uint8Array,
   amount: NearAmount,
   gas: NearAmount,
   weight: GasWeight
@@ -617,6 +773,34 @@ export function promiseBatchActionFunctionCallWeight(
     promiseIndex as unknown as bigint,
     methodName,
     args,
+    amount,
+    gas,
+    weight
+  );
+}
+
+/**
+ * Attach a function call with weight promise action to the NEAR promise index with the provided promise index.
+ *
+ * @param promiseIndex - The index of the promise to attach a function call with weight action to.
+ * @param methodName - The name of the method to be called.
+ * @param args - The utf-8 string arguments to call the method with.
+ * @param amount - The amount of NEAR to attach to the call.
+ * @param gas - The amount of Gas to attach to the call.
+ * @param weight - The weight of unused Gas to use.
+ */
+export function promiseBatchActionFunctionCallWeight(
+  promiseIndex: PromiseIndex,
+  methodName: string,
+  args: string,
+  amount: NearAmount,
+  gas: NearAmount,
+  weight: GasWeight
+): void {
+  promiseBatchActionFunctionCallWeightRaw(
+    promiseIndex,
+    methodName,
+    encode(args),
     amount,
     gas,
     weight
@@ -635,7 +819,7 @@ export function promiseResultsCount(): bigint {
  *
  * @param promiseIndex - The index of the promise to return the result for.
  */
-export function promiseResult(promiseIndex: PromiseIndex): Bytes {
+export function promiseResultRaw(promiseIndex: PromiseIndex): Uint8Array {
   const status = env.promise_result(promiseIndex as unknown as bigint, 0);
 
   assert(
@@ -653,6 +837,15 @@ export function promiseResult(promiseIndex: PromiseIndex): Bytes {
 }
 
 /**
+ * Returns the result of the NEAR promise for the passed promise index as utf-8 string
+ *
+ * @param promiseIndex - The index of the promise to return the result for.
+ */
+export function promiseResult(promiseIndex: PromiseIndex): string {
+  return decode(promiseResultRaw(promiseIndex));
+}
+
+/**
  * Executes the promise in the NEAR WASM virtual machine.
  *
  * @param promiseIndex - The index of the promise to execute.
@@ -666,7 +859,7 @@ export function promiseReturn(promiseIndex: PromiseIndex): void {
  * @param value - value to be hashed, in Bytes
  * @returns hash result in Bytes
  */
-export function sha256(value: Bytes): Bytes {
+export function sha256(value: Uint8Array): Uint8Array {
   env.sha256(value, 0);
   return env.read_register(0);
 }
@@ -676,7 +869,7 @@ export function sha256(value: Bytes): Bytes {
  * @param value - value to be hashed, in Bytes
  * @returns hash result in Bytes
  */
-export function keccak256(value: Bytes): Bytes {
+export function keccak256(value: Uint8Array): Uint8Array {
   env.keccak256(value, 0);
   return env.read_register(0);
 }
@@ -686,7 +879,7 @@ export function keccak256(value: Bytes): Bytes {
  * @param value - value to be hashed, in Bytes
  * @returns hash result in Bytes
  */
-export function keccak512(value: Bytes): Bytes {
+export function keccak512(value: Uint8Array): Uint8Array {
   env.keccak512(value, 0);
   return env.read_register(0);
 }
@@ -696,7 +889,7 @@ export function keccak512(value: Bytes): Bytes {
  * @param value - value to be hashed, in Bytes
  * @returns hash result in Bytes
  */
-export function ripemd160(value: Bytes): Bytes {
+export function ripemd160(value: Uint8Array): Uint8Array {
   env.ripemd160(value, 0);
   return env.read_register(0);
 }
@@ -713,11 +906,11 @@ export function ripemd160(value: Bytes): Bytes {
  * @returns 64 bytes representing the public key if the recovery was successful.
  */
 export function ecrecover(
-  hash: Bytes,
-  sig: Bytes,
+  hash: Uint8Array,
+  sig: Uint8Array,
   v: number,
   malleabilityFlag: number
-): Bytes | null {
+): Uint8Array | null {
   const returnValue = env.ecrecover(hash, sig, v, malleabilityFlag, 0);
 
   if (returnValue === 0n) {
@@ -733,7 +926,7 @@ export function ecrecover(
  * Panic the transaction execution with given message
  * @param msg - panic message in raw bytes, which should be a valid UTF-8 sequence
  */
-export function panicUtf8(msg: Bytes): never {
+export function panicUtf8(msg: Uint8Array): never {
   env.panic_utf8(msg);
 }
 
@@ -741,7 +934,7 @@ export function panicUtf8(msg: Bytes): never {
  * Log the message in transaction logs
  * @param msg - message in raw bytes, which should be a valid UTF-8 sequence
  */
-export function logUtf8(msg: Bytes) {
+export function logUtf8(msg: Uint8Array) {
   env.log_utf8(msg);
 }
 
@@ -749,7 +942,7 @@ export function logUtf8(msg: Bytes) {
  * Log the message in transaction logs
  * @param msg - message in raw bytes, which should be a valid UTF-16 sequence
  */
-export function logUtf16(msg: Bytes) {
+export function logUtf16(msg: Uint8Array) {
   env.log_utf16(msg);
 }
 
@@ -758,7 +951,7 @@ export function logUtf16(msg: Bytes) {
  * @param accountId - validator's AccountID
  * @returns - staked amount
  */
-export function validatorStake(accountId: Bytes): bigint {
+export function validatorStake(accountId: string): bigint {
   return env.validator_stake(accountId);
 }
 
@@ -782,7 +975,7 @@ export function validatorTotalStake(): bigint {
  *
  * @returns multi exp sum
  */
-export function altBn128G1Multiexp(value: Bytes): Bytes {
+export function altBn128G1Multiexp(value: Uint8Array): Uint8Array {
   env.alt_bn128_g1_multiexp(value, 0);
   return env.read_register(0);
 }
@@ -799,7 +992,7 @@ export function altBn128G1Multiexp(value: Bytes): Bytes {
  *
  * @returns sum over Fq.
  */
-export function altBn128G1Sum(value: Bytes): Bytes {
+export function altBn128G1Sum(value: Uint8Array): Uint8Array {
   env.alt_bn128_g1_sum(value, 0);
   return env.read_register(0);
 }
@@ -819,6 +1012,6 @@ export function altBn128G1Sum(value: Bytes): Bytes {
  *
  * @returns whether pairing check pass
  */
-export function altBn128PairingCheck(value: Bytes): boolean {
+export function altBn128PairingCheck(value: Uint8Array): boolean {
   return env.alt_bn128_pairing_check(value) === 1n;
 }

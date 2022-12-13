@@ -1,4 +1,4 @@
-import { assert } from "./utils";
+import { assert, str, encode, decode, } from "./utils";
 import { PromiseResult } from "./types";
 const U64_MAX = 2n ** 64n - 1n;
 const EVICTED_REGISTER = U64_MAX - 1n;
@@ -25,7 +25,7 @@ export function log(...params) {
  */
 export function signerAccountId() {
     env.signer_account_id(0);
-    return env.read_register(0);
+    return str(env.read_register(0));
 }
 /**
  * Returns the public key of the account that signed the transaction.
@@ -41,14 +41,14 @@ export function signerAccountPk() {
  */
 export function predecessorAccountId() {
     env.predecessor_account_id(0);
-    return env.read_register(0);
+    return str(env.read_register(0));
 }
 /**
  * Returns the account ID of the current contract - the contract that is being executed.
  */
 export function currentAccountId() {
     env.current_account_id(0);
-    return env.read_register(0);
+    return str(env.read_register(0));
 }
 /**
  * Returns the current block index.
@@ -110,7 +110,7 @@ export function accountLockedBalance() {
  *
  * @param key - The key to read from storage.
  */
-export function storageRead(key) {
+export function storageReadRaw(key) {
     const returnValue = env.storage_read(key, 0);
     if (returnValue !== 1n) {
         return null;
@@ -118,18 +118,44 @@ export function storageRead(key) {
     return env.read_register(0);
 }
 /**
+ * Reads the utf-8 string value from NEAR storage that is stored under the provided key.
+ *
+ * @param key - The utf-8 string key to read from storage.
+ */
+export function storageRead(key) {
+    const ret = storageReadRaw(encode(key));
+    if (ret !== null) {
+        return decode(ret);
+    }
+    return null;
+}
+/**
  * Checks for the existance of a value under the provided key in NEAR storage.
  *
  * @param key - The key to check for in storage.
  */
-export function storageHasKey(key) {
+export function storageHasKeyRaw(key) {
     return env.storage_has_key(key) === 1n;
+}
+/**
+ * Checks for the existance of a value under the provided utf-8 string key in NEAR storage.
+ *
+ * @param key - The utf-8 string key to check for in storage.
+ */
+export function storageHasKey(key) {
+    return storageHasKeyRaw(encode(key));
 }
 /**
  * Get the last written or removed value from NEAR storage.
  */
-export function storageGetEvicted() {
+export function storageGetEvictedRaw() {
     return env.read_register(EVICTED_REGISTER);
+}
+/**
+ * Get the last written or removed value from NEAR storage as utf-8 string.
+ */
+export function storageGetEvicted() {
+    return decode(storageGetEvictedRaw());
 }
 /**
  * Returns the current accounts NEAR storage usage.
@@ -143,16 +169,33 @@ export function storageUsage() {
  * @param key - The key under which to store the value.
  * @param value - The value to store.
  */
-export function storageWrite(key, value) {
+export function storageWriteRaw(key, value) {
     return env.storage_write(key, value, EVICTED_REGISTER) === 1n;
+}
+/**
+ * Writes the provided utf-8 string to NEAR storage under the provided key.
+ *
+ * @param key - The utf-8 string key under which to store the value.
+ * @param value - The utf-8 string value to store.
+ */
+export function storageWrite(key, value) {
+    return storageWriteRaw(encode(key), encode(value));
 }
 /**
  * Removes the value of the provided key from NEAR storage.
  *
  * @param key - The key to be removed.
  */
-export function storageRemove(key) {
+export function storageRemoveRaw(key) {
     return env.storage_remove(key, EVICTED_REGISTER) === 1n;
+}
+/**
+ * Removes the value of the provided utf-8 string key from NEAR storage.
+ *
+ * @param key - The utf-8 string key to be removed.
+ */
+export function storageRemove(key) {
+    return storageRemoveRaw(encode(key));
 }
 /**
  * Returns the cost of storing 0 Byte on NEAR storage.
@@ -163,17 +206,31 @@ export function storageByteCost() {
 /**
  * Returns the arguments passed to the current smart contract call.
  */
-export function input() {
+export function inputRaw() {
     env.input(0);
     return env.read_register(0);
+}
+/**
+ * Returns the arguments passed to the current smart contract call as utf-8 string.
+ */
+export function input() {
+    return decode(inputRaw());
 }
 /**
  * Returns the value from the NEAR WASM virtual machine.
  *
  * @param value - The value to return.
  */
-export function valueReturn(value) {
+export function valueReturnRaw(value) {
     env.value_return(value);
+}
+/**
+ * Returns the utf-8 string value from the NEAR WASM virtual machine.
+ *
+ * @param value - The utf-8 string value to return.
+ */
+export function valueReturn(value) {
+    valueReturnRaw(encode(value));
 }
 /**
  * Returns a random string of bytes.
@@ -191,8 +248,20 @@ export function randomSeed() {
  * @param amount - The amount of NEAR attached to the call.
  * @param gas - The amount of Gas attached to the call.
  */
-export function promiseCreate(accountId, methodName, args, amount, gas) {
+export function promiseCreateRaw(accountId, methodName, args, amount, gas) {
     return env.promise_create(accountId, methodName, args, amount, gas);
+}
+/**
+ * Create a NEAR promise call to a contract on the blockchain.
+ *
+ * @param accountId - The account ID of the target contract.
+ * @param methodName - The name of the method to be called.
+ * @param args - The utf-8 string arguments to call the method with.
+ * @param amount - The amount of NEAR attached to the call.
+ * @param gas - The amount of Gas attached to the call.
+ */
+export function promiseCreate(accountId, methodName, args, amount, gas) {
+    return promiseCreateRaw(accountId, methodName, encode(args), amount, gas);
 }
 /**
  * Attach a callback NEAR promise to be executed after a provided promise.
@@ -204,8 +273,21 @@ export function promiseCreate(accountId, methodName, args, amount, gas) {
  * @param amount - The amount of NEAR to attach to the call.
  * @param gas - The amount of Gas to attach to the call.
  */
-export function promiseThen(promiseIndex, accountId, methodName, args, amount, gas) {
+export function promiseThenRaw(promiseIndex, accountId, methodName, args, amount, gas) {
     return env.promise_then(promiseIndex, accountId, methodName, args, amount, gas);
+}
+/**
+ * Attach a callback NEAR promise to be executed after a provided promise.
+ *
+ * @param promiseIndex - The promise after which to call the callback.
+ * @param accountId - The account ID of the contract to perform the callback on.
+ * @param methodName - The name of the method to call.
+ * @param args - The utf-8 string arguments to call the method with.
+ * @param amount - The amount of NEAR to attach to the call.
+ * @param gas - The amount of Gas to attach to the call.
+ */
+export function promiseThen(promiseIndex, accountId, methodName, args, amount, gas) {
+    return promiseThenRaw(promiseIndex, accountId, methodName, encode(args), amount, gas);
 }
 /**
  * Join an arbitrary array of NEAR promises.
@@ -258,8 +340,20 @@ export function promiseBatchActionDeployContract(promiseIndex, code) {
  * @param amount - The amount of NEAR to attach to the call.
  * @param gas - The amount of Gas to attach to the call.
  */
-export function promiseBatchActionFunctionCall(promiseIndex, methodName, args, amount, gas) {
+export function promiseBatchActionFunctionCallRaw(promiseIndex, methodName, args, amount, gas) {
     env.promise_batch_action_function_call(promiseIndex, methodName, args, amount, gas);
+}
+/**
+ * Attach a function call promise action to the NEAR promise index with the provided promise index.
+ *
+ * @param promiseIndex - The index of the promise to attach a function call action to.
+ * @param methodName - The name of the method to be called.
+ * @param args - The utf-8 string arguments to call the method with.
+ * @param amount - The amount of NEAR to attach to the call.
+ * @param gas - The amount of Gas to attach to the call.
+ */
+export function promiseBatchActionFunctionCall(promiseIndex, methodName, args, amount, gas) {
+    promiseBatchActionFunctionCallRaw(promiseIndex, methodName, encode(args), amount, gas);
 }
 /**
  * Attach a transfer promise action to the NEAR promise index with the provided promise index.
@@ -331,8 +425,21 @@ export function promiseBatchActionDeleteAccount(promiseIndex, beneficiaryId) {
  * @param gas - The amount of Gas to attach to the call.
  * @param weight - The weight of unused Gas to use.
  */
-export function promiseBatchActionFunctionCallWeight(promiseIndex, methodName, args, amount, gas, weight) {
+export function promiseBatchActionFunctionCallWeightRaw(promiseIndex, methodName, args, amount, gas, weight) {
     env.promise_batch_action_function_call_weight(promiseIndex, methodName, args, amount, gas, weight);
+}
+/**
+ * Attach a function call with weight promise action to the NEAR promise index with the provided promise index.
+ *
+ * @param promiseIndex - The index of the promise to attach a function call with weight action to.
+ * @param methodName - The name of the method to be called.
+ * @param args - The utf-8 string arguments to call the method with.
+ * @param amount - The amount of NEAR to attach to the call.
+ * @param gas - The amount of Gas to attach to the call.
+ * @param weight - The weight of unused Gas to use.
+ */
+export function promiseBatchActionFunctionCallWeight(promiseIndex, methodName, args, amount, gas, weight) {
+    promiseBatchActionFunctionCallWeightRaw(promiseIndex, methodName, encode(args), amount, gas, weight);
 }
 /**
  * The number of promise results available.
@@ -345,7 +452,7 @@ export function promiseResultsCount() {
  *
  * @param promiseIndex - The index of the promise to return the result for.
  */
-export function promiseResult(promiseIndex) {
+export function promiseResultRaw(promiseIndex) {
     const status = env.promise_result(promiseIndex, 0);
     assert(Number(status) === PromiseResult.Successful, `Promise result ${status == PromiseResult.Failed
         ? "Failed"
@@ -353,6 +460,14 @@ export function promiseResult(promiseIndex) {
             ? "NotReady"
             : status}`);
     return env.read_register(0);
+}
+/**
+ * Returns the result of the NEAR promise for the passed promise index as utf-8 string
+ *
+ * @param promiseIndex - The index of the promise to return the result for.
+ */
+export function promiseResult(promiseIndex) {
+    return decode(promiseResultRaw(promiseIndex));
 }
 /**
  * Executes the promise in the NEAR WASM virtual machine.

@@ -77,14 +77,12 @@ export class NftContract {
     near.promiseBatchActionFunctionCall(
       promise,
       "nftOnTransfer",
-      bytes(
         JSON.stringify({
           senderId: sender_id,
           previousOwnerId: old_owner_id,
           tokenId: token_id,
           msg: msg,
-        })
-      ),
+        }),
       0,
       30000000000000
     );
@@ -92,7 +90,7 @@ export class NftContract {
       promise,
       near.currentAccountId(),
       "_nftResolveTransfer",
-      bytes(JSON.stringify({ sender_id, receiver_id, token_id })),
+      JSON.stringify({ sender_id, receiver_id, token_id }),
       0,
       30000000000000
     );

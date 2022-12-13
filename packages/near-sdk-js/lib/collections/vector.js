@@ -1,9 +1,9 @@
 import * as near from "../api";
-import { assert, getValueWithOptions, u8ArrayToBytes, serializeValueWithOptions, ERR_INCONSISTENT_STATE, ERR_INDEX_OUT_OF_BOUNDS, } from "../utils";
+import { assert, getValueWithOptions, serializeValueWithOptions, ERR_INCONSISTENT_STATE, ERR_INDEX_OUT_OF_BOUNDS, str, bytes, } from "../utils";
 function indexToKey(prefix, index) {
     const data = new Uint32Array([index]);
     const array = new Uint8Array(data.buffer);
-    const key = u8ArrayToBytes(array);
+    const key = str(array);
     return prefix + key;
 }
 /**
@@ -36,7 +36,7 @@ export class Vector {
             return options?.defaultValue ?? null;
         }
         const storageKey = indexToKey(this.prefix, index);
-        const value = near.storageRead(storageKey);
+        const value = near.storageReadRaw(bytes(storageKey));
         return getValueWithOptions(value, options);
     }
     /**
@@ -54,8 +54,8 @@ export class Vector {
         }
         const key = indexToKey(this.prefix, index);
         const last = this.pop(options);
-        assert(near.storageWrite(key, serializeValueWithOptions(last, options)), ERR_INCONSISTENT_STATE);
-        const value = near.storageGetEvicted();
+        assert(near.storageWriteRaw(bytes(key), serializeValueWithOptions(last, options)), ERR_INCONSISTENT_STATE);
+        const value = near.storageGetEvictedRaw();
         return getValueWithOptions(value, options);
     }
     /**
@@ -67,7 +67,7 @@ export class Vector {
     push(element, options) {
         const key = indexToKey(this.prefix, this.length);
         this.length += 1;
-        near.storageWrite(key, serializeValueWithOptions(element, options));
+        near.storageWriteRaw(bytes(key), serializeValueWithOptions(element, options));
     }
     /**
      * Removes and retrieves the element with the highest index.
@@ -81,8 +81,8 @@ export class Vector {
         const lastIndex = this.length - 1;
         const lastKey = indexToKey(this.prefix, lastIndex);
         this.length -= 1;
-        assert(near.storageRemove(lastKey), ERR_INCONSISTENT_STATE);
-        const value = near.storageGetEvicted();
+        assert(near.storageRemoveRaw(bytes(lastKey)), ERR_INCONSISTENT_STATE);
+        const value = near.storageGetEvictedRaw();
         return getValueWithOptions(value, options);
     }
     /**
@@ -95,8 +95,8 @@ export class Vector {
     replace(index, element, options) {
         assert(index < this.length, ERR_INDEX_OUT_OF_BOUNDS);
         const key = indexToKey(this.prefix, index);
-        assert(near.storageWrite(key, serializeValueWithOptions(element, options)), ERR_INCONSISTENT_STATE);
-        const value = near.storageGetEvicted();
+        assert(near.storageWriteRaw(bytes(key), serializeValueWithOptions(element, options)), ERR_INCONSISTENT_STATE);
+        const value = near.storageGetEvictedRaw();
         return getValueWithOptions(value, options);
     }
     /**
@@ -141,7 +141,7 @@ export class Vector {
     clear() {
         for (let index = 0; index < this.length; index++) {
             const key = indexToKey(this.prefix, index);
-            near.storageRemove(key);
+            near.storageRemoveRaw(bytes(key));
         }
         this.length = 0;
     }

@@ -35,7 +35,7 @@ export default function () {
                     const fileRelPath = firstArg.value; // Get literal string value
                     const filePath = join(root, fileRelPath);
                     const fileSrc = readFileSync(filePath, { encoding }).toString();
-                    path.replaceWith(t.stringLiteral(fileSrc));
+                    path.replaceWith(t.callExpression(t.memberExpression(t.identifier("env"), t.identifier("latin1_string_to_uint8array")), [t.stringLiteral(fileSrc)]));
                 }
             },
         },

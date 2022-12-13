@@ -1,6 +1,6 @@
 import * as near from "../api";
 import { GetOptions } from "../types/collections";
-import { Bytes, serializeValueWithOptions } from "../utils";
+import { serializeValueWithOptions } from "../utils";
 
 /**
  * A lookup set collection that stores entries in NEAR storage.
@@ -9,7 +9,7 @@ export class LookupSet<DataType> {
   /**
    * @param keyPrefix - The byte prefix to use when storing elements inside this collection.
    */
-  constructor(readonly keyPrefix: Bytes) {}
+  constructor(readonly keyPrefix: string) {}
 
   /**
    * Checks whether the collection contains the value.
@@ -72,7 +72,7 @@ export class LookupSet<DataType> {
    *
    * @param options - Options for storing the data.
    */
-  serialize(options?: Pick<GetOptions<DataType>, "serializer">): string {
+  serialize(options?: Pick<GetOptions<DataType>, "serializer">): Uint8Array {
     return serializeValueWithOptions(this, options);
   }
 

@@ -1,5 +1,5 @@
 import * as near from "./api";
-import { deserialize, serialize } from "./utils";
+import { deserialize, serialize, bytes, encode } from "./utils";
 
 type EmptyParameterObject = Record<never, never>;
 type AnyObject = Record<string, unknown>;
@@ -145,8 +145,8 @@ export function middleware<Arguments extends Array<any>>(
  */
 export function NearBindgen(options: {
   requireInit?: boolean;
-  serializer?(value: unknown): string;
-  deserializer?(value: string): unknown;
+  serializer?(value: unknown): Uint8Array;
+  deserializer?(value: Uint8Array): unknown;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 }): any;
 export function NearBindgen({
@@ -155,8 +155,8 @@ export function NearBindgen({
   deserializer = deserialize,
 }: {
   requireInit?: boolean;
-  serializer?(value: unknown): string;
-  deserializer?(value: string): unknown;
+  serializer?(value: unknown): Uint8Array;
+  deserializer?(value: Uint8Array): unknown;
 }) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return <T extends { new (...args: any[]): any }>(target: T) => {
@@ -166,29 +166,31 @@ export function NearBindgen({
       }
 
       static _getState(): unknown | null {
-        const rawState = near.storageRead("STATE");
+        const rawState = near.storageReadRaw(bytes("STATE"));
         return rawState ? this._deserialize(rawState) : null;
       }
 
       static _saveToStorage(objectToSave: unknown): void {
-        near.storageWrite("STATE", this._serialize(objectToSave));
+        near.storageWriteRaw(bytes("STATE"), this._serialize(objectToSave));
       }
 
       static _getArgs(): unknown {
         return JSON.parse(near.input() || "{}");
       }
 
-      static _serialize(value: unknown, forReturn = false): string {
+      static _serialize(value: unknown, forReturn = false): Uint8Array {
         if (forReturn) {
-          return JSON.stringify(value, (_, value) =>
-            typeof value === "bigint" ? `${value}` : value
+          return encode(
+            JSON.stringify(value, (_, value) =>
+              typeof value === "bigint" ? `${value}` : value
+            )
           );
         }
 
         return serializer(value);
       }
 
-      static _deserialize(value: string): unknown {
+      static _deserialize(value: Uint8Array): unknown {
         return deserializer(value);
       }
 
