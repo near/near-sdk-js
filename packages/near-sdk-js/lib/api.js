@@ -439,7 +439,7 @@ export function promiseBatchActionFunctionCallWeightRaw(promiseIndex, methodName
  * @param weight - The weight of unused Gas to use.
  */
 export function promiseBatchActionFunctionCallWeight(promiseIndex, methodName, args, amount, gas, weight) {
-    env.promise_batch_action_function_call_weight(promiseIndex, methodName, encode(args), amount, gas, weight);
+    promiseBatchActionFunctionCallWeightRaw(promiseIndex, methodName, encode(args), amount, gas, weight);
 }
 /**
  * The number of promise results available.

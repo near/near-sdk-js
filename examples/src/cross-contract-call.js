@@ -20,7 +20,7 @@ export class OnCall {
     near.promiseBatchActionFunctionCall(
       promise,
       "get_status",
-      bytes(JSON.stringify({ account_id: accountId })),
+      JSON.stringify({ account_id: accountId }),
       0,
       30000000000000
     );
@@ -28,7 +28,7 @@ export class OnCall {
       promise,
       near.currentAccountId(),
       "_set_person_on_call_private",
-      bytes(JSON.stringify({ accountId: accountId })),
+      JSON.stringify({ accountId: accountId }),
       0,
       30000000000000
     );

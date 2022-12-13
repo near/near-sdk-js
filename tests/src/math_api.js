@@ -1,19 +1,19 @@
 import { near, bytes } from "near-sdk-js";
 
 export function test_sha256() {
-  near.valueReturn(near.sha256(bytes("tesdsst")));
+  near.valueReturnRaw(near.sha256(bytes("tesdsst")));
 }
 
 export function test_keccak256() {
-  near.valueReturn(near.keccak256(bytes("tesdsst")));
+  near.valueReturnRaw(near.keccak256(bytes("tesdsst")));
 }
 
 export function test_keccak512() {
-  near.valueReturn(near.keccak512(bytes("tesdsst")));
+  near.valueReturnRaw(near.keccak512(bytes("tesdsst")));
 }
 
 export function test_ripemd160() {
-  near.valueReturn(near.ripemd160(bytes("tesdsst")));
+  near.valueReturnRaw(near.ripemd160(bytes("tesdsst")));
 }
 
 export function test_ecrecover() {
@@ -30,5 +30,5 @@ export function test_ecrecover() {
   let v = 1;
   let malleabilityFlag = 1;
   let ret = near.ecrecover(hash, sign, v, malleabilityFlag);
-  near.valueReturn(ret);
+  near.valueReturnRaw(ret);
 }

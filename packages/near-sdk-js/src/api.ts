@@ -797,8 +797,8 @@ export function promiseBatchActionFunctionCallWeight(
   gas: NearAmount,
   weight: GasWeight
 ): void {
-  env.promise_batch_action_function_call_weight(
-    promiseIndex as unknown as bigint,
+  promiseBatchActionFunctionCallWeightRaw(
+    promiseIndex,
     methodName,
     encode(args),
     amount,

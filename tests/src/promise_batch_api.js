@@ -1,4 +1,4 @@
-import { near, bytes, includeBytes } from "near-sdk-js";
+import { near, includeBytes } from "near-sdk-js";
 
 export function test_promise_batch_stake() {
   let promiseId = near.promiseBatchCreate("caller2.test.near");
@@ -64,7 +64,7 @@ export function test_promise_batch_call_weight() {
   near.promiseBatchActionFunctionCallWeight(
     promiseId,
     "cross_contract_call_gas",
-    bytes("abc"),
+    "abc",
     0,
     0,
     1
@@ -85,7 +85,7 @@ export function test_promise_batch_deploy_call() {
   near.promiseBatchActionFunctionCall(
     promiseId,
     "cross_contract_callee",
-    bytes("abc"),
+    "abc",
     0,
     2 * Math.pow(10, 13)
   );
