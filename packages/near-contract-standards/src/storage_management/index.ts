@@ -4,9 +4,19 @@ import { Option } from "../non_fungible_token/utils";
 export class StorageBalance {
     total: number;
     available: number;
+
+    constructor(total: number, available: number) {
+        this.total = total;
+        this.available = available;
+    }
 }
 
 export class StorageBalanceBounds {
+    constructor(min: number, max: Option<number>) {
+        this.min = min;
+        this.max = max;
+    }
+
     min: number;
     max: Option<number>;
 }

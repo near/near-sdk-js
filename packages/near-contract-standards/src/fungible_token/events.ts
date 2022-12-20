@@ -38,6 +38,12 @@ export class FtMint {
     amount: number;
     memo: Option<string>;
 
+    constructor(owner_id: AccountId, amount: number, memo: Option<string>) {
+        this.owner_id = owner_id;
+        this.amount = amount;
+        this.memo = memo;
+    }
+
     /** Logs the event to the host. This is required to ensure that the event is triggered
      * and to consume the event.
      */
@@ -62,6 +68,13 @@ export class FtTransfer {
     amount: number;
     memo: Option<string>;
 
+    constructor(old_owner_id: AccountId, new_owner_id: AccountId, amount: number, memo: Option<string>) {
+        this.old_owner_id = old_owner_id;
+        this.new_owner_id = new_owner_id;
+        this.amount = amount;
+        this.memo = memo;
+    }
+
     /** Logs the event to the host. This is required to ensure that the event is triggered
      * and to consume the event.
      */
@@ -82,6 +95,12 @@ export class FtBurn {
     owner_id: AccountId;
     amount: number;
     memo: Option<string>;
+
+    constructor(owner_id: AccountId, amount: number, memo: Option<string>) {
+        this.owner_id = owner_id;
+        this.amount = amount;
+        this.memo = memo;
+    }
 
     /** Logs the event to the host. This is required to ensure that the event is triggered
      * and to consume the event.
