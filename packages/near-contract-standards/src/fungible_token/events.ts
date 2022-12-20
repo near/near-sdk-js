@@ -19,6 +19,19 @@ import { NearEvent } from "../event";
 import { Option } from "../non_fungible_token/utils";
 import { AccountId } from "near-sdk-js";
 
+export type Nep141EventKind = FtMint[] | FtTransfer[] | FtBurn[];
+
+export class Nep141Event extends NearEvent {
+    version: string;
+    event_kind: Nep141EventKind;
+
+    constructor(version: string, event_kind: Nep141EventKind) {
+      super();
+      this.version = version;
+      this.event_kind = event_kind;
+    }
+  }
+
 /** Data to log for an FT mint event. To log this event, call [`.emit()`](FtMint::emit). */
 export class FtMint {
     owner_id: AccountId;
@@ -29,14 +42,14 @@ export class FtMint {
      * and to consume the event.
      */
     emit() {
-        Self::emit_many(&[self])
+        this.emit_many([this])
     }
 
     /** Emits an FT mint event, through [`env::log_str`](near_sdk::env::log_str),
      * where each [`FtMint`] represents the data of each mint.
      */
-    emit_many(data: &[FtMint<'_>]) {
-        new_141_v1(Nep141EventKind::FtMint(data)).emit()
+    emit_many(data: FtMint[]) {
+        new_141_v1(data).emit()
     }
 }
 
@@ -52,15 +65,15 @@ export class FtTransfer {
     /** Logs the event to the host. This is required to ensure that the event is triggered
      * and to consume the event.
      */
-    emit(self) {
-        Self::emit_many(&[self])
+    emit() {
+        this.emit_many([this])
     }
 
     /** Emits an FT transfer event, through [`env::log_str`](near_sdk::env::log_str),
      * where each [`FtTransfer`] represents the data of each transfer.
      */
-     emit_many(data: &[FtTransfer<'_>]) {
-        new_141_v1(Nep141EventKind::FtTransfer(data)).emit()
+     emit_many(data: FtTransfer[]) {
+        new_141_v1(data).emit()
      }
 }
 
@@ -73,40 +86,24 @@ export class FtBurn {
     /** Logs the event to the host. This is required to ensure that the event is triggered
      * and to consume the event.
      */
-    emit(self) {
-        Self::emit_many(&[self])
+    emit() {
+        this.emit_many([this])
     }
 
     /** Emits an FT burn event, through [`env::log_str`](near_sdk::env::log_str),
      * where each [`FtBurn`] represents the data of each burn.
      */
-    emit_many<'a>(data: &'a [FtBurn<'a>]) {
-        new_141_v1(Nep141EventKind::FtBurn(data)).emit()
+    emit_many(data: FtBurn[]) {
+        new_141_v1(data).emit()
     }
 }
 
-pub(crate) struct Nep141Event<'a> {
-    version: &'static str,
-    #[serde(flatten)]
-    event_kind: Nep141EventKind<'a>,
+function new_141(version: string, event_kind: Nep141EventKind): NearEvent {
+    return new Nep141Event(version, event_kind);
 }
 
-#[derive(Serialize, Debug)]
-#[serde(tag = "event", content = "data")]
-#[serde(rename_all = "snake_case")]
-#[allow(clippy::enum_variant_names)]
-enum Nep141EventKind<'a> {
-    FtMint(&'a [FtMint<'a>]),
-    FtTransfer(&'a [FtTransfer<'a>]),
-    FtBurn(&'a [FtBurn<'a>]),
-}
-
-new_141<'a>(version: &'static str, event_kind: Nep141EventKind<'a>) : NearEvent<'a> {
-    NearEvent::Nep141(Nep141Event { version, event_kind })
-}
-
-new_141_v1(event_kind: Nep141EventKind) : NearEvent {
-    new_141("1.0.0", event_kind)
+function new_141_v1(event_kind: Nep141EventKind) : NearEvent {
+    return new_141("1.0.0", event_kind)
 }
 
 // #[cfg(test)]
