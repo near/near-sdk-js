@@ -1,7 +1,6 @@
 import { NonFungibleToken } from "near-contract-standards/lib";
 import {
   assert,
-  bytes,
   call,
   initialize,
   near,
@@ -9,6 +8,7 @@ import {
   NearPromise,
   PromiseOrValue,
   view,
+  IntoStorageKey
 } from "near-sdk-js";
 import {
   NFTContractMetadata,
@@ -16,7 +16,6 @@ import {
   TokenMetadata,
 } from "near-contract-standards/lib/non_fungible_token/metadata";
 import {
-  IntoStorageKey,
   Option,
 } from "near-contract-standards/lib/non_fungible_token/utils";
 import { AccountId } from "near-sdk-js";

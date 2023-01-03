@@ -9,6 +9,3 @@ export declare function assert_at_least_one_yocto(): void;
 /** Assert that exactly 1 yoctoNEAR was attached */
 export declare function assert_one_yocto(): void;
 export type Option<T> = T | null;
-export interface IntoStorageKey {
-    into_storage_key(): string;
-}

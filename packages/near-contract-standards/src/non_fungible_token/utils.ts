@@ -58,7 +58,3 @@ export function assert_one_yocto(): void {
 }
 
 export type Option<T> = T | null;
-
-export interface IntoStorageKey {
-  into_storage_key(): string;
-}
