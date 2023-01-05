@@ -17,14 +17,14 @@ type ValueAndIndex = [value: string, index: number];
  * An unordered map that stores data in NEAR storage.
  */
 export class UnorderedMap<DataType> {
-  readonly keys: Vector<string>;
+  readonly _keys: Vector<string>;
   readonly values: LookupMap<ValueAndIndex>;
 
   /**
    * @param prefix - The byte prefix to use when storing elements inside this collection.
    */
   constructor(readonly prefix: string) {
-    this.keys = new Vector<string>(`${prefix}u`); // intentional different prefix with old UnorderedMap
+    this._keys = new Vector<string>(`${prefix}u`); // intentional different prefix with old UnorderedMap
     this.values = new LookupMap<ValueAndIndex>(`${prefix}m`);
   }
 
@@ -32,14 +32,14 @@ export class UnorderedMap<DataType> {
    * The number of elements stored in the collection.
    */
   get length() {
-    return this.keys.length;
+    return this._keys.length;
   }
 
   /**
    * Checks whether the collection is empty.
    */
   isEmpty(): boolean {
-    return this.keys.isEmpty();
+    return this._keys.isEmpty();
   }
 
   /**
@@ -81,7 +81,7 @@ export class UnorderedMap<DataType> {
     if (valueAndIndex === null) {
       const newElementIndex = this.length;
 
-      this.keys.push(key);
+      this._keys.push(key);
       this.values.set(key, [decode(serialized), newElementIndex]);
 
       return null;
@@ -111,12 +111,12 @@ export class UnorderedMap<DataType> {
 
     const [value, index] = oldValueAndIndex;
 
-    assert(this.keys.swapRemove(index) !== null, ERR_INCONSISTENT_STATE);
+    assert(this._keys.swapRemove(index) !== null, ERR_INCONSISTENT_STATE);
 
     // the last key is swapped to key[index], the corresponding [value, index] need update
-    if (!this.keys.isEmpty() && index !== this.keys.length) {
+    if (!this._keys.isEmpty() && index !== this._keys.length) {
       // if there is still elements and it was not the last element
-      const swappedKey = this.keys.get(index);
+      const swappedKey = this._keys.get(index);
       const swappedValueAndIndex = this.values.get(swappedKey);
 
       assert(swappedValueAndIndex !== null, ERR_INCONSISTENT_STATE);
@@ -131,12 +131,12 @@ export class UnorderedMap<DataType> {
    * Remove all of the elements stored within the collection.
    */
   clear(): void {
-    for (const key of this.keys) {
+    for (const key of this._keys) {
       // Set instead of remove to avoid loading the value from storage.
       this.values.set(key, null);
     }
 
-    this.keys.clear();
+    this._keys.clear();
   }
 
   [Symbol.iterator](): UnorderedMapIterator<DataType> {
@@ -206,12 +206,26 @@ export class UnorderedMap<DataType> {
     const map = new UnorderedMap(data.prefix) as MutableUnorderedMap;
 
     // reconstruct keys Vector
-    map.keys = new Vector(`${data.prefix}u`);
-    map.keys.length = data.keys.length;
+    map._keys = new Vector(`${data.prefix}u`);
+    map._keys.length = data._keys.length;
     // reconstruct values LookupMap
     map.values = new LookupMap(`${data.prefix}m`);
 
     return map as UnorderedMap<DataType>;
+  }
+
+  keys({start, limit}): string[] {
+    let ret = [];
+    if (start === undefined) {
+      start = 0;
+    }
+    if (limit == undefined) {
+      limit = this.length - start;
+    }
+    for (let i = start; i < start + limit; i++) {
+      ret.push(this._keys.get(i));
+    }
+    return ret;
   }
 }
 
@@ -230,7 +244,7 @@ class UnorderedMapIterator<DataType> {
     unorderedMap: UnorderedMap<DataType>,
     private options?: GetOptions<DataType>
   ) {
-    this.keys = new VectorIterator(unorderedMap.keys);
+    this.keys = new VectorIterator(unorderedMap._keys);
     this.map = unorderedMap.values;
   }
 

@@ -27,28 +27,28 @@ function deserializeIndex(rawIndex: Uint8Array): number {
  */
 export class UnorderedSet<DataType> {
   readonly elementIndexPrefix: string;
-  readonly elements: Vector<DataType>;
+  readonly _elements: Vector<DataType>;
 
   /**
    * @param prefix - The byte prefix to use when storing elements inside this collection.
    */
   constructor(readonly prefix: string) {
     this.elementIndexPrefix = `${prefix}i`;
-    this.elements = new Vector(`${prefix}e`);
+    this._elements = new Vector(`${prefix}e`);
   }
 
   /**
    * The number of elements stored in the collection.
    */
   get length(): number {
-    return this.elements.length;
+    return this._elements.length;
   }
 
   /**
    * Checks whether the collection is empty.
    */
   isEmpty(): boolean {
-    return this.elements.isEmpty();
+    return this._elements.isEmpty();
   }
 
   /**
@@ -87,7 +87,7 @@ export class UnorderedSet<DataType> {
     const nextIndex = this.length;
     const nextIndexRaw = serializeIndex(nextIndex);
     near.storageWriteRaw(encode(indexLookup), nextIndexRaw);
-    this.elements.push(element, options);
+    this._elements.push(element, options);
 
     return true;
   }
@@ -113,14 +113,14 @@ export class UnorderedSet<DataType> {
       near.storageRemove(indexLookup);
 
       const index = deserializeIndex(indexRaw);
-      this.elements.swapRemove(index);
+      this._elements.swapRemove(index);
 
       return true;
     }
 
     // If there is more than one element then swap remove swaps it with the last
     // element.
-    const lastElement = this.elements.get(this.length - 1, options);
+    const lastElement = this._elements.get(this.length - 1, options);
 
     assert(!!lastElement, ERR_INCONSISTENT_STATE);
 
@@ -136,7 +136,7 @@ export class UnorderedSet<DataType> {
     }
 
     const index = deserializeIndex(indexRaw);
-    this.elements.swapRemove(index);
+    this._elements.swapRemove(index);
 
     return true;
   }
@@ -145,17 +145,17 @@ export class UnorderedSet<DataType> {
    * Remove all of the elements stored within the collection.
    */
   clear(options?: Pick<GetOptions<DataType>, "serializer">): void {
-    for (const element of this.elements) {
+    for (const element of this._elements) {
       const indexLookup =
         this.elementIndexPrefix + serializeValueWithOptions(element, options);
       near.storageRemove(indexLookup);
     }
 
-    this.elements.clear();
+    this._elements.clear();
   }
 
   [Symbol.iterator](): VectorIterator<DataType> {
-    return this.elements[Symbol.iterator]();
+    return this._elements[Symbol.iterator]();
   }
 
   /**
@@ -167,7 +167,7 @@ export class UnorderedSet<DataType> {
     [Symbol.iterator](): VectorIterator<DataType>;
   } {
     return {
-      [Symbol.iterator]: () => new VectorIterator(this.elements, options),
+      [Symbol.iterator]: () => new VectorIterator(this._elements, options),
     };
   }
 
@@ -221,9 +221,23 @@ export class UnorderedSet<DataType> {
     const set = new UnorderedSet(data.prefix) as MutableUnorderedSet;
     // reconstruct Vector
     const elementsPrefix = data.prefix + "e";
-    set.elements = new Vector(elementsPrefix);
-    set.elements.length = data.elements.length;
+    set._elements = new Vector(elementsPrefix);
+    set._elements.length = data._elements.length;
 
     return set as UnorderedSet<DataType>;
+  }
+
+  elements({options, start, limit}: {options?: GetOptions<DataType>, start?: number, limit?: number}): DataType[] {
+    let ret = [];
+    if (start === undefined) {
+      start = 0;
+    }
+    if (limit == undefined) {
+      limit = this.length - start;
+    }
+    for (let i = start; i < start + limit; i++) {
+      ret.push(this._elements.get(i, options));
+    }
+    return ret;
   }
 }
