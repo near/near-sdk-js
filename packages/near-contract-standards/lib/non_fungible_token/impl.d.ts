@@ -1,6 +1,6 @@
-import { AccountId, UnorderedMap, LookupMap, UnorderedSet, NearPromise } from "near-sdk-js";
+import { AccountId, UnorderedMap, LookupMap, UnorderedSet, NearPromise, IntoStorageKey } from "near-sdk-js";
 import { TokenMetadata } from "./metadata";
-import { IntoStorageKey, Option } from "./utils";
+import { Option } from "./utils";
 import { NonFungibleTokenResolver } from "./core/resolver";
 import { Token, TokenId } from "./token";
 import { NonFungibleTokenCore } from "./core";

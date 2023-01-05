@@ -88,4 +88,10 @@ export declare function encode(s: string): Uint8Array;
  * @returns result string
  */
 export declare function decode(a: Uint8Array): string;
+/**
+ * When implemented, allow object to be stored as collection key
+ */
+export interface IntoStorageKey {
+    into_storage_key(): string;
+}
 export {};

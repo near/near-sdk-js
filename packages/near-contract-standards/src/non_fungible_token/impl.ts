@@ -9,6 +9,7 @@ import {
   bytes,
   serialize,
   str,
+  IntoStorageKey,
 } from "near-sdk-js";
 import { TokenMetadata } from "./metadata";
 import {
@@ -16,7 +17,6 @@ import {
   refund_deposit,
   refund_deposit_to_account,
   assert_at_least_one_yocto,
-  IntoStorageKey,
   Option,
   assert_one_yocto,
 } from "./utils";
