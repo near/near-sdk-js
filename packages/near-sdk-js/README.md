@@ -83,18 +83,17 @@ pnpm build
 NEAR-SDK-JS is written in TypeScript, so every API function has a type specified by signature that looks familiar to JavaScript/TypeScript Developers. Two types in the signature need a special attention:
 
 - Most of the API take `bigint` instead of Number as type. This because JavaScript Number cannot hold 64 bit and 128 bit integer without losing precision.
-- `Bytes` in both arguments and return represent a byte buffer, internally it's a JavaScript String Object. Any binary data `0x00-0xff` is stored as the char '\x00-\xff'. This is because QuickJS doesn't have Uint8Array in C API.
-  - To ensure correctness, every `Bytes` argument need to be pass in with the `bytes()` function to runtime type check it's indeed a `Bytes`.
-  - If `Bytes` is too long that `bytes()` can cause gas limit problem, such as in factory contract, represents the content of contract to be deployed. In this case you can precheck and guarantee the correctness of the content and use without `bytes()`.
+- For those API that takes or returns raw bytes, it is a JavaScript `Uint8Array`. You can use standard `Uint8Array` methods on it or decode it to string with `decode` or `str`. The differece between `decode` and `str` is: `decode` decode the array as UTF-8 sequence. `str` simply converts each Uint8 to one char with that char code.
 
 ### Context API
 
 ```
 function currentAccountId(): string;
 function signerAccountId(): string;
-function signerAccountPk(): Bytes;
+function signerAccountPk(): Uint8Array;
 function predecessorAccountId(): string;
-function input(): Bytes;
+function inputRaw(): Uint8Array;
+function input(): string;
 function blockIndex(): bigint;
 function blockHeight(): bigint;
 function blockTimestamp(): bigint;
@@ -115,30 +114,32 @@ function usedGas(): bigint;
 ### Math API
 
 ```
-function randomSeed(): Bytes;
-function sha256(value: Bytes): Bytes;
-function keccak256(value: Bytes): Bytes;
-function keccak512(value: Bytes): Bytes;
-function ripemd160(value: Bytes): Bytes;
-function ecrecover(hash: Bytes, sign: Bytes, v: bigint, malleability_flag: bigint): Bytes | null;
+function randomSeed(): Uint8Array;
+function sha256(value: Uint8Array): Uint8Array;
+function keccak256(value: Uint8Array): Uint8Array;
+function keccak512(value: Uint8Array): Uint8Array;
+function ripemd160(value: Uint8Array): Uint8Array;
+function ecrecover(hash: Uint8Array, sign: Uint8Array, v: bigint, malleability_flag: bigint): Uint8Array | null;
 ```
 
 ### Miscellaneous API
 
 ```
-function valueReturn(value: Bytes);
+function valueReturnRaw(value: Uint8Array);
+function valueReturn(value: string);
 function panic(msg?: string);
-function panicUtf8(msg: Bytes);
-function log(msg: string);
-function logUtf8(msg: Bytes);
-function logUtf16(msg: Bytes);
+function panicUtf8(msg: Uint8Array);
+function logUtf8(msg: Uint8Array);
+function logUtf16(msg: Uint8Array);
+function log(...params: unknown[]);
+
 ```
 
 ### Promises API
 
 ```
-function promiseCreate(account_id: string, method_name: string, arguments: Bytes, amount: bigint, gas: bigint): bigint;
-function promiseThen(promise_index: bigint, account_id: string, method_name: string, arguments: Bytes, amount: bigint, gas: bigint): bigint;
+function promiseCreate(account_id: string, method_name: string, arguments: Uint8Array, amount: bigint, gas: bigint): bigint;
+function promiseThen(promise_index: bigint, account_id: string, method_name: string, arguments: Uint8Array, amount: bigint, gas: bigint): bigint;
 function promiseAnd(...promise_idx: bigint): bigint;
 function promiseBatchCreate(account_id: string): bigint;
 function promiseBatchThen(promise_index: bigint, account_id: string): bigint;
@@ -147,34 +148,38 @@ function promiseBatchThen(promise_index: bigint, account_id: string): bigint;
 ### Promise API actions
 
 ```
-function promiseBatchActionCreateAccount(promise_index: bigint);
-function promiseBatchActionDeployContract(promise_index: bigint, code: Bytes);
-function promiseBatchActionFunctionCall(promise_index: bigint, method_name: string, arguments: Bytes, amount: bigint, gas: bigint);
-function promiseBatchActionFunctionCallWeight(promise_index: bigint, method_name: string, arguments: Bytes, amount: bigint, gas: bigint, weight: bigint);
-
-function promiseBatchActionTransfer(promise_index: bigint, amount: bigint);
-function promiseBatchActionStake(promise_index: bigint, amount: bigint, public_key: Bytes);
-function promiseBatchActionAddKeyWithFullAccess(promise_index: bigint, public_key: Bytes, nonce: bigint);
-function promiseBatchActionAddKeyWithFunctionCall(promise_index: bigint, public_key: Bytes, nonce: bigint, allowance: bigint, receiver_id: string, method_names: string);
-function promiseBatchActionDeleteKey(promise_index: bigint, public_key: Bytes);
-function promiseBatchActionDeleteAccount(promise_index: bigint, beneficiary_id: string);
+function promiseBatchActionCreateAccount(promise_index: PromiseIndex);
+function promiseBatchActionDeployContract(promise_index: PromiseIndex, code: Uint8Array);
+function promiseBatchActionFunctionCall(promise_index: PromiseIndex, method_name: string, arguments: Uint8Array, amount: bigint, gas: bigint);
+function promiseBatchActionFunctionCallWeight(promise_index: PromiseIndex, method_name: string, arguments: Uint8Array, amount: bigint, gas: bigint, weight: bigint);
+function promiseBatchActionTransfer(promise_index: PromiseIndex, amount: bigint);
+function promiseBatchActionStake(promise_index: PromiseIndex, amount: bigint, public_key: Uint8Array);
+function promiseBatchActionAddKeyWithFullAccess(promise_index: PromiseIndex, public_key: Uint8Array, nonce: bigint);
+function promiseBatchActionAddKeyWithFunctionCall(promise_index: PromiseIndex, public_key: Uint8Array, nonce: bigint, allowance: bigint, receiver_id: string, method_names: string);
+function promiseBatchActionDeleteKey(promise_index: PromiseIndex, public_key: Uint8Array);
+function promiseBatchActionDeleteAccount(promise_index: PromiseIndex, beneficiary_id: string);
 ```
 
 ### Promise API results
 
 ```
 function promiseResultsCount(): bigint;
-function promiseResult(result_idx: bigint, register_id: bigint): bigint;
-function promiseReturn(promise_idx: bigint);
+function promiseResultRaw(result_idx: PromiseIndex): Uint8Array;
+function promiseResult(result_idx: PromiseIndex): string;
+function promiseReturn(promise_idx: PromiseIndex);
 ```
 
 ### Storage API
 
 ```
-function storageWrite(key: Bytes, value: Bytes, register_id: bigint): bigint;
-function storageRead(key: Bytes, register_id: bigint): bigint;
-function storageRemove(key: Bytes, register_id: bigint): bigint;
-function storageHasKey(key: Bytes): bigint;
+function storageWriteRaw(key: Uint8Array, value: Uint8Array): boolean;
+function storageReadRaw(key: Uint8Array): Uint8Array | null;
+function storageRemoveRaw(key: Uint8Array): boolean;
+function storageHasKeyRaw(key: Uint8Array): boolean;
+function storageWrite(key: string, value: string): boolean;
+function storageRead(key: string): bigint;
+function storageRemove(key: string): bigint;
+function storageHasKey(key: string): bigint;
 ```
 
 ### Validator API
@@ -187,9 +192,9 @@ function validatorTotalStake(): bigint;
 ### Alt BN128
 
 ```
-function altBn128G1Multiexp(value: Bytes, register_id: bigint);
-function altBn128G1Sum(value: Bytes, register_id: bigint);
-function altBn128PairingCheck(value: Bytes): bigint;
+function altBn128G1Multiexp(value: Uint8Array): Uint8Array;
+function altBn128G1Sum(value: Uint8Array): Uint8Array;
+function altBn128PairingCheck(value: Uint8Array): boolean;
 ```
 
 ### NearBindgen and other decorators
@@ -225,7 +230,7 @@ In order to initialize the contract, you need to add functions flagged with `@in
 
 ### Collections
 
-A few useful on-chain persistent collections are provided. All keys, values and elements are of type `Bytes`.
+A few useful on-chain persistent collections are provided. All keys, values and elements are of type `string`.
 
 #### Vector
 
@@ -532,21 +537,35 @@ return promise;
 
 ### Types
 
-NEAR-SDK-JS also includes type defintions that are equivalent to that in Rust SDK / nearcore. You can browse them in near-sdk-js/src/types. Most of them are just type alias to Bytes and bigint.
+NEAR-SDK-JS also includes type defintions that are equivalent to that in Rust SDK / nearcore. You can browse them in near-sdk-js/src/types. Most of them are just type alias to string and bigint.
 
 #### Public Key
 
 Public Key is representing a NEAR account's public key in a JavaScript class. You can either initiate a Public Key from binary data, or from a human readable string.
 
-The binary data is in the same format as nearcore, but encoded in bytes. That's one byte to represent the curve type of the public key, either ed25519 (`\x00`), or secp256k1 ('\x01'), follows by the curve-specific public key data in bytes. Examples:
+The binary data is in the same format as nearcore in `Uint8Array`. That's one byte to represent the curve type of the public key, either ed25519 (`0x0`), or secp256k1 (`0x1`), follows by the curve-specific public key data in bytes. Examples:
 
 ```js
 new PublicKey(near.signerAccountPk());
-new PublicKey(
-  "\x00\xeb\x7f\x5f\x11\xd1\x08\x1f\xe0\xd2\x24\xc5\x67\x36\x21\xad\xcb\x97\xd5\x13\xff\xa8\x5e\x55\xbc\x2b\x74\x4f\x0d\xb1\xe9\xf8\x1f"
+let pk = new PublicKey(
+    new Uint8Array([
+        // CurveType.ED25519 = 0
+        0,
+        // ED25519 PublicKey data
+        186, 44, 216, 49, 157, 48, 151, 47, 23, 244, 137, 69, 78, 150, 54, 42, 30,
+        248, 110, 26, 205, 18, 137, 154, 10, 208, 26, 183, 65, 166, 223, 18,
+    ])
 );
-new PublicKey(
-  "\x01\xf2\x56\xc6\xe6\xc8\x0b\x21\x3f\x2a\xa0\xb0\x17\x44\x23\x5d\x51\x5c\x59\x44\x35\xbe\x65\x1b\x15\x88\x3a\x10\xdd\x47\x2f\xa6\x46\xce\x62\xea\xf3\x67\x0d\xc5\xcb\x91\x00\xa0\xca\x2a\x55\xb2\xc1\x47\xc1\xe9\xa3\x8c\xe4\x28\x87\x8e\x7d\x46\xe1\xfb\x71\x4a\x99"
+let pk = new PublicKey(
+    new Uint8Array([
+        // CurveType.SECP256K1 = 1
+        1,
+        // SECP256K1 PublicKey data
+        242, 86, 198, 230, 200, 11, 33, 63, 42, 160, 176, 23, 68, 35, 93, 81, 92,
+        89, 68, 53, 190, 101, 27, 21, 136, 58, 16, 221, 71, 47, 166, 70, 206, 98,
+        234, 243, 103, 13, 197, 203, 145, 0, 160, 202, 42, 85, 178, 193, 71, 193,
+        233, 163, 140, 228, 40, 135, 142, 125, 70, 225, 251, 113, 74, 153,
+    ])
 );
 ```
 

@@ -1,6 +1,6 @@
 {
   "name": "near-sdk-js",
-  "version": "0.6.0",
+  "version": "0.7.0-2",
   "description": "High Level JavaScript SDK for building smart contracts on NEAR",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -56,7 +56,13 @@
   },
   "files": [
     "builder",
-    "lib"
+    "lib/*.js",
+    "lib/*.d.ts",
+    "lib/collections/*",
+    "lib/types/*",
+    "lib/cli/*.js",
+    "lib/cli/*.d.ts",
+    "lib/cli/build-tools/*"
   ],
   "devDependencies": {
     "@rollup/plugin-typescript": "^8.3.2",
