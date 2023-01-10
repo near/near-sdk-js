@@ -14,10 +14,11 @@ import {
     call,
     view,
     assert,
+    IntoStorageKey,
 } from "near-sdk-js";
 
 // TODO: move to the main SDK package
-import { IntoStorageKey, assert_one_yocto } from "../non_fungible_token/utils";
+import { assert_one_yocto } from "../non_fungible_token/utils";
 
 const GAS_FOR_RESOLVE_TRANSFER: Gas = 5_000_000_000_000n;
 const GAS_FOR_FT_TRANSFER_CALL: Gas = 25_000_000_000_000n + GAS_FOR_RESOLVE_TRANSFER;
