@@ -1,4 +1,4 @@
-import { assert, Bytes, PromiseIndex } from "./utils";
+import { assert, PromiseIndex } from "./utils";
 import * as near from "./api";
 import { Balance, PublicKey, AccountId, Gas, GasWeight } from "./types";
 import { Nonce } from "./types/primitives";
@@ -35,7 +35,7 @@ export class DeployContract extends PromiseAction {
   /**
    * @param code - The code of the contract to be deployed.
    */
-  constructor(public code: Bytes) {
+  constructor(public code: Uint8Array) {
     super();
   }
 
@@ -52,13 +52,13 @@ export class DeployContract extends PromiseAction {
 export class FunctionCall extends PromiseAction {
   /**
    * @param functionName - The name of the function to be called.
-   * @param args - The arguments to be passed to the function.
+   * @param args - The utf-8 string arguments to be passed to the function.
    * @param amount - The amount of NEAR to attach to the call.
    * @param gas - The amount of Gas to attach to the call.
    */
   constructor(
     public functionName: string,
-    public args: Bytes,
+    public args: string,
     public amount: Balance,
     public gas: Gas
   ) {
@@ -77,6 +77,38 @@ export class FunctionCall extends PromiseAction {
 }
 
 /**
+ * A function call raw promise action.
+ *
+ * @extends {PromiseAction}
+ */
+export class FunctionCallRaw extends PromiseAction {
+  /**
+   * @param functionName - The name of the function to be called.
+   * @param args - The arguments to be passed to the function.
+   * @param amount - The amount of NEAR to attach to the call.
+   * @param gas - The amount of Gas to attach to the call.
+   */
+  constructor(
+    public functionName: string,
+    public args: Uint8Array,
+    public amount: Balance,
+    public gas: Gas
+  ) {
+    super();
+  }
+
+  add(promiseIndex: PromiseIndex) {
+    near.promiseBatchActionFunctionCallRaw(
+      promiseIndex,
+      this.functionName,
+      this.args,
+      this.amount,
+      this.gas
+    );
+  }
+}
+
+/**
  * A function call weight promise action.
  *
  * @extends {PromiseAction}
@@ -84,14 +116,14 @@ export class FunctionCall extends PromiseAction {
 export class FunctionCallWeight extends PromiseAction {
   /**
    * @param functionName - The name of the function to be called.
-   * @param args - The arguments to be passed to the function.
+   * @param args - The utf-8 string arguments to be passed to the function.
    * @param amount - The amount of NEAR to attach to the call.
    * @param gas - The amount of Gas to attach to the call.
    * @param weight - The weight of unused Gas to use.
    */
   constructor(
     public functionName: string,
-    public args: Bytes,
+    public args: string,
     public amount: Balance,
     public gas: Gas,
     public weight: GasWeight
@@ -101,6 +133,41 @@ export class FunctionCallWeight extends PromiseAction {
 
   add(promiseIndex: PromiseIndex) {
     near.promiseBatchActionFunctionCallWeight(
+      promiseIndex,
+      this.functionName,
+      this.args,
+      this.amount,
+      this.gas,
+      this.weight
+    );
+  }
+}
+
+/**
+ * A function call weight raw promise action.
+ *
+ * @extends {PromiseAction}
+ */
+export class FunctionCallWeightRaw extends PromiseAction {
+  /**
+   * @param functionName - The name of the function to be called.
+   * @param args - The arguments to be passed to the function.
+   * @param amount - The amount of NEAR to attach to the call.
+   * @param gas - The amount of Gas to attach to the call.
+   * @param weight - The weight of unused Gas to use.
+   */
+  constructor(
+    public functionName: string,
+    public args: Uint8Array,
+    public amount: Balance,
+    public gas: Gas,
+    public weight: GasWeight
+  ) {
+    super();
+  }
+
+  add(promiseIndex: PromiseIndex) {
+    near.promiseBatchActionFunctionCallWeightRaw(
       promiseIndex,
       this.functionName,
       this.args,
@@ -336,7 +403,7 @@ export class NearPromise {
    *
    * @param code - The code of the contract to be deployed.
    */
-  deployContract(code: Bytes): NearPromise {
+  deployContract(code: Uint8Array): NearPromise {
     return this.addAction(new DeployContract(code));
   }
 
@@ -344,13 +411,13 @@ export class NearPromise {
    * Creates a function call promise action and adds it to the current promise.
    *
    * @param functionName - The name of the function to be called.
-   * @param args - The arguments to be passed to the function.
+   * @param args - The utf-8 string arguments to be passed to the function.
    * @param amount - The amount of NEAR to attach to the call.
    * @param gas - The amount of Gas to attach to the call.
    */
   functionCall(
     functionName: string,
-    args: Bytes,
+    args: string,
     amount: Balance,
     gas: Gas
   ): NearPromise {
@@ -358,7 +425,45 @@ export class NearPromise {
   }
 
   /**
+   * Creates a function call raw promise action and adds it to the current promise.
+   *
+   * @param functionName - The name of the function to be called.
+   * @param args - The arguments to be passed to the function.
+   * @param amount - The amount of NEAR to attach to the call.
+   * @param gas - The amount of Gas to attach to the call.
+   */
+  functionCallRaw(
+    functionName: string,
+    args: Uint8Array,
+    amount: Balance,
+    gas: Gas
+  ): NearPromise {
+    return this.addAction(new FunctionCallRaw(functionName, args, amount, gas));
+  }
+
+  /**
    * Creates a function call weight promise action and adds it to the current promise.
+   *
+   * @param functionName - The name of the function to be called.
+   * @param args - The utf-8 string arguments to be passed to the function.
+   * @param amount - The amount of NEAR to attach to the call.
+   * @param gas - The amount of Gas to attach to the call.
+   * @param weight - The weight of unused Gas to use.
+   */
+  functionCallWeight(
+    functionName: string,
+    args: string,
+    amount: Balance,
+    gas: Gas,
+    weight: GasWeight
+  ): NearPromise {
+    return this.addAction(
+      new FunctionCallWeight(functionName, args, amount, gas, weight)
+    );
+  }
+
+  /**
+   * Creates a function call weight raw promise action and adds it to the current promise.
    *
    * @param functionName - The name of the function to be called.
    * @param args - The arguments to be passed to the function.
@@ -366,15 +471,15 @@ export class NearPromise {
    * @param gas - The amount of Gas to attach to the call.
    * @param weight - The weight of unused Gas to use.
    */
-  functionCallWeight(
+  functionCallWeightRaw(
     functionName: string,
-    args: Bytes,
+    args: Uint8Array,
     amount: Balance,
     gas: Gas,
     weight: GasWeight
   ): NearPromise {
     return this.addAction(
-      new FunctionCallWeight(functionName, args, amount, gas, weight)
+      new FunctionCallWeightRaw(functionName, args, amount, gas, weight)
     );
   }
 

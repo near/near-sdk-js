@@ -1,4 +1,4 @@
-import { near, assert, Bytes, AccountId } from "near-sdk-js";
+import { near, assert, AccountId, bytes } from "near-sdk-js";
 
 export function refund_storage_deposit(
   account_id: AccountId,
@@ -37,8 +37,8 @@ export function refund_deposit(storage_used: bigint): void {
   refund_deposit_to_account(storage_used, near.predecessorAccountId());
 }
 
-export function hash_account_id(account_id: AccountId): Bytes {
-  return near.sha256(account_id);
+export function hash_account_id(account_id: AccountId): Uint8Array {
+  return near.sha256(bytes(account_id));
 }
 
 /** Assert that at least 1 yoctoNEAR was attached. */
@@ -58,7 +58,3 @@ export function assert_one_yocto(): void {
 }
 
 export type Option<T> = T | null;
-
-export interface IntoStorageKey {
-  into_storage_key(): Bytes;
-}

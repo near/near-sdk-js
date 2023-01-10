@@ -6,7 +6,6 @@ import {
   PromiseOrValue,
   assert,
   call,
-  bytes,
   serialize,
 } from "near-sdk-js";
 import { AccountId } from "near-sdk-js";
@@ -56,9 +55,9 @@ export class ApprovalReceiver
       default: {
         const prepaid_gas = near.prepaidGas();
         const account_id = near.currentAccountId();
-        return NearPromise.new(account_id).functionCall(
+        return NearPromise.new(account_id).functionCallRaw(
           "ok_go",
-          bytes(serialize({ msg })),
+          serialize({ msg }),
           0n,
           prepaid_gas - GAS_FOR_NFT_ON_APPROVE
         );

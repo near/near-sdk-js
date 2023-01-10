@@ -1,7 +1,6 @@
 import { NonFungibleToken } from "near-contract-standards/lib";
 import {
   assert,
-  Bytes,
   call,
   initialize,
   near,
@@ -9,6 +8,7 @@ import {
   NearPromise,
   PromiseOrValue,
   view,
+  IntoStorageKey
 } from "near-sdk-js";
 import {
   NFTContractMetadata,
@@ -16,7 +16,6 @@ import {
   TokenMetadata,
 } from "near-contract-standards/lib/non_fungible_token/metadata";
 import {
-  IntoStorageKey,
   Option,
 } from "near-contract-standards/lib/non_fungible_token/utils";
 import { AccountId } from "near-sdk-js";
@@ -32,25 +31,25 @@ import { NonFungibleTokenEnumeration } from "near-contract-standards/lib/non_fun
 class StorageKey {}
 
 class StorageKeyNonFungibleToken extends StorageKey implements IntoStorageKey {
-  into_storage_key(): Bytes {
+  into_storage_key(): string {
     return "NFT_";
   }
 }
 
 class StorageKeyTokenMetadata extends StorageKey implements IntoStorageKey {
-  into_storage_key(): Bytes {
+  into_storage_key(): string {
     return "TOKEN_METADATA_";
   }
 }
 
 class StorageKeyTokenEnumeration extends StorageKey implements IntoStorageKey {
-  into_storage_key(): Bytes {
+  into_storage_key(): string {
     return "TOKEN_ENUMERATION_";
   }
 }
 
 class StorageKeyApproval extends StorageKey implements IntoStorageKey {
-  into_storage_key(): Bytes {
+  into_storage_key(): string {
     return "APPROVAL1_";
   }
 }

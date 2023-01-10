@@ -1,14 +1,13 @@
 import * as near from "../api";
-import { u8ArrayToBytes, bytesToU8Array, assert, serializeValueWithOptions, ERR_INCONSISTENT_STATE, } from "../utils";
+import { assert, serializeValueWithOptions, ERR_INCONSISTENT_STATE, encode, } from "../utils";
 import { Vector, VectorIterator } from "./vector";
 function serializeIndex(index) {
     const data = new Uint32Array([index]);
     const array = new Uint8Array(data.buffer);
-    return u8ArrayToBytes(array);
+    return array;
 }
 function deserializeIndex(rawIndex) {
-    const array = bytesToU8Array(rawIndex);
-    const [data] = new Uint32Array(array.buffer);
+    const [data] = new Uint32Array(rawIndex.buffer);
     return data;
 }
 /**
@@ -59,7 +58,7 @@ export class UnorderedSet {
         }
         const nextIndex = this.length;
         const nextIndexRaw = serializeIndex(nextIndex);
-        near.storageWrite(indexLookup, nextIndexRaw);
+        near.storageWriteRaw(encode(indexLookup), nextIndexRaw);
         this.elements.push(element, options);
         return true;
     }
@@ -71,7 +70,7 @@ export class UnorderedSet {
      */
     remove(element, options) {
         const indexLookup = this.elementIndexPrefix + serializeValueWithOptions(element, options);
-        const indexRaw = near.storageRead(indexLookup);
+        const indexRaw = near.storageReadRaw(encode(indexLookup));
         if (!indexRaw) {
             return false;
         }
@@ -93,7 +92,7 @@ export class UnorderedSet {
         if (lastElement !== element) {
             const lastLookupElement = this.elementIndexPrefix +
                 serializeValueWithOptions(lastElement, options);
-            near.storageWrite(lastLookupElement, indexRaw);
+            near.storageWriteRaw(encode(lastLookupElement), indexRaw);
         }
         const index = deserializeIndex(indexRaw);
         this.elements.swapRemove(index);

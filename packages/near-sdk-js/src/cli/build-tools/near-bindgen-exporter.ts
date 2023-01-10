@@ -238,7 +238,7 @@ function saveToStorage(
  *   if (_result && _result.constructor && _result.constructor.name === 'NearPromise') {
  *     _result.onReturn();
  *   } else {
- *     near.valueReturn(_contract._serialize(result));
+ *     near.valueReturnRaw(_contract._serialize(result));
  *   }
  * }
  * ```
@@ -342,7 +342,7 @@ function createDeclaration(
         //   if (_result && _result.constructor && _result.constructor.name === 'NearPromise')
         //     _result.onReturn();
         //   else
-        //     near.valueReturn(_contract._serialize(result));
+        //     near.valueReturnRaw(_contract._serialize(result));
         executePromise(classId),
       ])
     )

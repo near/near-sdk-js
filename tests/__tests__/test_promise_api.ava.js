@@ -232,8 +232,9 @@ test("promise batch deploy contract and call", async (t) => {
     caller2Contract,
     "test_promise_batch_deploy_call",
     "",
-    { gas: "200 Tgas" }
+    { gas: "300 Tgas" }
   );
+
   let deployed = caller2Contract.getSubAccount("b");
   t.deepEqual(JSON.parse(Buffer.from(r.result.status.SuccessValue, "base64")), {
     currentAccountId: deployed.accountId,

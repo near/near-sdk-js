@@ -1,9 +1,13 @@
 import { GetOptions } from "./types/collections";
 
-/**
- * A string containing byte characters. Can be safely used in NEAR calls.
- */
-export type Bytes = string;
+export interface Env {
+  uint8array_to_latin1_string(a: Uint8Array): string;
+  uint8array_to_utf8_string(a: Uint8Array): string;
+  latin1_string_to_uint8array(s: string): Uint8Array;
+  utf8_string_to_uint8array(s: string): Uint8Array;
+}
+
+declare const env: Env;
 
 // make PromiseIndex a nominal typing
 enum PromiseIndexBrand {
@@ -35,46 +39,17 @@ export const ERR_INDEX_OUT_OF_BOUNDS = "Index out of bounds";
 const ACCOUNT_ID_REGEX =
   /^(([a-z\d]+[-_])*[a-z\d]+\.)*([a-z\d]+[-_])*[a-z\d]+$/;
 
-export function u8ArrayToBytes(array: Uint8Array): Bytes {
-  return array.reduce(
-    (result, value) => `${result}${String.fromCharCode(value)}`,
-    ""
-  );
-}
-
-// TODO this function is a bit broken and the type can't be string
-// TODO for more info: https://github.com/near/near-sdk-js/issues/78
-export function bytesToU8Array(bytes: Bytes): Uint8Array {
-  return Uint8Array.from([...bytes].map((byte) => byte.charCodeAt(0)));
-}
-
 /**
- * Accepts a string or Uint8Array and either checks for the validity of the string or converts the Uint8Array to Bytes.
- *
- * @param stringOrU8Array - The string or Uint8Array to be checked/transformed
- * @returns Safe Bytes to be used in NEAR calls.
+ * Concat two Uint8Array
+ * @param array1
+ * @param array2
+ * @returns the concatenation of two array
  */
-export function bytes(stringOrU8Array: string | Uint8Array): Bytes {
-  if (typeof stringOrU8Array === "string") {
-    return checkStringIsBytes(stringOrU8Array);
-  }
-
-  if (stringOrU8Array instanceof Uint8Array) {
-    return u8ArrayToBytes(stringOrU8Array);
-  }
-
-  throw new Error("bytes: expected string or Uint8Array");
-}
-
-function checkStringIsBytes(value: string): string {
-  [...value].forEach((character, index) => {
-    assert(
-      character.charCodeAt(0) <= 255,
-      `string ${value} at index ${index}: ${character} is not a valid byte`
-    );
-  });
-
-  return value;
+export function concat(array1: Uint8Array, array2: Uint8Array): Uint8Array {
+  const mergedArray = new Uint8Array(array1.length + array2.length);
+  mergedArray.set(array1);
+  mergedArray.set(array2, array1.length);
+  return mergedArray;
 }
 
 /**
@@ -95,11 +70,15 @@ export function assert(
 export type Mutable<T> = { -readonly [P in keyof T]: T[P] };
 
 export function getValueWithOptions<DataType>(
-  value: string,
+  value: Uint8Array | null,
   options: Omit<GetOptions<DataType>, "serializer"> = {
     deserializer: deserialize,
   }
 ): DataType | null {
+  if (value === null) {
+    return options?.defaultValue ?? null;
+  }
+
   const deserialized = deserialize(value);
 
   if (deserialized === undefined || deserialized === null) {
@@ -118,36 +97,38 @@ export function serializeValueWithOptions<DataType>(
   { serializer }: Pick<GetOptions<DataType>, "serializer"> = {
     serializer: serialize,
   }
-): string {
+): Uint8Array {
   return serializer(value);
 }
 
-export function serialize(valueToSerialize: unknown): string {
-  return JSON.stringify(valueToSerialize, function (key, value) {
-    if (typeof value === "bigint") {
-      return {
-        value: value.toString(),
-        [TYPE_KEY]: TypeBrand.BIGINT,
-      };
-    }
+export function serialize(valueToSerialize: unknown): Uint8Array {
+  return encode(
+    JSON.stringify(valueToSerialize, function (key, value) {
+      if (typeof value === "bigint") {
+        return {
+          value: value.toString(),
+          [TYPE_KEY]: TypeBrand.BIGINT,
+        };
+      }
 
-    if (
-      typeof this[key] === "object" &&
-      this[key] !== null &&
-      this[key] instanceof Date
-    ) {
-      return {
-        value: this[key].toISOString(),
-        [TYPE_KEY]: TypeBrand.DATE,
-      };
-    }
+      if (
+        typeof this[key] === "object" &&
+        this[key] !== null &&
+        this[key] instanceof Date
+      ) {
+        return {
+          value: this[key].toISOString(),
+          [TYPE_KEY]: TypeBrand.DATE,
+        };
+      }
 
-    return value;
-  });
+      return value;
+    })
+  );
 }
 
-export function deserialize(valueToDeserialize: string): unknown {
-  return JSON.parse(valueToDeserialize, (_, value) => {
+export function deserialize(valueToDeserialize: Uint8Array): unknown {
+  return JSON.parse(decode(valueToDeserialize), (_, value) => {
     if (
       value !== null &&
       typeof value === "object" &&
@@ -178,4 +159,73 @@ export function validateAccountId(accountId: string): boolean {
     accountId.length <= 64 &&
     ACCOUNT_ID_REGEX.test(accountId)
   );
+}
+
+/**
+ * A subset of NodeJS TextEncoder API
+ */
+export class TextEncoder {
+  encode(s: string): Uint8Array {
+    return env.utf8_string_to_uint8array(s);
+  }
+}
+
+/**
+ * A subset of NodeJS TextDecoder API. Only support utf-8 and latin1 encoding.
+ */
+export class TextDecoder {
+  constructor(public encoding: string = "utf-8") {}
+
+  decode(a: Uint8Array): string {
+    if (this.encoding == "utf-8") {
+      return env.uint8array_to_utf8_string(a);
+    } else if (this.encoding == "latin1") {
+      return env.uint8array_to_latin1_string(a);
+    } else {
+      throw new Error("unsupported encoding: " + this.encoding);
+    }
+  }
+}
+
+/**
+ * Convert a string to Uint8Array, each character must have a char code between 0-255.
+ * @param s - string that with only Latin1 character to convert
+ * @returns result Uint8Array
+ */
+export function bytes(s: string): Uint8Array {
+  return env.latin1_string_to_uint8array(s);
+}
+
+/**
+ * Convert a Uint8Array to string, each uint8 to the single character of that char code
+ * @param a - Uint8Array to convert
+ * @returns result string
+ */
+export function str(a: Uint8Array): string {
+  return env.uint8array_to_latin1_string(a);
+}
+
+/**
+ * Encode the string to Uint8Array with UTF-8 encoding
+ * @param s - String to encode
+ * @returns result Uint8Array
+ */
+export function encode(s: string): Uint8Array {
+  return env.utf8_string_to_uint8array(s);
+}
+
+/**
+ * Decode the Uint8Array to string in UTF-8 encoding
+ * @param a - array to decode
+ * @returns result string
+ */
+export function decode(a: Uint8Array): string {
+  return env.uint8array_to_utf8_string(a);
+}
+
+/**
+ * When implemented, allow object to be stored as collection key
+ */
+export interface IntoStorageKey {
+  into_storage_key(): string;
 }

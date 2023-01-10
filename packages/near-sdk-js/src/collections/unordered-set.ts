@@ -1,11 +1,9 @@
 import * as near from "../api";
 import {
-  u8ArrayToBytes,
-  bytesToU8Array,
-  Bytes,
   assert,
   serializeValueWithOptions,
   ERR_INCONSISTENT_STATE,
+  encode,
 } from "../utils";
 import { Vector, VectorIterator } from "./vector";
 import { Mutable } from "../utils";
@@ -15,12 +13,11 @@ function serializeIndex(index: number) {
   const data = new Uint32Array([index]);
   const array = new Uint8Array(data.buffer);
 
-  return u8ArrayToBytes(array);
+  return array;
 }
 
-function deserializeIndex(rawIndex: Bytes): number {
-  const array = bytesToU8Array(rawIndex);
-  const [data] = new Uint32Array(array.buffer);
+function deserializeIndex(rawIndex: Uint8Array): number {
+  const [data] = new Uint32Array(rawIndex.buffer);
 
   return data;
 }
@@ -29,13 +26,13 @@ function deserializeIndex(rawIndex: Bytes): number {
  * An unordered set that stores data in NEAR storage.
  */
 export class UnorderedSet<DataType> {
-  readonly elementIndexPrefix: Bytes;
+  readonly elementIndexPrefix: string;
   readonly elements: Vector<DataType>;
 
   /**
    * @param prefix - The byte prefix to use when storing elements inside this collection.
    */
-  constructor(readonly prefix: Bytes) {
+  constructor(readonly prefix: string) {
     this.elementIndexPrefix = `${prefix}i`;
     this.elements = new Vector(`${prefix}e`);
   }
@@ -89,7 +86,7 @@ export class UnorderedSet<DataType> {
 
     const nextIndex = this.length;
     const nextIndexRaw = serializeIndex(nextIndex);
-    near.storageWrite(indexLookup, nextIndexRaw);
+    near.storageWriteRaw(encode(indexLookup), nextIndexRaw);
     this.elements.push(element, options);
 
     return true;
@@ -104,7 +101,7 @@ export class UnorderedSet<DataType> {
   remove(element: DataType, options?: GetOptions<DataType>): boolean {
     const indexLookup =
       this.elementIndexPrefix + serializeValueWithOptions(element, options);
-    const indexRaw = near.storageRead(indexLookup);
+    const indexRaw = near.storageReadRaw(encode(indexLookup));
 
     if (!indexRaw) {
       return false;
@@ -135,7 +132,7 @@ export class UnorderedSet<DataType> {
       const lastLookupElement =
         this.elementIndexPrefix +
         serializeValueWithOptions(lastElement, options);
-      near.storageWrite(lastLookupElement, indexRaw);
+      near.storageWriteRaw(encode(lastLookupElement), indexRaw);
     }
 
     const index = deserializeIndex(indexRaw);
@@ -207,7 +204,7 @@ export class UnorderedSet<DataType> {
    *
    * @param options - Options for storing the data.
    */
-  serialize(options?: Pick<GetOptions<DataType>, "serializer">): string {
+  serialize(options?: Pick<GetOptions<DataType>, "serializer">): Uint8Array {
     return serializeValueWithOptions(this, options);
   }
 

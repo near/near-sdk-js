@@ -1,9 +1,9 @@
 import * as near from "../api";
 import { GetOptions } from "../types/collections";
 import {
-  Bytes,
   getValueWithOptions,
   serializeValueWithOptions,
+  encode,
 } from "../utils";
 
 /**
@@ -13,14 +13,14 @@ export class LookupMap<DataType> {
   /**
    * @param keyPrefix - The byte prefix to use when storing elements inside this collection.
    */
-  constructor(readonly keyPrefix: Bytes) {}
+  constructor(readonly keyPrefix: string) {}
 
   /**
    * Checks whether the collection contains the value.
    *
    * @param key - The value for which to check the presence.
    */
-  containsKey(key: Bytes): boolean {
+  containsKey(key: string): boolean {
     const storageKey = this.keyPrefix + key;
     return near.storageHasKey(storageKey);
   }
@@ -32,11 +32,11 @@ export class LookupMap<DataType> {
    * @param options - Options for retrieving the data.
    */
   get(
-    key: Bytes,
+    key: string,
     options?: Omit<GetOptions<DataType>, "serializer">
   ): DataType | null {
     const storageKey = this.keyPrefix + key;
-    const value = near.storageRead(storageKey);
+    const value = near.storageReadRaw(encode(storageKey));
 
     return getValueWithOptions(value, options);
   }
@@ -48,7 +48,7 @@ export class LookupMap<DataType> {
    * @param options - Options for retrieving the data.
    */
   remove(
-    key: Bytes,
+    key: string,
     options?: Omit<GetOptions<DataType>, "serializer">
   ): DataType | null {
     const storageKey = this.keyPrefix + key;
@@ -57,7 +57,7 @@ export class LookupMap<DataType> {
       return options?.defaultValue ?? null;
     }
 
-    const value = near.storageGetEvicted();
+    const value = near.storageGetEvictedRaw();
 
     return getValueWithOptions(value, options);
   }
@@ -70,18 +70,18 @@ export class LookupMap<DataType> {
    * @param options - Options for retrieving and storing the data.
    */
   set(
-    key: Bytes,
+    key: string,
     newValue: DataType,
     options?: GetOptions<DataType>
   ): DataType | null {
     const storageKey = this.keyPrefix + key;
     const storageValue = serializeValueWithOptions(newValue, options);
 
-    if (!near.storageWrite(storageKey, storageValue)) {
+    if (!near.storageWriteRaw(encode(storageKey), storageValue)) {
       return options?.defaultValue ?? null;
     }
 
-    const value = near.storageGetEvicted();
+    const value = near.storageGetEvictedRaw();
 
     return getValueWithOptions(value, options);
   }
@@ -93,7 +93,7 @@ export class LookupMap<DataType> {
    * @param options - Options for storing the data.
    */
   extend(
-    keyValuePairs: [Bytes, DataType][],
+    keyValuePairs: [string, DataType][],
     options?: GetOptions<DataType>
   ): void {
     for (const [key, value] of keyValuePairs) {
@@ -106,7 +106,7 @@ export class LookupMap<DataType> {
    *
    * @param options - Options for storing the data.
    */
-  serialize(options?: Pick<GetOptions<DataType>, "serializer">): string {
+  serialize(options?: Pick<GetOptions<DataType>, "serializer">): Uint8Array {
     return serializeValueWithOptions(this, options);
   }
 

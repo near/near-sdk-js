@@ -12,34 +12,17 @@ var TypeBrand;
 export const ERR_INCONSISTENT_STATE = "The collection is an inconsistent state. Did previous smart contract execution terminate unexpectedly?";
 export const ERR_INDEX_OUT_OF_BOUNDS = "Index out of bounds";
 const ACCOUNT_ID_REGEX = /^(([a-z\d]+[-_])*[a-z\d]+\.)*([a-z\d]+[-_])*[a-z\d]+$/;
-export function u8ArrayToBytes(array) {
-    return array.reduce((result, value) => `${result}${String.fromCharCode(value)}`, "");
-}
-// TODO this function is a bit broken and the type can't be string
-// TODO for more info: https://github.com/near/near-sdk-js/issues/78
-export function bytesToU8Array(bytes) {
-    return Uint8Array.from([...bytes].map((byte) => byte.charCodeAt(0)));
-}
 /**
- * Accepts a string or Uint8Array and either checks for the validity of the string or converts the Uint8Array to Bytes.
- *
- * @param stringOrU8Array - The string or Uint8Array to be checked/transformed
- * @returns Safe Bytes to be used in NEAR calls.
+ * Concat two Uint8Array
+ * @param array1
+ * @param array2
+ * @returns the concatenation of two array
  */
-export function bytes(stringOrU8Array) {
-    if (typeof stringOrU8Array === "string") {
-        return checkStringIsBytes(stringOrU8Array);
-    }
-    if (stringOrU8Array instanceof Uint8Array) {
-        return u8ArrayToBytes(stringOrU8Array);
-    }
-    throw new Error("bytes: expected string or Uint8Array");
-}
-function checkStringIsBytes(value) {
-    [...value].forEach((character, index) => {
-        assert(character.charCodeAt(0) <= 255, `string ${value} at index ${index}: ${character} is not a valid byte`);
-    });
-    return value;
+export function concat(array1, array2) {
+    const mergedArray = new Uint8Array(array1.length + array2.length);
+    mergedArray.set(array1);
+    mergedArray.set(array2, array1.length);
+    return mergedArray;
 }
 /**
  * Asserts that the expression passed to the function is truthy, otherwise throws a new Error with the provided message.
@@ -55,6 +38,9 @@ export function assert(expression, message) {
 export function getValueWithOptions(value, options = {
     deserializer: deserialize,
 }) {
+    if (value === null) {
+        return options?.defaultValue ?? null;
+    }
     const deserialized = deserialize(value);
     if (deserialized === undefined || deserialized === null) {
         return options?.defaultValue ?? null;
@@ -70,7 +56,7 @@ export function serializeValueWithOptions(value, { serializer } = {
     return serializer(value);
 }
 export function serialize(valueToSerialize) {
-    return JSON.stringify(valueToSerialize, function (key, value) {
+    return encode(JSON.stringify(valueToSerialize, function (key, value) {
         if (typeof value === "bigint") {
             return {
                 value: value.toString(),
@@ -86,10 +72,10 @@ export function serialize(valueToSerialize) {
             };
         }
         return value;
-    });
+    }));
 }
 export function deserialize(valueToDeserialize) {
-    return JSON.parse(valueToDeserialize, (_, value) => {
+    return JSON.parse(decode(valueToDeserialize), (_, value) => {
         if (value !== null &&
             typeof value === "object" &&
             Object.keys(value).length === 2 &&
@@ -114,4 +100,63 @@ export function validateAccountId(accountId) {
     return (accountId.length >= 2 &&
         accountId.length <= 64 &&
         ACCOUNT_ID_REGEX.test(accountId));
+}
+/**
+ * A subset of NodeJS TextEncoder API
+ */
+export class TextEncoder {
+    encode(s) {
+        return env.utf8_string_to_uint8array(s);
+    }
+}
+/**
+ * A subset of NodeJS TextDecoder API. Only support utf-8 and latin1 encoding.
+ */
+export class TextDecoder {
+    constructor(encoding = "utf-8") {
+        this.encoding = encoding;
+    }
+    decode(a) {
+        if (this.encoding == "utf-8") {
+            return env.uint8array_to_utf8_string(a);
+        }
+        else if (this.encoding == "latin1") {
+            return env.uint8array_to_latin1_string(a);
+        }
+        else {
+            throw new Error("unsupported encoding: " + this.encoding);
+        }
+    }
+}
+/**
+ * Convert a string to Uint8Array, each character must have a char code between 0-255.
+ * @param s - string that with only Latin1 character to convert
+ * @returns result Uint8Array
+ */
+export function bytes(s) {
+    return env.latin1_string_to_uint8array(s);
+}
+/**
+ * Convert a Uint8Array to string, each uint8 to the single character of that char code
+ * @param a - Uint8Array to convert
+ * @returns result string
+ */
+export function str(a) {
+    return env.uint8array_to_latin1_string(a);
+}
+/**
+ * Encode the string to Uint8Array with UTF-8 encoding
+ * @param s - String to encode
+ * @returns result Uint8Array
+ */
+export function encode(s) {
+    return env.utf8_string_to_uint8array(s);
+}
+/**
+ * Decode the Uint8Array to string in UTF-8 encoding
+ * @param a - array to decode
+ * @returns result string
+ */
+export function decode(a) {
+    return env.uint8array_to_utf8_string(a);
 }

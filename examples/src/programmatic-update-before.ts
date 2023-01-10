@@ -24,7 +24,7 @@ export function updateContract() {
   );
 
   const promiseId = near.promiseBatchCreate(near.currentAccountId());
-  near.promiseBatchActionDeployContract(promiseId, near.input());
+  near.promiseBatchActionDeployContract(promiseId, near.inputRaw());
 
   return near.promiseReturn(promiseId);
 }

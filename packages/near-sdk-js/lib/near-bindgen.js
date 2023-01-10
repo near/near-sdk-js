@@ -1,5 +1,5 @@
 import * as near from "./api";
-import { deserialize, serialize } from "./utils";
+import { deserialize, serialize, bytes, encode } from "./utils";
 /**
  * Tells the SDK to use this function as the initialization function of the contract.
  *
@@ -71,18 +71,18 @@ export function NearBindgen({ requireInit = false, serializer = serialize, deser
                 return new target();
             }
             static _getState() {
-                const rawState = near.storageRead("STATE");
+                const rawState = near.storageReadRaw(bytes("STATE"));
                 return rawState ? this._deserialize(rawState) : null;
             }
             static _saveToStorage(objectToSave) {
-                near.storageWrite("STATE", this._serialize(objectToSave));
+                near.storageWriteRaw(bytes("STATE"), this._serialize(objectToSave));
             }
             static _getArgs() {
                 return JSON.parse(near.input() || "{}");
             }
             static _serialize(value, forReturn = false) {
                 if (forReturn) {
-                    return JSON.stringify(value, (_, value) => typeof value === "bigint" ? `${value}` : value);
+                    return encode(JSON.stringify(value, (_, value) => typeof value === "bigint" ? `${value}` : value));
                 }
                 return serializer(value);
             }

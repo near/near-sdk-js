@@ -1,4 +1,4 @@
-import { assert, ERR_INCONSISTENT_STATE, getValueWithOptions, serializeValueWithOptions, } from "../utils";
+import { assert, ERR_INCONSISTENT_STATE, getValueWithOptions, serializeValueWithOptions, encode, decode, } from "../utils";
 import { Vector, VectorIterator } from "./vector";
 import { LookupMap } from "./lookup-map";
 /**
@@ -37,7 +37,7 @@ export class UnorderedMap {
             return options?.defaultValue ?? null;
         }
         const [value] = valueAndIndex;
-        return getValueWithOptions(value, options);
+        return getValueWithOptions(encode(value), options);
     }
     /**
      * Store a new value at the provided key.
@@ -52,12 +52,12 @@ export class UnorderedMap {
         if (valueAndIndex === null) {
             const newElementIndex = this.length;
             this.keys.push(key);
-            this.values.set(key, [serialized, newElementIndex]);
+            this.values.set(key, [decode(serialized), newElementIndex]);
             return null;
         }
         const [oldValue, oldIndex] = valueAndIndex;
-        this.values.set(key, [serialized, oldIndex]);
-        return getValueWithOptions(oldValue, options);
+        this.values.set(key, [decode(serialized), oldIndex]);
+        return getValueWithOptions(encode(oldValue), options);
     }
     /**
      * Removes and retrieves the element with the provided key.
@@ -80,7 +80,7 @@ export class UnorderedMap {
             assert(swappedValueAndIndex !== null, ERR_INCONSISTENT_STATE);
             this.values.set(swappedKey, [swappedValueAndIndex[0], index]);
         }
-        return getValueWithOptions(value, options);
+        return getValueWithOptions(encode(value), options);
     }
     /**
      * Remove all of the elements stored within the collection.
@@ -173,7 +173,10 @@ class UnorderedMapIterator {
         assert(valueAndIndex !== null, ERR_INCONSISTENT_STATE);
         return {
             done: key.done,
-            value: [key.value, getValueWithOptions(valueAndIndex[0], this.options)],
+            value: [
+                key.value,
+                getValueWithOptions(encode(valueAndIndex[0]), this.options),
+            ],
         };
     }
 }

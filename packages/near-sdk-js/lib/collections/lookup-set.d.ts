@@ -1,14 +1,13 @@
 import { GetOptions } from "../types/collections";
-import { Bytes } from "../utils";
 /**
  * A lookup set collection that stores entries in NEAR storage.
  */
 export declare class LookupSet<DataType> {
-    readonly keyPrefix: Bytes;
+    readonly keyPrefix: string;
     /**
      * @param keyPrefix - The byte prefix to use when storing elements inside this collection.
      */
-    constructor(keyPrefix: Bytes);
+    constructor(keyPrefix: string);
     /**
      * Checks whether the collection contains the value.
      *
@@ -43,7 +42,7 @@ export declare class LookupSet<DataType> {
      *
      * @param options - Options for storing the data.
      */
-    serialize(options?: Pick<GetOptions<DataType>, "serializer">): string;
+    serialize(options?: Pick<GetOptions<DataType>, "serializer">): Uint8Array;
     /**
      * Converts the deserialized data from storage to a JavaScript instance of the collection.
      *

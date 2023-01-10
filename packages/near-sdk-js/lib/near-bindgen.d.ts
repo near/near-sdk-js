@@ -54,8 +54,8 @@ export declare function middleware<Arguments extends Array<any>>(...middlewares:
  */
 export declare function NearBindgen(options: {
     requireInit?: boolean;
-    serializer?(value: unknown): string;
-    deserializer?(value: string): unknown;
+    serializer?(value: unknown): Uint8Array;
+    deserializer?(value: Uint8Array): unknown;
 }): any;
 declare module "./" {
     /**

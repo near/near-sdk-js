@@ -1,4 +1,4 @@
-import { near, assert } from "near-sdk-js";
+import { near, assert, bytes } from "near-sdk-js";
 export function refund_storage_deposit(account_id, storage_released) {
     const promise_id = near.promiseBatchCreate(account_id);
     near.promiseBatchActionTransfer(promise_id, BigInt(storage_released) * near.storageByteCost());
@@ -20,7 +20,7 @@ export function refund_deposit(storage_used) {
     refund_deposit_to_account(storage_used, near.predecessorAccountId());
 }
 export function hash_account_id(account_id) {
-    return near.sha256(account_id);
+    return near.sha256(bytes(account_id));
 }
 /** Assert that at least 1 yoctoNEAR was attached. */
 export function assert_at_least_one_yocto() {

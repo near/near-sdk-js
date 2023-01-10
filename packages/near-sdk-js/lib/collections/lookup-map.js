@@ -1,5 +1,5 @@
 import * as near from "../api";
-import { getValueWithOptions, serializeValueWithOptions, } from "../utils";
+import { getValueWithOptions, serializeValueWithOptions, encode, } from "../utils";
 /**
  * A lookup map that stores data in NEAR storage.
  */
@@ -27,7 +27,7 @@ export class LookupMap {
      */
     get(key, options) {
         const storageKey = this.keyPrefix + key;
-        const value = near.storageRead(storageKey);
+        const value = near.storageReadRaw(encode(storageKey));
         return getValueWithOptions(value, options);
     }
     /**
@@ -41,7 +41,7 @@ export class LookupMap {
         if (!near.storageRemove(storageKey)) {
             return options?.defaultValue ?? null;
         }
-        const value = near.storageGetEvicted();
+        const value = near.storageGetEvictedRaw();
         return getValueWithOptions(value, options);
     }
     /**
@@ -54,10 +54,10 @@ export class LookupMap {
     set(key, newValue, options) {
         const storageKey = this.keyPrefix + key;
         const storageValue = serializeValueWithOptions(newValue, options);
-        if (!near.storageWrite(storageKey, storageValue)) {
+        if (!near.storageWriteRaw(encode(storageKey), storageValue)) {
             return options?.defaultValue ?? null;
         }
-        const value = near.storageGetEvicted();
+        const value = near.storageGetEvictedRaw();
         return getValueWithOptions(value, options);
     }
     /**

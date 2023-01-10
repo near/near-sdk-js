@@ -1,17 +1,16 @@
-import { Bytes } from "../utils";
 import { GetOptions } from "../types/collections";
 /**
  * An iterable implementation of vector that stores its content on the trie.
  * Uses the following map: index -> element
  */
 export declare class Vector<DataType> {
-    readonly prefix: Bytes;
+    readonly prefix: string;
     length: number;
     /**
      * @param prefix - The byte prefix to use when storing elements inside this collection.
      * @param length - The initial length of the collection. By default 0.
      */
-    constructor(prefix: Bytes, length?: number);
+    constructor(prefix: string, length?: number);
     /**
      * Checks whether the collection is empty.
      */
@@ -81,7 +80,7 @@ export declare class Vector<DataType> {
      *
      * @param options - Options for storing the data.
      */
-    serialize(options?: Pick<GetOptions<DataType>, "serializer">): string;
+    serialize(options?: Pick<GetOptions<DataType>, "serializer">): Uint8Array;
     /**
      * Converts the deserialized data from storage to a JavaScript instance of the collection.
      *

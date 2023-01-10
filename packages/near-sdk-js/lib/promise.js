@@ -40,7 +40,7 @@ export class DeployContract extends PromiseAction {
 export class FunctionCall extends PromiseAction {
     /**
      * @param functionName - The name of the function to be called.
-     * @param args - The arguments to be passed to the function.
+     * @param args - The utf-8 string arguments to be passed to the function.
      * @param amount - The amount of NEAR to attach to the call.
      * @param gas - The amount of Gas to attach to the call.
      */
@@ -56,11 +56,59 @@ export class FunctionCall extends PromiseAction {
     }
 }
 /**
+ * A function call raw promise action.
+ *
+ * @extends {PromiseAction}
+ */
+export class FunctionCallRaw extends PromiseAction {
+    /**
+     * @param functionName - The name of the function to be called.
+     * @param args - The arguments to be passed to the function.
+     * @param amount - The amount of NEAR to attach to the call.
+     * @param gas - The amount of Gas to attach to the call.
+     */
+    constructor(functionName, args, amount, gas) {
+        super();
+        this.functionName = functionName;
+        this.args = args;
+        this.amount = amount;
+        this.gas = gas;
+    }
+    add(promiseIndex) {
+        near.promiseBatchActionFunctionCallRaw(promiseIndex, this.functionName, this.args, this.amount, this.gas);
+    }
+}
+/**
  * A function call weight promise action.
  *
  * @extends {PromiseAction}
  */
 export class FunctionCallWeight extends PromiseAction {
+    /**
+     * @param functionName - The name of the function to be called.
+     * @param args - The utf-8 string arguments to be passed to the function.
+     * @param amount - The amount of NEAR to attach to the call.
+     * @param gas - The amount of Gas to attach to the call.
+     * @param weight - The weight of unused Gas to use.
+     */
+    constructor(functionName, args, amount, gas, weight) {
+        super();
+        this.functionName = functionName;
+        this.args = args;
+        this.amount = amount;
+        this.gas = gas;
+        this.weight = weight;
+    }
+    add(promiseIndex) {
+        near.promiseBatchActionFunctionCallWeight(promiseIndex, this.functionName, this.args, this.amount, this.gas, this.weight);
+    }
+}
+/**
+ * A function call weight raw promise action.
+ *
+ * @extends {PromiseAction}
+ */
+export class FunctionCallWeightRaw extends PromiseAction {
     /**
      * @param functionName - The name of the function to be called.
      * @param args - The arguments to be passed to the function.
@@ -77,7 +125,7 @@ export class FunctionCallWeight extends PromiseAction {
         this.weight = weight;
     }
     add(promiseIndex) {
-        near.promiseBatchActionFunctionCallWeight(promiseIndex, this.functionName, this.args, this.amount, this.gas, this.weight);
+        near.promiseBatchActionFunctionCallWeightRaw(promiseIndex, this.functionName, this.args, this.amount, this.gas, this.weight);
     }
 }
 /**
@@ -274,7 +322,7 @@ export class NearPromise {
      * Creates a function call promise action and adds it to the current promise.
      *
      * @param functionName - The name of the function to be called.
-     * @param args - The arguments to be passed to the function.
+     * @param args - The utf-8 string arguments to be passed to the function.
      * @param amount - The amount of NEAR to attach to the call.
      * @param gas - The amount of Gas to attach to the call.
      */
@@ -282,7 +330,30 @@ export class NearPromise {
         return this.addAction(new FunctionCall(functionName, args, amount, gas));
     }
     /**
+     * Creates a function call raw promise action and adds it to the current promise.
+     *
+     * @param functionName - The name of the function to be called.
+     * @param args - The arguments to be passed to the function.
+     * @param amount - The amount of NEAR to attach to the call.
+     * @param gas - The amount of Gas to attach to the call.
+     */
+    functionCallRaw(functionName, args, amount, gas) {
+        return this.addAction(new FunctionCallRaw(functionName, args, amount, gas));
+    }
+    /**
      * Creates a function call weight promise action and adds it to the current promise.
+     *
+     * @param functionName - The name of the function to be called.
+     * @param args - The utf-8 string arguments to be passed to the function.
+     * @param amount - The amount of NEAR to attach to the call.
+     * @param gas - The amount of Gas to attach to the call.
+     * @param weight - The weight of unused Gas to use.
+     */
+    functionCallWeight(functionName, args, amount, gas, weight) {
+        return this.addAction(new FunctionCallWeight(functionName, args, amount, gas, weight));
+    }
+    /**
+     * Creates a function call weight raw promise action and adds it to the current promise.
      *
      * @param functionName - The name of the function to be called.
      * @param args - The arguments to be passed to the function.
@@ -290,8 +361,8 @@ export class NearPromise {
      * @param gas - The amount of Gas to attach to the call.
      * @param weight - The weight of unused Gas to use.
      */
-    functionCallWeight(functionName, args, amount, gas, weight) {
-        return this.addAction(new FunctionCallWeight(functionName, args, amount, gas, weight));
+    functionCallWeightRaw(functionName, args, amount, gas, weight) {
+        return this.addAction(new FunctionCallWeightRaw(functionName, args, amount, gas, weight));
     }
     /**
      * Creates a transfer promise action and adds it to the current promise.
