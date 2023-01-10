@@ -1,24 +1,24 @@
-import { AccountId } from "near-sdk-js"
+import { AccountId, Balance } from "near-sdk-js"
 import { Option } from "../non_fungible_token/utils"; 
 
 export class StorageBalance {
-    total: number;
-    available: number;
+    total: Balance;
+    available: Balance;
 
-    constructor(total: number, available: number) {
+    constructor(total: Balance, available: Balance) {
         this.total = total;
         this.available = available;
     }
 }
 
 export class StorageBalanceBounds {
-    constructor(min: number, max: Option<number>) {
+    constructor(min: Balance, max: Option<Balance>) {
         this.min = min;
         this.max = max;
     }
 
-    min: number;
-    max: Option<number>;
+    min: Balance;
+    max: Option<Balance>;
 }
 
 export interface StorageManagement {

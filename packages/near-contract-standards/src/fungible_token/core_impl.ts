@@ -17,6 +17,8 @@ import {
     IntoStorageKey,
 } from "near-sdk-js";
 
+import { Option } from '../non_fungible_token/utils';
+
 // TODO: move to the main SDK package
 import { assert_one_yocto } from "../non_fungible_token/utils";
 
@@ -264,7 +266,7 @@ class FungibleToken implements FungibleTokenCore, StorageManagement, FungibleTok
 
     @view({})
     internal_storage_balance_of(account_id: AccountId): Option<StorageBalance> {
-        if (this.accounts.contains_key(account_id)) {
+        if (this.accounts.containsKey(account_id)) {
             return new StorageBalance(this.storage_balance_bounds().min, 0)
         } else {
             return null;
@@ -276,18 +278,18 @@ class FungibleToken implements FungibleTokenCore, StorageManagement, FungibleTok
      */
     @call({})
     storage_deposit(
-        account_id: Option<AccountId>,
-        registration_only: Option<boolean>,
+        account_id?: AccountId,
+        registration_only?: boolean,
     ) : StorageBalance {
         let amount: Balance = near.attachedDeposit();
         account_id = account_id ?? near.predecessorAccountId();
-        if this.accounts.contains_key(account_id) {
+        if (this.accounts.containsKey(account_id)) {
             near.log!("The account is already registered, refunding the deposit");
             if (amount > 0) {
                 Promise::new(near.predecessorAccountId()).transfer(amount);
             }
         } else {
-            let min_balance = this.storage_balance_bounds().min.0;
+            let min_balance: Balance = this.storage_balance_bounds().min.0;
             if (amount < min_balance) {
                 throw Error("The attached deposit is less than the minimum storage balance");
             }
@@ -326,14 +328,14 @@ class FungibleToken implements FungibleTokenCore, StorageManagement, FungibleTok
     // }
 
     @call({})
-    storage_unregister(force: Option<bool>) : bool {
+    storage_unregister(force?: boolean) : boolean {
         return this.internal_storage_unregister(force) ? true : false;
     }
 
     @view({})
     storage_balance_bounds() : StorageBalanceBounds {
-        let required_storage_balance =
-            Balance(this.account_storage_usage) * near.storageByteCost();
+        let required_storage_balance: Balance =
+            BigInt(this.account_storage_usage) * near.storageByteCost();
         return new StorageBalanceBounds(required_storage_balance, required_storage_balance);
     }
 
