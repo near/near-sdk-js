@@ -48,8 +48,8 @@ export interface FungibleTokenCore {
     ) : PromiseOrValue<number>;
 
     /** Returns the total supply of the token in a decimal string representation. */
-    ft_total_supply() : number;
+    ft_total_supply() : Balance;
 
     /** Returns the balance of the account. If the account doesn't exist must returns `"0"`. */
-    ft_balance_of(account_id: AccountId) : number;
+    ft_balance_of(account_id: AccountId) : Balance;
 }

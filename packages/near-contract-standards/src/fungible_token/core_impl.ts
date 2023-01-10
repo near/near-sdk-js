@@ -228,13 +228,13 @@ class FungibleToken implements FungibleTokenCore, StorageManagement, FungibleTok
     // }
 
     @view({})
-    ft_total_supply() : number {
+    ft_total_supply() : Balance {
         return this.total_supply;
     }
 
     @view({})
-    ft_balance_of(account_id: AccountId) : number {
-        return this.accounts.get(account_id) ?? 0;
+    ft_balance_of(account_id: AccountId) : Balance {
+        return this.accounts.get(account_id) ?? BigInt(0);
     }
 
     /** Implementation of storage
