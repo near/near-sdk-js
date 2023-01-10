@@ -58,7 +58,7 @@ class FungibleToken implements FungibleTokenCore, StorageManagement, FungibleTok
     measure_account_storage_usage() {
         let initial_storage_usage = near.storageUsage();
         let tmp_account_id = "a".repeat(64);
-        this.accounts.insert(tmp_account_id, 0n);
+        this.accounts.set(tmp_account_id, 0n);
         this.account_storage_usage = near.storageUsage() - initial_storage_usage;
         this.accounts.remove(tmp_account_id);
     }
@@ -78,7 +78,7 @@ class FungibleToken implements FungibleTokenCore, StorageManagement, FungibleTok
         if (!Number.isSafeInteger(new_balance)) {
             throw Error("Balance overflow");
         }
-        this.accounts.insert(account_id, new_balance);
+        this.accounts.set(account_id, new_balance);
         let new_total_supply = this.total_supply + amount;
         if (!Number.isSafeInteger(new_total_supply)) {
             throw Error(ERR_TOTAL_SUPPLY_OVERFLOW);
@@ -91,7 +91,7 @@ class FungibleToken implements FungibleTokenCore, StorageManagement, FungibleTok
         let new_balance = balance - amount;
         // TODO: is it the right check?
         if (!Number.isSafeInteger(new_balance)) {
-            this.accounts.insert(account_id, new_balance);
+            this.accounts.set(account_id, new_balance);
             let new_total_supply = this.total_supply - amount;
             if (!Number.isSafeInteger(new_total_supply)) {
                 throw Error(ERR_TOTAL_SUPPLY_OVERFLOW);
@@ -106,7 +106,7 @@ class FungibleToken implements FungibleTokenCore, StorageManagement, FungibleTok
         sender_id: AccountId,
         receiver_id: AccountId,
         amount: Balance,
-        memo: Option<String>,
+        memo?: string,
     ) {
         assert(sender_id != receiver_id, "Sender and receiver should be different");
         assert(amount > 0, "The amount should be a positive number");
@@ -116,7 +116,7 @@ class FungibleToken implements FungibleTokenCore, StorageManagement, FungibleTok
     }
 
     internal_register_account(account_id: AccountId) {
-        if (this.accounts.insert(account_id, 0).is_some()) { //TODO: check is_some
+        if (this.accounts.set(account_id, 0).is_some()) { //TODO: check is_some
             throw Error("The account is already registered");
         }
     }
@@ -148,14 +148,14 @@ class FungibleToken implements FungibleTokenCore, StorageManagement, FungibleTok
     //         if receiver_balance > 0 {
     //             let refund_amount = std::cmp::min(receiver_balance, unused_amount);
     //             if let Some(new_receiver_balance) = receiver_balance.checked_sub(refund_amount) {
-    //                 this.accounts.insert(&receiver_id, &new_receiver_balance);
+    //                 this.accounts.set(&receiver_id, &new_receiver_balance);
     //             } else {
     //                 throw Error("The receiver account doesn't have enough balance");
     //             }
 
     //             if let Some(sender_balance) = this.accounts.get(sender_id) {
     //                 if let Some(new_sender_balance) = sender_balance.checked_add(refund_amount) {
-    //                     this.accounts.insert(sender_id, &new_sender_balance);
+    //                     this.accounts.set(sender_id, &new_sender_balance);
     //                 } else {
     //                     throw Error("Sender balance overflow");
     //                 }
