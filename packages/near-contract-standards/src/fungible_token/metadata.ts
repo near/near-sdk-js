@@ -1,5 +1,4 @@
 import {
-    Bytes,
     assert,
 } from "near-sdk-js";
 
@@ -13,8 +12,8 @@ export class FungibleTokenMetadata {
     symbol: string;
     icon: Option<string>;
     reference: Option<string>;
-    reference_hash: Option<Bytes>;
-    decimals: Bytes;
+    reference_hash: Option<Uint8Array>;
+    decimals: number;
 
     assert_valid() {
         assert(this.spec == FT_METADATA_SPEC, "Invalid FT_METADATA_SPEC");
