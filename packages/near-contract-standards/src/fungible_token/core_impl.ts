@@ -116,9 +116,10 @@ class FungibleToken implements FungibleTokenCore, StorageManagement, FungibleTok
     }
 
     internal_register_account(account_id: AccountId) {
-        if (this.accounts.set(account_id, 0).is_some()) { //TODO: check is_some
+        if (this.accounts.containsKey(account_id)) {
             throw Error("The account is already registered");
         }
+        this.accounts.set(account_id, BigInt(0));
     }
 
     /** Internal method that returns the amount of burned tokens in a corner case when the sender
