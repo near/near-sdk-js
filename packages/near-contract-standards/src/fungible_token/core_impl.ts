@@ -194,10 +194,10 @@ class FungibleToken implements FungibleTokenCore, StorageManagement, FungibleTok
 
     /** Implementation of FungibleTokenCore */
     @call({})
-    ft_transfer(receiver_id: AccountId, amount: number, memo: Option<String>) {
+    ft_transfer(receiver_id: AccountId, amount: Balance, memo?: string) {
         assert_one_yocto();
         let sender_id = near.predecessorAccountId();
-        this.internal_transfer(sender_id, receiver_id, Balance(amount), memo);
+        this.internal_transfer(sender_id, receiver_id, amount, memo);
     }
 
     // @call({})

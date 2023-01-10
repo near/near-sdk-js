@@ -1,4 +1,4 @@
-import { AccountId, PromiseOrValue } from "near-sdk-js"
+import { AccountId, PromiseOrValue, Balance } from "near-sdk-js"
 import { Option } from "../non_fungible_token/utils"
 export interface FungibleTokenCore {
     /**
@@ -13,7 +13,7 @@ export interface FungibleTokenCore {
      * @param amount - the amount of tokens to transfer. Must be a positive number in decimal string representation.
      * @param memo - an optional string field in a free form to associate a memo with this transfer.
      */
-    ft_transfer(receiver_id: AccountId, amount: number, memo: Option<String>);
+    ft_transfer(receiver_id: AccountId, amount: Balance, memo: Option<String>);
 
     /**
      * Transfers positive `amount` of tokens from the `env::predecessor_account_id` to `receiver_id` account. Then
