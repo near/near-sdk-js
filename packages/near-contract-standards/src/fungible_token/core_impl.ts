@@ -10,6 +10,7 @@ import {
     Gas,
     PromiseOrValue,
     PromiseResult,
+    NearPromise,
     StorageUsage,
     call,
     view,
@@ -267,7 +268,7 @@ class FungibleToken implements FungibleTokenCore, StorageManagement, FungibleTok
     @view({})
     internal_storage_balance_of(account_id: AccountId): Option<StorageBalance> {
         if (this.accounts.containsKey(account_id)) {
-            return new StorageBalance(this.storage_balance_bounds().min, 0)
+            return new StorageBalance(this.storage_balance_bounds().min, BigInt(0))
         } else {
             return null;
         }
@@ -286,10 +287,10 @@ class FungibleToken implements FungibleTokenCore, StorageManagement, FungibleTok
         if (this.accounts.containsKey(account_id)) {
             near.log!("The account is already registered, refunding the deposit");
             if (amount > 0) {
-                Promise::new(near.predecessorAccountId()).transfer(amount);
+                NearPromise.new(near.predecessorAccountId()).transfer(amount);
             }
         } else {
-            let min_balance: Balance = this.storage_balance_bounds().min.0;
+            let min_balance: Balance = this.storage_balance_bounds().min;
             if (amount < min_balance) {
                 throw Error("The attached deposit is less than the minimum storage balance");
             }
@@ -297,10 +298,10 @@ class FungibleToken implements FungibleTokenCore, StorageManagement, FungibleTok
             this.internal_register_account(account_id);
             let refund = amount - min_balance;
             if (refund > 0) {
-                Promise::new(near.predecessorAccountId()).transfer(refund);
+                NearPromise.new(near.predecessorAccountId()).transfer(refund);
             }
         }
-        return this.internal_storage_balance_of(account_id).unwrap()
+        return this.internal_storage_balance_of(account_id);
     }
 
     /**
