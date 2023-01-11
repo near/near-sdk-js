@@ -203,32 +203,30 @@ class FungibleToken implements FungibleTokenCore, StorageManagement, FungibleTok
         this.internal_transfer(sender_id, receiver_id, amount, memo);
     }
 
-    // @call({})
-    // ft_transfer_call(
-    //     receiver_id: AccountId,
-    //     amount: number,
-    //     memo: Option<String>,
-    //     msg: String,
-    // ) : PromiseOrValue<number> {
-    //     assert_one_yocto();
-    //     assert(near.prepaidGas() > GAS_FOR_FT_TRANSFER_CALL, "More gas is required");
-    //     let sender_id = near.predecessorAccountId();
-    //     this.internal_transfer(sender_id, receiver_id, Balance(amount), memo);
-    //     let receiver_gas = near.prepaidGas()
-    //         .0
-    //         .checked_sub(GAS_FOR_FT_TRANSFER_CALL.0)
-    //         .unwrap_or_else(|| throw Error("Prepaid gas overflow"));
-    //     // Initiating receiver's call and the callback
-    //     ext_ft_receiver::ext(receiver_id.clone())
-    //         .with_static_gas(receiver_gas.into())
-    //         .ft_on_transfer(sender_id.clone(), Balance(amount), msg)
-    //         .then(
-    //             ext_ft_resolver::ext(near.currentAccountId())
-    //                 .with_static_gas(GAS_FOR_RESOLVE_TRANSFER)
-    //                 .ft_resolve_transfer(sender_id, receiver_id, Balance(amount)),
-    //         )
-    //         .into()
-    // }
+    @call({})
+    ft_transfer_call(
+        receiver_id: AccountId,
+        amount: number,
+        memo?: string,
+        msg: string,
+    ) : PromiseOrValue<bigint> {
+        assert_one_yocto();
+        assert(near.prepaidGas() > GAS_FOR_FT_TRANSFER_CALL, "More gas is required");
+        let sender_id = near.predecessorAccountId();
+        this.internal_transfer(sender_id, receiver_id, BigInt(amount), memo);
+        let receiver_gas = near.prepaidGas() - GAS_FOR_FT_TRANSFER_CALL;
+        if(receiver_gas < 0 ) {
+            throw new Error("Prepaid gas overflow");
+        }
+        // Initiating receiver's call and the callback
+        ext_ft_receiver::ext(receiver_id)
+            .with_static_gas(receiver_gas)
+            .ft_on_transfer(sender_id, BigInt(amount), msg)
+            .then(
+                ext_ft_resolver::ext(near.currentAccountId())
+                    .with_static_gas(GAS_FOR_RESOLVE_TRANSFER)
+                    .ft_resolve_transfer(sender_id, receiver_id, BigInt(amount)))
+    }
 
     @view({})
     ft_total_supply() : Balance {

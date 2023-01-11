@@ -45,7 +45,7 @@ export interface FungibleTokenCore {
         amount: number,
         memo: Option<String>,
         msg: String,
-    ) : PromiseOrValue<number>;
+    ) : PromiseOrValue<bigint>;
 
     /** Returns the total supply of the token in a decimal string representation. */
     ft_total_supply() : Balance;
