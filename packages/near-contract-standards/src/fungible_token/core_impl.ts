@@ -244,26 +244,24 @@ class FungibleToken implements FungibleTokenCore, StorageManagement, FungibleTok
      * Internal method that returns the Account ID and the balance in case the account was
      * unregistered.
      */
-    // internal_storage_unregister(
-    //     force: Option<bool>,
-    // ) : Option<(AccountId, Balance)> {
-    //     assert_one_yocto();
-    //     let account_id = near.predecessorAccountId();
-    //     let force = force.unwrap_or(false);
-    //     if let Some(balance) = this.accounts.get(account_id) {
-    //         if balance == 0 || force {
-    //             this.accounts.remove(account_id);
-    //             this.total_supply -= balance;
-    //             Promise::new(account_id.clone()).transfer(this.storage_balance_bounds().min.0 + 1);
-    //             Some((account_id, balance))
-    //         } else {
-    //             throw Error("Can't unregister the account with the positive balance without force");
-    //         }
-    //     } else {
-    //         near.log(`The account ${account_id} is not registered`);
-    //         None
-    //     }
-    // }
+    internal_storage_unregister(force?: boolean) : Option<[AccountId, Balance]> {
+        assert_one_yocto();
+        let account_id = near.predecessorAccountId();
+        let balance = this.accounts.get(account_id);
+        if (balance) {
+            if (balance == BigInt(0) || force) {
+                this.accounts.remove(account_id);
+                this.total_supply -= balance;
+                NearPromise.new(account_id).transfer(this.storage_balance_bounds().min + BigInt(1));
+                return [account_id, balance];
+            } else {
+                throw Error("Can't unregister the account with the positive balance without force");
+            }
+        } else {
+            near.log(`The account ${account_id} is not registered`);
+            return null;
+        }
+    }
 
     @view({})
     internal_storage_balance_of(account_id: AccountId): Option<StorageBalance> {
