@@ -311,21 +311,20 @@ class FungibleToken implements FungibleTokenCore, StorageManagement, FungibleTok
      * - never transfers Ⓝ to caller
      * - returns a `storage_balance` struct if `amount` is 0
      */
-    // @view({})
-    // storage_withdraw(amount: Option<number>) : StorageBalance {
-    //     assert_one_yocto();
-    //     let predecessor_account_id = near.predecessorAccountId();
-    //     if let Some(storage_balance) = this.internal_storage_balance_of(&predecessor_account_id) {
-    //         match amount {
-    //             Some(amount) if amount.0 > 0 => {
-    //                 throw Error("The amount is greater than the available storage balance");
-    //             }
-    //             _ => storage_balance,
-    //         }
-    //     } else {
-    //         throw Error(`The account ${predecessor_account_id} is not registered`)
-    //     }
-    // }
+    @view({})
+    storage_withdraw(amount?: bigint) : StorageBalance {
+        assert_one_yocto();
+        let predecessor_account_id = near.predecessorAccountId();
+        const storage_balance = this.internal_storage_balance_of(predecessor_account_id);
+        if (storage_balance) {
+            if (amount && amount > 0) {
+                throw Error("The amount is greater than the available storage balance");
+            }
+            return storage_balance;
+        } else {
+            throw Error(`The account ${predecessor_account_id} is not registered`)
+        }
+    }
 
     @call({})
     storage_unregister(force?: boolean) : boolean {

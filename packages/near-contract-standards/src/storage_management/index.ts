@@ -46,7 +46,7 @@ export interface StorageManagement {
     *
     * @returns the StorageBalance structure showing updated balances.
     */
-    storage_withdraw(amount: Option<number>) : StorageBalance;
+    storage_withdraw(amount?: bigint) : StorageBalance;
 
     /** Unregisters the predecessor account and returns the storage NEAR deposit back.
     *
