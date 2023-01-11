@@ -129,71 +129,63 @@ class FungibleToken implements FungibleTokenCore, StorageManagement, FungibleTok
      * has deleted (unregistered) their account while the `ft_transfer_call` was still in flight.
      * Returns (Used token amount, Burned token amount)
      */
-    // internal_ft_resolve_transfer(
-    //     sender_id: AccountId,
-    //     receiver_id: AccountId,
-    //     amount: number,
-    // ) : (number, number) {
-    //     // Get the unused amount from the `ft_on_transfer` call result.
-    //     let unused_amount = match near.promiseResult(0) {
-    //         PromiseResult::NotReady => near.abort(),
-    //         PromiseResult::Successful(value) => {
-    //             if let Ok(unused_amount) = near_sdk::serde_json::from_slice::<number>(&value) {
-    //                 std::cmp::min(amount, unused_amount.0)
-    //             } else {
-    //                 amount
-    //             }
-    //         }
-    //         PromiseResult::Failed => amount,
-    //     };
+    internal_ft_resolve_transfer(sender_id: AccountId, receiver_id: AccountId, amount: number) : [number, number] {
+        // Get the unused amount from the `ft_on_transfer` call result.
+        let unused_amount: number;
+        try {
+            unused_amount = Math.min(amount, JSON.parse(near.promiseResult(0)));
+        } catch (e) {
+            if (e.include('Failed')) {
+                unused_amount = amount;
+            } else {
+                throw e;
+            }
+        }
 
-    //     if unused_amount > 0 {
-    //         let receiver_balance = this.accounts.get(&receiver_id).unwrap_or(0);
-    //         if receiver_balance > 0 {
-    //             let refund_amount = std::cmp::min(receiver_balance, unused_amount);
-    //             if let Some(new_receiver_balance) = receiver_balance.checked_sub(refund_amount) {
-    //                 this.accounts.set(&receiver_id, &new_receiver_balance);
-    //             } else {
-    //                 throw Error("The receiver account doesn't have enough balance");
-    //             }
+        if (unused_amount > 0) {
+            let receiver_balance: BigInt = this.accounts.get(receiver_id) ?? 0n;
+            if (receiver_balance > BigInt(0)) {
+                let refund_amount = Math.min(+receiver_balance, unused_amount);
+                let new_receiver_balance = receiver_balance.valueOf() - BigInt(refund_amount);
+                if (new_receiver_balance < 0n) {
+                    throw Error("The receiver account doesn't have enough balance");
+                }
+                this.accounts.set(receiver_id, new_receiver_balance);
 
-    //             if let Some(sender_balance) = this.accounts.get(sender_id) {
-    //                 if let Some(new_sender_balance) = sender_balance.checked_add(refund_amount) {
-    //                     this.accounts.set(sender_id, &new_sender_balance);
-    //                 } else {
-    //                     throw Error("Sender balance overflow");
-    //                 }
+                let sender_balance: BigInt = this.accounts.get(sender_id) ?? 0n;
+                if (sender_balance) {
+                    let new_sender_balance = sender_balance.valueOf() + BigInt(refund_amount);
+                    this.accounts.set(sender_id, new_sender_balance);
+                    new FtTransfer(
+                        receiver_id,
+                        sender_id,
+                        BigInt(refund_amount),
+                        "refund",
+                    ).emit();
 
-    //                 FtTransfer {
-    //                     old_owner_id: &receiver_id,
-    //                     new_owner_id: sender_id,
-    //                     amount: &number(refund_amount),
-    //                     memo: Some("refund"),
-    //                 }
-    //                 .emit();
-    //                 let used_amount = amount
-    //                     .checked_sub(refund_amount)
-    //                     .unwrap_or_else(|| throw Error(ERR_TOTAL_SUPPLY_OVERFLOW));
-    //                 return (used_amount, 0);
-    //             } else {
-    //                 // Sender's account was deleted, so we need to burn tokens.
-    //                 this.total_supply = self
-    //                     .total_supply
-    //                     .checked_sub(refund_amount)
-    //                     .unwrap_or_else(|| throw Error(ERR_TOTAL_SUPPLY_OVERFLOW));
-    //                 log!("The account of the sender was deleted");
-    //                 FtBurn {
-    //                     owner_id: &receiver_id,
-    //                     amount: &number(refund_amount),
-    //                     memo: Some("refund"),
-    //                 }
-    //                 .emit();
-    //                 return (amount, refund_amount);
-    //             }
-    //         }
-    //     }
-    //     (amount, 0)
-    // }
+                    let used_amount = amount - refund_amount;
+                    if (used_amount < 0) {
+                        throw Error(ERR_TOTAL_SUPPLY_OVERFLOW);
+                    }
+                    return [used_amount, 0];
+                } else {
+                    const new_total_supply = this.total_supply - BigInt(refund_amount);
+                    if (new_total_supply < 0) {
+                        throw Error(ERR_TOTAL_SUPPLY_OVERFLOW);
+                    }
+                    this.total_supply = new_total_supply
+                    near.log("The account of the sender was deleted");
+                    new FtBurn(
+                        receiver_id,
+                        refund_amount,
+                        "refund",
+                    ).emit();
+                    return [amount, refund_amount];
+                }
+            }
+        }
+        return [amount, 0];
+    }
 
     /** Implementation of FungibleTokenCore */
     @call({})
