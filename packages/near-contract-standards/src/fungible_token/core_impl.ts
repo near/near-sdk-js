@@ -198,7 +198,7 @@ class FungibleToken implements FungibleTokenCore, StorageManagement, FungibleTok
     ft_transfer_call(
         receiver_id: AccountId,
         amount: number,
-        memo?: string,
+        memo: Option<string>,
         msg: string,
     ): PromiseOrValue<bigint> {
         assert_one_yocto();
@@ -209,14 +209,13 @@ class FungibleToken implements FungibleTokenCore, StorageManagement, FungibleTok
         if (receiver_gas < 0) {
             throw new Error("Prepaid gas overflow");
         }
-        // Initiating receiver's call and the callback
-        ext_ft_receiver:: ext(receiver_id)
-            .with_static_gas(receiver_gas)
-            .ft_on_transfer(sender_id, BigInt(amount), msg)
+
+        return NearPromise.new(receiver_id)
+            .functionCall("ft_on_transfer", JSON.stringify({ sender_id, amount, msg }), BigInt(0), receiver_gas)
             .then(
-                ext_ft_resolver:: ext(near.currentAccountId())
-                    .with_static_gas(GAS_FOR_RESOLVE_TRANSFER)
-                    .ft_resolve_transfer(sender_id, receiver_id, BigInt(amount)))
+                NearPromise.new(near.currentAccountId())
+                    .functionCall("ft_resolve_transfer", JSON.stringify({ sender_id, receiver_id, amount }), BigInt(0), GAS_FOR_RESOLVE_TRANSFER)
+            );
     }
 
     @view({})
