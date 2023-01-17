@@ -1,6 +1,6 @@
 {
   "name": "near-contract-standards",
-  "version": "0.7.0-2",
+  "version": "0.7.0",
   "description": "Compatible near-contract-standards implementation in JS",
   "main": "index.js",
   "type": "module",
