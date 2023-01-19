@@ -9,7 +9,7 @@ This document describes step to do a new pre-release or formal release.
 ## Steps for pre-release
 1. Create a new branch for the release.
 2. Bump version in packages/near-sdk-js/package.json and packages/near-contract-standards/package.json to the version about to release. It should be `x.y.z-0`, and next pre-release `x.y.z-1`, etc.
-3. Run `pnpm release` in packages/near-sdk-js and in packages/near-contract-standards.
+3. Run `pnpm publish` in packages/near-sdk-js and in packages/near-contract-standards.
 4. Copy examples folder in this repo to another place, drop `node_modules`, change its package.json from:
 ```
     "near-contract-standards": "workspace:*",
@@ -23,6 +23,6 @@ to the version you just released, e.g. `x.y.z-1`.
 ## Steps for formal release
 1. Create a new release branch from the candidate pre-release branch
 2. Bump version in packages/near-sdk-js/package.json and packages/near-contract-standards/package.json to the version about to release. It should be `x.y.z`.
-3. Run `pnpm release` in packages/near-sdk-js and in packages/near-contract-standards.
+3. Run `pnpm publish` in packages/near-sdk-js and in packages/near-contract-standards.
 4. Go to https://github.com/near/near-sdk-js/releases/new, create a tag for the new release branch from the branch you created in step 1, and copy the highlights from latest pre-release candidate.
 5. Advertise it to the community!
