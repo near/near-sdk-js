@@ -153,8 +153,8 @@ export async function buildCom(source, target, packageJson, tsConfig, { verbose 
     requireTargetExt(target);
     signale.await(`Building ${source} contract...`);
     await checkTypescriptCom(source, { verbose });
-    await generateAbi(source, target, packageJson, tsConfig, { verbose });
     ensureTargetDirExists(target);
+    await generateAbi(source, target, packageJson, tsConfig, { verbose });
     await validateCom(source, { verbose });
     await createJsFileWithRollupCom(source, target, { verbose });
     await transpileJsAndBuildWasmCom(target, { verbose });

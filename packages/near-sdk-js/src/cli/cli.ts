@@ -261,9 +261,9 @@ export async function buildCom(
 
   await checkTypescriptCom(source, { verbose });
 
-  await generateAbi(source, target, packageJson, tsConfig, { verbose });
-
   ensureTargetDirExists(target);
+
+  await generateAbi(source, target, packageJson, tsConfig, { verbose });
 
   await validateCom(source, { verbose });
 
