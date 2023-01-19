@@ -33,6 +33,7 @@ program
       .argument("[packageJson]", "Target file path and name.", "package.json")
       .argument("[tsConfig]", "Target file path and name.", "tsconfig.json")
       .option("--verbose", "Whether to print more verbose output.", false)
+      .option("--generateABI", "Whether to generate ABI.", false)
       .action(buildCom)
   )
   .addCommand(
@@ -251,7 +252,7 @@ export async function buildCom(
   target: string,
   packageJson: string,
   tsConfig: string,
-  { verbose = false }: { verbose: boolean }
+  { verbose = false, generateABI = false }: { verbose: boolean, generateABI: boolean },
 ): Promise<void> {
   const signale = new Signale({ scope: "build", interactive: !verbose });
 
@@ -263,7 +264,9 @@ export async function buildCom(
 
   ensureTargetDirExists(target);
 
-  await generateAbi(source, target, packageJson, tsConfig, { verbose });
+  if (generateABI) {
+    await generateAbi(source, target, packageJson, tsConfig, { verbose });
+  }
 
   await validateCom(source, { verbose });
 
