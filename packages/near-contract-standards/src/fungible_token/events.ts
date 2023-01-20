@@ -66,9 +66,9 @@ export class FtTransfer {
     old_owner_id: AccountId;
     new_owner_id: AccountId;
     amount: bigint;
-    memo: Option<string>;
+    memo: Option<String>;
 
-    constructor(old_owner_id: AccountId, new_owner_id: AccountId, amount: bigint, memo: Option<string>) {
+    constructor(old_owner_id: AccountId, new_owner_id: AccountId, amount: bigint, memo: Option<String>) {
         this.old_owner_id = old_owner_id;
         this.new_owner_id = new_owner_id;
         this.amount = amount;

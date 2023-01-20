@@ -22,7 +22,7 @@ export declare class FungibleToken implements FungibleTokenCore, StorageManageme
     internal_unwrap_balance_of(account_id: AccountId): Balance;
     internal_deposit(account_id: AccountId, amount: Balance): void;
     internal_withdraw(account_id: AccountId, amount: Balance): void;
-    internal_transfer(sender_id: AccountId, receiver_id: AccountId, amount: Balance, memo?: string): void;
+    internal_transfer(sender_id: AccountId, receiver_id: AccountId, amount: Balance, memo?: String): void;
     internal_register_account(account_id: AccountId): void;
     /** Internal method that returns the amount of burned tokens in a corner case when the sender
      * has deleted (unregistered) their account while the `ft_transfer_call` was still in flight.
@@ -30,10 +30,21 @@ export declare class FungibleToken implements FungibleTokenCore, StorageManageme
      */
     internal_ft_resolve_transfer(sender_id: AccountId, receiver_id: AccountId, amount: number): [bigint, bigint];
     /** Implementation of FungibleTokenCore */
-    ft_transfer(receiver_id: AccountId, amount: Balance, memo?: string): void;
-    ft_transfer_call(receiver_id: AccountId, amount: number, memo: Option<string>, msg: string): PromiseOrValue<bigint>;
+    ft_transfer({ receiver_id, amount, memo }: {
+        receiver_id: AccountId;
+        amount: Balance;
+        memo?: String;
+    }): void;
+    ft_transfer_call({ receiver_id, amount, memo, msg }: {
+        receiver_id: AccountId;
+        amount: Balance;
+        memo: Option<String>;
+        msg: string;
+    }): PromiseOrValue<bigint>;
     ft_total_supply(): Balance;
-    ft_balance_of(account_id: AccountId): Balance;
+    ft_balance_of({ account_id }: {
+        account_id: AccountId;
+    }): Balance;
     /** Implementation of storage
      * Internal method that returns the Account ID and the balance in case the account was
      * unregistered.
@@ -57,5 +68,9 @@ export declare class FungibleToken implements FungibleTokenCore, StorageManageme
     storage_balance_bounds(): StorageBalanceBounds;
     storage_balance_of(account_id: AccountId): Option<StorageBalance>;
     /** Implementation of FungibleTokenResolver */
-    ft_resolve_transfer(sender_id: AccountId, receiver_id: AccountId, amount: number): Balance;
+    ft_resolve_transfer({ sender_id, receiver_id, amount }: {
+        sender_id: AccountId;
+        receiver_id: AccountId;
+        amount: number;
+    }): Balance;
 }

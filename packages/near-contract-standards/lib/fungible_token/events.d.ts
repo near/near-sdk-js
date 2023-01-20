@@ -45,8 +45,8 @@ export declare class FtTransfer {
     old_owner_id: AccountId;
     new_owner_id: AccountId;
     amount: bigint;
-    memo: Option<string>;
-    constructor(old_owner_id: AccountId, new_owner_id: AccountId, amount: bigint, memo: Option<string>);
+    memo: Option<String>;
+    constructor(old_owner_id: AccountId, new_owner_id: AccountId, amount: bigint, memo: Option<String>);
     /** Logs the event to the host. This is required to ensure that the event is triggered
      * and to consume the event.
      */

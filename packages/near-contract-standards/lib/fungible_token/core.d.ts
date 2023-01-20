@@ -13,7 +13,11 @@ export interface FungibleTokenCore {
      * @param amount - the amount of tokens to transfer. Must be a positive number in decimal string representation.
      * @param memo - an optional string field in a free form to associate a memo with this transfer.
      */
-    ft_transfer(receiver_id: AccountId, amount: Balance, memo: Option<String>): any;
+    ft_transfer({ receiver_id, amount, memo }: {
+        receiver_id: AccountId;
+        amount: Balance;
+        memo?: String;
+    }): any;
     /**
      * Transfers positive `amount` of tokens from the `env::predecessor_account_id` to `receiver_id` account. Then
      * calls `ft_on_transfer` method on `receiver_id` contract and attaches a callback to resolve this transfer.
@@ -39,9 +43,16 @@ export interface FungibleTokenCore {
      *
      * @returns a promise which will result in the amount of tokens withdrawn from sender's account.
      */
-    ft_transfer_call(receiver_id: AccountId, amount: number, memo: Option<String>, msg: String): PromiseOrValue<bigint>;
+    ft_transfer_call({ receiver_id, amount, memo, msg }: {
+        receiver_id: AccountId;
+        amount: Balance;
+        memo: Option<String>;
+        msg: String;
+    }): PromiseOrValue<bigint>;
     /** Returns the total supply of the token in a decimal string representation. */
     ft_total_supply(): Balance;
     /** Returns the balance of the account. If the account doesn't exist must returns `"0"`. */
-    ft_balance_of(account_id: AccountId): Balance;
+    ft_balance_of({ account_id }: {
+        account_id: AccountId;
+    }): Balance;
 }

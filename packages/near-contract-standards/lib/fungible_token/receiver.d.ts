@@ -20,5 +20,9 @@ export interface FungibleTokenReceiver {
      *
      * @returns the amount of unused tokens that should be returned to sender, in a decimal string representation.
      */
-    ft_on_transfer(sender_id: AccountId, amount: number, msg: String): PromiseOrValue<number>;
+    ft_on_transfer({ sender_id, amount, msg }: {
+        sender_id: AccountId;
+        amount: number;
+        msg: String;
+    }): PromiseOrValue<number>;
 }

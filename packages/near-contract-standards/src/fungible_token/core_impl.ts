@@ -108,7 +108,7 @@ export class FungibleToken implements FungibleTokenCore, StorageManagement, Fung
         sender_id: AccountId,
         receiver_id: AccountId,
         amount: Balance,
-        memo?: string,
+        memo?: String,
     ) {
         assert(sender_id != receiver_id, "Sender and receiver should be different");
         assert(amount > 0, "The amount should be a positive number");
@@ -188,19 +188,32 @@ export class FungibleToken implements FungibleTokenCore, StorageManagement, Fung
 
     /** Implementation of FungibleTokenCore */
     @call({})
-    ft_transfer(receiver_id: AccountId, amount: Balance, memo?: string) {
+    ft_transfer({
+        receiver_id,
+        amount,
+        memo
+    }: {
+        receiver_id: AccountId,
+        amount: Balance,
+        memo?: String
+    }) {
         assert_one_yocto();
         let sender_id = near.predecessorAccountId();
         this.internal_transfer(sender_id, receiver_id, amount, memo);
     }
 
     @call({})
-    ft_transfer_call(
+    ft_transfer_call({
+        receiver_id,
+        amount,
+        memo,
+        msg
+    }: {
         receiver_id: AccountId,
-        amount: number,
-        memo: Option<string>,
-        msg: string,
-    ): PromiseOrValue<bigint> {
+        amount: Balance,
+        memo: Option<String>,
+        msg: string
+    }): PromiseOrValue<bigint> {
         assert_one_yocto();
         assert(near.prepaidGas() > GAS_FOR_FT_TRANSFER_CALL, "More gas is required");
         let sender_id = near.predecessorAccountId();
@@ -224,7 +237,7 @@ export class FungibleToken implements FungibleTokenCore, StorageManagement, Fung
     }
 
     @view({})
-    ft_balance_of(account_id: AccountId): Balance {
+    ft_balance_of({ account_id }: { account_id: AccountId }): Balance {
         return this.accounts.get(account_id) ?? BigInt(0);
     }
 
@@ -332,11 +345,15 @@ export class FungibleToken implements FungibleTokenCore, StorageManagement, Fung
 
     /** Implementation of FungibleTokenResolver */
     @call({})
-    ft_resolve_transfer(
+    ft_resolve_transfer({
+        sender_id,
+        receiver_id,
+        amount
+    }: {
         sender_id: AccountId,
         receiver_id: AccountId,
-        amount: number,
-    ): Balance {
+        amount: number
+    }): Balance {
         return this.internal_ft_resolve_transfer(sender_id, receiver_id, amount)[0];
     }
 }

@@ -140,12 +140,12 @@ export class FungibleToken {
         return [BigInt(amount), 0n];
     }
     /** Implementation of FungibleTokenCore */
-    ft_transfer(receiver_id, amount, memo) {
+    ft_transfer({ receiver_id, amount, memo }) {
         assert_one_yocto();
         let sender_id = near.predecessorAccountId();
         this.internal_transfer(sender_id, receiver_id, amount, memo);
     }
-    ft_transfer_call(receiver_id, amount, memo, msg) {
+    ft_transfer_call({ receiver_id, amount, memo, msg }) {
         assert_one_yocto();
         assert(near.prepaidGas() > GAS_FOR_FT_TRANSFER_CALL, "More gas is required");
         let sender_id = near.predecessorAccountId();
@@ -162,7 +162,7 @@ export class FungibleToken {
     ft_total_supply() {
         return this.total_supply;
     }
-    ft_balance_of(account_id) {
+    ft_balance_of({ account_id }) {
         return this.accounts.get(account_id) ?? BigInt(0);
     }
     /** Implementation of storage
@@ -255,7 +255,7 @@ export class FungibleToken {
         return this.internal_storage_balance_of(account_id);
     }
     /** Implementation of FungibleTokenResolver */
-    ft_resolve_transfer(sender_id, receiver_id, amount) {
+    ft_resolve_transfer({ sender_id, receiver_id, amount }) {
         return this.internal_ft_resolve_transfer(sender_id, receiver_id, amount)[0];
     }
 }
