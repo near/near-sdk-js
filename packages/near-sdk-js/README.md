@@ -60,6 +60,11 @@ When call host function with inappropriate type, means incorrect number of argum
 - if argument is different than the required type, it'll be coerced to required type
 - if argument is different than the required type but cannot be coerced, will throw runtime type error, also with message and stacktrace
 
+## Migrating from near-sdk-js 0.6.0
+If you have a near-sdk-js 0.6.0 contract, you need to drop the `babel.config.json` because it is now inlined in near-sdk-js CLI. 
+
+Also `Bytes` type in 0.6.0 is replaced with `string` and `Uint8Array`. Because `Bytes` was an alias to `string`, this doesn't affect all collection APIs and most low level APIs. Some low level APIs below now also comes with a raw version, which ends with `Raw` and takes `Uint8Array` instead of `string`, for example, `storageRead` vs `storageReadRaw`. Some low level APIs have more sense to use `Uint8Array` instead of `string`, such as `sha256` and arguments for a function call type of promise, these are **BREAKING** changes. Please refer to next section for details: look for functions with `Uint8Array` argument and return types. 
+
 ## NEAR-SDK-JS API Reference
 
 All NEAR blockchain provided functionality (host functions) are defined in `src/api.ts` and exported as `near`. You can use them by:
