@@ -11,8 +11,6 @@ import {
     PromiseOrValue,
     NearPromise,
     StorageUsage,
-    call,
-    view,
     assert,
     IntoStorageKey,
 } from "near-sdk-js";
@@ -56,7 +54,6 @@ export class FungibleToken implements FungibleTokenCore, StorageManagement, Fung
     }
 
 
-    @call({})
     measure_account_storage_usage() {
         let initial_storage_usage = near.storageUsage();
         let tmp_account_id = "a".repeat(64);
@@ -65,7 +62,6 @@ export class FungibleToken implements FungibleTokenCore, StorageManagement, Fung
         this.accounts.remove(tmp_account_id);
     }
 
-    @view({})
     internal_unwrap_balance_of(account_id: AccountId): Balance {
         let balance = this.accounts.get(account_id);
         if (balance === null) {
@@ -187,7 +183,6 @@ export class FungibleToken implements FungibleTokenCore, StorageManagement, Fung
     }
 
     /** Implementation of FungibleTokenCore */
-    @call({})
     ft_transfer({
         receiver_id,
         amount,
@@ -202,7 +197,6 @@ export class FungibleToken implements FungibleTokenCore, StorageManagement, Fung
         this.internal_transfer(sender_id, receiver_id, amount, memo);
     }
 
-    @call({})
     ft_transfer_call({
         receiver_id,
         amount,
@@ -231,12 +225,10 @@ export class FungibleToken implements FungibleTokenCore, StorageManagement, Fung
             );
     }
 
-    @view({})
     ft_total_supply(): Balance {
         return this.total_supply;
     }
 
-    @view({})
     ft_balance_of({ account_id }: { account_id: AccountId }): Balance {
         return this.accounts.get(account_id) ?? BigInt(0);
     }
@@ -264,7 +256,6 @@ export class FungibleToken implements FungibleTokenCore, StorageManagement, Fung
         }
     }
 
-    @view({})
     internal_storage_balance_of(account_id: AccountId): Option<StorageBalance> {
         if (this.accounts.containsKey(account_id)) {
             return new StorageBalance(this.storage_balance_bounds().min, BigInt(0))
@@ -276,7 +267,6 @@ export class FungibleToken implements FungibleTokenCore, StorageManagement, Fung
     /** Implementation of StorageManagement
      * @param registration_only doesn't affect the implementation for vanilla fungible token.
      */
-    @call({})
     storage_deposit(
         account_id?: AccountId,
         registration_only?: boolean,
@@ -311,7 +301,6 @@ export class FungibleToken implements FungibleTokenCore, StorageManagement, Fung
      * - never transfers Ⓝ to caller
      * - returns a `storage_balance` struct if `amount` is 0
      */
-    @view({})
     storage_withdraw(amount?: bigint): StorageBalance {
         assert_one_yocto();
         let predecessor_account_id = near.predecessorAccountId();
@@ -326,25 +315,21 @@ export class FungibleToken implements FungibleTokenCore, StorageManagement, Fung
         }
     }
 
-    @call({})
     storage_unregister(force?: boolean): boolean {
         return this.internal_storage_unregister(force) ? true : false;
     }
 
-    @view({})
     storage_balance_bounds(): StorageBalanceBounds {
         let required_storage_balance: Balance =
             BigInt(this.account_storage_usage) * near.storageByteCost();
         return new StorageBalanceBounds(required_storage_balance, required_storage_balance);
     }
 
-    @view({})
     storage_balance_of(account_id: AccountId): Option<StorageBalance> {
         return this.internal_storage_balance_of(account_id);
     }
 
     /** Implementation of FungibleTokenResolver */
-    @call({})
     ft_resolve_transfer({
         sender_id,
         receiver_id,

@@ -1,12 +1,6 @@
-var __decorate = (this && this.__decorate) || function (decorators, target, key, desc) {
-    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
-    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
-    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
-    return c > 3 && r && Object.defineProperty(target, key, r), r;
-};
 import { StorageBalance, StorageBalanceBounds } from "../storage_management";
 import { FtBurn, FtTransfer } from "./events";
-import { near, LookupMap, NearPromise, call, view, assert, } from "near-sdk-js";
+import { near, LookupMap, NearPromise, assert, } from "near-sdk-js";
 // TODO: move to the main SDK package
 import { assert_one_yocto } from "../non_fungible_token/utils";
 const GAS_FOR_RESOLVE_TRANSFER = 5000000000000n;
@@ -259,42 +253,3 @@ export class FungibleToken {
         return this.internal_ft_resolve_transfer(sender_id, receiver_id, amount)[0];
     }
 }
-__decorate([
-    call({})
-], FungibleToken.prototype, "measure_account_storage_usage", null);
-__decorate([
-    view({})
-], FungibleToken.prototype, "internal_unwrap_balance_of", null);
-__decorate([
-    call({})
-], FungibleToken.prototype, "ft_transfer", null);
-__decorate([
-    call({})
-], FungibleToken.prototype, "ft_transfer_call", null);
-__decorate([
-    view({})
-], FungibleToken.prototype, "ft_total_supply", null);
-__decorate([
-    view({})
-], FungibleToken.prototype, "ft_balance_of", null);
-__decorate([
-    view({})
-], FungibleToken.prototype, "internal_storage_balance_of", null);
-__decorate([
-    call({})
-], FungibleToken.prototype, "storage_deposit", null);
-__decorate([
-    view({})
-], FungibleToken.prototype, "storage_withdraw", null);
-__decorate([
-    call({})
-], FungibleToken.prototype, "storage_unregister", null);
-__decorate([
-    view({})
-], FungibleToken.prototype, "storage_balance_bounds", null);
-__decorate([
-    view({})
-], FungibleToken.prototype, "storage_balance_of", null);
-__decorate([
-    call({})
-], FungibleToken.prototype, "ft_resolve_transfer", null);
