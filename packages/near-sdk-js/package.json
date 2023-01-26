@@ -1,6 +1,6 @@
 {
   "name": "near-sdk-js",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "High Level JavaScript SDK for building smart contracts on NEAR",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -32,31 +32,37 @@
   },
   "author": "Near Inc <hello@nearprotocol.com>",
   "dependencies": {
+    "@babel/core": "^7.20.5",
     "@babel/plugin-proposal-decorators": "^7.17.2",
     "@babel/preset-typescript": "^7.18.6",
-    "@babel/core": "^7.20.5",
     "@babel/types": "^7.20.5",
     "@rollup/plugin-babel": "^5.3.1",
     "@rollup/plugin-commonjs": "^21.0.1",
     "@rollup/plugin-node-resolve": "^13.1.1",
     "@scure/base": "^1.1.1",
     "@types/estree": "^1.0.0",
+    "@typescript-eslint/eslint-plugin": "^5.31.0",
+    "@typescript-eslint/parser": "^5.31.0",
     "commander": "^9.4.1",
+    "eslint": "^8.20.0",
+    "json-schema": "0.4.0",
     "near-abi": "^0.1.0",
+    "near-typescript-json-schema": "0.55.0",
     "rollup": "^2.61.1",
     "rollup-plugin-sourcemaps": "^0.6.3",
     "signale": "^1.4.0",
     "ts-morph": "^16.0.0",
-    "typescript": "~4.7.2",
-    "near-typescript-json-schema": "0.55.0",
-    "json-schema": "0.4.0",
-    "@typescript-eslint/eslint-plugin": "^5.31.0",
-    "@typescript-eslint/parser": "^5.31.0",
-    "eslint": "^8.20.0"
+    "typescript": "~4.7.2"
   },
   "files": [
     "builder",
-    "lib"
+    "lib/*.js",
+    "lib/*.d.ts",
+    "lib/collections/*",
+    "lib/types/*",
+    "lib/cli/*.js",
+    "lib/cli/*.d.ts",
+    "lib/cli/build-tools/*"
   ],
   "devDependencies": {
     "@rollup/plugin-typescript": "^8.3.2",
@@ -71,6 +77,7 @@
     "chalk": "^5.1.0",
     "eslint": "^8.23.1",
     "eslint-config-prettier": "^8.5.0",
+    "json5": "^2.2.3",
     "npm-run-all": "^4.1.5",
     "prettier": "^2.7.1",
     "typescript": "^4.7.2"
