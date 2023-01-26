@@ -15,11 +15,18 @@ import {
     call,
     view,
     NearBindgen,
+    IntoStorageKey,
 } from "near-sdk-js";
 
 import {
     Option,
 } from "near-contract-standards/lib/non_fungible_token/utils"; // TODO: fix import
+
+class FTPrefix implements IntoStorageKey {
+    into_storage_key(): string {
+      return "A"; // TODO: What is the best value to put here?
+    }
+  }
 
 /** Implementation of a FungibleToken standard
  * Allows to include NEP-141 compatible token to any contract.
@@ -38,19 +45,14 @@ export class MyFt implements FungibleTokenCore, StorageManagement, FungibleToken
 
     // TODO: constructor is used instead of new in Rust, check if it's ok. In NFT it's called init, why?.
     constructor() {
-        this.token = new FungibleToken();
+        this.token = new FungibleToken(new FTPrefix());
         this.metadata = new FungibleTokenMetadata();
     }
 
 
     @call({})
     measure_account_storage_usage() {
-
-    }
-
-    @view({})
-    internal_unwrap_balance_of(account_id: AccountId): Balance {
-
+        return this.token.measure_account_storage_usage();
     }
 
     /** Implementation of FungibleTokenCore */
@@ -64,7 +66,7 @@ export class MyFt implements FungibleTokenCore, StorageManagement, FungibleToken
         amount: Balance,
         memo?: String
     }) {
-
+        return this.token.ft_transfer({ receiver_id, amount, memo });
     }
 
     @call({})
@@ -79,15 +81,17 @@ export class MyFt implements FungibleTokenCore, StorageManagement, FungibleToken
         memo: Option<String>,
         msg: string
     }): PromiseOrValue<bigint> {
-
+        return this.token.ft_transfer_call({ receiver_id, amount, memo, msg });
     }
 
     @view({})
     ft_total_supply(): Balance {
+        return this.token.ft_total_supply();
     }
 
     @view({})
     ft_balance_of({ account_id }: { account_id: AccountId }): Balance {
+        return this.token.ft_balance_of({ account_id });
     }
 
     /** Implementation of StorageManagement
@@ -98,7 +102,7 @@ export class MyFt implements FungibleTokenCore, StorageManagement, FungibleToken
         account_id?: AccountId,
         registration_only?: boolean,
     ): StorageBalance {
-
+        return this.token.storage_deposit(account_id, registration_only);
     }
 
     /**
@@ -111,22 +115,22 @@ export class MyFt implements FungibleTokenCore, StorageManagement, FungibleToken
      */
     @view({})
     storage_withdraw(amount?: bigint): StorageBalance {
-
+        return this.token.storage_withdraw(amount);
     }
 
     @call({})
     storage_unregister(force?: boolean): boolean {
-
+        return this.token.storage_unregister(force);
     }
 
     @view({})
     storage_balance_bounds(): StorageBalanceBounds {
-
+        return this.token.storage_balance_bounds();
     }
 
     @view({})
     storage_balance_of(account_id: AccountId): Option<StorageBalance> {
-
+        return this.token.storage_balance_of(account_id);
     }
 
     @call({})
@@ -139,6 +143,6 @@ export class MyFt implements FungibleTokenCore, StorageManagement, FungibleToken
         receiver_id: AccountId,
         amount: number
     }): Balance {
-
+        return this.token.ft_resolve_transfer({ sender_id, receiver_id, amount });
     }
 }
