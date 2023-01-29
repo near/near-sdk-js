@@ -15,6 +15,24 @@ export class FungibleTokenMetadata {
     reference_hash: Option<Uint8Array>;
     decimals: number;
 
+    constructor(
+        spec: string,
+        name: string,
+        symbol: string,
+        icon: Option<string>,
+        referance: Option<string>,
+        referance_hash: Option<Uint8Array>,
+        decimals: number,
+    ) {
+        this.spec = spec;
+        this.name = name;
+        this.symbol = symbol;
+        this.icon = icon;
+        this.reference = referance;
+        this.reference_hash = referance_hash;
+        this.decimals = decimals;
+    }
+
     assert_valid() {
         assert(this.spec == FT_METADATA_SPEC, "Invalid FT_METADATA_SPEC");
         const isReferenceProvided = this.reference ? true : false;

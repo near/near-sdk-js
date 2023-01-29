@@ -1,6 +1,15 @@
 import { assert, } from "near-sdk-js";
 const FT_METADATA_SPEC = "ft-1.0.0";
 export class FungibleTokenMetadata {
+    constructor(spec, name, symbol, icon, referance, referance_hash, decimals) {
+        this.spec = spec;
+        this.name = name;
+        this.symbol = symbol;
+        this.icon = icon;
+        this.reference = referance;
+        this.reference_hash = referance_hash;
+        this.decimals = decimals;
+    }
     assert_valid() {
         assert(this.spec == FT_METADATA_SPEC, "Invalid FT_METADATA_SPEC");
         const isReferenceProvided = this.reference ? true : false;

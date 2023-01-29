@@ -14,6 +14,7 @@ import {
     PromiseOrValue,
     call,
     view,
+    initialize,
     NearBindgen,
     IntoStorageKey,
 } from "near-sdk-js";
@@ -24,9 +25,9 @@ import {
 
 class FTPrefix implements IntoStorageKey {
     into_storage_key(): string {
-      return "A"; // TODO: What is the best value to put here?
+        return "A"; // TODO: What is the best value to put here?
     }
-  }
+}
 
 /** Implementation of a FungibleToken standard
  * Allows to include NEP-141 compatible token to any contract.
@@ -43,10 +44,54 @@ export class MyFt implements FungibleTokenCore, StorageManagement, FungibleToken
     token: FungibleToken;
     metadata: FungibleTokenMetadata;
 
-    // TODO: constructor is used instead of new in Rust, check if it's ok. In NFT it's called init, why?.
     constructor() {
         this.token = new FungibleToken(new FTPrefix());
         this.metadata = new FungibleTokenMetadata();
+    }
+
+    @initialize({ requireInit: true })
+    init({
+        owner_id,
+        total_supply,
+        metadata,
+    }: {
+        owner_id: AccountId;
+        total_supply: Balance;
+        metadata: FungibleTokenMetadata;
+    }) {
+        // require!(!env:: state_exists(), "Already initialized");
+        // metadata.assert_valid();
+        // let mut this = Self {
+        //     token: FungibleToken:: new (StorageKey::FungibleToken),
+        //     metadata: LazyOption:: new (StorageKey:: Metadata, Some(& metadata)),
+        // };
+        // this.token.internal_register_account(& owner_id);
+        // this.token.internal_deposit(& owner_id, total_supply.into());
+        // this
+    }
+
+    @initialize({ requireInit: true })
+    init_with_default_meta({
+        owner_id,
+        total_supply
+    }: {
+        owner_id: AccountId;
+        total_supply: Balance;
+    }) {
+        const metadata = new FungibleTokenMetadata(
+            "FT_METADATA_SPEC",
+            "Example NEAR fungible token",
+            "EXAMPLE",
+            "DATA_IMAGE_SVG_NEAR_ICON",
+            null,
+            null,
+            24,
+        );
+        return this.init({
+            owner_id,
+            total_supply,
+            metadata
+        })
     }
 
 
