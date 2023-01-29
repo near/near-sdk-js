@@ -17,6 +17,7 @@ import {
     initialize,
     NearBindgen,
     IntoStorageKey,
+    near,
 } from "near-sdk-js";
 
 import {
@@ -44,12 +45,7 @@ export class MyFt implements FungibleTokenCore, StorageManagement, FungibleToken
     token: FungibleToken;
     metadata: FungibleTokenMetadata;
 
-    constructor() {
-        this.token = new FungibleToken(new FTPrefix());
-        this.metadata = new FungibleTokenMetadata();
-    }
-
-    @initialize({ requireInit: true })
+    @initialize({})
     init({
         owner_id,
         total_supply,
@@ -59,18 +55,15 @@ export class MyFt implements FungibleTokenCore, StorageManagement, FungibleToken
         total_supply: Balance;
         metadata: FungibleTokenMetadata;
     }) {
-        // require!(!env:: state_exists(), "Already initialized");
-        // metadata.assert_valid();
-        // let mut this = Self {
-        //     token: FungibleToken:: new (StorageKey::FungibleToken),
-        //     metadata: LazyOption:: new (StorageKey:: Metadata, Some(& metadata)),
-        // };
-        // this.token.internal_register_account(& owner_id);
-        // this.token.internal_deposit(& owner_id, total_supply.into());
-        // this
+        metadata.assert_valid();
+        this.token = new FungibleToken(new FTPrefix());
+        this.metadata = metadata;
+
+        this.token.internal_register_account(owner_id);
+        this.token.internal_deposit(owner_id, total_supply);
     }
 
-    @initialize({ requireInit: true })
+    @initialize({})
     init_with_default_meta({
         owner_id,
         total_supply
