@@ -40,7 +40,7 @@ program
     .argument("[source]", "Typescript file to validate", "src/index.ts")
     .option("--verbose", "Whether to print more verbose output.", false)
     .action(checkTypescriptCom))
-    .addCommand(new Command("createJsFileWithRullup")
+    .addCommand(new Command("createJsFileWithRollup")
     .usage("[source] [target]")
     .description("Create intermediate javascript file for later processing with QJSC")
     .argument("[source]", "Contract to build.", "src/index.js")

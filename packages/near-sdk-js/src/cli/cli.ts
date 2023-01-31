@@ -57,7 +57,7 @@ program
       .action(checkTypescriptCom)
   )
   .addCommand(
-    new Command("createJsFileWithRullup")
+    new Command("createJsFileWithRollup")
       .usage("[source] [target]")
       .description(
         "Create intermediate javascript file for later processing with QJSC"
