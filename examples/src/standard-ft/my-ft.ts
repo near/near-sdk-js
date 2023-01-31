@@ -17,7 +17,6 @@ import {
     initialize,
     NearBindgen,
     IntoStorageKey,
-    near,
 } from "near-sdk-js";
 
 import {
