@@ -1,6 +1,8 @@
 import { Worker } from "near-workspaces";
 import test from "ava";
 
+const INITIAL_BALANCE = NEAR.parse("10000 N");
+
 test.beforeEach(async (t) => {
     const worker = await Worker.init();
     const root = worker.rootAccount;
@@ -40,20 +42,13 @@ async function registerUser(contract, account_id) {
 }
 
 test("test_total_supply", async () => {
-    // let initial_balance = U128::from(parse_near!("10000 N"));
-    // let worker = workspaces::sandbox().await?;
-    // let (contract, _, _) = init(&worker, initial_balance).await?;
-
-    // let res = contract.call("ft_total_supply").view().await?;
-    // assert_eq!(res.json::<U128>()?, initial_balance);
-
-    // Ok(())
+    const { ftContract } = t.context.accounts;
+    const res = await ftContract.view("ft_total_supply", {});
+    t.is(res, INITIAL_BALANCE);
 });
 
 test("test_simple_transfer", async () => {
-    // let initial_balance = U128::from(parse_near!("10000 N"));
     // let transfer_amount = U128::from(parse_near!("100 N"));
-    // let worker = workspaces::sandbox().await?;
     // let (contract, alice, _) = init(&worker, initial_balance).await?;
 
     // let res = contract
@@ -79,13 +74,9 @@ test("test_simple_transfer", async () => {
     //     .json::<U128>()?;
     // assert_eq!(initial_balance.0 - transfer_amount.0, root_balance.0);
     // assert_eq!(transfer_amount.0, alice_balance.0);
-
-    // Ok(())
 });
 
 test("test_close_account_empty_balance", async () => {
-    // let initial_balance = U128::from(parse_near!("10000 N"));
-    // let worker = workspaces::sandbox().await?;
     // let (contract, alice, _) = init(&worker, initial_balance).await?;
 
     // let res = alice
@@ -96,14 +87,9 @@ test("test_close_account_empty_balance", async () => {
     //     .transact()
     //     .await?;
     // assert!(res.json::<bool>()?);
-
-    // Ok(())
 });
 
 test("test_close_account_non_empty_balance", async () => {
-    // let initial_balance = U128::from(parse_near!("10000 N"));
-    // let worker = workspaces::sandbox().await?;
-    // let (contract, _, _) = init(&worker, initial_balance).await?;
 
     // let res = contract
     //     .call("storage_unregister")
@@ -124,14 +110,9 @@ test("test_close_account_non_empty_balance", async () => {
     //     .await;
     // assert!(format!("{:?}", res)
     //     .contains("Can't unregister the account with the positive balance without force"));
-
-    // Ok(())
 });
 
 test("simulate_close_account_force_non_empty_balance", () => {
-    // let initial_balance = U128::from(parse_near!("10000 N"));
-    // let worker = workspaces::sandbox().await?;
-    // let (contract, _, _) = init(&worker, initial_balance).await?;
 
     // let res = contract
     //     .call("storage_unregister")
@@ -144,14 +125,10 @@ test("simulate_close_account_force_non_empty_balance", () => {
 
     // let res = contract.call("ft_total_supply").view().await?;
     // assert_eq!(res.json::<U128>()?.0, 0);
-
-    // Ok(())
 });
 
 test("simulate_transfer_call_with_burned_amount", async () => {
-    // let initial_balance = U128::from(parse_near!("10000 N"));
     // let transfer_amount = U128::from(parse_near!("100 N"));
-    // let worker = workspaces::sandbox().await?;
     // let (contract, _, defi_contract) = init(&worker, initial_balance).await?;
 
     // // defi contract must be registered as a FT account
@@ -203,14 +180,10 @@ test("simulate_transfer_call_with_burned_amount", async () => {
     //     .await?
     //     .json::<U128>()?;
     // assert_eq!(defi_balance.0, transfer_amount.0 - 10);
-
-    // Ok(())
 });
 
 test("simulate_transfer_call_with_immediate_return_and_no_refund", () => {
-    // let initial_balance = U128::from(parse_near!("10000 N"));
     // let transfer_amount = U128::from(parse_near!("100 N"));
-    // let worker = workspaces::sandbox().await?;
     // let (contract, _, defi_contract) = init(&worker, initial_balance).await?;
 
     // // defi contract must be registered as a FT account
@@ -240,14 +213,10 @@ test("simulate_transfer_call_with_immediate_return_and_no_refund", () => {
     //     .json::<U128>()?;
     // assert_eq!(initial_balance.0 - transfer_amount.0, root_balance.0);
     // assert_eq!(transfer_amount.0, defi_balance.0);
-
-    // Ok(())
 });
 
 test("simulate_transfer_call_when_called_contract_not_registered_with_ft", async () => {
-    // let initial_balance = U128::from(parse_near!("10000 N"));
     // let transfer_amount = U128::from(parse_near!("100 N"));
-    // let worker = workspaces::sandbox().await?;
     // let (contract, _, defi_contract) = init(&worker, initial_balance).await?;
 
     // // call fails because DEFI contract is not registered as FT user
@@ -275,15 +244,11 @@ test("simulate_transfer_call_when_called_contract_not_registered_with_ft", async
     //     .json::<U128>()?;
     // assert_eq!(initial_balance.0, root_balance.0);
     // assert_eq!(0, defi_balance.0);
-
-    // Ok(())
 });
 
 test("simulate_transfer_call_with_promise_and_refund", async () => {
-    // let initial_balance = U128::from(parse_near!("10000 N"));
     // let refund_amount = U128::from(parse_near!("50 N"));
     // let transfer_amount = U128::from(parse_near!("100 N"));
-    // let worker = workspaces::sandbox().await?;
     // let (contract, _, defi_contract) = init(&worker, initial_balance).await?;
 
     // // defi contract must be registered as a FT account
@@ -317,14 +282,10 @@ test("simulate_transfer_call_with_promise_and_refund", async () => {
     //     .json::<U128>()?;
     // assert_eq!(initial_balance.0 - transfer_amount.0 + refund_amount.0, root_balance.0);
     // assert_eq!(transfer_amount.0 - refund_amount.0, defi_balance.0);
-
-    // Ok(())
 });
 
 test("simulate_transfer_call_promise_panics_for_a_full_refund", async () => {
-    // let initial_balance = U128::from(parse_near!("10000 N"));
     // let transfer_amount = U128::from(parse_near!("100 N"));
-    // let worker = workspaces::sandbox().await?;
     // let (contract, _, defi_contract) = init(&worker, initial_balance).await?;
 
     // // defi contract must be registered as a FT account
@@ -369,6 +330,4 @@ test("simulate_transfer_call_promise_panics_for_a_full_refund", async () => {
     //     .json::<U128>()?;
     // assert_eq!(initial_balance, root_balance);
     // assert_eq!(0, defi_balance.0);
-
-    // Ok(())
 });
