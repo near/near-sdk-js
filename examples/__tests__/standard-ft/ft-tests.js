@@ -18,7 +18,7 @@ test.beforeEach(async (t) => {
         non_fungible_token_account_id: ftContract.accountId,
     });
 
-    await ftContract.call("storage_deposit", { account_id: alice.accountId, registration_only: null }, { attachedDeposit: near_sdk:: env:: storage_byte_cost() * 125 });
+    await registerUser(ftContract, alice.accountId);
 
     t.context.worker = worker;
     t.context.accounts = {
@@ -35,15 +35,8 @@ test.afterEach.always(async (t) => {
 });
 
 
-async function registerUser(contract: Contract, account_id: AccountId) {
-    // let res = contract
-    //     .call("storage_deposit")
-    //     .args_json((account_id, Option::<bool>::None))
-    //     .max_gas()
-    //     .deposit(near_sdk::env::storage_byte_cost() * 125)
-    //     .transact()
-    //     .await?;
-    // assert!(res.is_success());
+async function registerUser(contract, account_id) {
+    await ftContract.call("storage_deposit", { account_id: account_id, registration_only: null }, { attachedDeposit: near_sdk:: env:: storage_byte_cost() * 125 });
 }
 
 test("test_total_supply", async () => {
