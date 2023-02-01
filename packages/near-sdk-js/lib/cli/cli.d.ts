@@ -14,6 +14,7 @@ export declare function createJsFileWithRollupCom(source: string, target: string
 export declare function transpileJsAndBuildWasmCom(target: string, { verbose }: {
     verbose: boolean;
 }): Promise<void>;
-export declare function buildCom(source: string, target: string, packageJson: string, tsConfig: string, { verbose }: {
+export declare function buildCom(source: string, target: string, packageJson: string, tsConfig: string, { verbose, generateABI }: {
     verbose: boolean;
+    generateABI: boolean;
 }): Promise<void>;

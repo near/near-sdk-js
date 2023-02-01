@@ -222,3 +222,10 @@ export function encode(s: string): Uint8Array {
 export function decode(a: Uint8Array): string {
   return env.uint8array_to_utf8_string(a);
 }
+
+/**
+ * When implemented, allow object to be stored as collection key
+ */
+export interface IntoStorageKey {
+  into_storage_key(): string;
+}

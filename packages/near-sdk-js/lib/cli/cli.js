@@ -26,6 +26,7 @@ program
     .argument("[packageJson]", "Target file path and name.", "package.json")
     .argument("[tsConfig]", "Target file path and name.", "tsconfig.json")
     .option("--verbose", "Whether to print more verbose output.", false)
+    .option("--generateABI", "Whether to generate ABI.", false)
     .action(buildCom))
     .addCommand(new Command("validateContract")
     .usage("[source]")
@@ -39,7 +40,7 @@ program
     .argument("[source]", "Typescript file to validate", "src/index.ts")
     .option("--verbose", "Whether to print more verbose output.", false)
     .action(checkTypescriptCom))
-    .addCommand(new Command("createJsFileWithRullup")
+    .addCommand(new Command("createJsFileWithRollup")
     .usage("[source] [target]")
     .description("Create intermediate javascript file for later processing with QJSC")
     .argument("[source]", "Contract to build.", "src/index.js")
@@ -148,13 +149,15 @@ export async function transpileJsAndBuildWasmCom(target, { verbose = false }) {
     await wasiStubContract(getContractTarget(target), verbose);
     signale.success(`Generated ${getContractTarget(target)} contract successfully!`);
 }
-export async function buildCom(source, target, packageJson, tsConfig, { verbose = false }) {
+export async function buildCom(source, target, packageJson, tsConfig, { verbose = false, generateABI = false }) {
     const signale = new Signale({ scope: "build", interactive: !verbose });
     requireTargetExt(target);
     signale.await(`Building ${source} contract...`);
     await checkTypescriptCom(source, { verbose });
-    await generateAbi(source, target, packageJson, tsConfig, { verbose });
     ensureTargetDirExists(target);
+    if (generateABI) {
+        await generateAbi(source, target, packageJson, tsConfig, { verbose });
+    }
     await validateCom(source, { verbose });
     await createJsFileWithRollupCom(source, target, { verbose });
     await transpileJsAndBuildWasmCom(target, { verbose });
