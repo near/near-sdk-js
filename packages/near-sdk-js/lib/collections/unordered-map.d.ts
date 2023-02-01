@@ -7,7 +7,7 @@ declare type ValueAndIndex = [value: string, index: number];
  */
 export declare class UnorderedMap<DataType> {
     readonly prefix: string;
-    readonly keys: Vector<string>;
+    readonly _keys: Vector<string>;
     readonly values: LookupMap<ValueAndIndex>;
     /**
      * @param prefix - The byte prefix to use when storing elements inside this collection.
@@ -78,6 +78,10 @@ export declare class UnorderedMap<DataType> {
      * @param data - The deserialized data to create an instance from.
      */
     static reconstruct<DataType>(data: UnorderedMap<DataType>): UnorderedMap<DataType>;
+    keys({ start, limit }: {
+        start: any;
+        limit: any;
+    }): string[];
 }
 /**
  * An iterator for the UnorderedMap collection.

@@ -20,19 +20,19 @@ export class UnorderedSet {
     constructor(prefix) {
         this.prefix = prefix;
         this.elementIndexPrefix = `${prefix}i`;
-        this.elements = new Vector(`${prefix}e`);
+        this._elements = new Vector(`${prefix}e`);
     }
     /**
      * The number of elements stored in the collection.
      */
     get length() {
-        return this.elements.length;
+        return this._elements.length;
     }
     /**
      * Checks whether the collection is empty.
      */
     isEmpty() {
-        return this.elements.isEmpty();
+        return this._elements.isEmpty();
     }
     /**
      * Checks whether the collection contains the value.
@@ -59,7 +59,7 @@ export class UnorderedSet {
         const nextIndex = this.length;
         const nextIndexRaw = serializeIndex(nextIndex);
         near.storageWriteRaw(encode(indexLookup), nextIndexRaw);
-        this.elements.push(element, options);
+        this._elements.push(element, options);
         return true;
     }
     /**
@@ -79,12 +79,12 @@ export class UnorderedSet {
         if (this.length === 1) {
             near.storageRemove(indexLookup);
             const index = deserializeIndex(indexRaw);
-            this.elements.swapRemove(index);
+            this._elements.swapRemove(index);
             return true;
         }
         // If there is more than one element then swap remove swaps it with the last
         // element.
-        const lastElement = this.elements.get(this.length - 1, options);
+        const lastElement = this._elements.get(this.length - 1, options);
         assert(!!lastElement, ERR_INCONSISTENT_STATE);
         near.storageRemove(indexLookup);
         // If the removed element was the last element from keys, then we don't need to
@@ -95,21 +95,21 @@ export class UnorderedSet {
             near.storageWriteRaw(encode(lastLookupElement), indexRaw);
         }
         const index = deserializeIndex(indexRaw);
-        this.elements.swapRemove(index);
+        this._elements.swapRemove(index);
         return true;
     }
     /**
      * Remove all of the elements stored within the collection.
      */
     clear(options) {
-        for (const element of this.elements) {
+        for (const element of this._elements) {
             const indexLookup = this.elementIndexPrefix + serializeValueWithOptions(element, options);
             near.storageRemove(indexLookup);
         }
-        this.elements.clear();
+        this._elements.clear();
     }
     [Symbol.iterator]() {
-        return this.elements[Symbol.iterator]();
+        return this._elements[Symbol.iterator]();
     }
     /**
      * Create a iterator on top of the default collection iterator using custom options.
@@ -118,7 +118,7 @@ export class UnorderedSet {
      */
     createIteratorWithOptions(options) {
         return {
-            [Symbol.iterator]: () => new VectorIterator(this.elements, options),
+            [Symbol.iterator]: () => new VectorIterator(this._elements, options),
         };
     }
     /**
@@ -161,8 +161,21 @@ export class UnorderedSet {
         const set = new UnorderedSet(data.prefix);
         // reconstruct Vector
         const elementsPrefix = data.prefix + "e";
-        set.elements = new Vector(elementsPrefix);
-        set.elements.length = data.elements.length;
+        set._elements = new Vector(elementsPrefix);
+        set._elements.length = data._elements.length;
         return set;
+    }
+    elements({ options, start, limit }) {
+        let ret = [];
+        if (start === undefined) {
+            start = 0;
+        }
+        if (limit == undefined) {
+            limit = this.length - start;
+        }
+        for (let i = start; i < start + limit; i++) {
+            ret.push(this._elements.get(i, options));
+        }
+        return ret;
     }
 }

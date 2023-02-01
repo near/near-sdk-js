@@ -6,7 +6,7 @@ import { GetOptions } from "../types/collections";
 export declare class UnorderedSet<DataType> {
     readonly prefix: string;
     readonly elementIndexPrefix: string;
-    readonly elements: Vector<DataType>;
+    readonly _elements: Vector<DataType>;
     /**
      * @param prefix - The byte prefix to use when storing elements inside this collection.
      */
@@ -76,4 +76,9 @@ export declare class UnorderedSet<DataType> {
      * @param data - The deserialized data to create an instance from.
      */
     static reconstruct<DataType>(data: UnorderedSet<DataType>): UnorderedSet<DataType>;
+    elements({ options, start, limit }: {
+        options?: GetOptions<DataType>;
+        start?: number;
+        limit?: number;
+    }): DataType[];
 }

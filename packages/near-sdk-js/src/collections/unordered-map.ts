@@ -214,8 +214,8 @@ export class UnorderedMap<DataType> {
     return map as UnorderedMap<DataType>;
   }
 
-  keys({start, limit}): string[] {
-    let ret = [];
+  keys({ start, limit }): string[] {
+    const ret = [];
     if (start === undefined) {
       start = 0;
     }

@@ -227,8 +227,16 @@ export class UnorderedSet<DataType> {
     return set as UnorderedSet<DataType>;
   }
 
-  elements({options, start, limit}: {options?: GetOptions<DataType>, start?: number, limit?: number}): DataType[] {
-    let ret = [];
+  elements({
+    options,
+    start,
+    limit,
+  }: {
+    options?: GetOptions<DataType>;
+    start?: number;
+    limit?: number;
+  }): DataType[] {
+    const ret = [];
     if (start === undefined) {
       start = 0;
     }
