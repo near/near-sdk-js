@@ -165,8 +165,8 @@ export class UnorderedSet {
         set._elements.length = data._elements.length;
         return set;
     }
-    elements({ options, start, limit }) {
-        let ret = [];
+    elements({ options, start, limit, }) {
+        const ret = [];
         if (start === undefined) {
             start = 0;
         }

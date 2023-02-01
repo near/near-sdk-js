@@ -76,7 +76,7 @@ export declare class UnorderedSet<DataType> {
      * @param data - The deserialized data to create an instance from.
      */
     static reconstruct<DataType>(data: UnorderedSet<DataType>): UnorderedSet<DataType>;
-    elements({ options, start, limit }: {
+    elements({ options, start, limit, }: {
         options?: GetOptions<DataType>;
         start?: number;
         limit?: number;
