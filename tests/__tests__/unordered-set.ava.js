@@ -128,3 +128,34 @@ test("Add and check exist of object", async (t) => {
   await ali.call(unorderedSetContract, "add_house", houseSpec);
   t.is(await unorderedSetContract.view("house_exist", houseSpec), true);
 });
+
+test("Enumerate and pagination of elements", async (t) => {
+  const {bob, unorderedSetContract} = t.context.accounts;
+
+  await bob.callRaw(unorderedSetContract, "extend", {
+    elements: ["aaa", "bbb", "ccc", "ddd"],
+  });
+
+  t.deepEqual(await unorderedSetContract.view("elements", {}), [
+    "aaa",
+    "bbb",
+    "ccc",
+    "ddd"
+  ]);
+
+  t.deepEqual(await unorderedSetContract.view("elements", {start: 1}), [
+    "bbb",
+    "ccc",
+    "ddd"
+  ]);
+
+  t.deepEqual(await unorderedSetContract.view("elements", {limit: 2}), [
+    "aaa",
+    "bbb",
+  ]);
+
+  t.deepEqual(await unorderedSetContract.view("elements", {start: 1, limit: 2}), [
+    "bbb",
+    "ccc",
+  ]);
+})

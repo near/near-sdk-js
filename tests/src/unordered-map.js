@@ -70,4 +70,9 @@ export class UnorderedMapTestContract {
     const room = house.rooms[0];
     return house.describe() + room.describe();
   }
+
+  @view({})
+  keys({start, limit}) {
+    return this.unorderedMap.keys({start,limit});
+  }
 }
