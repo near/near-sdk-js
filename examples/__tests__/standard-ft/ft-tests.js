@@ -152,8 +152,7 @@ test("simulate_transfer_call_with_burned_amount", async () => {
     // assert_eq!(defi_balance.0, TRANSFER_AMOUNT - 10);
 });
 
-test("
-", () => {
+test("simulate_transfer_call_with_immediate_return_and_no_refund", () => {
     const TRANSFER_AMOUNT = NEAR.parse("100 N");
 
     const { ftContract, defiContract } = t.context.accounts;
