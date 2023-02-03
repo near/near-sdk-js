@@ -152,34 +152,28 @@ test("simulate_transfer_call_with_burned_amount", async () => {
     // assert_eq!(defi_balance.0, TRANSFER_AMOUNT - 10);
 });
 
-test("simulate_transfer_call_with_immediate_return_and_no_refund", () => {
+test("
+", () => {
     const TRANSFER_AMOUNT = NEAR.parse("100 N");
 
-    // let (ftContract, _, defiContract) = init(&worker, initial_balance).await?;
+    const { ftContract, defiContract } = t.context.accounts;
 
-    // // defi ftContract must be registered as a FT account
-    // registerUser(&ftContract, defiContract.id()).await?;
+    // defi ftContract must be registered as a FT account
+    await registerUser(ftContract, defiContract.accointId);
 
-    // // root invests in defi by calling `ft_transfer_call`
-    // let res = ftContract
-    //     .call("ft_transfer_call")
-    //     .args_json((defiContract.id(), TRANSFER_AMOUNT, Option::<String>::None, "take-my-money"))
-    //     .deposit(ONE_YOCTO)
+    // root invests in defi by calling `ft_transfer_call`
+    await ftContract.call("ft_transfer_call", {
+        receiver_id: defiContract.accointId,
+        amount: TRANSFER_AMOUNT,
+        memo: null,
+        msg: "take-my-money"
+    }, { attachedDeposit: ONE_YOCTO });
 
-    // let root_balance = ftContract
-    //     .call("ft_balance_of")
-    //     .args_json((ftContract.id(),))
-    //     .view()
-    //     .await?
-    //     .json::<U128>()?;
-    // let defi_balance = ftContract
-    //     .call("ft_balance_of")
-    //     .args_json((defiContract.id(),))
-    //     .view()
-    //     .await?
-    //     .json::<U128>()?;
-    // assert_eq!(initial_balance.0 - TRANSFER_AMOUNT, root_balance.0);
-    // assert_eq!(TRANSFER_AMOUNT, defi_balance.0);
+    let root_balance = await ftContract.view("ft_balance_of", { account_id: ftContract.accountId });
+    let defi_balance = await ftContract.view("ft_balance_of", { account_id: defiContract.accountId });
+
+    t.is(INITIAL_BALANCE - TRANSFER_AMOUNT, root_balance);
+    t.is(TRANSFER_AMOUNT, defi_balance);
 });
 
 test("simulate_transfer_call_when_called_contract_not_registered_with_ft", async () => {
