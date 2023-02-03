@@ -81,28 +81,31 @@ test("test_close_account_empty_balance", async () => {
 });
 
 test("test_close_account_non_empty_balance", async () => {
+    const { ftContract } = t.context.accounts;
+
     let res = await ftContract.call("storage_unregister", {}, { attachedDeposit: ONE_YOCTO });
     t.is(res.contains("Can't unregister the account with the positive balance without force"));
 
-    let res2 = await ftContract.call("storage_unregister", {force: false}, { attachedDeposit: ONE_YOCTO });
+    let res2 = await ftContract.call("storage_unregister", { force: false }, { attachedDeposit: ONE_YOCTO });
     t.is(res2.contains("Can't unregister the account with the positive balance without force"));
 });
 
 test("simulate_close_account_force_non_empty_balance", () => {
+    const { ftContract } = t.context.accounts;
 
-    await ftContract.call("storage_unregister", {force: true}, {attachedDeposit: ONE_YOCTO});
+    await ftContract.call("storage_unregister", { force: true }, { attachedDeposit: ONE_YOCTO });
 
-    const res = await ftContract.call("ft_total_supply").view().await?;
+    const res = await ftContract.view("ft_total_supply", {});
     t.is(res, 0);
 });
 
 test("simulate_transfer_call_with_burned_amount", async () => {
-    const TRANSFER_AMOUNT = NEAR.parse("100 N");
+    // const TRANSFER_AMOUNT = NEAR.parse("100 N");
 
-    // let (ftContract, _, defiContract) = init(&worker, initial_balance).await?;
+    // const { ftContract, defiContract } = t.context.accounts;
 
     // // defi contract must be registered as a FT account
-    // registerUser(&ftContract, defiContract.id()).await?;
+    // await registerUser(ftContract, defiContract.accointId);
 
     // // root invests in defi by calling `ft_transfer_call`
     // let res = ftContract
