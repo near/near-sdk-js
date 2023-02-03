@@ -60,8 +60,8 @@ export class NonFungibleToken {
         assert(l > 0, "limit must be greater than 0.");
         l = Math.min(l, this.owner_by_id.length - start_index);
         const ret = [];
-        for (let i = start_index; i < start_index + l; i++) {
-            const token_id = this.owner_by_id.keys.get(i);
+        const tokens = this.owner_by_id.keys({ start: from_index, limit: l });
+        for (let token_id of tokens) {
             const owner_id = this.owner_by_id.get(token_id);
             ret.push(this.enum_get_token(owner_id, token_id));
         }
@@ -88,8 +88,8 @@ export class NonFungibleToken {
         assert(l > 0, "limit must be greater than 0.");
         l = Math.min(l, token_set.length - start_index);
         const ret = [];
-        for (let i = start_index; i < start_index + l; i++) {
-            const token_id = token_set.elements.get(i);
+        const tokens = token_set.elements({ start: from_index, limit: l });
+        for (let token_id of tokens) {
             const owner_id = this.owner_by_id.get(token_id);
             ret.push(this.enum_get_token(owner_id, token_id));
         }

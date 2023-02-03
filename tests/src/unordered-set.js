@@ -43,6 +43,11 @@ export class UnorderedSetTestContract {
     return res;
   }
 
+  @view({})
+  elements({start, limit}) {
+    return this.unorderedSet.elements({start, limit})
+  }
+
   @call({})
   extend({ elements }) {
     this.unorderedSet.extend(elements);
