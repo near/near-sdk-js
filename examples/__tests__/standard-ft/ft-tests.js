@@ -90,13 +90,10 @@ test("test_close_account_non_empty_balance", async () => {
 
 test("simulate_close_account_force_non_empty_balance", () => {
 
-    // let res = ftContract
-    //     .call("storage_unregister")
-    //     .args_json((Some(true),))
-    //     .deposit(ONE_YOCTO)
+    await ftContract.call("storage_unregister", {force: true}, {attachedDeposit: ONE_YOCTO});
 
-    // let res = ftContract.call("ft_total_supply").view().await?;
-    // assert_eq!(res.json::<U128>()?.0, 0);
+    const res = await ftContract.call("ft_total_supply").view().await?;
+    t.is(res, 0);
 });
 
 test("simulate_transfer_call_with_burned_amount", async () => {
