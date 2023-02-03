@@ -2,6 +2,7 @@ import { Worker } from "near-workspaces";
 import test from "ava";
 
 const INITIAL_BALANCE = NEAR.parse("10000 N");
+const ONE_YOCTO = 1;
 
 test.beforeEach(async (t) => {
     const worker = await Worker.init();
@@ -48,65 +49,54 @@ test("test_total_supply", async () => {
 });
 
 test("test_simple_transfer", async () => {
-    // let transfer_amount = U128::from(parse_near!("100 N"));
-    // let (contract, alice, _) = init(&worker, initial_balance).await?;
+    const TRANSFER_AMOUNT = NEAR.parse("100 N");
 
-    // let res = contract
-    //     .call("ft_transfer")
-    //     .args_json((alice.id(), transfer_amount, Option::<bool>::None))
-    //     .max_gas()
-    //     .deposit(ONE_YOCTO)
-    //     .transact()
-    //     .await?;
-    // assert!(res.is_success());
+    const { ftContract, alice } = t.context.accounts;
 
-    // let root_balance = contract
-    //     .call("ft_balance_of")
-    //     .args_json((contract.id(),))
-    //     .view()
-    //     .await?
-    //     .json::<U128>()?;
-    // let alice_balance = contract
-    //     .call("ft_balance_of")
-    //     .args_json((alice.id(),))
-    //     .view()
-    //     .await?
-    //     .json::<U128>()?;
-    // assert_eq!(initial_balance.0 - transfer_amount.0, root_balance.0);
-    // assert_eq!(transfer_amount.0, alice_balance.0);
+    const res = ftContract.call(
+        "ft_transfer",
+        {
+            reciever_id: alice.accountId,
+            amount: TRANSFER_AMOUNT,
+            memo: null
+        },
+        {
+            attachedDeposit: ONE_YOCTO
+        }
+    );
+
+    let root_balance = ftContract.view("ft_balance_of", { account_id: ftContract.accountId });
+
+    let alice_balance = ftContract.view("ft_balance_of", { account_id: allice.accointId });
+
+    t.is(INITIAL_BALANCE - TRANSFER_AMOUNT, root_balance);
+    t.is(TRANSFER_AMOUNT, alice_balance);
 });
 
 test("test_close_account_empty_balance", async () => {
-    // let (contract, alice, _) = init(&worker, initial_balance).await?;
+    const { ftContract, alice } = t.context.accounts;
 
     // let res = alice
-    //     .call(contract.id(), "storage_unregister")
+    //     .call(ftContract.id(), "storage_unregister")
     //     .args_json((Option::<bool>::None,))
-    //     .max_gas()
     //     .deposit(ONE_YOCTO)
-    //     .transact()
-    //     .await?;
     // assert!(res.json::<bool>()?);
 });
 
 test("test_close_account_non_empty_balance", async () => {
 
-    // let res = contract
+    // let res = ftContract
     //     .call("storage_unregister")
     //     .args_json((Option::<bool>::None,))
-    //     .max_gas()
     //     .deposit(ONE_YOCTO)
-    //     .transact()
     //     .await;
     // assert!(format!("{:?}", res)
     //     .contains("Can't unregister the account with the positive balance without force"));
 
-    // let res = contract
+    // let res = ftContract
     //     .call("storage_unregister")
     //     .args_json((Some(false),))
-    //     .max_gas()
     //     .deposit(ONE_YOCTO)
-    //     .transact()
     //     .await;
     // assert!(format!("{:?}", res)
     //     .contains("Can't unregister the account with the positive balance without force"));
@@ -114,32 +104,29 @@ test("test_close_account_non_empty_balance", async () => {
 
 test("simulate_close_account_force_non_empty_balance", () => {
 
-    // let res = contract
+    // let res = ftContract
     //     .call("storage_unregister")
     //     .args_json((Some(true),))
-    //     .max_gas()
     //     .deposit(ONE_YOCTO)
-    //     .transact()
-    //     .await?;
-    // assert!(res.is_success());
 
-    // let res = contract.call("ft_total_supply").view().await?;
+    // let res = ftContract.call("ft_total_supply").view().await?;
     // assert_eq!(res.json::<U128>()?.0, 0);
 });
 
 test("simulate_transfer_call_with_burned_amount", async () => {
-    // let transfer_amount = U128::from(parse_near!("100 N"));
-    // let (contract, _, defi_contract) = init(&worker, initial_balance).await?;
+    const TRANSFER_AMOUNT = NEAR.parse("100 N");
+
+    // let (ftContract, _, defiContract) = init(&worker, initial_balance).await?;
 
     // // defi contract must be registered as a FT account
-    // registerUser(&contract, defi_contract.id()).await?;
+    // registerUser(&ftContract, defiContract.id()).await?;
 
     // // root invests in defi by calling `ft_transfer_call`
-    // let res = contract
+    // let res = ftContract
     //     .batch()
     //     .call(
     //         Function::new("ft_transfer_call")
-    //             .args_json((defi_contract.id(), transfer_amount, Option::<String>::None, "10"))
+    //             .args_json((defiContract.id(), TRANSFER_AMOUNT, Option::<String>::None, "10"))
     //             .deposit(ONE_YOCTO)
     //             .gas(300_000_000_000_000 / 2)
     //     )
@@ -149,12 +136,9 @@ test("simulate_transfer_call_with_burned_amount", async () => {
     //             .deposit(ONE_YOCTO)
     //             .gas(300_000_000_000_000 / 2)
     //     )
-    //     .transact()
-    //     .await?;
-    // assert!(res.is_success());
 
     // let logs = res.logs();
-    // let expected = format!("Account @{} burned {}", contract.id(), 10);
+    // let expected = format!("Account @{} burned {}", ftContract.id(), 10);
     // assert!(logs.len() >= 2);
     // assert!(logs.contains(&"The account of the sender was deleted"));
     // assert!(logs.contains(&(expected.as_str())));
@@ -165,80 +149,75 @@ test("simulate_transfer_call_with_burned_amount", async () => {
     //     ValueOrReceiptId::Value(val) => {
     //         let bytes = base64::decode(&val)?;
     //         let used_amount = serde_json::from_slice::<U128>(&bytes)?;
-    //         assert_eq!(used_amount, transfer_amount);
+    //         assert_eq!(used_amount, TRANSFER_AMOUNT);
     //     }
     //     _ => panic!("Unexpected receipt id"),
     // }
     // assert!(res.json::<bool>()?);
 
-    // let res = contract.call("ft_total_supply").view().await?;
-    // assert_eq!(res.json::<U128>()?.0, transfer_amount.0 - 10);
-    // let defi_balance = contract
+    // let res = ftContract.call("ft_total_supply").view().await?;
+    // assert_eq!(res.json::<U128>()?.0, TRANSFER_AMOUNT - 10);
+    // let defi_balance = ftContract
     //     .call("ft_balance_of")
-    //     .args_json((defi_contract.id(),))
+    //     .args_json((defiContract.id(),))
     //     .view()
     //     .await?
     //     .json::<U128>()?;
-    // assert_eq!(defi_balance.0, transfer_amount.0 - 10);
+    // assert_eq!(defi_balance.0, TRANSFER_AMOUNT - 10);
 });
 
 test("simulate_transfer_call_with_immediate_return_and_no_refund", () => {
-    // let transfer_amount = U128::from(parse_near!("100 N"));
-    // let (contract, _, defi_contract) = init(&worker, initial_balance).await?;
+    const TRANSFER_AMOUNT = NEAR.parse("100 N");
 
-    // // defi contract must be registered as a FT account
-    // registerUser(&contract, defi_contract.id()).await?;
+    // let (ftContract, _, defiContract) = init(&worker, initial_balance).await?;
+
+    // // defi ftContract must be registered as a FT account
+    // registerUser(&ftContract, defiContract.id()).await?;
 
     // // root invests in defi by calling `ft_transfer_call`
-    // let res = contract
+    // let res = ftContract
     //     .call("ft_transfer_call")
-    //     .args_json((defi_contract.id(), transfer_amount, Option::<String>::None, "take-my-money"))
-    //     .max_gas()
+    //     .args_json((defiContract.id(), TRANSFER_AMOUNT, Option::<String>::None, "take-my-money"))
     //     .deposit(ONE_YOCTO)
-    //     .transact()
-    //     .await?;
-    // assert!(res.is_success());
 
-    // let root_balance = contract
+    // let root_balance = ftContract
     //     .call("ft_balance_of")
-    //     .args_json((contract.id(),))
+    //     .args_json((ftContract.id(),))
     //     .view()
     //     .await?
     //     .json::<U128>()?;
-    // let defi_balance = contract
+    // let defi_balance = ftContract
     //     .call("ft_balance_of")
-    //     .args_json((defi_contract.id(),))
+    //     .args_json((defiContract.id(),))
     //     .view()
     //     .await?
     //     .json::<U128>()?;
-    // assert_eq!(initial_balance.0 - transfer_amount.0, root_balance.0);
-    // assert_eq!(transfer_amount.0, defi_balance.0);
+    // assert_eq!(initial_balance.0 - TRANSFER_AMOUNT, root_balance.0);
+    // assert_eq!(TRANSFER_AMOUNT, defi_balance.0);
 });
 
 test("simulate_transfer_call_when_called_contract_not_registered_with_ft", async () => {
-    // let transfer_amount = U128::from(parse_near!("100 N"));
-    // let (contract, _, defi_contract) = init(&worker, initial_balance).await?;
+    const TRANSFER_AMOUNT = NEAR.parse("100 N");
+
+    // let (ftContract, _, defiContract) = init(&worker, initial_balance).await?;
 
     // // call fails because DEFI contract is not registered as FT user
-    // let res = contract
+    // let res = ftContract
     //     .call("ft_transfer_call")
-    //     .args_json((defi_contract.id(), transfer_amount, Option::<String>::None, "take-my-money"))
-    //     .max_gas()
+    //     .args_json((defiContract.id(), TRANSFER_AMOUNT, Option::<String>::None, "take-my-money"))
     //     .deposit(ONE_YOCTO)
-    //     .transact()
-    //     .await?;
     // assert!(res.is_failure());
 
     // // balances remain unchanged
-    // let root_balance = contract
+    // let root_balance = ftContract
     //     .call("ft_balance_of")
-    //     .args_json((contract.id(),))
+    //     .args_json((ftContract.id(),))
     //     .view()
     //     .await?
     //     .json::<U128>()?;
-    // let defi_balance = contract
+    // let defi_balance = ftContract
     //     .call("ft_balance_of")
-    //     .args_json((defi_contract.id(),))
+    //     .args_json((defiContract.id(),))
     //     .view()
     //     .await?
     //     .json::<U128>()?;
@@ -248,63 +227,55 @@ test("simulate_transfer_call_when_called_contract_not_registered_with_ft", async
 
 test("simulate_transfer_call_with_promise_and_refund", async () => {
     // let refund_amount = U128::from(parse_near!("50 N"));
-    // let transfer_amount = U128::from(parse_near!("100 N"));
-    // let (contract, _, defi_contract) = init(&worker, initial_balance).await?;
+    const TRANSFER_AMOUNT = NEAR.parse("100 N");
+    // let (ftContract, _, defiContract) = init(&worker, initial_balance).await?;
 
     // // defi contract must be registered as a FT account
-    // registerUser(&contract, defi_contract.id()).await?;
+    // registerUser(&ftContract, defiContract.id()).await?;
 
-    // let res = contract
+    // let res = ftContract
     //     .call("ft_transfer_call")
     //     .args_json((
-    //         defi_contract.id(),
-    //         transfer_amount,
+    //         defiContract.id(),
+    //         TRANSFER_AMOUNT,
     //         Option::<String>::None,
     //         refund_amount.0.to_string(),
     //     ))
-    //     .max_gas()
     //     .deposit(ONE_YOCTO)
-    //     .transact()
-    //     .await?;
-    // assert!(res.is_success());
 
-    // let root_balance = contract
+    // let root_balance = ftContract
     //     .call("ft_balance_of")
-    //     .args_json((contract.id(),))
+    //     .args_json((ftContract.id(),))
     //     .view()
     //     .await?
     //     .json::<U128>()?;
-    // let defi_balance = contract
+    // let defi_balance = ftContract
     //     .call("ft_balance_of")
-    //     .args_json((defi_contract.id(),))
+    //     .args_json((defiContract.id(),))
     //     .view()
     //     .await?
     //     .json::<U128>()?;
-    // assert_eq!(initial_balance.0 - transfer_amount.0 + refund_amount.0, root_balance.0);
-    // assert_eq!(transfer_amount.0 - refund_amount.0, defi_balance.0);
+    // assert_eq!(initial_balance.0 - TRANSFER_AMOUNT + refund_amount.0, root_balance.0);
+    // assert_eq!(TRANSFER_AMOUNT - refund_amount.0, defi_balance.0);
 });
 
 test("simulate_transfer_call_promise_panics_for_a_full_refund", async () => {
-    // let transfer_amount = U128::from(parse_near!("100 N"));
-    // let (contract, _, defi_contract) = init(&worker, initial_balance).await?;
+    const TRANSFER_AMOUNT = NEAR.parse("100 N");
+    // let (ftContract, _, defiContract) = init(&worker, initial_balance).await?;
 
     // // defi contract must be registered as a FT account
-    // registerUser(&contract, defi_contract.id()).await?;
+    // registerUser(&ftContract, defiContract.id()).await?;
 
     // // root invests in defi by calling `ft_transfer_call`
-    // let res = contract
+    // let res = ftContract
     //     .call("ft_transfer_call")
     //     .args_json((
-    //         defi_contract.id(),
-    //         transfer_amount,
+    //         defiContract.id(),
+    //         TRANSFER_AMOUNT,
     //         Option::<String>::None,
     //         "no parsey as integer big panic oh no".to_string(),
     //     ))
-    //     .max_gas()
     //     .deposit(ONE_YOCTO)
-    //     .transact()
-    //     .await?;
-    // assert!(res.is_success());
 
     // let promise_failures = res.receipt_failures();
     // assert_eq!(promise_failures.len(), 1);
@@ -316,15 +287,15 @@ test("simulate_transfer_call_promise_panics_for_a_full_refund", async () => {
     // }
 
     // // balances remain unchanged
-    // let root_balance = contract
+    // let root_balance = ftContract
     //     .call("ft_balance_of")
-    //     .args_json((contract.id(),))
+    //     .args_json((ftContract.id(),))
     //     .view()
     //     .await?
     //     .json::<U128>()?;
-    // let defi_balance = contract
+    // let defi_balance = ftContract
     //     .call("ft_balance_of")
-    //     .args_json((defi_contract.id(),))
+    //     .args_json((defiContract.id(),))
     //     .view()
     //     .await?
     //     .json::<U128>()?;
