@@ -53,7 +53,7 @@ test("test_simple_transfer", async () => {
 
     const { ftContract, alice } = t.context.accounts;
 
-    const res = ftContract.call(
+    const res = await ftContract.call(
         "ft_transfer",
         {
             reciever_id: alice.accountId,
@@ -65,9 +65,9 @@ test("test_simple_transfer", async () => {
         }
     );
 
-    let root_balance = ftContract.view("ft_balance_of", { account_id: ftContract.accountId });
+    let root_balance = await ftContract.view("ft_balance_of", { account_id: ftContract.accountId });
 
-    let alice_balance = ftContract.view("ft_balance_of", { account_id: allice.accointId });
+    let alice_balance = await ftContract.view("ft_balance_of", { account_id: allice.accointId });
 
     t.is(INITIAL_BALANCE - TRANSFER_AMOUNT, root_balance);
     t.is(TRANSFER_AMOUNT, alice_balance);
@@ -76,27 +76,16 @@ test("test_simple_transfer", async () => {
 test("test_close_account_empty_balance", async () => {
     const { ftContract, alice } = t.context.accounts;
 
-    let res = alice.call(ftContract.id(), "storage_unregister", {}, { attachedDeposit: ONE_YOCTO });
+    let res = await alice.call(ftContract.id(), "storage_unregister", {}, { attachedDeposit: ONE_YOCTO });
     t.is(res, true); // TODO: doublecheck
 });
 
 test("test_close_account_non_empty_balance", async () => {
+    let res = await ftContract.call("storage_unregister", {}, { attachedDeposit: ONE_YOCTO });
+    t.is(res.contains("Can't unregister the account with the positive balance without force"));
 
-    // let res = ftContract
-    //     .call("storage_unregister")
-    //     .args_json((Option::<bool>::None,))
-    //     .deposit(ONE_YOCTO)
-    //     .await;
-    // assert!(format!("{:?}", res)
-    //     .contains("Can't unregister the account with the positive balance without force"));
-
-    // let res = ftContract
-    //     .call("storage_unregister")
-    //     .args_json((Some(false),))
-    //     .deposit(ONE_YOCTO)
-    //     .await;
-    // assert!(format!("{:?}", res)
-    //     .contains("Can't unregister the account with the positive balance without force"));
+    let res2 = await ftContract.call("storage_unregister", {force: false}, { attachedDeposit: ONE_YOCTO });
+    t.is(res2.contains("Can't unregister the account with the positive balance without force"));
 });
 
 test("simulate_close_account_force_non_empty_balance", () => {
