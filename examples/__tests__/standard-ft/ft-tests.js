@@ -76,11 +76,8 @@ test("test_simple_transfer", async () => {
 test("test_close_account_empty_balance", async () => {
     const { ftContract, alice } = t.context.accounts;
 
-    // let res = alice
-    //     .call(ftContract.id(), "storage_unregister")
-    //     .args_json((Option::<bool>::None,))
-    //     .deposit(ONE_YOCTO)
-    // assert!(res.json::<bool>()?);
+    let res = alice.call(ftContract.id(), "storage_unregister", {}, { attachedDeposit: ONE_YOCTO });
+    t.is(res, true); // TODO: doublecheck
 });
 
 test("test_close_account_non_empty_balance", async () => {
