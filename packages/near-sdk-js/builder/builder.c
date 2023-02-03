@@ -1008,25 +1008,25 @@ static JSValue near_validator_total_stake(JSContext *ctx, JSValueConst this_val,
 
 static JSValue near_utf8_string_to_uint8array(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
 {
-  char *data;
+  const char *data;
   size_t len;
   JSValue arraybuffer;
 
   data = JS_ToCStringLen(ctx, &len, argv[0]);
 
-  arraybuffer = JS_NewArrayBuffer(ctx, data, len, NULL, NULL, TRUE);
+  arraybuffer = JS_NewArrayBuffer(ctx, (uint8_t *)data, len, NULL, NULL, TRUE);
   return JS_CallConstructor(ctx, JS_GetPropertyStr(ctx, JS_GetGlobalObject(ctx), "Uint8Array"), 1, (JSValueConst *)&arraybuffer);
 }
 
 static JSValue near_latin1_string_to_uint8array(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
 {
-  char *data;
+  const char *data;
   size_t len;
   JSValue arraybuffer;
 
   data = JS_ToCStringLenRaw(ctx, &len, argv[0]);
 
-  arraybuffer = JS_NewArrayBuffer(ctx, data, len, NULL, NULL, TRUE);
+  arraybuffer = JS_NewArrayBuffer(ctx, (uint8_t *)data, len, NULL, NULL, TRUE);
   return JS_CallConstructor(ctx, JS_GetPropertyStr(ctx, JS_GetGlobalObject(ctx), "Uint8Array"), 1, (JSValueConst *)&arraybuffer);
 }
 
@@ -1040,7 +1040,7 @@ static JSValue near_uint8array_to_latin1_string(JSContext *ctx, JSValueConst thi
     return JS_ThrowTypeError(ctx, "Expect Uint8Array");
   }
 
-  return JS_NewStringLenRaw(ctx, data_ptr, data_len);
+  return JS_NewStringLenRaw(ctx, (const char *)data_ptr, data_len);
 }
 
 static JSValue near_uint8array_to_utf8_string(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
@@ -1053,7 +1053,7 @@ static JSValue near_uint8array_to_utf8_string(JSContext *ctx, JSValueConst this_
     return JS_ThrowTypeError(ctx, "Expect Uint8Array");
   }
   
-  return JS_NewStringLen(ctx, data_ptr, data_len);
+  return JS_NewStringLen(ctx, (const char *)data_ptr, data_len);
 }
 
 #ifdef NIGHTLY
