@@ -150,3 +150,38 @@ test("UnorderedMap set get object", async (t) => {
     "house house1 has 2 rooms. room room1 is 200sqft."
   );
 });
+
+test("UnorderedMap enumeration and pagination of keys", async (t) => {
+  const { bob, unorderedMapContract } = t.context.accounts;
+  await bob.call(unorderedMapContract, "extend", {
+    kvs: [
+      ["aaa", "world"],
+      ["bbb", "world1"],
+      ["ccc", "world2"],
+      ["ddd", "world3"]
+    ],
+  }); 
+
+  t.deepEqual(await unorderedMapContract.view("keys", {}), [
+    "aaa",
+    "bbb",
+    "ccc",
+    "ddd"
+  ]);
+
+  t.deepEqual(await unorderedMapContract.view("keys", {start: 1}), [
+    "bbb",
+    "ccc",
+    "ddd"
+  ]);
+
+  t.deepEqual(await unorderedMapContract.view("keys", {limit: 2}), [
+    "aaa",
+    "bbb",
+  ]);
+
+  t.deepEqual(await unorderedMapContract.view("keys", {start: 1, limit: 2}), [
+    "bbb",
+    "ccc",
+  ]);
+})
