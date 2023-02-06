@@ -199,37 +199,30 @@ test("simulate_transfer_call_when_called_contract_not_registered_with_ft", async
 });
 
 test("simulate_transfer_call_with_promise_and_refund", async () => {
-    // let refund_amount = U128::from(parse_near!("50 N"));
+    const REFUND_AMOUNT = NEAR.parse("50 N");
+
     const TRANSFER_AMOUNT = NEAR.parse("100 N");
-    // let (ftContract, _, defiContract) = init(&worker, initial_balance).await?;
 
-    // // defi contract must be registered as a FT account
-    // registerUser(&ftContract, defiContract.id()).await?;
+    const { ftContract, defiContract } = t.context.accounts;
 
-    // let res = ftContract
-    //     .call("ft_transfer_call")
-    //     .args_json((
-    //         defiContract.id(),
-    //         TRANSFER_AMOUNT,
-    //         Option::<String>::None,
-    //         refund_amount.0.to_string(),
-    //     ))
-    //     .deposit(ONE_YOCTO)
+    // defi contract must be registered as a FT account
+    await registerUser(ftContract, defiContract.accointId);
 
-    // let root_balance = ftContract
-    //     .call("ft_balance_of")
-    //     .args_json((ftContract.id(),))
-    //     .view()
-    //     .await?
-    //     .json::<U128>()?;
-    // let defi_balance = ftContract
-    //     .call("ft_balance_of")
-    //     .args_json((defiContract.id(),))
-    //     .view()
-    //     .await?
-    //     .json::<U128>()?;
-    // assert_eq!(initial_balance.0 - TRANSFER_AMOUNT + refund_amount.0, root_balance.0);
-    // assert_eq!(TRANSFER_AMOUNT - refund_amount.0, defi_balance.0);
+    await ftContract.call("ft_transfer_call", {
+        receiver_id: defiContract.accointId,
+        amount: TRANSFER_AMOUNT,
+        memo: null,
+        msg: refund_amount,
+    }, {
+        attachedDeposit: ONE_YOCTO
+    });
+
+    let root_balance = await ftContract.view("ft_balance_of", { account_id: ftContract.accountId });
+    let defi_balance = await ftContract.view("ft_balance_of", { account_id: defiContract.accountId });
+
+
+    t.is(INITIAL_BALANCE - TRANSFER_AMOUNT + REFUND_AMOUNT, root_balance);
+    t.is(TRANSFER_AMOUNT - refund_amount, defi_balance);
 });
 
 test("simulate_transfer_call_promise_panics_for_a_full_refund", async () => {
