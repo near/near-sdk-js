@@ -100,12 +100,12 @@ test("simulate_close_account_force_non_empty_balance", () => {
 });
 
 test("simulate_transfer_call_with_burned_amount", async () => {
-    // const TRANSFER_AMOUNT = NEAR.parse("100 N");
+    const TRANSFER_AMOUNT = NEAR.parse("100 N");
 
-    // const { ftContract, defiContract } = t.context.accounts;
+    const { ftContract, defiContract } = t.context.accounts;
 
-    // // defi contract must be registered as a FT account
-    // await registerUser(ftContract, defiContract.accointId);
+    // defi contract must be registered as a FT account
+    await registerUser(ftContract, defiContract.accointId);
 
     // // root invests in defi by calling `ft_transfer_call`
     // let res = ftContract
@@ -141,15 +141,13 @@ test("simulate_transfer_call_with_burned_amount", async () => {
     // }
     // assert!(res.json::<bool>()?);
 
-    // let res = ftContract.call("ft_total_supply").view().await?;
-    // assert_eq!(res.json::<U128>()?.0, TRANSFER_AMOUNT - 10);
-    // let defi_balance = ftContract
-    //     .call("ft_balance_of")
-    //     .args_json((defiContract.id(),))
-    //     .view()
-    //     .await?
-    //     .json::<U128>()?;
-    // assert_eq!(defi_balance.0, TRANSFER_AMOUNT - 10);
+    const res = await ftContract.view("ft_total_supply", {});
+
+    t.is(res, TRANSFER_AMOUNT - 10);
+
+    const defi_balance = await ftContract.view("ft_balance_of", { account_id: defiContract.accountId });
+
+    t.is(defi_balance, TRANSFER_AMOUNT);
 });
 
 test("simulate_transfer_call_with_immediate_return_and_no_refund", () => {
