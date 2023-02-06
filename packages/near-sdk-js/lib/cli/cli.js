@@ -228,5 +228,5 @@ async function createWasmContract(qjscTarget, contractTarget, verbose = false) {
 }
 async function wasiStubContract(contractTarget, verbose = false) {
     const WASI_STUB = `${NEAR_SDK_JS}/lib/cli/deps/binaryen/wasi-stub/run.sh`;
-    await executeCommand(`${WASI_STUB} ${contractTarget} >/dev/null`, verbose);
+    await executeCommand(`${WASI_STUB} ${contractTarget}`, verbose);
 }
