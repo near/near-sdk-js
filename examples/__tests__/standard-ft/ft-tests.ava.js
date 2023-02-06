@@ -1,4 +1,5 @@
-import { Worker } from "near-workspaces";
+import { NEAR, Worker } from "near-workspaces";
+import { near } from "near-sdk-js";
 import test from "ava";
 
 const INITIAL_BALANCE = NEAR.parse("10000 N");
@@ -39,7 +40,7 @@ test.afterEach.always(async (t) => {
 
 
 async function registerUser(contract, account_id) {
-    await ftContract.call("storage_deposit", { account_id: account_id, registration_only: null }, { attachedDeposit: near_sdk:: env:: storage_byte_cost() * 125 });
+    await contract.call("storage_deposit", { account_id: account_id, registration_only: null }, { attachedDeposit: near.storageByteCost() * 125 });
 }
 
 test("test_total_supply", async () => {
@@ -90,7 +91,7 @@ test("test_close_account_non_empty_balance", async () => {
     t.is(res2.contains("Can't unregister the account with the positive balance without force"));
 });
 
-test("simulate_close_account_force_non_empty_balance", () => {
+test("simulate_close_account_force_non_empty_balance", async () => {
     const { ftContract } = t.context.accounts;
 
     await ftContract.call("storage_unregister", { force: true }, { attachedDeposit: ONE_YOCTO });
@@ -150,7 +151,7 @@ test("simulate_transfer_call_with_burned_amount", async () => {
     t.is(defi_balance, TRANSFER_AMOUNT);
 });
 
-test("simulate_transfer_call_with_immediate_return_and_no_refund", () => {
+test("simulate_transfer_call_with_immediate_return_and_no_refund", async () => {
     const TRANSFER_AMOUNT = NEAR.parse("100 N");
 
     const { ftContract, defiContract } = t.context.accounts;
