@@ -227,22 +227,23 @@ test("simulate_transfer_call_with_promise_and_refund", async () => {
 
 test("simulate_transfer_call_promise_panics_for_a_full_refund", async () => {
     const TRANSFER_AMOUNT = NEAR.parse("100 N");
-    // let (ftContract, _, defiContract) = init(&worker, initial_balance).await?;
 
-    // // defi contract must be registered as a FT account
-    // registerUser(&ftContract, defiContract.id()).await?;
+    const { ftContract, defiContract } = t.context.accounts;
 
-    // // root invests in defi by calling `ft_transfer_call`
-    // let res = ftContract
-    //     .call("ft_transfer_call")
-    //     .args_json((
-    //         defiContract.id(),
-    //         TRANSFER_AMOUNT,
-    //         Option::<String>::None,
-    //         "no parsey as integer big panic oh no".to_string(),
-    //     ))
-    //     .deposit(ONE_YOCTO)
+    // defi contract must be registered as a FT account
+    await registerUser(ftContract, defiContract.accointId);
 
+    // root invests in defi by calling `ft_transfer_call`
+    const res = ftContract.call("ft_transfer_call", {
+        receiver_id: defiContract.accointId,
+        amount: TRANSFER_AMOUNT,
+        memo: null,
+        msg: "no parsey as integer big panic oh no",
+    }, {
+        attachedDeposit: ONE_YOCTO
+    });
+
+    //TODO
     // let promise_failures = res.receipt_failures();
     // assert_eq!(promise_failures.len(), 1);
     // let failure = promise_failures[0].clone().into_result();
@@ -252,19 +253,10 @@ test("simulate_transfer_call_promise_panics_for_a_full_refund", async () => {
     //     unreachable!();
     // }
 
-    // // balances remain unchanged
-    // let root_balance = ftContract
-    //     .call("ft_balance_of")
-    //     .args_json((ftContract.id(),))
-    //     .view()
-    //     .await?
-    //     .json::<U128>()?;
-    // let defi_balance = ftContract
-    //     .call("ft_balance_of")
-    //     .args_json((defiContract.id(),))
-    //     .view()
-    //     .await?
-    //     .json::<U128>()?;
-    // assert_eq!(initial_balance, root_balance);
-    // assert_eq!(0, defi_balance.0);
+    // balances remain unchanged
+    let root_balance = await ftContract.view("ft_balance_of", { account_id: ftContract.accountId });
+    let defi_balance = await ftContract.view("ft_balance_of", { account_id: defiContract.accountId });
+
+    t.is(INITIAL_BALANCE, root_balance);
+    t.is(0, defi_balance);
 });
