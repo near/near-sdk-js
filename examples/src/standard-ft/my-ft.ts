@@ -76,7 +76,7 @@ export class MyFt implements FungibleTokenCore, StorageManagement, FungibleToken
         total_supply: Balance;
     }) {
         const metadata = new FungibleTokenMetadata(
-            "FT_METADATA_SPEC",
+            "ft-1.0.0",
             "Example NEAR fungible token",
             "EXAMPLE",
             "DATA_IMAGE_SVG_NEAR_ICON",

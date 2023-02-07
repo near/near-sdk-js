@@ -10,17 +10,12 @@ test.beforeEach(async (t) => {
     const root = worker.rootAccount;
 
     const ftContract = await root.devDeploy("./build/my-ft.wasm");
-    await ftContract.call(ftContract, "new_default_meta", {});
+    await ftContract.call(ftContract, "init_with_default_meta", {});
 
     const defiContract = root.devDeploy("./build/defi.wasm");
     await defiContract.call("new", { fungible_token_account_id: ftContract.accountId })
 
     const alice = await root.createSubAccount("alice", { initialBalance: 10 });
-
-
-    await ftReceiver.call(ftReceiver, "init", {
-        non_fungible_token_account_id: ftContract.accountId,
-    });
 
     await registerUser(ftContract, alice.accountId);
 
