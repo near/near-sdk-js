@@ -268,8 +268,13 @@ export class FungibleToken implements FungibleTokenCore, StorageManagement, Fung
      * @param registration_only doesn't affect the implementation for vanilla fungible token.
      */
     storage_deposit(
-        account_id?: AccountId,
-        registration_only?: boolean,
+        {
+            account_id,
+            registration_only,
+        }: {
+            account_id?: AccountId,
+            registration_only?: boolean,
+        }
     ): StorageBalance {
         let amount: Balance = near.attachedDeposit();
         account_id = account_id ?? near.predecessorAccountId();
@@ -301,7 +306,7 @@ export class FungibleToken implements FungibleTokenCore, StorageManagement, Fung
      * - never transfers Ⓝ to caller
      * - returns a `storage_balance` struct if `amount` is 0
      */
-    storage_withdraw(amount?: bigint): StorageBalance {
+    storage_withdraw({ amount }: { amount?: bigint }): StorageBalance {
         assert_one_yocto();
         let predecessor_account_id = near.predecessorAccountId();
         const storage_balance = this.internal_storage_balance_of(predecessor_account_id);
@@ -315,7 +320,7 @@ export class FungibleToken implements FungibleTokenCore, StorageManagement, Fung
         }
     }
 
-    storage_unregister(force?: boolean): boolean {
+    storage_unregister({ force }: { force?: boolean }): boolean {
         return this.internal_storage_unregister(force) ? true : false;
     }
 
@@ -325,7 +330,7 @@ export class FungibleToken implements FungibleTokenCore, StorageManagement, Fung
         return new StorageBalanceBounds(required_storage_balance, required_storage_balance);
     }
 
-    storage_balance_of(account_id: AccountId): Option<StorageBalance> {
+    storage_balance_of({ account_id }: { account_id: AccountId }): Option<StorageBalance> {
         return this.internal_storage_balance_of(account_id);
     }
 

@@ -54,7 +54,10 @@ export declare class FungibleToken implements FungibleTokenCore, StorageManageme
     /** Implementation of StorageManagement
      * @param registration_only doesn't affect the implementation for vanilla fungible token.
      */
-    storage_deposit(account_id?: AccountId, registration_only?: boolean): StorageBalance;
+    storage_deposit({ account_id, registration_only, }: {
+        account_id?: AccountId;
+        registration_only?: boolean;
+    }): StorageBalance;
     /**
      * While storage_withdraw normally allows the caller to retrieve `available` balance, the basic
      * Fungible Token implementation sets storage_balance_bounds.min == storage_balance_bounds.max,
@@ -63,10 +66,16 @@ export declare class FungibleToken implements FungibleTokenCore, StorageManageme
      * - never transfers Ⓝ to caller
      * - returns a `storage_balance` struct if `amount` is 0
      */
-    storage_withdraw(amount?: bigint): StorageBalance;
-    storage_unregister(force?: boolean): boolean;
+    storage_withdraw({ amount }: {
+        amount?: bigint;
+    }): StorageBalance;
+    storage_unregister({ force }: {
+        force?: boolean;
+    }): boolean;
     storage_balance_bounds(): StorageBalanceBounds;
-    storage_balance_of(account_id: AccountId): Option<StorageBalance>;
+    storage_balance_of({ account_id }: {
+        account_id: AccountId;
+    }): Option<StorageBalance>;
     /** Implementation of FungibleTokenResolver */
     ft_resolve_transfer({ sender_id, receiver_id, amount }: {
         sender_id: AccountId;

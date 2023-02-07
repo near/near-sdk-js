@@ -44,6 +44,11 @@ export class MyFt implements FungibleTokenCore, StorageManagement, FungibleToken
     token: FungibleToken;
     metadata: FungibleTokenMetadata;
 
+    constructor() {
+        this.token = undefined;
+        this.metadata = undefined;
+    }
+
     @initialize({})
     init({
         owner_id,
@@ -136,10 +141,15 @@ export class MyFt implements FungibleTokenCore, StorageManagement, FungibleToken
      */
     @call({})
     storage_deposit(
-        account_id?: AccountId,
-        registration_only?: boolean,
+        {
+            account_id,
+            registration_only,
+        }: {
+            account_id?: AccountId,
+            registration_only?: boolean,
+        }
     ): StorageBalance {
-        return this.token.storage_deposit(account_id, registration_only);
+        return this.token.storage_deposit({ account_id, registration_only });
     }
 
     /**
@@ -151,13 +161,13 @@ export class MyFt implements FungibleTokenCore, StorageManagement, FungibleToken
      * - returns a `storage_balance` struct if `amount` is 0
      */
     @view({})
-    storage_withdraw(amount?: bigint): StorageBalance {
-        return this.token.storage_withdraw(amount);
+    storage_withdraw({ amount }: { amount?: bigint }): StorageBalance {
+        return this.token.storage_withdraw({ amount });
     }
 
     @call({})
-    storage_unregister(force?: boolean): boolean {
-        return this.token.storage_unregister(force);
+    storage_unregister({ force }: { force?: boolean }): boolean {
+        return this.token.storage_unregister({ force });
     }
 
     @view({})
@@ -166,8 +176,8 @@ export class MyFt implements FungibleTokenCore, StorageManagement, FungibleToken
     }
 
     @view({})
-    storage_balance_of(account_id: AccountId): Option<StorageBalance> {
-        return this.token.storage_balance_of(account_id);
+    storage_balance_of({ account_id }: { account_id: AccountId }): Option<StorageBalance> {
+        return this.token.storage_balance_of({ account_id });
     }
 
     @call({})

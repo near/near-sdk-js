@@ -1,9 +1,9 @@
 import { NEAR, Worker } from "near-workspaces";
-import { near } from "near-sdk-js";
 import test from "ava";
 
 const INITIAL_BALANCE = NEAR.parse("10000 N");
 const ONE_YOCTO = 1;
+const STOARAGE_BYTE_COST = 10_000_000_000_000_000_000n;
 
 test.beforeEach(async (t) => {
     const worker = await Worker.init();
@@ -40,7 +40,7 @@ test.afterEach.always(async (t) => {
 
 
 async function registerUser(contract, account_id) {
-    await contract.call("storage_deposit", { account_id: account_id, registration_only: null }, { attachedDeposit: near.storageByteCost() * 125 });
+    await contract.call("storage_deposit", { account_id: account_id, registration_only: null }, { attachedDeposit: STOARAGE_BYTE_COST * 125 });
 }
 
 test("test_total_supply", async () => {
