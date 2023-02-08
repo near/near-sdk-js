@@ -10,11 +10,16 @@
     "build:highlevel-minimal": "near-sdk-js build src/highlevel-minimal.js build/highlevel-minimal.wasm",
     "build:lowlevel-api": "near-sdk-js build src/lowlevel-api.js build/lowlevel-api.wasm",
     "build:highlevel-collection": "near-sdk-js build src/highlevel-collection.js build/highlevel-collection.wasm",
+    "build:expensive-calc": "near-sdk-js build src/expensive-calc.js build/expensive-calc.wasm",
+    "build:deploy-contract": "near-sdk-js build src/deploy-contract.js build/deploy-contract.wasm",
     "test": "ava",
     "test:lowlevel-minimal": "ava __tests__/test-lowlevel-minimal.ava.js",
     "test:highlevel-minimal": "ava __tests__/test-highlevel-minimal.ava.js",
     "test:lowlevel-api": "ava __tests__/test-lowlevel-api.ava.js",
-    "test:highlevel-collection": "ava __tests__/test-highlevel-collection.ava.js"
+    "test:highlevel-collection": "ava __tests__/test-highlevel-collection.ava.js",
+    "test:expensive-calc": "ava __tests__/test-expensive-calc.ava.js",
+    "test:deploy-contract": "ava __tests__/test-deploy-contract.ava.js"
+
   },
   "author": "Near Inc <hello@nearprotocol.com>",
   "license": "Apache-2.0",

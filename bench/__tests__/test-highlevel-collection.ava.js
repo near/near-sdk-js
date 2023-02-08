@@ -24,22 +24,22 @@ test.before(async (t) => {
 });
 
 
-test("JS highlevel minimal contract", async (t) => {
+test("JS highlevel collection contract", async (t) => {
     const { bob, highlevelContract } = t.context.accounts;
     let r = await bob.callRaw(
         highlevelContract,
         "set",
-        JSON.stringify({key: 'a'.repeat(100), value: 'b'.repeat(100)})
+        {key: 'a'.repeat(100), value: 'b'.repeat(100)}
     );
     r = await bob.callRaw(
       highlevelContract,
       "set",
-      JSON.stringify({key: 'b'.repeat(100), value: 'c'.repeat(100)})
+      {key: 'b'.repeat(100), value: 'c'.repeat(100)}
     );
     r = await bob.callRaw(
       highlevelContract,
       "set",
-      JSON.stringify({key: 'c'.repeat(100), value: 'd'.repeat(100)})
+      {key: 'c'.repeat(100), value: 'd'.repeat(100)}
   );
     
 
@@ -47,24 +47,23 @@ test("JS highlevel minimal contract", async (t) => {
     logGasDetail(r, t)
 });
 
-test("RS highlevel minimal contract", async (t) => {
+test("RS highlevel collection contract", async (t) => {
   const { bob, highlevelContractRs } = t.context.accounts;
   let r = await bob.callRaw(
       highlevelContractRs,
       "set",
-      JSON.stringify({key: 'a'.repeat(100), value: 'b'.repeat(100)})
+      {key: 'a'.repeat(100), value: 'b'.repeat(100)}
   );
   r = await bob.callRaw(
     highlevelContractRs,
     "set",
-    JSON.stringify({key: 'b'.repeat(100), value: 'c'.repeat(100)})
+    {key: 'b'.repeat(100), value: 'c'.repeat(100)}
   );
   r = await bob.callRaw(
     highlevelContractRs,
     "set",
-    JSON.stringify({key: 'c'.repeat(100), value: 'd'.repeat(100)})
+    {key: 'c'.repeat(100), value: 'd'.repeat(100)}
 );
-
   t.is(r.result.status.SuccessValue, "");
   logGasDetail(r, t)
 });
