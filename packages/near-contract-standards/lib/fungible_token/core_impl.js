@@ -44,31 +44,20 @@ export class FungibleToken {
     internal_deposit(account_id, amount) {
         let balance = this.internal_unwrap_balance_of(account_id);
         let new_balance = balance + amount;
-        if (!Number.isSafeInteger(new_balance)) {
-            throw Error("Balance overflow");
-        }
         this.accounts.set(account_id, new_balance);
         let new_total_supply = this.total_supply + amount;
-        if (!Number.isSafeInteger(new_total_supply)) {
-            throw Error(ERR_TOTAL_SUPPLY_OVERFLOW);
-        }
+        // TODO: check for total supply overflow?
         this.total_supply = new_total_supply;
     }
     internal_withdraw(account_id, amount) {
         let balance = this.internal_unwrap_balance_of(account_id);
         let new_balance = balance - amount;
-        // TODO: is it the right check?
-        if (!Number.isSafeInteger(new_balance)) {
-            this.accounts.set(account_id, new_balance);
-            let new_total_supply = this.total_supply - amount;
-            if (!Number.isSafeInteger(new_total_supply)) {
-                throw Error(ERR_TOTAL_SUPPLY_OVERFLOW);
-            }
-            this.total_supply = new_total_supply;
-        }
-        else {
+        if (new_balance < 0) {
             throw Error("The account doesn't have enough balance");
         }
+        this.accounts.set(account_id, new_balance);
+        let new_total_supply = this.total_supply - amount;
+        this.total_supply = new_total_supply;
     }
     internal_transfer(sender_id, receiver_id, amount, memo) {
         assert(sender_id != receiver_id, "Sender and receiver should be different");

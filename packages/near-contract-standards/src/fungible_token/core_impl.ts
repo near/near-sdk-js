@@ -73,31 +73,21 @@ export class FungibleToken implements FungibleTokenCore, StorageManagement, Fung
     internal_deposit(account_id: AccountId, amount: Balance) {
         let balance: Balance = this.internal_unwrap_balance_of(account_id);
         let new_balance: Balance = balance + amount;
-        if (!Number.isSafeInteger(new_balance)) {
-            throw Error("Balance overflow");
-        }
         this.accounts.set(account_id, new_balance);
         let new_total_supply: Balance = this.total_supply + amount;
-        if (!Number.isSafeInteger(new_total_supply)) {
-            throw Error(ERR_TOTAL_SUPPLY_OVERFLOW);
-        }
+        // TODO: check for total supply overflow?
         this.total_supply = new_total_supply;
     }
 
     internal_withdraw(account_id: AccountId, amount: Balance) {
         let balance: Balance = this.internal_unwrap_balance_of(account_id);
         let new_balance: Balance = balance - amount;
-        // TODO: is it the right check?
-        if (!Number.isSafeInteger(new_balance)) {
-            this.accounts.set(account_id, new_balance);
-            let new_total_supply: Balance = this.total_supply - amount;
-            if (!Number.isSafeInteger(new_total_supply)) {
-                throw Error(ERR_TOTAL_SUPPLY_OVERFLOW);
-            }
-            this.total_supply = new_total_supply;
-        } else {
+        if (new_balance < 0) {
             throw Error("The account doesn't have enough balance");
         }
+        this.accounts.set(account_id, new_balance);
+        let new_total_supply: Balance = this.total_supply - amount;
+        this.total_supply = new_total_supply;
     }
 
     internal_transfer(
