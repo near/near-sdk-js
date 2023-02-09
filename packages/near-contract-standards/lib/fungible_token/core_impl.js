@@ -19,6 +19,8 @@ const ERR_TOTAL_SUPPLY_OVERFLOW = "Total supply overflow";
 export class FungibleToken {
     // TODO: constructor is used instead of new in Rust, check if it's ok. In NFT it's called init, why?.
     constructor(prefix) {
+        this.bigIntMax = (...args) => args.reduce((m, e) => e > m ? e : m);
+        this.bigIntMin = (...args) => args.reduce((m, e) => e < m ? e : m);
         const storage_prefix = prefix.into_storage_key();
         this.accounts = new LookupMap(storage_prefix);
         this.total_supply = 0n;
@@ -89,7 +91,7 @@ export class FungibleToken {
         // Get the unused amount from the `ft_on_transfer` call result.
         let unused_amount;
         try {
-            unused_amount = Math.min(amount, JSON.parse(near.promiseResult(0)));
+            unused_amount = this.bigIntMin(amount, JSON.parse(near.promiseResult(0)));
         }
         catch (e) {
             if (e.include('Failed')) {
@@ -102,7 +104,7 @@ export class FungibleToken {
         if (unused_amount > 0) {
             let receiver_balance = this.accounts.get(receiver_id) ?? 0n;
             if (receiver_balance > BigInt(0)) {
-                let refund_amount = Math.min(+receiver_balance, unused_amount);
+                let refund_amount = this.bigIntMin(receiver_balance, unused_amount);
                 let new_receiver_balance = receiver_balance.valueOf() - BigInt(refund_amount);
                 if (new_receiver_balance < 0n) {
                     throw Error("The receiver account doesn't have enough balance");
@@ -143,7 +145,7 @@ export class FungibleToken {
         assert_one_yocto();
         assert(near.prepaidGas() > GAS_FOR_FT_TRANSFER_CALL, "More gas is required");
         let sender_id = near.predecessorAccountId();
-        this.internal_transfer(sender_id, receiver_id, BigInt(amount), memo);
+        this.internal_transfer(sender_id, receiver_id, amount, memo);
         let receiver_gas = near.prepaidGas() - GAS_FOR_FT_TRANSFER_CALL;
         if (receiver_gas < 0) {
             throw new Error("Prepaid gas overflow");

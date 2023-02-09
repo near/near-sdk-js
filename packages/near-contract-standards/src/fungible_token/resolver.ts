@@ -8,6 +8,6 @@ export interface FungibleTokenResolver {
     }: {
         sender_id: AccountId,
         receiver_id: AccountId,
-        amount: number,
+        amount: Balance,
     }): Balance;
 }

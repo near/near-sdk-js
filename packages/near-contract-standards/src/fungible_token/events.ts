@@ -17,7 +17,7 @@
 
 import { NearEvent } from "../event";
 import { Option } from "../non_fungible_token/utils";
-import { AccountId } from "near-sdk-js";
+import { AccountId, Balance } from "near-sdk-js";
 
 export type Nep141EventKind = FtMint[] | FtTransfer[] | FtBurn[];
 
@@ -93,10 +93,10 @@ export class FtTransfer {
 /** Data to log for an FT burn event. To log this event, call [`.emit()`](FtBurn::emit). */
 export class FtBurn {
     owner_id: AccountId;
-    amount: number;
+    amount: Balance;
     memo: Option<string>;
 
-    constructor(owner_id: AccountId, amount: number, memo: Option<string>) {
+    constructor(owner_id: AccountId, amount: Balance, memo: Option<string>) {
         this.owner_id = owner_id;
         this.amount = amount;
         this.memo = memo;

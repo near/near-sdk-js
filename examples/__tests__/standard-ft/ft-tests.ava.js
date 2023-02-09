@@ -10,7 +10,14 @@ test.beforeEach(async (t) => {
     const root = worker.rootAccount;
 
     const ftContract = await root.devDeploy("./build/my-ft.wasm");
-    await ftContract.call(ftContract, "init_with_default_meta", {});
+    await ftContract.call(
+        ftContract,
+        "init_with_default_meta",
+        {
+            owner_id: ftContract.accountId,
+            total_supply: INITIAL_BALANCE
+        }
+    );
 
     const defiContract = root.devDeploy("./build/defi.wasm");
     await defiContract.call("new", { fungible_token_account_id: ftContract.accountId })
@@ -38,13 +45,13 @@ async function registerUser(contract, account_id) {
     await contract.call("storage_deposit", { account_id: account_id, registration_only: null }, { attachedDeposit: STOARAGE_BYTE_COST * 125 });
 }
 
-test("test_total_supply", async () => {
+test("test_total_supply", async (t) => {
     const { ftContract } = t.context.accounts;
     const res = await ftContract.view("ft_total_supply", {});
     t.is(res, INITIAL_BALANCE);
 });
 
-test("test_simple_transfer", async () => {
+test("test_simple_transfer", async (t) => {
     const TRANSFER_AMOUNT = NEAR.parse("100 N");
 
     const { ftContract, alice } = t.context.accounts;
@@ -69,14 +76,14 @@ test("test_simple_transfer", async () => {
     t.is(TRANSFER_AMOUNT, alice_balance);
 });
 
-test("test_close_account_empty_balance", async () => {
+test("test_close_account_empty_balance", async (t) => {
     const { ftContract, alice } = t.context.accounts;
 
     let res = await alice.call(ftContract.id(), "storage_unregister", {}, { attachedDeposit: ONE_YOCTO });
     t.is(res, true); // TODO: doublecheck
 });
 
-test("test_close_account_non_empty_balance", async () => {
+test("test_close_account_non_empty_balance", async (t) => {
     const { ftContract } = t.context.accounts;
 
     let res = await ftContract.call("storage_unregister", {}, { attachedDeposit: ONE_YOCTO });
@@ -86,7 +93,7 @@ test("test_close_account_non_empty_balance", async () => {
     t.is(res2.contains("Can't unregister the account with the positive balance without force"));
 });
 
-test("simulate_close_account_force_non_empty_balance", async () => {
+test("simulate_close_account_force_non_empty_balance", async (t) => {
     const { ftContract } = t.context.accounts;
 
     await ftContract.call("storage_unregister", { force: true }, { attachedDeposit: ONE_YOCTO });
@@ -95,7 +102,7 @@ test("simulate_close_account_force_non_empty_balance", async () => {
     t.is(res, 0);
 });
 
-test("simulate_transfer_call_with_burned_amount", async () => {
+test("simulate_transfer_call_with_burned_amount", async (t) => {
     const TRANSFER_AMOUNT = NEAR.parse("100 N");
 
     const { ftContract, defiContract } = t.context.accounts;
@@ -146,7 +153,7 @@ test("simulate_transfer_call_with_burned_amount", async () => {
     t.is(defi_balance, TRANSFER_AMOUNT);
 });
 
-test("simulate_transfer_call_with_immediate_return_and_no_refund", async () => {
+test("simulate_transfer_call_with_immediate_return_and_no_refund", async (t) => {
     const TRANSFER_AMOUNT = NEAR.parse("100 N");
 
     const { ftContract, defiContract } = t.context.accounts;
@@ -169,7 +176,7 @@ test("simulate_transfer_call_with_immediate_return_and_no_refund", async () => {
     t.is(TRANSFER_AMOUNT, defi_balance);
 });
 
-test("simulate_transfer_call_when_called_contract_not_registered_with_ft", async () => {
+test("simulate_transfer_call_when_called_contract_not_registered_with_ft", async (t) => {
     const TRANSFER_AMOUNT = NEAR.parse("100 N");
 
     const { ftContract, defiContract } = t.context.accounts;
@@ -192,7 +199,7 @@ test("simulate_transfer_call_when_called_contract_not_registered_with_ft", async
     t.is(0, defi_balance);
 });
 
-test("simulate_transfer_call_with_promise_and_refund", async () => {
+test("simulate_transfer_call_with_promise_and_refund", async (t) => {
     const REFUND_AMOUNT = NEAR.parse("50 N");
 
     const TRANSFER_AMOUNT = NEAR.parse("100 N");
@@ -219,7 +226,7 @@ test("simulate_transfer_call_with_promise_and_refund", async () => {
     t.is(TRANSFER_AMOUNT - refund_amount, defi_balance);
 });
 
-test("simulate_transfer_call_promise_panics_for_a_full_refund", async () => {
+test("simulate_transfer_call_promise_panics_for_a_full_refund", async (t) => {
     const TRANSFER_AMOUNT = NEAR.parse("100 N");
 
     const { ftContract, defiContract } = t.context.accounts;

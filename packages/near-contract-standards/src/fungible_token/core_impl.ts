@@ -55,15 +55,15 @@ export class FungibleToken implements FungibleTokenCore, StorageManagement, Fung
 
 
     measure_account_storage_usage() {
-        let initial_storage_usage = near.storageUsage();
-        let tmp_account_id = "a".repeat(64);
+        let initial_storage_usage: bigint = near.storageUsage();
+        let tmp_account_id: string = "a".repeat(64);
         this.accounts.set(tmp_account_id, 0n);
         this.account_storage_usage = near.storageUsage() - initial_storage_usage;
         this.accounts.remove(tmp_account_id);
     }
 
     internal_unwrap_balance_of(account_id: AccountId): Balance {
-        let balance = this.accounts.get(account_id);
+        let balance: Balance = this.accounts.get(account_id);
         if (balance === null) {
             throw Error(`The account ${account_id} is not registered`);
         }
@@ -71,13 +71,13 @@ export class FungibleToken implements FungibleTokenCore, StorageManagement, Fung
     }
 
     internal_deposit(account_id: AccountId, amount: Balance) {
-        let balance = this.internal_unwrap_balance_of(account_id);
-        let new_balance = balance + amount;
+        let balance: Balance = this.internal_unwrap_balance_of(account_id);
+        let new_balance: Balance = balance + amount;
         if (!Number.isSafeInteger(new_balance)) {
             throw Error("Balance overflow");
         }
         this.accounts.set(account_id, new_balance);
-        let new_total_supply = this.total_supply + amount;
+        let new_total_supply: Balance = this.total_supply + amount;
         if (!Number.isSafeInteger(new_total_supply)) {
             throw Error(ERR_TOTAL_SUPPLY_OVERFLOW);
         }
@@ -85,12 +85,12 @@ export class FungibleToken implements FungibleTokenCore, StorageManagement, Fung
     }
 
     internal_withdraw(account_id: AccountId, amount: Balance) {
-        let balance = this.internal_unwrap_balance_of(account_id);
-        let new_balance = balance - amount;
+        let balance: Balance = this.internal_unwrap_balance_of(account_id);
+        let new_balance: Balance = balance - amount;
         // TODO: is it the right check?
         if (!Number.isSafeInteger(new_balance)) {
             this.accounts.set(account_id, new_balance);
-            let new_total_supply = this.total_supply - amount;
+            let new_total_supply: Balance = this.total_supply - amount;
             if (!Number.isSafeInteger(new_total_supply)) {
                 throw Error(ERR_TOTAL_SUPPLY_OVERFLOW);
             }
@@ -124,11 +124,11 @@ export class FungibleToken implements FungibleTokenCore, StorageManagement, Fung
      * has deleted (unregistered) their account while the `ft_transfer_call` was still in flight.
      * Returns (Used token amount, Burned token amount)
      */
-    internal_ft_resolve_transfer(sender_id: AccountId, receiver_id: AccountId, amount: number): [bigint, bigint] {
+    internal_ft_resolve_transfer(sender_id: AccountId, receiver_id: AccountId, amount: Balance): [bigint, bigint] {
         // Get the unused amount from the `ft_on_transfer` call result.
-        let unused_amount: number;
+        let unused_amount: Balance;
         try {
-            unused_amount = Math.min(amount, JSON.parse(near.promiseResult(0)));
+            unused_amount = this.bigIntMin(amount, JSON.parse(near.promiseResult(0)));
         } catch (e) {
             if (e.include('Failed')) {
                 unused_amount = amount;
@@ -138,18 +138,18 @@ export class FungibleToken implements FungibleTokenCore, StorageManagement, Fung
         }
 
         if (unused_amount > 0) {
-            let receiver_balance: BigInt = this.accounts.get(receiver_id) ?? 0n;
+            let receiver_balance: Balance = this.accounts.get(receiver_id) ?? 0n;
             if (receiver_balance > BigInt(0)) {
-                let refund_amount = Math.min(+receiver_balance, unused_amount);
-                let new_receiver_balance = receiver_balance.valueOf() - BigInt(refund_amount);
+                let refund_amount: Balance = this.bigIntMin(receiver_balance, unused_amount);
+                let new_receiver_balance: Balance = receiver_balance.valueOf() - BigInt(refund_amount);
                 if (new_receiver_balance < 0n) {
                     throw Error("The receiver account doesn't have enough balance");
                 }
                 this.accounts.set(receiver_id, new_receiver_balance);
 
-                let sender_balance: BigInt = this.accounts.get(sender_id) ?? 0n;
+                let sender_balance: Balance = this.accounts.get(sender_id) ?? 0n;
                 if (sender_balance) {
-                    let new_sender_balance = sender_balance.valueOf() + BigInt(refund_amount);
+                    let new_sender_balance: Balance = sender_balance.valueOf() + BigInt(refund_amount);
                     this.accounts.set(sender_id, new_sender_balance);
                     new FtTransfer(
                         receiver_id,
@@ -158,7 +158,7 @@ export class FungibleToken implements FungibleTokenCore, StorageManagement, Fung
                         "refund",
                     ).emit();
 
-                    let used_amount: BigInt = BigInt(amount - refund_amount);
+                    let used_amount: Balance = BigInt(amount - refund_amount);
                     if (used_amount < 0n) {
                         throw Error(ERR_TOTAL_SUPPLY_OVERFLOW);
                     }
@@ -193,7 +193,7 @@ export class FungibleToken implements FungibleTokenCore, StorageManagement, Fung
         memo?: String
     }) {
         assert_one_yocto();
-        let sender_id = near.predecessorAccountId();
+        let sender_id: AccountId = near.predecessorAccountId();
         this.internal_transfer(sender_id, receiver_id, amount, memo);
     }
 
@@ -210,9 +210,9 @@ export class FungibleToken implements FungibleTokenCore, StorageManagement, Fung
     }): PromiseOrValue<bigint> {
         assert_one_yocto();
         assert(near.prepaidGas() > GAS_FOR_FT_TRANSFER_CALL, "More gas is required");
-        let sender_id = near.predecessorAccountId();
-        this.internal_transfer(sender_id, receiver_id, BigInt(amount), memo);
-        let receiver_gas = near.prepaidGas() - GAS_FOR_FT_TRANSFER_CALL;
+        let sender_id: AccountId = near.predecessorAccountId();
+        this.internal_transfer(sender_id, receiver_id, amount, memo);
+        let receiver_gas: bigint = near.prepaidGas() - GAS_FOR_FT_TRANSFER_CALL;
         if (receiver_gas < 0) {
             throw new Error("Prepaid gas overflow");
         }
@@ -239,8 +239,8 @@ export class FungibleToken implements FungibleTokenCore, StorageManagement, Fung
      */
     internal_storage_unregister(force?: boolean): Option<[AccountId, Balance]> {
         assert_one_yocto();
-        let account_id = near.predecessorAccountId();
-        let balance = this.accounts.get(account_id);
+        let account_id: AccountId = near.predecessorAccountId();
+        let balance: Balance = this.accounts.get(account_id);
         if (balance) {
             if (balance == BigInt(0) || force) {
                 this.accounts.remove(account_id);
@@ -290,7 +290,7 @@ export class FungibleToken implements FungibleTokenCore, StorageManagement, Fung
             }
 
             this.internal_register_account(account_id);
-            let refund = amount - min_balance;
+            let refund: Balance = amount - min_balance;
             if (refund > 0) {
                 NearPromise.new(near.predecessorAccountId()).transfer(refund);
             }
@@ -308,7 +308,7 @@ export class FungibleToken implements FungibleTokenCore, StorageManagement, Fung
      */
     storage_withdraw({ amount }: { amount?: bigint }): StorageBalance {
         assert_one_yocto();
-        let predecessor_account_id = near.predecessorAccountId();
+        let predecessor_account_id: AccountId = near.predecessorAccountId();
         const storage_balance = this.internal_storage_balance_of(predecessor_account_id);
         if (storage_balance) {
             if (amount && amount > 0) {
@@ -342,8 +342,11 @@ export class FungibleToken implements FungibleTokenCore, StorageManagement, Fung
     }: {
         sender_id: AccountId,
         receiver_id: AccountId,
-        amount: number
+        amount: Balance
     }): Balance {
         return this.internal_ft_resolve_transfer(sender_id, receiver_id, amount)[0];
     }
+
+    bigIntMax = (...args: bigint[]) => args.reduce((m, e) => e > m ? e : m);
+    bigIntMin = (...args: bigint[]) => args.reduce((m, e) => e < m ? e : m);
 }

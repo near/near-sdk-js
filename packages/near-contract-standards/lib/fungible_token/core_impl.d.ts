@@ -28,7 +28,7 @@ export declare class FungibleToken implements FungibleTokenCore, StorageManageme
      * has deleted (unregistered) their account while the `ft_transfer_call` was still in flight.
      * Returns (Used token amount, Burned token amount)
      */
-    internal_ft_resolve_transfer(sender_id: AccountId, receiver_id: AccountId, amount: number): [bigint, bigint];
+    internal_ft_resolve_transfer(sender_id: AccountId, receiver_id: AccountId, amount: Balance): [bigint, bigint];
     /** Implementation of FungibleTokenCore */
     ft_transfer({ receiver_id, amount, memo }: {
         receiver_id: AccountId;
@@ -80,6 +80,8 @@ export declare class FungibleToken implements FungibleTokenCore, StorageManageme
     ft_resolve_transfer({ sender_id, receiver_id, amount }: {
         sender_id: AccountId;
         receiver_id: AccountId;
-        amount: number;
+        amount: Balance;
     }): Balance;
+    bigIntMax: (...args: bigint[]) => bigint;
+    bigIntMin: (...args: bigint[]) => bigint;
 }

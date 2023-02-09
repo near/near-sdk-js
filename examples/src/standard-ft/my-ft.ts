@@ -188,7 +188,7 @@ export class MyFt implements FungibleTokenCore, StorageManagement, FungibleToken
     }: {
         sender_id: AccountId,
         receiver_id: AccountId,
-        amount: number
+        amount: Balance
     }): Balance {
         return this.token.ft_resolve_transfer({ sender_id, receiver_id, amount });
     }
