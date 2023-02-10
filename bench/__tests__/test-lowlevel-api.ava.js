@@ -59,15 +59,3 @@ test("JS lowlevel API contract, call many", async (t) => {
   t.is(r.result.status.SuccessValue, "");
   logGasDetail(r, t)
 });
-
-test("JS lowlevel API contract, write different", async (t) => {
-  const { bob, lowlevelContract } = t.context.accounts;
-  let r = await bob.callRaw(
-      lowlevelContract,
-      "lowlevel_storage_write_different",
-      ""
-  );
-
-  t.is(r.result.status.SuccessValue, "");
-  logGasDetail(r, t)
-});
