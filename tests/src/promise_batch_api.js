@@ -77,7 +77,6 @@ export function test_promise_batch_deploy_call() {
   near.promiseBatchActionCreateAccount(promiseId);
   near.promiseBatchActionTransfer(promiseId, 10000000000000000000000000n);
   // deploy content of promise_api.wasm to `b.caller2.test.near`
-  // Note, we do not use `bytes()`, it's too expensive for long bytes and exceed gas limit
   near.promiseBatchActionDeployContract(
     promiseId,
     includeBytes("../build/promise_api.wasm")

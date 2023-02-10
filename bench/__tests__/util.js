@@ -1,8 +1,8 @@
 export function formatGas(gas) {
     if (gas < 10 ** 12) {
-        let tGas = gas / 10**9
-        let roundTGas = Math.round(tGas * 100) / 100
-        return roundTGas + 'G'
+        let tGas = gas / 10**12
+        let roundTGas = Math.round(tGas * 100000) / 100000
+        return roundTGas + 'T'
     }
     let tGas = gas / 10**12
     let roundTGas = Math.round(tGas * 100) / 100

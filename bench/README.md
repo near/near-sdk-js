@@ -1,3 +1,5 @@
+
+https://github.com/near/sdk-rs-gas-benchmark
   ✔ RS lowlevel minimal contract (2.5s)
     ℹ Gas used to convert transaction to receipt:  2.43T
     ℹ Gas used to execute the receipt (actual contract call):  2.43T
@@ -289,3 +291,93 @@
     ℹ    WRITE_REGISTER_BYTE :  0.06G
     ℹ Gas used to refund unused gas:  223.18G
     ℹ Total gas used:  68.59T
+
+-rwxrwxr-x 1 bo bo 109K Nov 23 17:16 ./examples/non-fungible-token/res/approval_receiver.wasm
+-rwxrwxr-x 1 bo bo 248K Nov 23 17:16 ./examples/non-fungible-token/res/non_fungible_token.wasm
+-rwxrwxr-x 1 bo bo 108K Nov 23 17:16 ./examples/non-fungible-token/res/token_receiver.wasm
+-rwxrwxr-x 2 bo bo 109K Nov 23 17:16 ./examples/non-fungible-token/target/wasm32-unknown-unknown/release/approval_receiver.wasm
+-rwxrwxr-x 2 bo bo 109K Nov 23 17:16 ./examples/non-fungible-token/target/wasm32-unknown-unknown/release/deps/approval_receiver.wasm
+-rwxrwxr-x 2 bo bo 248K Nov 23 17:16 ./examples/non-fungible-token/target/wasm32-unknown-unknown/release/deps/non_fungible_token.wasm
+-rwxrwxr-x 2 bo bo 108K Nov 23 17:16 ./examples/non-fungible-token/target/wasm32-unknown-unknown/release/deps/token_receiver.wasm
+-rwxrwxr-x 2 bo bo 248K Nov 23 17:16 ./examples/non-fungible-token/target/wasm32-unknown-unknown/release/non_fungible_token.wasm
+-rwxrwxr-x 2 bo bo 108K Nov 23 17:16 ./examples/non-fungible-token/target/wasm32-unknown-unknown/release/token_receiver.wasm
+-rwxrwxr-x 1 bo bo 103K Feb  7 10:15 ./examples/status-message/res/status_message.wasm
+-rwxrwxr-x 2 bo bo 124K Sep 27 09:36 ./examples/status-message/target/wasm32-unknown-unknown/release/deps/status_message.wasm
+-rwxrwxr-x 2 bo bo 124K Sep 27 09:36 ./examples/status-message/target/wasm32-unknown-unknown/release/status_message.wasm
+-rwxrwxr-x 2 bo bo 103K Feb  7 10:15 ./target/wasm32-unknown-unknown/release/deps/status_message.wasm
+-rwxrwxr-x 2 bo bo 103K Feb  7 10:15 ./target/wasm32-unknown-unknown/release/status_message.wasm
+
+-rwxrwxr-x 1 bo bo 306K Feb  8 12:18 expensive_calc.wasm
+-rwxrwxr-x 1 bo bo 320K Feb  8 11:26 highlevel_collection.wasm
+-rwxrwxr-x 1 bo bo 160K Feb  7 10:51 highlevel_minimal.wasm
+-rwxrwxr-x 1 bo bo  387 Feb  7 11:56 lowlevel_api.wasm
+-rwxrwxr-x 1 bo bo  219 Feb  7 10:33 lowlevel_minimal.wasm
+
+
+  ✔ promise batch deploy contract and call (5.5s)
+    ℹ Gas used to convert transaction to receipt:  2.43T
+    ℹ Gas used to execute the receipt (actual contract call):  25.86T
+    ℹ    CREATE_ACCOUNT :  0.09961T
+    ℹ    DEPLOY_CONTRACT :  3.71T
+    ℹ    FUNCTION_CALL :  2.32T
+    ℹ    NEW_RECEIPT :  0.10806T
+    ℹ    TRANSFER :  0.11512T
+    ℹ    BASE :  0.00159T
+    ℹ    CONTRACT_LOADING_BASE :  0.00004T
+    ℹ    CONTRACT_LOADING_BYTES :  0.22386T
+    ℹ    PROMISE_RETURN :  0.00056T
+    ℹ    READ_MEMORY_BASE :  0.01566T
+    ℹ    READ_MEMORY_BYTE :  1.97T
+    ℹ    UTF8_DECODING_BASE :  0.00311T
+    ℹ    UTF8_DECODING_BYTE :  0.00525T
+    ℹ    WASM_INSTRUCTION :  14.86T
+    ℹ Gas used to execute the cross contract call:  41.9T
+    ℹ    BASE :  0.00344T
+    ℹ    CONTRACT_LOADING_BASE :  0.00004T
+    ℹ    CONTRACT_LOADING_BYTES :  0.11228T
+    ℹ    READ_MEMORY_BASE :  0.00261T
+    ℹ    READ_MEMORY_BYTE :  0.0005T
+    ℹ    READ_REGISTER_BASE :  0.01007T
+    ℹ    READ_REGISTER_BYTE :  0T
+    ℹ    WASM_INSTRUCTION :  5.47T
+    ℹ    WRITE_MEMORY_BASE :  0.01122T
+    ℹ    WRITE_MEMORY_BYTE :  0.00014T
+    ℹ    WRITE_REGISTER_BASE :  0.01146T
+    ℹ    WRITE_REGISTER_BYTE :  0.00019T
+    ℹ Gas used to refund unused gas for cross contract call:  0.22318T
+    ℹ Gas used to refund unused gas:  0.22318T
+    ℹ Total gas used:  70.63T
+
+   ℹ Gas used to convert transaction to receipt:  2.43T
+    ℹ Gas used to execute the receipt (actual contract call):  10.89T
+    ℹ    CREATE_ACCOUNT :  0.09961T
+    ℹ    DEPLOY_CONTRACT :  3.71T
+    ℹ    FUNCTION_CALL :  2.32T
+    ℹ    NEW_RECEIPT :  0.10806T
+    ℹ    TRANSFER :  0.11512T
+    ℹ    BASE :  0.00159T
+    ℹ    CONTRACT_LOADING_BASE :  0.00004T
+    ℹ    CONTRACT_LOADING_BYTES :  0.11283T
+    ℹ    PROMISE_RETURN :  0.00056T
+    ℹ    READ_MEMORY_BASE :  0.01566T
+    ℹ    READ_MEMORY_BYTE :  1.97T
+    ℹ    UTF8_DECODING_BASE :  0.00311T
+    ℹ    UTF8_DECODING_BYTE :  0.00525T
+    ℹ    WASM_INSTRUCTION :  0.00038T
+    ℹ Gas used to execute the cross contract call:  41.9T
+    ℹ    BASE :  0.00344T
+    ℹ    CONTRACT_LOADING_BASE :  0.00004T
+    ℹ    CONTRACT_LOADING_BYTES :  0.11228T
+    ℹ    READ_MEMORY_BASE :  0.00261T
+    ℹ    READ_MEMORY_BYTE :  0.0005T
+    ℹ    READ_REGISTER_BASE :  0.01007T
+    ℹ    READ_REGISTER_BYTE :  0T
+    ℹ    WASM_INSTRUCTION :  5.47T
+    ℹ    WRITE_MEMORY_BASE :  0.01122T
+    ℹ    WRITE_MEMORY_BYTE :  0.00014T
+    ℹ    WRITE_REGISTER_BASE :  0.01146T
+    ℹ    WRITE_REGISTER_BYTE :  0.00019T
+    ℹ Gas used to refund unused gas for cross contract call:  0.22318T
+    ℹ Gas used to refund unused gas:  0.22318T
+    ℹ Total gas used:  55.67T
+  ─
