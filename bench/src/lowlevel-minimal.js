@@ -1,3 +1,4 @@
-export function empty() {
-    
+import { near } from "near-sdk-js";
+
+export function empty() {  
 }
