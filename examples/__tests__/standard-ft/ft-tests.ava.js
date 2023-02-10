@@ -19,10 +19,17 @@ test.beforeEach(async (t) => {
         }
     );
 
-    const defiContract = root.devDeploy("./build/defi.wasm");
-    await defiContract.call("new", { fungible_token_account_id: ftContract.accountId })
+    const defiContract = await root.devDeploy("./res/defi.wasm");
 
-    const alice = await root.createSubAccount("alice", { initialBalance: 10 });
+    await defiContract.call(
+        defiContract,
+        "new",
+        {
+            fungible_token_account_id: ftContract.accountId
+        }
+    );
+
+    const alice = await root.createSubAccount("alice", { initialBalance: NEAR.parse("10 N").toJSON() });
 
     await registerUser(ftContract, alice.accountId);
 
@@ -42,7 +49,8 @@ test.afterEach.always(async (t) => {
 
 
 async function registerUser(contract, account_id) {
-    await contract.call("storage_deposit", { account_id: account_id, registration_only: null }, { attachedDeposit: STOARAGE_BYTE_COST * 125 });
+    const deposit = String(STOARAGE_BYTE_COST * 125n);
+    await contract.call(contract, "storage_deposit", { account_id: account_id, registration_only: null }, { attachedDeposit: deposit });
 }
 
 test("test_total_supply", async (t) => {
