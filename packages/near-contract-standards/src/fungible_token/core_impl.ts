@@ -50,7 +50,7 @@ export class FungibleToken implements FungibleTokenCore, StorageManagement, Fung
         this.account_storage_usage = 0n;
     }
 
-    new(prefix: IntoStorageKey) {
+    init(prefix: IntoStorageKey) {
         const storage_prefix = prefix.into_storage_key();
         this.accounts = new LookupMap<Balance>(storage_prefix);
         this.total_supply = 0n;
@@ -345,4 +345,15 @@ export class FungibleToken implements FungibleTokenCore, StorageManagement, Fung
 
     bigIntMax = (...args: bigint[]) => args.reduce((m, e) => e > m ? e : m);
     bigIntMin = (...args: bigint[]) => args.reduce((m, e) => e < m ? e : m);
+
+    static reconstruct(data: FungibleToken): FungibleToken {
+        const ret = new FungibleToken();
+        Object.assign(ret, data);
+        if (ret.accounts) {
+            ret.accounts = LookupMap.reconstruct(
+                ret.accounts
+            );
+        }
+        return ret;
+    }
 }

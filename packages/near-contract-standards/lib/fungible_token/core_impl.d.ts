@@ -18,7 +18,7 @@ export declare class FungibleToken implements FungibleTokenCore, StorageManageme
     total_supply: Balance;
     account_storage_usage: StorageUsage;
     constructor();
-    new(prefix: IntoStorageKey): this;
+    init(prefix: IntoStorageKey): this;
     measure_account_storage_usage(): void;
     internal_unwrap_balance_of(account_id: AccountId): Balance;
     internal_deposit(account_id: AccountId, amount: Balance): void;
@@ -85,4 +85,5 @@ export declare class FungibleToken implements FungibleTokenCore, StorageManageme
     }): Balance;
     bigIntMax: (...args: bigint[]) => bigint;
     bigIntMin: (...args: bigint[]) => bigint;
+    static reconstruct(data: FungibleToken): FungibleToken;
 }

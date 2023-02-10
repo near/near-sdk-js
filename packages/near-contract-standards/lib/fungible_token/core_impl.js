@@ -24,7 +24,7 @@ export class FungibleToken {
         this.total_supply = 0n;
         this.account_storage_usage = 0n;
     }
-    new(prefix) {
+    init(prefix) {
         const storage_prefix = prefix.into_storage_key();
         this.accounts = new LookupMap(storage_prefix);
         this.total_supply = 0n;
@@ -247,5 +247,13 @@ export class FungibleToken {
     /** Implementation of FungibleTokenResolver */
     ft_resolve_transfer({ sender_id, receiver_id, amount }) {
         return this.internal_ft_resolve_transfer(sender_id, receiver_id, amount)[0];
+    }
+    static reconstruct(data) {
+        const ret = new FungibleToken();
+        Object.assign(ret, data);
+        if (ret.accounts) {
+            ret.accounts = LookupMap.reconstruct(ret.accounts);
+        }
+        return ret;
     }
 }
