@@ -16,14 +16,14 @@ This results in:
 
 ### A minimal contract
 
-- RS lowlevel minimal contract (2.5s)
+- RS lowlevel minimal contract
   -   Gas used to convert transaction to receipt:  2.43T
   -   Gas used to execute the receipt (actual contract call):  2.43T
     -      CONTRACT_LOADING_BASE :  0.00004T
     -      CONTRACT_LOADING_BYTES :  0.00005T
   -   Gas used to refund unused gas:  0.22318T
   -   Total gas used:  5.08T
-- JS lowlevel minimal contract (4.5s)
+- JS lowlevel minimal contract
   -   Gas used to convert transaction to receipt:  2.43T
   -   Gas used to execute the receipt (actual contract call):  7.07T
     -      CONTRACT_LOADING_BASE :  0.00004T
@@ -138,58 +138,58 @@ JS `@NearBindgen` is more expensive, the major difference is in `WASM_INSTRUCTIO
 In this case, JS lowlevel API contract uses same gas in the storage write API part (`STORAGE_WRITE_BASE` / `STORAGE_WRITE_KEY_BYTE` / `STORAGE_WRITE_VALUE_BYTE` ). The major excessive gas is due to the overhead of initialize QuickJS VM and loading near-sdk-js. We can see this more obviously by calling storage write for 10 times ("call many tests" in above).
 
 ### Highlevel collection
-- RS highlevel collection contract (8.6s)
-    -   Gas used to convert transaction to receipt:  2.43T
-    -   Gas used to execute the receipt (actual contract call):  3.32T
-      -      BASE :  3.18G
-      -      CONTRACT_LOADING_BASE :  0.04G
-      -      CONTRACT_LOADING_BYTES :  70.94G
-      -      READ_CACHED_TRIE_NODE :  95.76G
-      -      READ_MEMORY_BASE :  26.1G
-      -      READ_MEMORY_BYTE :  1.87G
-      -      READ_REGISTER_BASE :  5.03G
-      -      READ_REGISTER_BYTE :  0.03G
-      -      STORAGE_READ_BASE :  112.71G
-      -      STORAGE_READ_KEY_BYTE :  3.44G
-      -      STORAGE_READ_VALUE_BYTE :  0.19G
-      -      STORAGE_WRITE_BASE :  256.79G
-      -      STORAGE_WRITE_EVICTED_BYTE :  1.09G
-      -      STORAGE_WRITE_KEY_BYTE :  9.23G
-      -      STORAGE_WRITE_VALUE_BYTE :  7.75G
-      -      TOUCHING_TRIE_NODE :  257.63G
-      -      WASM_INSTRUCTION :  16.36G
-      -      WRITE_MEMORY_BASE :  8.41G
-      -      WRITE_MEMORY_BYTE :  0.74G
-      -      WRITE_REGISTER_BASE :  8.6G
-      -      WRITE_REGISTER_BYTE :  1.1G
-    -   Gas used to refund unused gas:  223.18G
-    -   Total gas used:  5.97T
-  - JS highlevel collection contract (9.6s)
-    -   Gas used to convert transaction to receipt:  2.43T
-    -   Gas used to execute the receipt (actual contract call):  10.06T
-      -      BASE :  2.91G
-      -      CONTRACT_LOADING_BASE :  0.04G
-      -      CONTRACT_LOADING_BYTES :  113.46G
-      -      READ_CACHED_TRIE_NODE :  72.96G
-      -      READ_MEMORY_BASE :  20.88G
-      -      READ_MEMORY_BYTE :  2G
-      -      READ_REGISTER_BASE :  5.03G
-      -      READ_REGISTER_BYTE :  0.03G
-      -      STORAGE_READ_BASE :  112.71G
-      -      STORAGE_READ_KEY_BYTE :  3.31G
-      -      STORAGE_READ_VALUE_BYTE :  0.53G
-      -      STORAGE_WRITE_BASE :  192.59G
-      -      STORAGE_WRITE_EVICTED_BYTE :  3.02G
-      -      STORAGE_WRITE_KEY_BYTE :  7.96G
-      -      STORAGE_WRITE_VALUE_BYTE :  9.49G
-      -      TOUCHING_TRIE_NODE :  209.33G
-      -      WASM_INSTRUCTION :  6.86T
-      -      WRITE_MEMORY_BASE :  8.41G
-      -      WRITE_MEMORY_BYTE :  0.9G
-      -      WRITE_REGISTER_BASE :  8.6G
-      -      WRITE_REGISTER_BYTE :  1.55G
-    -   Gas used to refund unused gas:  223.18G
-    -   Total gas used:  12.71T
+- RS highlevel collection contract
+  -   Gas used to convert transaction to receipt:  2.43T
+  -   Gas used to execute the receipt (actual contract call):  3.32T
+    -      BASE :  3.18G
+    -      CONTRACT_LOADING_BASE :  0.04G
+    -      CONTRACT_LOADING_BYTES :  70.94G
+    -      READ_CACHED_TRIE_NODE :  95.76G
+    -      READ_MEMORY_BASE :  26.1G
+    -      READ_MEMORY_BYTE :  1.87G
+    -      READ_REGISTER_BASE :  5.03G
+    -      READ_REGISTER_BYTE :  0.03G
+    -      STORAGE_READ_BASE :  112.71G
+    -      STORAGE_READ_KEY_BYTE :  3.44G
+    -      STORAGE_READ_VALUE_BYTE :  0.19G
+    -      STORAGE_WRITE_BASE :  256.79G
+    -      STORAGE_WRITE_EVICTED_BYTE :  1.09G
+    -      STORAGE_WRITE_KEY_BYTE :  9.23G
+    -      STORAGE_WRITE_VALUE_BYTE :  7.75G
+    -      TOUCHING_TRIE_NODE :  257.63G
+    -      WASM_INSTRUCTION :  16.36G
+    -      WRITE_MEMORY_BASE :  8.41G
+    -      WRITE_MEMORY_BYTE :  0.74G
+    -      WRITE_REGISTER_BASE :  8.6G
+    -      WRITE_REGISTER_BYTE :  1.1G
+  -   Gas used to refund unused gas:  223.18G
+  -   Total gas used:  5.97T
+- JS highlevel collection contract
+  -   Gas used to convert transaction to receipt:  2.43T
+  -   Gas used to execute the receipt (actual contract call):  10.06T
+    -      BASE :  2.91G
+    -      CONTRACT_LOADING_BASE :  0.04G
+    -      CONTRACT_LOADING_BYTES :  113.46G
+    -      READ_CACHED_TRIE_NODE :  72.96G
+    -      READ_MEMORY_BASE :  20.88G
+    -      READ_MEMORY_BYTE :  2G
+    -      READ_REGISTER_BASE :  5.03G
+    -      READ_REGISTER_BYTE :  0.03G
+    -      STORAGE_READ_BASE :  112.71G
+    -      STORAGE_READ_KEY_BYTE :  3.31G
+    -      STORAGE_READ_VALUE_BYTE :  0.53G
+    -      STORAGE_WRITE_BASE :  192.59G
+    -      STORAGE_WRITE_EVICTED_BYTE :  3.02G
+    -      STORAGE_WRITE_KEY_BYTE :  7.96G
+    -      STORAGE_WRITE_VALUE_BYTE :  9.49G
+    -      TOUCHING_TRIE_NODE :  209.33G
+    -      WASM_INSTRUCTION :  6.86T
+    -      WRITE_MEMORY_BASE :  8.41G
+    -      WRITE_MEMORY_BYTE :  0.9G
+    -      WRITE_REGISTER_BASE :  8.6G
+    -      WRITE_REGISTER_BYTE :  1.55G
+  -   Gas used to refund unused gas:  223.18G
+  -   Total gas used:  12.71T
 
 JS SDK's collection has about 1T overhead, deduct the 4.5T VM/near-sdk-js loading and 1T `@NearBindgen`. Note this benches the most complicated `UnorderedMap`, which gas usage is strictly greater than the other collections. And the gas used in actual writing the collection to storage is similar (`STORAGE_WRITE_BASE` / `STORAGE_WRITE_KEY_BYTE` / `STORAGE_WRITE_VALUE_BYTE` ).
 
@@ -420,7 +420,7 @@ If the above cases don't cover use case or you have a complex algorithm to imple
 
 You don't have to implement the exact algorithm to estimate the gas usage. Instead, you can find out the most expensive execution path of the algorithm, and estimate it by using the upper bound. For example, store the biggest possible objects into the collection and iterate for most possible times. Then goes to write the benchmark and the total gas cannot be more than 300T to be a valid contract. Also, if it has cross contract call, make sure the total gas, that's a sum of all cross contract calls, is less than 300T.
 
-To Add your benchmark, write a one function contract of your most expensive operation. And write a test to call this function. If it doesn't involve cross contract call or promises, creating such test is simple. You can refer to `bench/src/expensive-calc.js` and `bench/__tests__/test-expensive-calc.ava.js` on how to write such test and print the gas breakdown. If it involves create promises or cross contract calls, printing the gas breakdown is a little bit more complex, you can refer to `bench/__tests__/test-deploy-contract.ava.js` for the recipe.
+To add your benchmark, write a one function contract of your most expensive operation. And write a test to call this function. If it doesn't involve cross contract call or promises, creating such test is simple. You can refer to `bench/src/expensive-calc.js` and `bench/__tests__/test-expensive-calc.ava.js` on how to write such test and print the gas breakdown. If it involves create promises or cross contract calls, printing the gas breakdown is a little bit more complex, you can refer to `bench/__tests__/test-deploy-contract.ava.js` for the recipe.
 
 ## Details of size benchmark
 ### JS Contract
