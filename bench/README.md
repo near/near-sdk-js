@@ -191,7 +191,7 @@ In this case, JS lowlevel API contract uses same gas in the storage write API pa
     -   Gas used to refund unused gas:  223.18G
     -   Total gas used:  12.71T
 
-JS SDK's collection has about 1T overhead, deduct the 4.5T VM/near-sdk-js loading and 1T `@NearBindgen`. The gas used in actual writing the collection to storage is similar (`STORAGE_WRITE_BASE` / `STORAGE_WRITE_KEY_BYTE` / `STORAGE_WRITE_VALUE_BYTE` ).
+JS SDK's collection has about 1T overhead, deduct the 4.5T VM/near-sdk-js loading and 1T `@NearBindgen`. Note this benches the most complicated `UnorderedMap`, which gas usage is strictly greater than the other collections. And the gas used in actual writing the collection to storage is similar (`STORAGE_WRITE_BASE` / `STORAGE_WRITE_KEY_BYTE` / `STORAGE_WRITE_VALUE_BYTE` ).
 
 ### Computational expensive contract
   - JS expensive contract, iterate 20000 times
