@@ -17,15 +17,20 @@ const ERR_TOTAL_SUPPLY_OVERFLOW = "Total supply overflow";
  * For example usage, see examples/fungible-token/src/lib.rs.
  */
 export class FungibleToken {
-    // TODO: constructor is used instead of new in Rust, check if it's ok. In NFT it's called init, why?.
-    constructor(prefix) {
+    constructor() {
         this.bigIntMax = (...args) => args.reduce((m, e) => e > m ? e : m);
         this.bigIntMin = (...args) => args.reduce((m, e) => e < m ? e : m);
+        this.accounts = new LookupMap("");
+        this.total_supply = 0n;
+        this.account_storage_usage = 0n;
+    }
+    new(prefix) {
         const storage_prefix = prefix.into_storage_key();
         this.accounts = new LookupMap(storage_prefix);
         this.total_supply = 0n;
         this.account_storage_usage = 0n;
         this.measure_account_storage_usage();
+        return this;
     }
     measure_account_storage_usage() {
         let initial_storage_usage = near.storageUsage();

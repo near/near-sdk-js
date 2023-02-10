@@ -17,7 +17,8 @@ export declare class FungibleToken implements FungibleTokenCore, StorageManageme
     accounts: LookupMap<Balance>;
     total_supply: Balance;
     account_storage_usage: StorageUsage;
-    constructor(prefix: IntoStorageKey);
+    constructor();
+    new(prefix: IntoStorageKey): this;
     measure_account_storage_usage(): void;
     internal_unwrap_balance_of(account_id: AccountId): Balance;
     internal_deposit(account_id: AccountId, amount: Balance): void;

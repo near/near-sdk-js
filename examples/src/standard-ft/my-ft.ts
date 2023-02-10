@@ -45,8 +45,8 @@ export class MyFt implements FungibleTokenCore, StorageManagement, FungibleToken
     metadata: FungibleTokenMetadata;
 
     constructor() {
-        this.token = undefined;
-        this.metadata = undefined;
+        this.token = new FungibleToken();
+        this.metadata = new FungibleTokenMetadata("", "", "", "", null, null, 0);
     }
 
     @initialize({})
@@ -60,9 +60,9 @@ export class MyFt implements FungibleTokenCore, StorageManagement, FungibleToken
         metadata: FungibleTokenMetadata;
     }) {
         metadata.assert_valid();
-        this.token = new FungibleToken(new FTPrefix());
+        const token = new FungibleToken();
+        this.token = token.new(new FTPrefix());
         this.metadata = metadata;
-
         this.token.internal_register_account(owner_id);
         this.token.internal_deposit(owner_id, total_supply);
     }
@@ -139,7 +139,7 @@ export class MyFt implements FungibleTokenCore, StorageManagement, FungibleToken
     /** Implementation of StorageManagement
      * @param registration_only doesn't affect the implementation for vanilla fungible token.
      */
-    @call({})
+    @call({ payableFunction: true })
     storage_deposit(
         {
             account_id,
