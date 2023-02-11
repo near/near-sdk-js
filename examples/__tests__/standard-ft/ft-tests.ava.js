@@ -31,7 +31,7 @@ test.beforeEach(async (t) => {
 
     const alice = await root.createSubAccount("alice", { initialBalance: NEAR.parse("10 N").toJSON() });
 
-    // await registerUser(ftContract, alice.accountId);
+    await registerUser(ftContract, alice.accountId);
 
     t.context.worker = worker;
     t.context.accounts = {
@@ -49,7 +49,7 @@ test.afterEach.always(async (t) => {
 
 
 async function registerUser(contract, account_id) {
-    const deposit = String(STOARAGE_BYTE_COST * 125n);
+    const deposit = String(STOARAGE_BYTE_COST * 138n);
     await contract.call(contract, "storage_deposit", { account_id: account_id }, { attachedDeposit: deposit });
 }
 
