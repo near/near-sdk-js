@@ -251,7 +251,7 @@ export class AddAccessKey extends PromiseAction {
   /**
    * @param publicKey - The public key to add as a access key.
    * @param allowance - The allowance for the key in yoctoNEAR.
-   * @param receiverId - The account ID of the reciever.
+   * @param receiverId - The account ID of the receiver.
    * @param functionNames - The names of funcitons to authorize.
    * @param nonce - The nonce to use.
    */
@@ -529,7 +529,7 @@ export class NearPromise {
    *
    * @param publicKey - The public key to add as a access key.
    * @param allowance - The allowance for the key in yoctoNEAR.
-   * @param receiverId - The account ID of the reciever.
+   * @param receiverId - The account ID of the receiver.
    * @param functionNames - The names of funcitons to authorize.
    */
   addAccessKey(
@@ -553,7 +553,7 @@ export class NearPromise {
    *
    * @param publicKey - The public key to add as a access key.
    * @param allowance - The allowance for the key in yoctoNEAR.
-   * @param receiverId - The account ID of the reciever.
+   * @param receiverId - The account ID of the receiver.
    * @param functionNames - The names of funcitons to authorize.
    * @param nonce - The nonce to use.
    */

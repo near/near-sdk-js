@@ -69,7 +69,8 @@ test("test_storage_deposit", async (t) => {
 });
 
 test("test_simple_transfer", async (t) => {
-    const TRANSFER_AMOUNT = NEAR.parse("100 N");
+    const TRANSFER_AMOUNT = NEAR.parse("1000 N");
+    const EXPECTED_ROOT_BALANCE = NEAR.parse("9000 N");
 
     const { ftContract, alice } = t.context.accounts;
 
@@ -77,7 +78,7 @@ test("test_simple_transfer", async (t) => {
         ftContract,
         "ft_transfer",
         {
-            reciever_id: alice.accountId,
+            receiver_id: alice.accountId,
             amount: TRANSFER_AMOUNT,
             memo: null
         },
@@ -88,10 +89,11 @@ test("test_simple_transfer", async (t) => {
 
     let root_balance = await ftContract.view("ft_balance_of", { account_id: ftContract.accountId });
 
-    let alice_balance = await ftContract.view("ft_balance_of", { account_id: allice.accountId });
+    let alice_balance = await ftContract.view("ft_balance_of", { account_id: alice.accountId });
 
-    t.is(INITIAL_BALANCE - TRANSFER_AMOUNT, root_balance);
-    t.is(TRANSFER_AMOUNT, alice_balance);
+    // TODO: these conversions are too complicated
+    t.is(String(EXPECTED_ROOT_BALANCE), root_balance.toLocaleString('fullwide', {useGrouping:false}));
+    t.is(String(TRANSFER_AMOUNT), Number(alice_balance).toLocaleString('fullwide', {useGrouping:false}));
 });
 
 test("test_close_account_empty_balance", async (t) => {
