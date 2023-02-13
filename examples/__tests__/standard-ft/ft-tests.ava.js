@@ -106,11 +106,19 @@ test("test_close_account_empty_balance", async (t) => {
 test("test_close_account_non_empty_balance", async (t) => {
     const { ftContract } = t.context.accounts;
 
-    let res = await ftContract.call("storage_unregister", {}, { attachedDeposit: ONE_YOCTO });
-    t.is(res.contains("Can't unregister the account with the positive balance without force"));
+    try {
+        await ftContract.call(ftContract, "storage_unregister", {}, { attachedDeposit: ONE_YOCTO });
+        throw Error("Unreachable string");
+    } catch(e) {
+        t.is(JSON.stringify(e, Object.getOwnPropertyNames(e)).includes("Can't unregister the account with the positive balance without force"), true);
+    }
 
-    let res2 = await ftContract.call("storage_unregister", { force: false }, { attachedDeposit: ONE_YOCTO });
-    t.is(res2.contains("Can't unregister the account with the positive balance without force"));
+    try {
+        await ftContract.call(ftContract, "storage_unregister", { force: false }, { attachedDeposit: ONE_YOCTO });
+        throw Error("Unreachable string");
+    } catch(e) {
+        t.is(JSON.stringify(e, Object.getOwnPropertyNames(e)).includes("Can't unregister the account with the positive balance without force"), true);
+    }
 });
 
 test("simulate_close_account_force_non_empty_balance", async (t) => {
