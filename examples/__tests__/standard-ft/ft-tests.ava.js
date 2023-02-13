@@ -63,9 +63,9 @@ test("test_total_supply", async (t) => {
 test("test_storage_deposit", async (t) => {
     const { ftContract, root } = t.context.accounts;
     const bob = await root.createSubAccount("bob", { initialBalance: NEAR.parse("10 N").toJSON() });
-    registerUser(ftContract, bob.accountId);
+    await registerUser(ftContract, bob.accountId);
     const bobStorageBalance = await ftContract.view("storage_balance_of", { account_id: bob.accountId });
-    t.is(bobStorageBalance, ACCOUNT_STORAGE_BALANCE);
+    t.is(bobStorageBalance.total, String(ACCOUNT_STORAGE_BALANCE));
 });
 
 test("test_simple_transfer", async (t) => {
