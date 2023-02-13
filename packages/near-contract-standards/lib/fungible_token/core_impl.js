@@ -163,10 +163,10 @@ export class FungibleToken {
         assert_one_yocto();
         let account_id = near.predecessorAccountId();
         let balance = this.accounts.get(account_id);
-        if (balance) {
+        if (balance || balance == BigInt(0)) {
             if (balance == BigInt(0) || force) {
                 this.accounts.remove(account_id);
-                this.total_supply -= balance;
+                this.total_supply = this.total_supply - balance;
                 NearPromise.new(account_id).transfer(this.storage_balance_bounds().min + BigInt(1));
                 return [account_id, balance];
             }
@@ -253,6 +253,12 @@ export class FungibleToken {
         Object.assign(ret, data);
         if (ret.accounts) {
             ret.accounts = LookupMap.reconstruct(ret.accounts);
+        }
+        if (ret.total_supply) {
+            ret.total_supply = BigInt(ret.total_supply);
+        }
+        if (ret.account_storage_usage) {
+            ret.account_storage_usage = BigInt(ret.account_storage_usage);
         }
         return ret;
     }

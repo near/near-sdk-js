@@ -99,7 +99,7 @@ test("test_simple_transfer", async (t) => {
 test("test_close_account_empty_balance", async (t) => {
     const { ftContract, alice } = t.context.accounts;
 
-    let res = await alice.call(ftContract.id(), "storage_unregister", {}, { attachedDeposit: ONE_YOCTO });
+    let res = await alice.call(ftContract, "storage_unregister", {}, { attachedDeposit: ONE_YOCTO });
     t.is(res, true); // TODO: doublecheck
 });
 

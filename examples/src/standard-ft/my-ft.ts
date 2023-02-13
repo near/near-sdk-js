@@ -165,7 +165,7 @@ export class MyFt implements FungibleTokenCore, StorageManagement, FungibleToken
         return this.token.storage_withdraw({ amount });
     }
 
-    @call({})
+    @call({ payableFunction: true })
     storage_unregister({ force }: { force?: boolean }): boolean {
         return this.token.storage_unregister({ force });
     }
