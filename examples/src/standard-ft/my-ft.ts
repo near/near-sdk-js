@@ -98,7 +98,7 @@ export class MyFt implements FungibleTokenCore, StorageManagement, FungibleToken
     }
 
     /** Implementation of FungibleTokenCore */
-    @call({})
+    @call({ payableFunction: true })
     ft_transfer({
         receiver_id,
         amount,
@@ -111,7 +111,7 @@ export class MyFt implements FungibleTokenCore, StorageManagement, FungibleToken
         return this.token.ft_transfer({ receiver_id, amount, memo });
     }
 
-    @call({})
+    @call({ payableFunction: true })
     ft_transfer_call({
         receiver_id,
         amount,

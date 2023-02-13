@@ -350,9 +350,7 @@ export class FungibleToken implements FungibleTokenCore, StorageManagement, Fung
         const ret = new FungibleToken();
         Object.assign(ret, data);
         if (ret.accounts) {
-            ret.accounts = LookupMap.reconstruct(
-                ret.accounts
-            );
+            ret.accounts = LookupMap.reconstruct(ret.accounts);
         }
         return ret;
     }

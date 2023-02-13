@@ -4,6 +4,7 @@ import test from "ava";
 const INITIAL_BALANCE = NEAR.parse("10000 N");
 const ONE_YOCTO = 1;
 const STOARAGE_BYTE_COST = 10_000_000_000_000_000_000n;
+const ACCOUNT_STORAGE_BALANCE = STOARAGE_BYTE_COST * 138n;
 
 test.beforeEach(async (t) => {
     const worker = await Worker.init();
@@ -49,7 +50,7 @@ test.afterEach.always(async (t) => {
 
 
 async function registerUser(contract, account_id) {
-    const deposit = String(STOARAGE_BYTE_COST * 138n);
+    const deposit = String(ACCOUNT_STORAGE_BALANCE);
     await contract.call(contract, "storage_deposit", { account_id: account_id }, { attachedDeposit: deposit });
 }
 
@@ -59,12 +60,21 @@ test("test_total_supply", async (t) => {
     t.is(BigInt(res), INITIAL_BALANCE.toBigInt());
 });
 
+test("test_storage_deposit", async (t) => {
+    const { ftContract, root } = t.context.accounts;
+    const bob = await root.createSubAccount("bob", { initialBalance: NEAR.parse("10 N").toJSON() });
+    registerUser(ftContract, bob.accountId);
+    const bobStorageBalance = await ftContract.view("storage_balance_of", { account_id: bob.accountId });
+    t.is(bobStorageBalance, ACCOUNT_STORAGE_BALANCE);
+});
+
 test("test_simple_transfer", async (t) => {
     const TRANSFER_AMOUNT = NEAR.parse("100 N");
 
     const { ftContract, alice } = t.context.accounts;
 
-    const res = await ftContract.call(
+    await ftContract.call(
+        ftContract,
         "ft_transfer",
         {
             reciever_id: alice.accountId,
@@ -78,7 +88,7 @@ test("test_simple_transfer", async (t) => {
 
     let root_balance = await ftContract.view("ft_balance_of", { account_id: ftContract.accountId });
 
-    let alice_balance = await ftContract.view("ft_balance_of", { account_id: allice.accointId });
+    let alice_balance = await ftContract.view("ft_balance_of", { account_id: allice.accountId });
 
     t.is(INITIAL_BALANCE - TRANSFER_AMOUNT, root_balance);
     t.is(TRANSFER_AMOUNT, alice_balance);
@@ -116,7 +126,7 @@ test("simulate_transfer_call_with_burned_amount", async (t) => {
     const { ftContract, defiContract } = t.context.accounts;
 
     // defi contract must be registered as a FT account
-    await registerUser(ftContract, defiContract.accointId);
+    await registerUser(ftContract, defiContract.accountId);
 
     // // root invests in defi by calling `ft_transfer_call`
     // let res = ftContract
@@ -167,11 +177,11 @@ test("simulate_transfer_call_with_immediate_return_and_no_refund", async (t) => 
     const { ftContract, defiContract } = t.context.accounts;
 
     // defi ftContract must be registered as a FT account
-    await registerUser(ftContract, defiContract.accointId);
+    await registerUser(ftContract, defiContract.accountId);
 
     // root invests in defi by calling `ft_transfer_call`
     await ftContract.call("ft_transfer_call", {
-        receiver_id: defiContract.accointId,
+        receiver_id: defiContract.accountId,
         amount: TRANSFER_AMOUNT,
         memo: null,
         msg: "take-my-money"
@@ -191,7 +201,7 @@ test("simulate_transfer_call_when_called_contract_not_registered_with_ft", async
 
     // call fails because DEFI contract is not registered as FT user
     let res = await ftContract.call("ft_transfer_call", {
-        receiver_id: defiContract.accointId,
+        receiver_id: defiContract.accountId,
         amount: TRANSFER_AMOUNT,
         memo: null,
         msg: "take-my-money"
@@ -215,10 +225,10 @@ test("simulate_transfer_call_with_promise_and_refund", async (t) => {
     const { ftContract, defiContract } = t.context.accounts;
 
     // defi contract must be registered as a FT account
-    await registerUser(ftContract, defiContract.accointId);
+    await registerUser(ftContract, defiContract.accountId);
 
     await ftContract.call("ft_transfer_call", {
-        receiver_id: defiContract.accointId,
+        receiver_id: defiContract.accountId,
         amount: TRANSFER_AMOUNT,
         memo: null,
         msg: refund_amount,
@@ -240,11 +250,11 @@ test("simulate_transfer_call_promise_panics_for_a_full_refund", async (t) => {
     const { ftContract, defiContract } = t.context.accounts;
 
     // defi contract must be registered as a FT account
-    await registerUser(ftContract, defiContract.accointId);
+    await registerUser(ftContract, defiContract.accountId);
 
     // root invests in defi by calling `ft_transfer_call`
     const res = ftContract.call("ft_transfer_call", {
-        receiver_id: defiContract.accointId,
+        receiver_id: defiContract.accountId,
         amount: TRANSFER_AMOUNT,
         memo: null,
         msg: "no parsey as integer big panic oh no",
