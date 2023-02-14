@@ -8,7 +8,7 @@ importers:
     devDependencies:
       turbo: 1.6.3
 
-  bench:
+  benchmark:
     specifiers:
       ava: ^4.2.0
       near-sdk-js: workspace:*
