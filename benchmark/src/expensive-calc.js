@@ -7,9 +7,9 @@ export class ExpensiveCalc {
     let ret = 0;
     let sign = 1;
     for (let i = 0; i < n; i++) {
-        ret += i * sign;
-        sign *= -1;
+      ret += i * sign;
+      sign *= -1;
     }
-    near.valueReturn(ret.toString())
+    near.valueReturn(ret.toString());
   }
 }

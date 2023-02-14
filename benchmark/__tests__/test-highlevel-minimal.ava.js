@@ -1,6 +1,6 @@
 import { Worker } from "near-workspaces";
 import test from "ava";
-import {logGasDetail} from "./util.js";
+import { logGasDetail } from "./util.js";
 
 test.before(async (t) => {
   // Init the worker and start a Sandbox server
@@ -10,8 +10,12 @@ test.before(async (t) => {
   const root = worker.rootAccount;
 
   // Deploy the test contract.
-  const highlevelContract = await root.devDeploy("build/highlevel-minimal.wasm");
-  const highlevelContractRs = await root.devDeploy("res/highlevel_minimal.wasm");
+  const highlevelContract = await root.devDeploy(
+    "build/highlevel-minimal.wasm"
+  );
+  const highlevelContractRs = await root.devDeploy(
+    "res/highlevel_minimal.wasm"
+  );
 
   // Test users
   const ali = await root.createSubAccount("ali");
@@ -20,31 +24,28 @@ test.before(async (t) => {
 
   // Save state for test runs
   t.context.worker = worker;
-  t.context.accounts = { root, highlevelContract, highlevelContractRs, ali, bob, carl };
+  t.context.accounts = {
+    root,
+    highlevelContract,
+    highlevelContractRs,
+    ali,
+    bob,
+    carl,
+  };
 });
 
-
 test("JS highlevel minimal contract", async (t) => {
-    const { bob, highlevelContract } = t.context.accounts;
-    let r = await bob.callRaw(
-        highlevelContract,
-        "empty",
-        ""
-    );
+  const { bob, highlevelContract } = t.context.accounts;
+  let r = await bob.callRaw(highlevelContract, "empty", "");
 
-    t.is(r.result.status.SuccessValue, "");
-    logGasDetail(r, t)
+  t.is(r.result.status.SuccessValue, "");
+  logGasDetail(r, t);
 });
 
 test("RS highlevel minimal contract", async (t) => {
   const { bob, highlevelContractRs } = t.context.accounts;
-  let r = await bob.callRaw(
-      highlevelContractRs,
-      "empty",
-      ""
-  );
+  let r = await bob.callRaw(highlevelContractRs, "empty", "");
 
   t.is(r.result.status.SuccessValue, "");
-  logGasDetail(r, t)
+  logGasDetail(r, t);
 });
-  

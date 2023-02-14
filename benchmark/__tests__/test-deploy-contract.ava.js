@@ -31,7 +31,14 @@ test.before(async (t) => {
 
   // Save state for test runs
   t.context.worker = worker;
-  t.context.accounts = { root, callerContract, ali, bob, carl, callerContractRs };
+  t.context.accounts = {
+    root,
+    callerContract,
+    ali,
+    bob,
+    carl,
+    callerContractRs,
+  };
 });
 
 test("JS promise batch deploy contract and call", async (t) => {
@@ -84,7 +91,6 @@ test("JS promise batch deploy contract and call", async (t) => {
     )
   );
 });
-
 
 test("RS promise batch deploy contract and call", async (t) => {
   const { bob, callerContractRs } = t.context.accounts;

@@ -19,7 +19,6 @@
     "test:highlevel-collection": "ava __tests__/test-highlevel-collection.ava.js",
     "test:expensive-calc": "ava __tests__/test-expensive-calc.ava.js",
     "test:deploy-contract": "ava __tests__/test-deploy-contract.ava.js"
-
   },
   "author": "Near Inc <hello@nearprotocol.com>",
   "license": "Apache-2.0",

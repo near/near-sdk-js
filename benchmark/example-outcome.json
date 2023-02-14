@@ -28,9 +28,7 @@
             ],
             "version": 1
           },
-          "receipt_ids": [
-            "8FYdTYgNnz5jnCDFFHfbyrBVq5rp9beStZYjxjrXvQ5F"
-          ],
+          "receipt_ids": ["8FYdTYgNnz5jnCDFFHfbyrBVq5rp9beStZYjxjrXvQ5F"],
           "status": {
             "SuccessValue": ""
           },
@@ -90,9 +88,7 @@
           "gas_profile": null,
           "version": 1
         },
-        "receipt_ids": [
-          "7GaMgKm53Mv5hwimyLTQnxEvaacvSABHhhJXbQYFkiXi"
-        ],
+        "receipt_ids": ["7GaMgKm53Mv5hwimyLTQnxEvaacvSABHhhJXbQYFkiXi"],
         "status": {
           "SuccessReceiptId": "7GaMgKm53Mv5hwimyLTQnxEvaacvSABHhhJXbQYFkiXi"
         },
