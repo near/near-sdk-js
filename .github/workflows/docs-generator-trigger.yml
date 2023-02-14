@@ -2,8 +2,7 @@ name: Docs Generator trigger
 
 on:
   workflow_run:
-    workflows: [Release]
-    types: [completed]
+
     branches: [feat/typedoc-update]
 
 concurrency:
