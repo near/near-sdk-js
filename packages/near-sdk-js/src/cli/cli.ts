@@ -33,6 +33,7 @@ program
       .argument("[packageJson]", "Target file path and name.", "package.json")
       .argument("[tsConfig]", "Target file path and name.", "tsconfig.json")
       .option("--verbose", "Whether to print more verbose output.", false)
+      .option("--generateABI", "Whether to generate ABI.", false)
       .action(buildCom)
   )
   .addCommand(
@@ -56,7 +57,7 @@ program
       .action(checkTypescriptCom)
   )
   .addCommand(
-    new Command("createJsFileWithRullup")
+    new Command("createJsFileWithRollup")
       .usage("[source] [target]")
       .description(
         "Create intermediate javascript file for later processing with QJSC"
@@ -251,7 +252,7 @@ export async function buildCom(
   target: string,
   packageJson: string,
   tsConfig: string,
-  { verbose = false }: { verbose: boolean }
+  { verbose = false, generateABI = false }: { verbose: boolean, generateABI: boolean },
 ): Promise<void> {
   const signale = new Signale({ scope: "build", interactive: !verbose });
 
@@ -261,9 +262,11 @@ export async function buildCom(
 
   await checkTypescriptCom(source, { verbose });
 
-  await generateAbi(source, target, packageJson, tsConfig, { verbose });
-
   ensureTargetDirExists(target);
+
+  if (generateABI) {
+    await generateAbi(source, target, packageJson, tsConfig, { verbose });
+  }
 
   await validateCom(source, { verbose });
 
@@ -382,5 +385,5 @@ async function createWasmContract(
 
 async function wasiStubContract(contractTarget: string, verbose = false) {
   const WASI_STUB = `${NEAR_SDK_JS}/lib/cli/deps/binaryen/wasi-stub/run.sh`;
-  await executeCommand(`${WASI_STUB} ${contractTarget} >/dev/null`, verbose);
+  await executeCommand(`${WASI_STUB} ${contractTarget}`, verbose);
 }

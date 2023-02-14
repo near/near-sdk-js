@@ -1,4 +1,5 @@
 import ts, { ClassDeclaration, Decorator, NodeArray } from "typescript";
+import JSON5 from 'json5';
 import * as abi from "near-abi";
 import * as TJS from "near-typescript-json-schema";
 import { JSONSchema7 } from "json-schema";
@@ -6,7 +7,7 @@ import * as fs from "fs";
 import { LIB_VERSION } from "../version.js";
 
 function parseMetadata(packageJsonPath: string): abi.AbiMetadata {
-  const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, "utf8"));
+  const packageJson = JSON5.parse(fs.readFileSync(packageJsonPath, "utf8"));
 
   let authors: string[] = [];
   if (packageJson["author"]) authors.push(packageJson["author"]);
@@ -71,7 +72,7 @@ export function runAbiCompilerPlugin(
   packageJsonPath: string,
   tsConfigJsonPath: string
 ) {
-  const tsConfig = JSON.parse(fs.readFileSync(tsConfigJsonPath, "utf8"));
+  const tsConfig = JSON5.parse(fs.readFileSync(tsConfigJsonPath, "utf8"));
   const program = getProgramFromFiles([tsFile], tsConfig["compilerOptions"]);
   const typeChecker = program.getTypeChecker();
 

@@ -10,20 +10,20 @@ export class UnorderedMap {
      */
     constructor(prefix) {
         this.prefix = prefix;
-        this.keys = new Vector(`${prefix}u`); // intentional different prefix with old UnorderedMap
+        this._keys = new Vector(`${prefix}u`); // intentional different prefix with old UnorderedMap
         this.values = new LookupMap(`${prefix}m`);
     }
     /**
      * The number of elements stored in the collection.
      */
     get length() {
-        return this.keys.length;
+        return this._keys.length;
     }
     /**
      * Checks whether the collection is empty.
      */
     isEmpty() {
-        return this.keys.isEmpty();
+        return this._keys.isEmpty();
     }
     /**
      * Get the data stored at the provided key.
@@ -51,7 +51,7 @@ export class UnorderedMap {
         const serialized = serializeValueWithOptions(value, options);
         if (valueAndIndex === null) {
             const newElementIndex = this.length;
-            this.keys.push(key);
+            this._keys.push(key);
             this.values.set(key, [decode(serialized), newElementIndex]);
             return null;
         }
@@ -71,11 +71,11 @@ export class UnorderedMap {
             return options?.defaultValue ?? null;
         }
         const [value, index] = oldValueAndIndex;
-        assert(this.keys.swapRemove(index) !== null, ERR_INCONSISTENT_STATE);
+        assert(this._keys.swapRemove(index) !== null, ERR_INCONSISTENT_STATE);
         // the last key is swapped to key[index], the corresponding [value, index] need update
-        if (!this.keys.isEmpty() && index !== this.keys.length) {
+        if (!this._keys.isEmpty() && index !== this._keys.length) {
             // if there is still elements and it was not the last element
-            const swappedKey = this.keys.get(index);
+            const swappedKey = this._keys.get(index);
             const swappedValueAndIndex = this.values.get(swappedKey);
             assert(swappedValueAndIndex !== null, ERR_INCONSISTENT_STATE);
             this.values.set(swappedKey, [swappedValueAndIndex[0], index]);
@@ -86,11 +86,11 @@ export class UnorderedMap {
      * Remove all of the elements stored within the collection.
      */
     clear() {
-        for (const key of this.keys) {
+        for (const key of this._keys) {
             // Set instead of remove to avoid loading the value from storage.
             this.values.set(key, null);
         }
-        this.keys.clear();
+        this._keys.clear();
     }
     [Symbol.iterator]() {
         return new UnorderedMapIterator(this);
@@ -144,11 +144,24 @@ export class UnorderedMap {
     static reconstruct(data) {
         const map = new UnorderedMap(data.prefix);
         // reconstruct keys Vector
-        map.keys = new Vector(`${data.prefix}u`);
-        map.keys.length = data.keys.length;
+        map._keys = new Vector(`${data.prefix}u`);
+        map._keys.length = data._keys.length;
         // reconstruct values LookupMap
         map.values = new LookupMap(`${data.prefix}m`);
         return map;
+    }
+    keys({ start, limit }) {
+        const ret = [];
+        if (start === undefined) {
+            start = 0;
+        }
+        if (limit == undefined) {
+            limit = this.length - start;
+        }
+        for (let i = start; i < start + limit; i++) {
+            ret.push(this._keys.get(i));
+        }
+        return ret;
     }
 }
 /**
@@ -161,7 +174,7 @@ class UnorderedMapIterator {
      */
     constructor(unorderedMap, options) {
         this.options = options;
-        this.keys = new VectorIterator(unorderedMap.keys);
+        this.keys = new VectorIterator(unorderedMap._keys);
         this.map = unorderedMap.values;
     }
     next() {

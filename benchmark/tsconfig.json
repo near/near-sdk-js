@@ -1,0 +1,9 @@
+{
+  "compilerOptions": {
+    "moduleResolution": "node",
+    "experimentalDecorators": true,
+    "target": "es2020",
+    "noEmit": true
+  },
+  "exclude": ["node_modules"]
+}

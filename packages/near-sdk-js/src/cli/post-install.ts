@@ -33,7 +33,7 @@ if (!SUPPORTED_ARCH.includes(ARCH)) {
 
 signale.await("Installing wasi-stub...");
 
-const BINARYEN_VERSION = `0.1.10`;
+const BINARYEN_VERSION = `0.1.15`;
 const BINARYEN_VERSION_TAG = `v${BINARYEN_VERSION}`;
 
 const BINARYEN_SYSTEM_NAME =
