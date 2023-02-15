@@ -162,7 +162,7 @@ export class FungibleToken {
     internal_storage_unregister(force) {
         assert_one_yocto();
         let account_id = near.predecessorAccountId();
-        let balance = this.accounts.get(account_id);
+        let balance = BigInt(this.accounts.get(account_id));
         if (balance || balance == BigInt(0)) {
             if (balance == BigInt(0) || force) {
                 this.accounts.remove(account_id);

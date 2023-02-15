@@ -237,7 +237,7 @@ export class FungibleToken implements FungibleTokenCore, StorageManagement, Fung
         assert_one_yocto();
         let account_id: AccountId = near.predecessorAccountId();
 
-        let balance: Balance = this.accounts.get(account_id);
+        let balance: Balance = BigInt(this.accounts.get(account_id));
         if (balance || balance == BigInt(0)) {
             if (balance == BigInt(0) || force) {
                 this.accounts.remove(account_id);

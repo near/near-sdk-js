@@ -124,10 +124,15 @@ test("test_close_account_non_empty_balance", async (t) => {
 test("simulate_close_account_force_non_empty_balance", async (t) => {
     const { ftContract } = t.context.accounts;
 
-    await ftContract.call("storage_unregister", { force: true }, { attachedDeposit: ONE_YOCTO });
+    await ftContract.call(
+        ftContract,
+        "storage_unregister",
+        { force: true },
+        { attachedDeposit: ONE_YOCTO }
+    );
 
     const res = await ftContract.view("ft_total_supply", {});
-    t.is(res, 0);
+    t.is(Number(res), 0);
 });
 
 test("simulate_transfer_call_with_burned_amount", async (t) => {
