@@ -69,11 +69,11 @@ export class FungibleToken implements FungibleTokenCore, StorageManagement, Fung
     }
 
     internal_unwrap_balance_of(account_id: AccountId): Balance {
-        let balance: Balance = this.accounts.get(account_id);
+        let balance = this.accounts.get(account_id);
         if (balance === null) {
             throw Error(`The account ${account_id} is not registered`);
         }
-        return balance;
+        return BigInt(balance);
     }
 
     internal_deposit(account_id: AccountId, amount: Balance) {
@@ -86,7 +86,7 @@ export class FungibleToken implements FungibleTokenCore, StorageManagement, Fung
     }
 
     internal_withdraw(account_id: AccountId, amount: Balance) {
-        let balance: Balance = this.internal_unwrap_balance_of(account_id);
+        let balance: Balance = BigInt(this.internal_unwrap_balance_of(account_id));
         let new_balance: Balance = balance - amount;
         if (new_balance < 0) {
             throw Error("The account doesn't have enough balance");

@@ -44,7 +44,7 @@ export class FungibleToken {
         if (balance === null) {
             throw Error(`The account ${account_id} is not registered`);
         }
-        return balance;
+        return BigInt(balance);
     }
     internal_deposit(account_id, amount) {
         let balance = this.internal_unwrap_balance_of(account_id);
@@ -55,7 +55,7 @@ export class FungibleToken {
         this.total_supply = new_total_supply;
     }
     internal_withdraw(account_id, amount) {
-        let balance = this.internal_unwrap_balance_of(account_id);
+        let balance = BigInt(this.internal_unwrap_balance_of(account_id));
         let new_balance = balance - amount;
         if (new_balance < 0) {
             throw Error("The account doesn't have enough balance");
@@ -148,6 +148,7 @@ export class FungibleToken {
             .functionCall("ft_on_transfer", JSON.stringify({ sender_id, amount, msg }), BigInt(0), receiver_gas)
             .then(NearPromise.new(near.currentAccountId())
             .functionCall("ft_resolve_transfer", JSON.stringify({ sender_id, receiver_id, amount }), BigInt(0), GAS_FOR_RESOLVE_TRANSFER));
+        return null;
     }
     ft_total_supply() {
         return this.total_supply;

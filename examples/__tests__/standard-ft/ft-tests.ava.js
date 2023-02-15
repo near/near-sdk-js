@@ -39,6 +39,7 @@ test.beforeEach(async (t) => {
         root,
         ftContract,
         alice,
+        defiContract,
     };
 });
 
@@ -92,8 +93,8 @@ test("test_simple_transfer", async (t) => {
     let alice_balance = await ftContract.view("ft_balance_of", { account_id: alice.accountId });
 
     // TODO: these conversions are too complicated
-    t.is(String(EXPECTED_ROOT_BALANCE), root_balance.toLocaleString('fullwide', {useGrouping:false}));
-    t.is(String(TRANSFER_AMOUNT), Number(alice_balance).toLocaleString('fullwide', {useGrouping:false}));
+    t.is(String(EXPECTED_ROOT_BALANCE), root_balance.toLocaleString('fullwide', { useGrouping: false }));
+    t.is(String(TRANSFER_AMOUNT), Number(alice_balance).toLocaleString('fullwide', { useGrouping: false }));
 });
 
 test("test_close_account_empty_balance", async (t) => {
@@ -109,14 +110,14 @@ test("test_close_account_non_empty_balance", async (t) => {
     try {
         await ftContract.call(ftContract, "storage_unregister", {}, { attachedDeposit: ONE_YOCTO });
         throw Error("Unreachable string");
-    } catch(e) {
+    } catch (e) {
         t.is(JSON.stringify(e, Object.getOwnPropertyNames(e)).includes("Can't unregister the account with the positive balance without force"), true);
     }
 
     try {
         await ftContract.call(ftContract, "storage_unregister", { force: false }, { attachedDeposit: ONE_YOCTO });
         throw Error("Unreachable string");
-    } catch(e) {
+    } catch (e) {
         t.is(JSON.stringify(e, Object.getOwnPropertyNames(e)).includes("Can't unregister the account with the positive balance without force"), true);
     }
 });
@@ -195,12 +196,20 @@ test("simulate_transfer_call_with_immediate_return_and_no_refund", async (t) => 
     await registerUser(ftContract, defiContract.accountId);
 
     // root invests in defi by calling `ft_transfer_call`
-    await ftContract.call("ft_transfer_call", {
-        receiver_id: defiContract.accountId,
-        amount: TRANSFER_AMOUNT,
-        memo: null,
-        msg: "take-my-money"
-    }, { attachedDeposit: ONE_YOCTO });
+    await ftContract.call(
+        ftContract,
+        "ft_transfer_call",
+        {
+            receiver_id: defiContract.accountId,
+            amount: TRANSFER_AMOUNT,
+            memo: null,
+            msg: "take-my-money"
+        },
+        {
+            attachedDeposit: ONE_YOCTO,
+            gas: 300000000000000,
+        }
+    );
 
     let root_balance = await ftContract.view("ft_balance_of", { account_id: ftContract.accountId });
     let defi_balance = await ftContract.view("ft_balance_of", { account_id: defiContract.accountId });
