@@ -44,7 +44,7 @@ export declare class FtMint {
 export declare class FtTransfer {
     old_owner_id: AccountId;
     new_owner_id: AccountId;
-    amount: bigint;
+    amount: string;
     memo: Option<String>;
     constructor(old_owner_id: AccountId, new_owner_id: AccountId, amount: bigint, memo: Option<String>);
     /** Logs the event to the host. This is required to ensure that the event is triggered
@@ -59,7 +59,7 @@ export declare class FtTransfer {
 /** Data to log for an FT burn event. To log this event, call [`.emit()`](FtBurn::emit). */
 export declare class FtBurn {
     owner_id: AccountId;
-    amount: Balance;
+    amount: string;
     memo: Option<string>;
     constructor(owner_id: AccountId, amount: Balance, memo: Option<string>);
     /** Logs the event to the host. This is required to ensure that the event is triggered

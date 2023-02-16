@@ -49,7 +49,7 @@ export class FtTransfer {
     constructor(old_owner_id, new_owner_id, amount, memo) {
         this.old_owner_id = old_owner_id;
         this.new_owner_id = new_owner_id;
-        this.amount = amount;
+        this.amount = amount.toString();
         this.memo = memo;
     }
     /** Logs the event to the host. This is required to ensure that the event is triggered
@@ -69,7 +69,7 @@ export class FtTransfer {
 export class FtBurn {
     constructor(owner_id, amount, memo) {
         this.owner_id = owner_id;
-        this.amount = amount;
+        this.amount = amount.toString();
         this.memo = memo;
     }
     /** Logs the event to the host. This is required to ensure that the event is triggered

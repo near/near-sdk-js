@@ -65,13 +65,13 @@ export class FtMint {
 export class FtTransfer {
     old_owner_id: AccountId;
     new_owner_id: AccountId;
-    amount: bigint;
+    amount: string;
     memo: Option<String>;
 
     constructor(old_owner_id: AccountId, new_owner_id: AccountId, amount: bigint, memo: Option<String>) {
         this.old_owner_id = old_owner_id;
         this.new_owner_id = new_owner_id;
-        this.amount = amount;
+        this.amount = amount.toString();
         this.memo = memo;
     }
 
@@ -93,12 +93,12 @@ export class FtTransfer {
 /** Data to log for an FT burn event. To log this event, call [`.emit()`](FtBurn::emit). */
 export class FtBurn {
     owner_id: AccountId;
-    amount: Balance;
+    amount: string;
     memo: Option<string>;
 
     constructor(owner_id: AccountId, amount: Balance, memo: Option<string>) {
         this.owner_id = owner_id;
-        this.amount = amount;
+        this.amount = amount.toString();
         this.memo = memo;
     }
 

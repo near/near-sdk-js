@@ -3,7 +3,7 @@ import { FtBurn, FtTransfer } from "./events";
 import { near, LookupMap, NearPromise, assert, } from "near-sdk-js";
 // TODO: move to the main SDK package
 import { assert_one_yocto } from "../non_fungible_token/utils";
-const GAS_FOR_RESOLVE_TRANSFER = 5000000000000n;
+const GAS_FOR_RESOLVE_TRANSFER = 15000000000000n;
 const GAS_FOR_FT_TRANSFER_CALL = 25000000000000n + GAS_FOR_RESOLVE_TRANSFER;
 const ERR_TOTAL_SUPPLY_OVERFLOW = "Total supply overflow";
 /** Implementation of a FungibleToken standard
@@ -56,12 +56,13 @@ export class FungibleToken {
     }
     internal_withdraw(account_id, amount) {
         let balance = BigInt(this.internal_unwrap_balance_of(account_id));
-        let new_balance = balance - amount;
+        let a = BigInt(amount);
+        let new_balance = balance - a;
         if (new_balance < 0) {
             throw Error("The account doesn't have enough balance");
         }
         this.accounts.set(account_id, new_balance);
-        let new_total_supply = this.total_supply - amount;
+        let new_total_supply = this.total_supply - a;
         this.total_supply = new_total_supply;
     }
     internal_transfer(sender_id, receiver_id, amount, memo) {
@@ -99,14 +100,14 @@ export class FungibleToken {
             let receiver_balance = this.accounts.get(receiver_id) ?? 0n;
             if (receiver_balance > BigInt(0)) {
                 let refund_amount = this.bigIntMin(receiver_balance, unused_amount);
-                let new_receiver_balance = receiver_balance.valueOf() - BigInt(refund_amount);
+                let new_receiver_balance = BigInt(receiver_balance) - BigInt(refund_amount);
                 if (new_receiver_balance < 0n) {
                     throw Error("The receiver account doesn't have enough balance");
                 }
                 this.accounts.set(receiver_id, new_receiver_balance);
                 let sender_balance = this.accounts.get(sender_id) ?? 0n;
                 if (sender_balance) {
-                    let new_sender_balance = sender_balance.valueOf() + BigInt(refund_amount);
+                    let new_sender_balance = BigInt(sender_balance) + BigInt(refund_amount);
                     this.accounts.set(sender_id, new_sender_balance);
                     new FtTransfer(receiver_id, sender_id, BigInt(refund_amount), "refund").emit();
                     let used_amount = BigInt(amount - refund_amount);
@@ -148,7 +149,6 @@ export class FungibleToken {
             .functionCall("ft_on_transfer", JSON.stringify({ sender_id, amount, msg }), BigInt(0), receiver_gas)
             .then(NearPromise.new(near.currentAccountId())
             .functionCall("ft_resolve_transfer", JSON.stringify({ sender_id, receiver_id, amount }), BigInt(0), GAS_FOR_RESOLVE_TRANSFER));
-        return null;
     }
     ft_total_supply() {
         return this.total_supply;

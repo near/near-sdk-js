@@ -20,7 +20,7 @@ import { Option } from '../non_fungible_token/utils';
 // TODO: move to the main SDK package
 import { assert_one_yocto } from "../non_fungible_token/utils";
 
-const GAS_FOR_RESOLVE_TRANSFER: Gas = 5_000_000_000_000n;
+const GAS_FOR_RESOLVE_TRANSFER: Gas = 15_000_000_000_000n;
 const GAS_FOR_FT_TRANSFER_CALL: Gas = 25_000_000_000_000n + GAS_FOR_RESOLVE_TRANSFER;
 const ERR_TOTAL_SUPPLY_OVERFLOW: string = "Total supply overflow";
 
@@ -87,12 +87,13 @@ export class FungibleToken implements FungibleTokenCore, StorageManagement, Fung
 
     internal_withdraw(account_id: AccountId, amount: Balance) {
         let balance: Balance = BigInt(this.internal_unwrap_balance_of(account_id));
-        let new_balance: Balance = balance - amount;
+        let a = BigInt(amount)
+        let new_balance: Balance = balance - a;
         if (new_balance < 0) {
             throw Error("The account doesn't have enough balance");
         }
         this.accounts.set(account_id, new_balance);
-        let new_total_supply: Balance = this.total_supply - amount;
+        let new_total_supply: Balance = this.total_supply - a;
         this.total_supply = new_total_supply;
     }
 
@@ -137,7 +138,7 @@ export class FungibleToken implements FungibleTokenCore, StorageManagement, Fung
             let receiver_balance: Balance = this.accounts.get(receiver_id) ?? 0n;
             if (receiver_balance > BigInt(0)) {
                 let refund_amount: Balance = this.bigIntMin(receiver_balance, unused_amount);
-                let new_receiver_balance: Balance = receiver_balance.valueOf() - BigInt(refund_amount);
+                let new_receiver_balance: Balance = BigInt(receiver_balance) - BigInt(refund_amount);
                 if (new_receiver_balance < 0n) {
                     throw Error("The receiver account doesn't have enough balance");
                 }
@@ -145,7 +146,7 @@ export class FungibleToken implements FungibleTokenCore, StorageManagement, Fung
 
                 let sender_balance: Balance = this.accounts.get(sender_id) ?? 0n;
                 if (sender_balance) {
-                    let new_sender_balance: Balance = sender_balance.valueOf() + BigInt(refund_amount);
+                    let new_sender_balance: Balance = BigInt(sender_balance) + BigInt(refund_amount);
                     this.accounts.set(sender_id, new_sender_balance);
                     new FtTransfer(
                         receiver_id,

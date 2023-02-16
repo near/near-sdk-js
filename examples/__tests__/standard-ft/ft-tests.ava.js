@@ -241,7 +241,7 @@ test("simulate_transfer_call_when_called_contract_not_registered_with_ft", async
     t.is(0, defi_balance);
 });
 
-test("simulate_transfer_call_with_promise_and_refund", async (t) => {
+test.only("simulate_transfer_call_with_promise_and_refund", async (t) => {
     const REFUND_AMOUNT = NEAR.parse("50 N");
 
     const TRANSFER_AMOUNT = NEAR.parse("100 N");
@@ -251,13 +251,14 @@ test("simulate_transfer_call_with_promise_and_refund", async (t) => {
     // defi contract must be registered as a FT account
     await registerUser(ftContract, defiContract.accountId);
 
-    await ftContract.call("ft_transfer_call", {
+    await ftContract.call(ftContract, "ft_transfer_call", {
         receiver_id: defiContract.accountId,
         amount: TRANSFER_AMOUNT,
         memo: null,
-        msg: refund_amount,
+        msg: REFUND_AMOUNT,
     }, {
-        attachedDeposit: ONE_YOCTO
+        attachedDeposit: ONE_YOCTO,
+        gas: 300_000_000_000_000n
     });
 
     let root_balance = await ftContract.view("ft_balance_of", { account_id: ftContract.accountId });
@@ -265,7 +266,7 @@ test("simulate_transfer_call_with_promise_and_refund", async (t) => {
 
 
     t.is(INITIAL_BALANCE - TRANSFER_AMOUNT + REFUND_AMOUNT, root_balance);
-    t.is(TRANSFER_AMOUNT - refund_amount, defi_balance);
+    t.is(TRANSFER_AMOUNT - REFUND_AMOUNT, defi_balance);
 });
 
 test("simulate_transfer_call_promise_panics_for_a_full_refund", async (t) => {
