@@ -46,6 +46,9 @@ If you think you need help planning your contribution, please ping us on [Discor
 
 We have the [`#dev-feedback`](https://discord.gg/XKGrd9h9TB) channel on [Discord](https://near.chat) to discuss all things about NEAR development. You can also be of great help by helping other users in the [`#dev-support`](https://discord.gg/Fy4WzwRgun) channel.
 
+### Join our Telegram User Group
+You can have near-sdk-js related discussions with other users, contributors and maintainers on [Telegram]( https://t.me/near_sdk_js).
+
 ### Triaging Issues and Pull Requests
 
 One great way you can contribute to the project without writing any code is to help triage issues and pull requests as they come in.
