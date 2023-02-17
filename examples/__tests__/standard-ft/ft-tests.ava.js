@@ -1,10 +1,10 @@
 import { NEAR, Worker } from "near-workspaces";
 import test from "ava";
 
-const INITIAL_BALANCE = NEAR.parse("10000 N");
-const ONE_YOCTO = 1;
+const INITIAL_BALANCE = NEAR.parse("10000 N").toJSON();
+const ONE_YOCTO = 1; // TODO: why ONE_YOCTO must be a number, while other arguments can be strings?
 const STOARAGE_BYTE_COST = 10_000_000_000_000_000_000n;
-const ACCOUNT_STORAGE_BALANCE = STOARAGE_BYTE_COST * 138n;
+const ACCOUNT_STORAGE_BALANCE = String(STOARAGE_BYTE_COST * 138n);
 
 test.beforeEach(async (t) => {
     const worker = await Worker.init();
@@ -241,10 +241,10 @@ test("simulate_transfer_call_when_called_contract_not_registered_with_ft", async
     t.is(0, defi_balance);
 });
 
-test.only("simulate_transfer_call_with_promise_and_refund", async (t) => {
-    const REFUND_AMOUNT = NEAR.parse("50 N");
-
-    const TRANSFER_AMOUNT = NEAR.parse("100 N");
+test("simulate_transfer_call_with_promise_and_refund", async (t) => {
+    const REFUND_AMOUNT = NEAR.parse("50 N").toJSON();
+    const TRANSFER_AMOUNT = NEAR.parse("100 N").toJSON();
+    const TRANSFER_CALL_GAS = String(300_000_000_000_000n);
 
     const { ftContract, defiContract } = t.context.accounts;
 
@@ -258,15 +258,14 @@ test.only("simulate_transfer_call_with_promise_and_refund", async (t) => {
         msg: REFUND_AMOUNT,
     }, {
         attachedDeposit: ONE_YOCTO,
-        gas: 300_000_000_000_000n
+        gas: TRANSFER_CALL_GAS,
     });
 
     let root_balance = await ftContract.view("ft_balance_of", { account_id: ftContract.accountId });
     let defi_balance = await ftContract.view("ft_balance_of", { account_id: defiContract.accountId });
 
-
-    t.is(INITIAL_BALANCE - TRANSFER_AMOUNT + REFUND_AMOUNT, root_balance);
-    t.is(TRANSFER_AMOUNT - REFUND_AMOUNT, defi_balance);
+    t.is(BigInt(INITIAL_BALANCE) - BigInt(TRANSFER_AMOUNT) + BigInt(REFUND_AMOUNT), BigInt(root_balance));
+    t.is(BigInt(TRANSFER_AMOUNT) - BigInt(REFUND_AMOUNT), BigInt(defi_balance));
 });
 
 test("simulate_transfer_call_promise_panics_for_a_full_refund", async (t) => {
