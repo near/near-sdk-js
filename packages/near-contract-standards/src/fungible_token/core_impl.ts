@@ -81,7 +81,6 @@ export class FungibleToken implements FungibleTokenCore, StorageManagement, Fung
         let new_balance: Balance = balance + BigInt(amount);
         this.accounts.set(account_id, new_balance);
         let new_total_supply: Balance = this.total_supply + BigInt(amount);
-
         this.total_supply = new_total_supply;
     }
 
@@ -122,12 +121,14 @@ export class FungibleToken implements FungibleTokenCore, StorageManagement, Fung
      * Returns (Used token amount, Burned token amount)
      */
     internal_ft_resolve_transfer(sender_id: AccountId, receiver_id: AccountId, amount: Balance): [bigint, bigint] {
+        amount = BigInt(amount);
         // Get the unused amount from the `ft_on_transfer` call result.
         let unused_amount: Balance;
         try {
-            unused_amount = this.bigIntMin(amount, JSON.parse(near.promiseResult(0)));
+            const promise_result = near.promiseResult(0).replace(/"*/g, ''); //TODO: why promiseResult returnes result with brackets?
+            unused_amount = this.bigIntMin(amount, BigInt(promise_result));
         } catch (e) {
-            if (e.include('Failed')) {
+            if (e.message.includes('Failed')) {
                 unused_amount = amount;
             } else {
                 throw e;
@@ -135,33 +136,33 @@ export class FungibleToken implements FungibleTokenCore, StorageManagement, Fung
         }
 
         if (unused_amount > 0) {
-            let receiver_balance: Balance = this.accounts.get(receiver_id) ?? 0n;
-            if (receiver_balance > BigInt(0)) {
+            let receiver_balance: Balance = BigInt(this.accounts.get(receiver_id)) ?? 0n;
+            if (receiver_balance > 0n) {
                 let refund_amount: Balance = this.bigIntMin(receiver_balance, unused_amount);
-                let new_receiver_balance: Balance = BigInt(receiver_balance) - BigInt(refund_amount);
+                let new_receiver_balance: Balance = receiver_balance - refund_amount;
                 if (new_receiver_balance < 0n) {
                     throw Error("The receiver account doesn't have enough balance");
                 }
                 this.accounts.set(receiver_id, new_receiver_balance);
 
-                let sender_balance: Balance = this.accounts.get(sender_id) ?? 0n;
+                let sender_balance: Balance = BigInt(this.accounts.get(sender_id)) ?? 0n;
                 if (sender_balance) {
-                    let new_sender_balance: Balance = BigInt(sender_balance) + BigInt(refund_amount);
+                    let new_sender_balance: Balance = sender_balance + refund_amount;
                     this.accounts.set(sender_id, new_sender_balance);
                     new FtTransfer(
                         receiver_id,
                         sender_id,
-                        BigInt(refund_amount),
+                        refund_amount,
                         "refund",
                     ).emit();
 
-                    let used_amount: Balance = BigInt(amount - refund_amount);
+                    let used_amount: Balance = amount - refund_amount;
                     if (used_amount < 0n) {
                         throw Error(ERR_TOTAL_SUPPLY_OVERFLOW);
                     }
                     return [used_amount.valueOf(), 0n];
                 } else {
-                    const new_total_supply = this.total_supply - BigInt(refund_amount);
+                    const new_total_supply = this.total_supply - refund_amount;
                     if (new_total_supply < 0) {
                         throw Error(ERR_TOTAL_SUPPLY_OVERFLOW);
                     }
@@ -172,11 +173,11 @@ export class FungibleToken implements FungibleTokenCore, StorageManagement, Fung
                         refund_amount,
                         "refund",
                     ).emit();
-                    return [BigInt(amount), BigInt(refund_amount)];
+                    return [amount, refund_amount];
                 }
             }
         }
-        return [BigInt(amount), 0n];
+        return [amount, 0n];
     }
 
     /** Implementation of FungibleTokenCore */

@@ -47,29 +47,21 @@ export class FungibleToken {
         return BigInt(balance);
     }
     internal_deposit(account_id, amount) {
-        near.log("in internal_deposit", account_id, amount);
         let balance = BigInt(this.internal_unwrap_balance_of(account_id));
-        near.log("balance", balance);
         let new_balance = balance + BigInt(amount);
-        near.log("new_balance", new_balance);
         this.accounts.set(account_id, new_balance);
         let new_total_supply = this.total_supply + BigInt(amount);
-        // TODO: check for total supply overflow?
         this.total_supply = new_total_supply;
     }
     internal_withdraw(account_id, amount) {
-        near.log("in internal_withdraw", account_id, amount);
         let balance = BigInt(this.internal_unwrap_balance_of(account_id));
-        near.log("balance", balance);
         let a = BigInt(amount);
         let new_balance = balance - a;
-        near.log("new_balance", new_balance);
         if (new_balance < 0) {
             throw Error("The account doesn't have enough balance");
         }
         this.accounts.set(account_id, new_balance);
         let new_total_supply = this.total_supply - a;
-        near.log("new_total_supply", new_total_supply);
         this.total_supply = new_total_supply;
     }
     internal_transfer(sender_id, receiver_id, amount, memo) {
@@ -90,13 +82,15 @@ export class FungibleToken {
      * Returns (Used token amount, Burned token amount)
      */
     internal_ft_resolve_transfer(sender_id, receiver_id, amount) {
+        amount = BigInt(amount);
         // Get the unused amount from the `ft_on_transfer` call result.
         let unused_amount;
         try {
-            unused_amount = this.bigIntMin(amount, JSON.parse(near.promiseResult(0)));
+            const promise_result = near.promiseResult(0).replace(/"*/g, ''); //TODO: why promiseResult returnes result with brackets?
+            unused_amount = this.bigIntMin(amount, BigInt(promise_result));
         }
         catch (e) {
-            if (e.include('Failed')) {
+            if (e.message.includes('Failed')) {
                 unused_amount = amount;
             }
             else {
@@ -104,38 +98,38 @@ export class FungibleToken {
             }
         }
         if (unused_amount > 0) {
-            let receiver_balance = this.accounts.get(receiver_id) ?? 0n;
-            if (receiver_balance > BigInt(0)) {
+            let receiver_balance = BigInt(this.accounts.get(receiver_id)) ?? 0n;
+            if (receiver_balance > 0n) {
                 let refund_amount = this.bigIntMin(receiver_balance, unused_amount);
-                let new_receiver_balance = BigInt(receiver_balance) - BigInt(refund_amount);
+                let new_receiver_balance = receiver_balance - refund_amount;
                 if (new_receiver_balance < 0n) {
                     throw Error("The receiver account doesn't have enough balance");
                 }
                 this.accounts.set(receiver_id, new_receiver_balance);
-                let sender_balance = this.accounts.get(sender_id) ?? 0n;
+                let sender_balance = BigInt(this.accounts.get(sender_id)) ?? 0n;
                 if (sender_balance) {
-                    let new_sender_balance = BigInt(sender_balance) + BigInt(refund_amount);
+                    let new_sender_balance = sender_balance + refund_amount;
                     this.accounts.set(sender_id, new_sender_balance);
-                    new FtTransfer(receiver_id, sender_id, BigInt(refund_amount), "refund").emit();
-                    let used_amount = BigInt(amount - refund_amount);
+                    new FtTransfer(receiver_id, sender_id, refund_amount, "refund").emit();
+                    let used_amount = amount - refund_amount;
                     if (used_amount < 0n) {
                         throw Error(ERR_TOTAL_SUPPLY_OVERFLOW);
                     }
                     return [used_amount.valueOf(), 0n];
                 }
                 else {
-                    const new_total_supply = this.total_supply - BigInt(refund_amount);
+                    const new_total_supply = this.total_supply - refund_amount;
                     if (new_total_supply < 0) {
                         throw Error(ERR_TOTAL_SUPPLY_OVERFLOW);
                     }
                     this.total_supply = new_total_supply;
                     near.log("The account of the sender was deleted");
                     new FtBurn(receiver_id, refund_amount, "refund").emit();
-                    return [BigInt(amount), BigInt(refund_amount)];
+                    return [amount, refund_amount];
                 }
             }
         }
-        return [BigInt(amount), 0n];
+        return [amount, 0n];
     }
     /** Implementation of FungibleTokenCore */
     ft_transfer({ receiver_id, amount, memo }) {
@@ -152,13 +146,10 @@ export class FungibleToken {
         if (receiver_gas < 0) {
             throw new Error("Prepaid gas overflow");
         }
-        // return NearPromise.new(receiver_id)
-        //     .functionCall("ft_on_transfer", JSON.stringify({ sender_id, amount, msg }), BigInt(0), receiver_gas)
-        //     .then(
-        //         NearPromise.new(near.currentAccountId())
-        //             .functionCall("ft_resolve_transfer", JSON.stringify({ sender_id, receiver_id, amount }), BigInt(0), GAS_FOR_RESOLVE_TRANSFER)
-        //     );
-        return null; //TODO: delete
+        return NearPromise.new(receiver_id)
+            .functionCall("ft_on_transfer", JSON.stringify({ sender_id, amount, msg }), BigInt(0), receiver_gas)
+            .then(NearPromise.new(near.currentAccountId())
+            .functionCall("ft_resolve_transfer", JSON.stringify({ sender_id, receiver_id, amount }), BigInt(0), GAS_FOR_RESOLVE_TRANSFER));
     }
     ft_total_supply() {
         return this.total_supply;
