@@ -47,22 +47,29 @@ export class FungibleToken {
         return BigInt(balance);
     }
     internal_deposit(account_id, amount) {
-        let balance = this.internal_unwrap_balance_of(account_id);
-        let new_balance = balance + amount;
+        near.log("in internal_deposit", account_id, amount);
+        let balance = BigInt(this.internal_unwrap_balance_of(account_id));
+        near.log("balance", balance);
+        let new_balance = balance + BigInt(amount);
+        near.log("new_balance", new_balance);
         this.accounts.set(account_id, new_balance);
-        let new_total_supply = this.total_supply + amount;
+        let new_total_supply = this.total_supply + BigInt(amount);
         // TODO: check for total supply overflow?
         this.total_supply = new_total_supply;
     }
     internal_withdraw(account_id, amount) {
+        near.log("in internal_withdraw", account_id, amount);
         let balance = BigInt(this.internal_unwrap_balance_of(account_id));
+        near.log("balance", balance);
         let a = BigInt(amount);
         let new_balance = balance - a;
+        near.log("new_balance", new_balance);
         if (new_balance < 0) {
             throw Error("The account doesn't have enough balance");
         }
         this.accounts.set(account_id, new_balance);
         let new_total_supply = this.total_supply - a;
+        near.log("new_total_supply", new_total_supply);
         this.total_supply = new_total_supply;
     }
     internal_transfer(sender_id, receiver_id, amount, memo) {
@@ -145,10 +152,13 @@ export class FungibleToken {
         if (receiver_gas < 0) {
             throw new Error("Prepaid gas overflow");
         }
-        return NearPromise.new(receiver_id)
-            .functionCall("ft_on_transfer", JSON.stringify({ sender_id, amount, msg }), BigInt(0), receiver_gas)
-            .then(NearPromise.new(near.currentAccountId())
-            .functionCall("ft_resolve_transfer", JSON.stringify({ sender_id, receiver_id, amount }), BigInt(0), GAS_FOR_RESOLVE_TRANSFER));
+        // return NearPromise.new(receiver_id)
+        //     .functionCall("ft_on_transfer", JSON.stringify({ sender_id, amount, msg }), BigInt(0), receiver_gas)
+        //     .then(
+        //         NearPromise.new(near.currentAccountId())
+        //             .functionCall("ft_resolve_transfer", JSON.stringify({ sender_id, receiver_id, amount }), BigInt(0), GAS_FOR_RESOLVE_TRANSFER)
+        //     );
+        return null; //TODO: delete
     }
     ft_total_supply() {
         return this.total_supply;

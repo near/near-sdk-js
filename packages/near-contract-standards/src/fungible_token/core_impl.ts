@@ -77,11 +77,11 @@ export class FungibleToken implements FungibleTokenCore, StorageManagement, Fung
     }
 
     internal_deposit(account_id: AccountId, amount: Balance) {
-        let balance: Balance = this.internal_unwrap_balance_of(account_id);
-        let new_balance: Balance = balance + amount;
+        let balance: Balance = BigInt(this.internal_unwrap_balance_of(account_id));
+        let new_balance: Balance = balance + BigInt(amount);
         this.accounts.set(account_id, new_balance);
-        let new_total_supply: Balance = this.total_supply + amount;
-        // TODO: check for total supply overflow?
+        let new_total_supply: Balance = this.total_supply + BigInt(amount);
+
         this.total_supply = new_total_supply;
     }
 
