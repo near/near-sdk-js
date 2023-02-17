@@ -280,7 +280,7 @@ test("simulate_transfer_call_with_promise_and_refund", async (t) => {
 });
 
 test("simulate_transfer_call_promise_panics_for_a_full_refund", async (t) => {
-    const TRANSFER_AMOUNT = NEAR.parse("100 N");
+    const TRANSFER_AMOUNT = NEAR.parse("100 N").toJSON();
 
     const { ftContract, defiContract } = t.context.accounts;
 
@@ -288,14 +288,20 @@ test("simulate_transfer_call_promise_panics_for_a_full_refund", async (t) => {
     await registerUser(ftContract, defiContract.accountId);
 
     // root invests in defi by calling `ft_transfer_call`
-    const res = ftContract.call("ft_transfer_call", {
-        receiver_id: defiContract.accountId,
-        amount: TRANSFER_AMOUNT,
-        memo: null,
-        msg: "no parsey as integer big panic oh no",
-    }, {
-        attachedDeposit: ONE_YOCTO
-    });
+    const res = await ftContract.call(
+        ftContract,
+        "ft_transfer_call",
+        {
+            receiver_id: defiContract.accountId,
+            amount: TRANSFER_AMOUNT,
+            memo: null,
+            msg: "no parsey as integer big panic oh no",
+        },
+        {
+            attachedDeposit: ONE_YOCTO,
+            gas: 50000000000000n,
+        }
+    );
 
     //TODO
     // let promise_failures = res.receipt_failures();
@@ -312,5 +318,5 @@ test("simulate_transfer_call_promise_panics_for_a_full_refund", async (t) => {
     let defi_balance = await ftContract.view("ft_balance_of", { account_id: defiContract.accountId });
 
     t.is(INITIAL_BALANCE, root_balance);
-    t.is(0, defi_balance);
+    t.is(0n, BigInt(defi_balance));
 });
