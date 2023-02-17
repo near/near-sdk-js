@@ -219,26 +219,37 @@ test("simulate_transfer_call_with_immediate_return_and_no_refund", async (t) => 
 });
 
 test("simulate_transfer_call_when_called_contract_not_registered_with_ft", async (t) => {
-    const TRANSFER_AMOUNT = NEAR.parse("100 N");
+    const TRANSFER_AMOUNT = NEAR.parse("100 N").toJSON();
 
     const { ftContract, defiContract } = t.context.accounts;
 
     // call fails because DEFI contract is not registered as FT user
-    let res = await ftContract.call("ft_transfer_call", {
-        receiver_id: defiContract.accountId,
-        amount: TRANSFER_AMOUNT,
-        memo: null,
-        msg: "take-my-money"
-    }, { attachedDeposit: ONE_YOCTO });
-
-    // assert!(res.is_failure()); // TODO
+    try {
+        await ftContract.call(
+            ftContract,
+            "ft_transfer_call",
+            {
+                receiver_id: defiContract.accountId,
+                amount: TRANSFER_AMOUNT,
+                memo: null,
+                msg: "take-my-money"
+            },
+            {
+                attachedDeposit: ONE_YOCTO,
+                gas: 50000000000000n,
+            }
+        );
+        t.is(true, false); // Unreachable
+    } catch (e) {
+        t.is(JSON.stringify(e, Object.getOwnPropertyNames(e)).includes("is not registered"), true);
+    }
 
     // balances remain unchanged
     let root_balance = await ftContract.view("ft_balance_of", { account_id: ftContract.accountId });
     let defi_balance = await ftContract.view("ft_balance_of", { account_id: defiContract.accountId });
 
-    t.is(initial_balance, root_balance);
-    t.is(0, defi_balance);
+    t.is(INITIAL_BALANCE, root_balance);
+    t.is(0n, BigInt(defi_balance));
 });
 
 test("simulate_transfer_call_with_promise_and_refund", async (t) => {
