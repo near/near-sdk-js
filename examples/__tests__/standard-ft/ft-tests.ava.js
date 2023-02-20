@@ -288,7 +288,7 @@ test("simulate_transfer_call_promise_panics_for_a_full_refund", async (t) => {
     await registerUser(ftContract, defiContract.accountId);
 
     // root invests in defi by calling `ft_transfer_call`
-    const res = await ftContract.call(
+    const res = await ftContract.callRaw(
         ftContract,
         "ft_transfer_call",
         {
@@ -303,15 +303,7 @@ test("simulate_transfer_call_promise_panics_for_a_full_refund", async (t) => {
         }
     );
 
-    //TODO
-    // let promise_failures = res.receipt_failures();
-    // assert_eq!(promise_failures.len(), 1);
-    // let failure = promise_failures[0].clone().into_result();
-    // if let Err(err) = failure {
-    //     assert!(err.to_string().contains("ParseIntError"));
-    // } else {
-    //     unreachable!();
-    // }
+    t.is(JSON.stringify(res).includes("ParseIntError"), true);
 
     // balances remain unchanged
     let root_balance = await ftContract.view("ft_balance_of", { account_id: ftContract.accountId });
