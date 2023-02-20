@@ -82,7 +82,6 @@ export class FungibleToken {
      * Returns (Used token amount, Burned token amount)
      */
     internal_ft_resolve_transfer(sender_id, receiver_id, amount) {
-        near.log("in internal_ft_resolve_transfer");
         amount = BigInt(amount);
         // Get the unused amount from the `ft_on_transfer` call result.
         let unused_amount;
@@ -98,32 +97,18 @@ export class FungibleToken {
                 throw e;
             }
         }
-        near.log("unused_amount:", unused_amount);
-        near.log("typeof unused_amount:", typeof (unused_amount));
         if (unused_amount > 0) {
             let receiver_balance = BigInt(this.accounts.get(receiver_id) ?? 0);
-            near.log("receiver_balance:", receiver_balance);
-            near.log("typeof receiver_balance:", typeof (receiver_balance));
             if (receiver_balance > 0n) {
-                near.log("receiver_balance > 0n");
                 let refund_amount = this.bigIntMin(receiver_balance, unused_amount);
-                near.log("refund_amount:", refund_amount);
                 let new_receiver_balance = receiver_balance - refund_amount;
-                near.log("new_receiver_balance:", new_receiver_balance);
-                near.log("typeof new_receiver_balance:", typeof (new_receiver_balance));
                 if (new_receiver_balance < 0n) {
                     throw Error("The receiver account doesn't have enough balance");
                 }
-                near.log("The error wasn't thrown");
                 this.accounts.set(receiver_id, new_receiver_balance);
-                near.log("The receiver balance was set");
-                near.log("getting sender balance for sender_id:", sender_id);
                 let sender_balance = this.accounts.get(sender_id);
-                near.log("sender_balance:", sender_balance);
-                near.log("typeof sender_balance:", typeof (sender_balance));
                 if (sender_balance) {
                     sender_balance = BigInt(sender_balance);
-                    near.log("in if");
                     let new_sender_balance = sender_balance + refund_amount;
                     this.accounts.set(sender_id, new_sender_balance);
                     new FtTransfer(receiver_id, sender_id, refund_amount, "refund").emit();
@@ -134,7 +119,6 @@ export class FungibleToken {
                     return [used_amount.valueOf(), 0n];
                 }
                 else {
-                    near.log("in else");
                     const new_total_supply = this.total_supply - refund_amount;
                     if (new_total_supply < 0) {
                         throw Error(ERR_TOTAL_SUPPLY_OVERFLOW);
