@@ -58,7 +58,7 @@ async function registerUser(contract, account_id) {
 test("test_total_supply", async (t) => {
     const { ftContract } = t.context.accounts;
     const res = await ftContract.view("ft_total_supply", {});
-    t.is(BigInt(res), INITIAL_BALANCE.toBigInt());
+    t.is(BigInt(res), BigInt(INITIAL_BALANCE));
 });
 
 test("test_storage_deposit", async (t) => {
