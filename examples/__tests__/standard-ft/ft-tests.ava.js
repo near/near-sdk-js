@@ -171,23 +171,10 @@ test("simulate_transfer_call_with_burned_amount", async (t) => {
         )
         .transact();
 
-    // let logs = res.logs();
-    // let expected = format!("Account @{} burned {}", ftContract.id(), 10);
-    // assert!(logs.len() >= 2);
-    // assert!(logs.contains(&"The account of the sender was deleted"));
-    // assert!(logs.contains(&(expected.as_str())));
-
-    // // TODO: replace the following manual value extraction when workspaces
-    // // resolves https://github.com/near/workspaces-rs/issues/201
-    // match res.receipt_outcomes()[5].clone().into_result()? {
-    //     ValueOrReceiptId::Value(val) => {
-    //         let bytes = base64::decode(&val)?;
-    //         let used_amount = serde_json::from_slice::<U128>(&bytes)?;
-    //         assert_eq!(used_amount, TRANSFER_AMOUNT);
-    //     }
-    //     _ => panic!("Unexpected receipt id"),
-    // }
-    // assert!(res.json::<bool>()?);
+    const q = JSON.stringify(result);
+    let expected = `Account @${ftContract.accountId} burned ${10}`;
+    t.is(logs.includes("The account of the sender was deleted"), true);
+    t.is(logs.includes(expected), true);
 
     const new_total_supply = await ftContract.view("ft_total_supply", {});
 

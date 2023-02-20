@@ -136,7 +136,7 @@ export class FungibleToken implements FungibleTokenCore, StorageManagement, Fung
         }
 
         if (unused_amount > 0) {
-            let receiver_balance: Balance = BigInt(this.accounts.get(receiver_id)) ?? 0n;
+            let receiver_balance: Balance = BigInt(this.accounts.get(receiver_id) ?? 0);
             if (receiver_balance > 0n) {
                 let refund_amount: Balance = this.bigIntMin(receiver_balance, unused_amount);
                 let new_receiver_balance: Balance = receiver_balance - refund_amount;
@@ -144,9 +144,9 @@ export class FungibleToken implements FungibleTokenCore, StorageManagement, Fung
                     throw Error("The receiver account doesn't have enough balance");
                 }
                 this.accounts.set(receiver_id, new_receiver_balance);
-
-                let sender_balance: Balance = BigInt(this.accounts.get(sender_id)) ?? 0n;
+                let sender_balance = this.accounts.get(sender_id);
                 if (sender_balance) {
+                    sender_balance = BigInt(sender_balance);
                     let new_sender_balance: Balance = sender_balance + refund_amount;
                     this.accounts.set(sender_id, new_sender_balance);
                     new FtTransfer(
