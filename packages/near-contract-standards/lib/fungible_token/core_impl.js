@@ -248,7 +248,13 @@ export class FungibleToken {
     }
     /** Implementation of FungibleTokenResolver */
     ft_resolve_transfer({ sender_id, receiver_id, amount }) {
-        return this.internal_ft_resolve_transfer(sender_id, receiver_id, amount)[0];
+        const res = this.internal_ft_resolve_transfer(sender_id, receiver_id, amount);
+        const used_amount = res[0];
+        const burned_amount = res[1];
+        if (burned_amount > 0) {
+            near.log(`Account @${sender_id} burned ${burned_amount}`);
+        }
+        return used_amount;
     }
     static reconstruct(data) {
         const ret = new FungibleToken();

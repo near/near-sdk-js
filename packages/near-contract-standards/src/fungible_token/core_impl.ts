@@ -219,7 +219,12 @@ export class FungibleToken implements FungibleTokenCore, StorageManagement, Fung
             .functionCall("ft_on_transfer", JSON.stringify({ sender_id, amount, msg }), BigInt(0), receiver_gas)
             .then(
                 NearPromise.new(near.currentAccountId())
-                    .functionCall("ft_resolve_transfer", JSON.stringify({ sender_id, receiver_id, amount }), BigInt(0), GAS_FOR_RESOLVE_TRANSFER)
+                    .functionCall(
+                        "ft_resolve_transfer",
+                        JSON.stringify({ sender_id, receiver_id, amount }),
+                        BigInt(0),
+                        GAS_FOR_RESOLVE_TRANSFER
+                    )
             );
     }
 
@@ -343,7 +348,13 @@ export class FungibleToken implements FungibleTokenCore, StorageManagement, Fung
         receiver_id: AccountId,
         amount: Balance
     }): Balance {
-        return this.internal_ft_resolve_transfer(sender_id, receiver_id, amount)[0];
+        const res = this.internal_ft_resolve_transfer(sender_id, receiver_id, amount);
+        const used_amount = res[0];
+        const burned_amount = res[1];
+        if (burned_amount > 0) {
+            near.log(`Account @${sender_id} burned ${burned_amount}`);
+        }
+        return used_amount;
     }
 
     bigIntMax = (...args: bigint[]) => args.reduce((m, e) => e > m ? e : m);

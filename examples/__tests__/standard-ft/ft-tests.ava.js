@@ -137,28 +137,39 @@ test("simulate_close_account_force_non_empty_balance", async (t) => {
 });
 
 test("simulate_transfer_call_with_burned_amount", async (t) => {
-    const TRANSFER_AMOUNT = NEAR.parse("100 N");
+    const TRANSFER_AMOUNT = NEAR.parse("100 N").toJSON();
 
     const { ftContract, defiContract } = t.context.accounts;
 
     // defi contract must be registered as a FT account
     await registerUser(ftContract, defiContract.accountId);
 
-    // // root invests in defi by calling `ft_transfer_call`
-    // let res = ftContract
-    //     .batch()
-    //     .call(
-    //         Function::new("ft_transfer_call")
-    //             .args_json((defiContract.id(), TRANSFER_AMOUNT, Option::<String>::None, "10"))
-    //             .deposit(ONE_YOCTO)
-    //             .gas(300_000_000_000_000 / 2)
-    //     )
-    //     .call(
-    //         Function::new("storage_unregister")
-    //             .args_json((Some(true),))
-    //             .deposit(ONE_YOCTO)
-    //             .gas(300_000_000_000_000 / 2)
-    //     )
+    const result = await ftContract
+        .batch(ftContract)
+        .functionCall(
+            'ft_transfer_call',
+            {
+                receiver_id: defiContract.accountId,
+                amount: TRANSFER_AMOUNT,
+                memo: null,
+                msg: "10",
+            },
+            {
+                attachedDeposit: '1',
+                gas: '150 Tgas'
+            },
+        )
+        .functionCall(
+            'storage_unregister',
+            {
+                force: true
+            },
+            {
+                attachedDeposit: '1',
+                gas: '150 Tgas',
+            },
+        )
+        .transact();
 
     // let logs = res.logs();
     // let expected = format!("Account @{} burned {}", ftContract.id(), 10);
@@ -180,7 +191,7 @@ test("simulate_transfer_call_with_burned_amount", async (t) => {
 
     const res = await ftContract.view("ft_total_supply", {});
 
-    t.is(res, TRANSFER_AMOUNT - 10);
+    t.is(BigInt(res), BigInt(TRANSFER_AMOUNT) - 10n); // TODO: fix this, tokens not burned
 
     const defi_balance = await ftContract.view("ft_balance_of", { account_id: defiContract.accountId });
 
