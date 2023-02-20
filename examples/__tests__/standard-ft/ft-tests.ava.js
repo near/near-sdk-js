@@ -189,13 +189,13 @@ test("simulate_transfer_call_with_burned_amount", async (t) => {
     // }
     // assert!(res.json::<bool>()?);
 
-    const res = await ftContract.view("ft_total_supply", {});
+    const new_total_supply = await ftContract.view("ft_total_supply", {});
 
-    t.is(BigInt(res), BigInt(TRANSFER_AMOUNT) - 10n); // TODO: fix this, tokens not burned
+    t.is(BigInt(new_total_supply), BigInt(TRANSFER_AMOUNT) - 10n);
 
     const defi_balance = await ftContract.view("ft_balance_of", { account_id: defiContract.accountId });
 
-    t.is(defi_balance, TRANSFER_AMOUNT);
+    t.is(BigInt(defi_balance), BigInt(TRANSFER_AMOUNT) - 10n);
 });
 
 test("simulate_transfer_call_with_immediate_return_and_no_refund", async (t) => {
