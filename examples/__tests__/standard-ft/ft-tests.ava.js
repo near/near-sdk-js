@@ -171,7 +171,7 @@ test("simulate_transfer_call_with_burned_amount", async (t) => {
         )
         .transact();
 
-    const q = JSON.stringify(result);
+    const logs = JSON.stringify(result);
     let expected = `Account @${ftContract.accountId} burned ${10}`;
     t.is(logs.includes("The account of the sender was deleted"), true);
     t.is(logs.includes(expected), true);
@@ -186,7 +186,7 @@ test("simulate_transfer_call_with_burned_amount", async (t) => {
 });
 
 test("simulate_transfer_call_with_immediate_return_and_no_refund", async (t) => {
-    const TRANSFER_AMOUNT = NEAR.parse("100 N");
+    const TRANSFER_AMOUNT = NEAR.parse("100 N").toJSON();
 
     const { ftContract, defiContract } = t.context.accounts;
 
@@ -212,8 +212,8 @@ test("simulate_transfer_call_with_immediate_return_and_no_refund", async (t) => 
     let root_balance = await ftContract.view("ft_balance_of", { account_id: ftContract.accountId });
     let defi_balance = await ftContract.view("ft_balance_of", { account_id: defiContract.accountId });
 
-    t.is(INITIAL_BALANCE - TRANSFER_AMOUNT, root_balance);
-    t.is(TRANSFER_AMOUNT, defi_balance);
+    t.is(BigInt(INITIAL_BALANCE) - BigInt(TRANSFER_AMOUNT), BigInt(root_balance));
+    t.is(BigInt(TRANSFER_AMOUNT), BigInt(defi_balance));
 });
 
 test("simulate_transfer_call_when_called_contract_not_registered_with_ft", async (t) => {
