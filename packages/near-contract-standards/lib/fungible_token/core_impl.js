@@ -48,20 +48,19 @@ export class FungibleToken {
     }
     internal_deposit(account_id, amount) {
         let balance = BigInt(this.internal_unwrap_balance_of(account_id));
-        let new_balance = balance + BigInt(amount);
+        let new_balance = balance + amount;
         this.accounts.set(account_id, new_balance);
-        let new_total_supply = this.total_supply + BigInt(amount);
+        let new_total_supply = this.total_supply + amount;
         this.total_supply = new_total_supply;
     }
     internal_withdraw(account_id, amount) {
         let balance = BigInt(this.internal_unwrap_balance_of(account_id));
-        let a = BigInt(amount);
-        let new_balance = balance - a;
+        let new_balance = balance - amount;
         if (new_balance < 0) {
             throw Error("The account doesn't have enough balance");
         }
         this.accounts.set(account_id, new_balance);
-        let new_total_supply = this.total_supply - a;
+        let new_total_supply = this.total_supply - amount;
         this.total_supply = new_total_supply;
     }
     internal_transfer(sender_id, receiver_id, amount, memo) {
@@ -75,14 +74,13 @@ export class FungibleToken {
         if (this.accounts.containsKey(account_id)) {
             throw Error("The account is already registered");
         }
-        this.accounts.set(account_id, BigInt(0));
+        this.accounts.set(account_id, 0n);
     }
     /** Internal method that returns the amount of burned tokens in a corner case when the sender
      * has deleted (unregistered) their account while the `ft_transfer_call` was still in flight.
      * Returns (Used token amount, Burned token amount)
      */
     internal_ft_resolve_transfer(sender_id, receiver_id, amount) {
-        amount = BigInt(amount);
         // Get the unused amount from the `ft_on_transfer` call result.
         let unused_amount;
         try {
@@ -134,11 +132,13 @@ export class FungibleToken {
     }
     /** Implementation of FungibleTokenCore */
     ft_transfer({ receiver_id, amount, memo }) {
+        amount = BigInt(amount);
         assert_one_yocto();
         let sender_id = near.predecessorAccountId();
         this.internal_transfer(sender_id, receiver_id, amount, memo);
     }
     ft_transfer_call({ receiver_id, amount, memo, msg }) {
+        amount = BigInt(amount);
         assert_one_yocto();
         assert(near.prepaidGas() > GAS_FOR_FT_TRANSFER_CALL, "More gas is required");
         let sender_id = near.predecessorAccountId();
@@ -156,7 +156,7 @@ export class FungibleToken {
         return this.total_supply;
     }
     ft_balance_of({ account_id }) {
-        return this.accounts.get(account_id) ?? BigInt(0);
+        return this.accounts.get(account_id) ?? 0n;
     }
     /** Implementation of storage
      * Internal method that returns the Account ID and the balance in case the account was
@@ -166,11 +166,11 @@ export class FungibleToken {
         assert_one_yocto();
         let account_id = near.predecessorAccountId();
         let balance = BigInt(this.accounts.get(account_id));
-        if (balance || balance == BigInt(0)) {
-            if (balance == BigInt(0) || force) {
+        if (balance || balance == 0n) {
+            if (balance == 0n || force) {
                 this.accounts.remove(account_id);
                 this.total_supply = this.total_supply - balance;
-                NearPromise.new(account_id).transfer(this.storage_balance_bounds().min + BigInt(1));
+                NearPromise.new(account_id).transfer(this.storage_balance_bounds().min + 1n);
                 return [account_id, balance];
             }
             else {
@@ -184,7 +184,7 @@ export class FungibleToken {
     }
     internal_storage_balance_of(account_id) {
         if (this.accounts.containsKey(account_id)) {
-            return new StorageBalance(this.storage_balance_bounds().min, BigInt(0));
+            return new StorageBalance(this.storage_balance_bounds().min, 0n);
         }
         else {
             return null;
@@ -224,6 +224,7 @@ export class FungibleToken {
      * - returns a `storage_balance` struct if `amount` is 0
      */
     storage_withdraw({ amount }) {
+        amount = BigInt(amount);
         assert_one_yocto();
         let predecessor_account_id = near.predecessorAccountId();
         const storage_balance = this.internal_storage_balance_of(predecessor_account_id);
@@ -241,7 +242,7 @@ export class FungibleToken {
         return this.internal_storage_unregister(force) ? true : false;
     }
     storage_balance_bounds() {
-        let required_storage_balance = BigInt(this.account_storage_usage) * near.storageByteCost();
+        let required_storage_balance = this.account_storage_usage * near.storageByteCost();
         return new StorageBalanceBounds(required_storage_balance, required_storage_balance);
     }
     storage_balance_of({ account_id }) {
@@ -249,6 +250,7 @@ export class FungibleToken {
     }
     /** Implementation of FungibleTokenResolver */
     ft_resolve_transfer({ sender_id, receiver_id, amount }) {
+        amount = BigInt(amount);
         const res = this.internal_ft_resolve_transfer(sender_id, receiver_id, amount);
         const used_amount = res[0];
         const burned_amount = res[1];
