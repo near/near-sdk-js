@@ -28,7 +28,7 @@ import { NonFungibleTokenResolver } from "near-contract-standards/lib/non_fungib
 import { NonFungibleTokenApproval } from "near-contract-standards/lib/non_fungible_token/approval";
 import { NonFungibleTokenEnumeration } from "near-contract-standards/lib/non_fungible_token/enumeration";
 
-class StorageKey {}
+class StorageKey { }
 
 class StorageKeyNonFungibleToken extends StorageKey implements IntoStorageKey {
   into_storage_key(): string {
@@ -57,12 +57,11 @@ class StorageKeyApproval extends StorageKey implements IntoStorageKey {
 @NearBindgen({ requireInit: true })
 export class MyNFT
   implements
-    NonFungibleTokenCore,
-    NonFungibleTokenMetadataProvider,
-    NonFungibleTokenResolver,
-    NonFungibleTokenApproval,
-    NonFungibleTokenEnumeration
-{
+  NonFungibleTokenCore,
+  NonFungibleTokenMetadataProvider,
+  NonFungibleTokenResolver,
+  NonFungibleTokenApproval,
+  NonFungibleTokenEnumeration {
   tokens: NonFungibleToken;
   metadata: Option<NFTContractMetadata>;
 
