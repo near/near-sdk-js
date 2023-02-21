@@ -216,12 +216,12 @@ export class FungibleToken implements FungibleTokenCore, StorageManagement, Fung
         }
 
         return NearPromise.new(receiver_id)
-            .functionCall("ft_on_transfer", JSON.stringify({ sender_id, amount, msg }), BigInt(0), receiver_gas)
+            .functionCall("ft_on_transfer", JSON.stringify({ sender_id, amount: String(amount), msg }), BigInt(0), receiver_gas)
             .then(
                 NearPromise.new(near.currentAccountId())
                     .functionCall(
                         "ft_resolve_transfer",
-                        JSON.stringify({ sender_id, receiver_id, amount }),
+                        JSON.stringify({ sender_id, receiver_id, amount: String(amount) }),
                         BigInt(0),
                         GAS_FOR_RESOLVE_TRANSFER
                     )

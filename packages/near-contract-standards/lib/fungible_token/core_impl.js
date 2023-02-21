@@ -148,9 +148,9 @@ export class FungibleToken {
             throw new Error("Prepaid gas overflow");
         }
         return NearPromise.new(receiver_id)
-            .functionCall("ft_on_transfer", JSON.stringify({ sender_id, amount, msg }), BigInt(0), receiver_gas)
+            .functionCall("ft_on_transfer", JSON.stringify({ sender_id, amount: String(amount), msg }), BigInt(0), receiver_gas)
             .then(NearPromise.new(near.currentAccountId())
-            .functionCall("ft_resolve_transfer", JSON.stringify({ sender_id, receiver_id, amount }), BigInt(0), GAS_FOR_RESOLVE_TRANSFER));
+            .functionCall("ft_resolve_transfer", JSON.stringify({ sender_id, receiver_id, amount: String(amount) }), BigInt(0), GAS_FOR_RESOLVE_TRANSFER));
     }
     ft_total_supply() {
         return this.total_supply;

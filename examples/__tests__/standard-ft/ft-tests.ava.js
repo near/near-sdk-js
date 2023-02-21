@@ -257,7 +257,7 @@ test("simulate_transfer_call_when_called_contract_not_registered_with_ft", async
     let root_balance = await ftContract.view("ft_balance_of", { account_id: ftContract.accountId });
     let defi_balance = await ftContract.view("ft_balance_of", { account_id: defiContract.accountId });
 
-    t.is(INITIAL_BALANCE, root_balance);
+    t.is(BigInt(INITIAL_BALANCE), BigInt(root_balance));
     t.is("0", defi_balance);
 });
 
