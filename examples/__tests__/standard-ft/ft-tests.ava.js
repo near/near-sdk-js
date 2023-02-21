@@ -20,6 +20,18 @@ test.beforeEach(async (t) => {
         }
     );
 
+    /**
+     * DEFI contract implemented in https://github.com/near/near-sdk-rs/tree/master/examples/fungible-token/test-contract-defi
+     * Iterface:
+     * pub fn new(fungible_token_account_id: AccountId) -> Self;
+     * fn ft_on_transfer(
+        &mut self,
+        sender_id: AccountId,
+        amount: U128,
+        msg: String,
+    ) -> PromiseOrValue<U128>
+     * If given `msg: "take-my-money", immediately returns U128::From(0). Otherwise, makes a cross-contract call to own `value_please` function, passing `msg` value_please will attempt to parse `msg` as an integer and return a U128 version of it
+     */
     const defiContract = await root.devDeploy("./res/defi.wasm");
 
     await defiContract.call(
