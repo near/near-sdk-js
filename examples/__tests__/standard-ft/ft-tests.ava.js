@@ -2,7 +2,7 @@ import { NEAR, Worker } from "near-workspaces";
 import test from "ava";
 
 const INITIAL_BALANCE = NEAR.parse("10000 N").toJSON();
-const ONE_YOCTO = 1; // TODO: why ONE_YOCTO must be a number, while other arguments can be strings?
+const ONE_YOCTO = "1";
 const STOARAGE_BYTE_COST = 10_000_000_000_000_000_000n;
 const ACCOUNT_STORAGE_BALANCE = String(STOARAGE_BYTE_COST * 138n);
 
@@ -70,8 +70,8 @@ test("test_storage_deposit", async (t) => {
 });
 
 test("test_simple_transfer", async (t) => {
-    const TRANSFER_AMOUNT = NEAR.parse("1000 N");
-    const EXPECTED_ROOT_BALANCE = NEAR.parse("9000 N");
+    const TRANSFER_AMOUNT = NEAR.parse("1000 N").toJSON();
+    const EXPECTED_ROOT_BALANCE = NEAR.parse("9000 N").toJSON();
 
     const { ftContract, alice } = t.context.accounts;
 
@@ -92,9 +92,8 @@ test("test_simple_transfer", async (t) => {
 
     let alice_balance = await ftContract.view("ft_balance_of", { account_id: alice.accountId });
 
-    // TODO: these conversions are too complicated
-    t.is(String(EXPECTED_ROOT_BALANCE), root_balance.toLocaleString('fullwide', { useGrouping: false }));
-    t.is(String(TRANSFER_AMOUNT), Number(alice_balance).toLocaleString('fullwide', { useGrouping: false }));
+    t.is(EXPECTED_ROOT_BALANCE, root_balance);
+    t.is(TRANSFER_AMOUNT, alice_balance);
 });
 
 test("test_close_account_empty_balance", async (t) => {
@@ -133,7 +132,7 @@ test("simulate_close_account_force_non_empty_balance", async (t) => {
     );
 
     const res = await ftContract.view("ft_total_supply", {});
-    t.is(Number(res), 0);
+    t.is(res, "0");
 });
 
 test("simulate_transfer_call_with_burned_amount", async (t) => {
@@ -213,7 +212,7 @@ test("simulate_transfer_call_with_immediate_return_and_no_refund", async (t) => 
     let defi_balance = await ftContract.view("ft_balance_of", { account_id: defiContract.accountId });
 
     t.is(BigInt(INITIAL_BALANCE) - BigInt(TRANSFER_AMOUNT), BigInt(root_balance));
-    t.is(BigInt(TRANSFER_AMOUNT), BigInt(defi_balance));
+    t.is(TRANSFER_AMOUNT, defi_balance);
 });
 
 test("simulate_transfer_call_when_called_contract_not_registered_with_ft", async (t) => {
@@ -247,7 +246,7 @@ test("simulate_transfer_call_when_called_contract_not_registered_with_ft", async
     let defi_balance = await ftContract.view("ft_balance_of", { account_id: defiContract.accountId });
 
     t.is(INITIAL_BALANCE, root_balance);
-    t.is(0n, BigInt(defi_balance));
+    t.is("0", defi_balance);
 });
 
 test("simulate_transfer_call_with_promise_and_refund", async (t) => {
@@ -308,5 +307,5 @@ test("simulate_transfer_call_promise_panics_for_a_full_refund", async (t) => {
     let defi_balance = await ftContract.view("ft_balance_of", { account_id: defiContract.accountId });
 
     t.is(INITIAL_BALANCE, root_balance);
-    t.is(0n, BigInt(defi_balance));
+    t.is("0", defi_balance);
 });
