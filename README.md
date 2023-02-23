@@ -37,6 +37,7 @@ This will scaffold a basic template for you 😎
 - [Learn how to use](https://docs.near.org/sdk/js/introduction) the library in your project
 - Check our [detailed examples and tutorials](https://docs.near.org/tutorials/welcome)
 - Find [source code examples](./examples) with common use cases
+- Lookup available features in [API reference](https://docs.near.org/sdk/near-sdk-js/reference)
 - 🏠 Learn more about NEAR on our [Documentation website](https://docs.near.org/)
 
 ## Contributing
