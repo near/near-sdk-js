@@ -30,16 +30,6 @@ class FTPrefix implements IntoStorageKey {
     }
 }
 
-/** Implementation of a FungibleToken standard
- * Allows to include NEP-141 compatible token to any contract.
- * There are next traits that any contract may implement:
- *     - FungibleTokenCore -- interface with ft_transfer methods. FungibleToken provides methods for it.
- *     - FungibleTokenMetaData -- return metadata for the token in NEP-148, up to contract to implement.
- *     - StorageManager -- interface for NEP-145 for allocating storage per account. FungibleToken provides methods for it.
- *     - AccountRegistrar -- interface for an account to register and unregister
- *
- * For example usage, see examples/fungible-token/src/lib.rs.
- */
 @NearBindgen({ requireInit: true })
 export class MyFt implements FungibleTokenCore, StorageManagement, FungibleTokenResolver {
     token: FungibleToken;
@@ -97,7 +87,6 @@ export class MyFt implements FungibleTokenCore, StorageManagement, FungibleToken
         return this.token.measure_account_storage_usage();
     }
 
-    /** Implementation of FungibleTokenCore */
     @call({ payableFunction: true })
     ft_transfer({
         receiver_id,
@@ -136,9 +125,6 @@ export class MyFt implements FungibleTokenCore, StorageManagement, FungibleToken
         return this.token.ft_balance_of({ account_id });
     }
 
-    /** Implementation of StorageManagement
-     * @param registration_only doesn't affect the implementation for vanilla fungible token.
-     */
     @call({ payableFunction: true })
     storage_deposit(
         {
@@ -152,14 +138,6 @@ export class MyFt implements FungibleTokenCore, StorageManagement, FungibleToken
         return this.token.storage_deposit({ account_id, registration_only });
     }
 
-    /**
-     * While storage_withdraw normally allows the caller to retrieve `available` balance, the basic
-     * Fungible Token implementation sets storage_balance_bounds.min == storage_balance_bounds.max,
-     * which means available balance will always be 0. So this implementation:
-     * - panics if `amount > 0`
-     * - never transfers Ⓝ to caller
-     * - returns a `storage_balance` struct if `amount` is 0
-     */
     @view({})
     storage_withdraw({ amount }: { amount?: bigint }): StorageBalance {
         return this.token.storage_withdraw({ amount });
