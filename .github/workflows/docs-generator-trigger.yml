@@ -3,6 +3,8 @@ name: Docs Generator trigger
 on:
   push:
     branches: [feat/typedoc-update]
+    tags:
+    - "v[0-9]+.*"    
 
 concurrency:
   group: "docs"
