@@ -206,6 +206,10 @@ async function createMethodsHeaderFile(rollupTarget, verbose = false) {
     }
     const mod = await import(`${PROJECT_DIR}/${rollupTarget}`);
     const exportNames = Object.keys(mod);
+    if (exportNames.includes('panic')) {
+        signal.error("'panic' is a reserved word, please use another name for contract method");
+        process.exit(1);
+    }
     const methods = exportNames.reduce((result, key) => `${result}DEFINE_NEAR_METHOD(${key})\n`, "");
     fs.writeFileSync(`${buildPath}/methods.h`, methods);
 }

@@ -1,6 +1,7 @@
 import { near } from "near-sdk-js";
 
 export abstract class NearEvent {
+
   private internal_to_json_string(): string {
     return JSON.stringify(this);
   }

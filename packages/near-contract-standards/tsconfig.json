@@ -23,8 +23,6 @@
   },
   "files": [
     "src/index.ts",
-    "src/non_fungible_token/approval/approval_receiver.ts",
-    "src/non_fungible_token/core/receiver.ts"
   ],
   "exclude": ["node_modules"]
 }
