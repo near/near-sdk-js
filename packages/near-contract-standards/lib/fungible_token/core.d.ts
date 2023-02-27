@@ -2,7 +2,7 @@ import { AccountId, PromiseOrValue, Balance } from "near-sdk-js";
 import { Option } from "../non_fungible_token/utils";
 export interface FungibleTokenCore {
     /**
-     * Transfers positive `amount` of tokens from the `env::predecessor_account_id` to `receiver_id`.
+     * Transfers positive `amount` of tokens from the `near.predecessorAccountId()` to `receiver_id`.
      * Both accounts must be registered with the contract for transfer to succeed. (See [NEP-145](https://github.com/near/NEPs/discussions/145))
      * This method must to be able to accept attached deposits, and must not panic on attached deposit.
      * Exactly 1 yoctoNEAR must be attached.
@@ -19,7 +19,7 @@ export interface FungibleTokenCore {
         memo?: String;
     }): any;
     /**
-     * Transfers positive `amount` of tokens from the `env::predecessor_account_id` to `receiver_id` account. Then
+     * Transfers positive `amount` of tokens from the `near.predecessorAccountId()` to `receiver_id` account. Then
      * calls `ft_on_transfer` method on `receiver_id` contract and attaches a callback to resolve this transfer.
      * `ft_on_transfer` method must return the amount of tokens unused by the receiver contract, the remaining tokens
      * must be refunded to the `predecessor_account_id` at the resolve transfer callback.
