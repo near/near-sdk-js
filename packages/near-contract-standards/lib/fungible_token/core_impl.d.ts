@@ -5,13 +5,13 @@ import { AccountId, LookupMap, Balance, PromiseOrValue, StorageUsage, IntoStorag
 import { Option } from '../non_fungible_token/utils';
 /** Implementation of a FungibleToken standard
  * Allows to include NEP-141 compatible token to any contract.
- * There are next traits that any contract may implement:
+ * There are next interfaces that any contract may implement:
  *     - FungibleTokenCore -- interface with ft_transfer methods. FungibleToken provides methods for it.
  *     - FungibleTokenMetaData -- return metadata for the token in NEP-148, up to contract to implement.
  *     - StorageManager -- interface for NEP-145 for allocating storage per account. FungibleToken provides methods for it.
  *     - AccountRegistrar -- interface for an account to register and unregister
  *
- * For example usage, see examples/fungible-token/src/lib.rs.
+ * For example usage, see examples/src/standard-ft/src/my-ft.ts
  */
 export declare class FungibleToken implements FungibleTokenCore, StorageManagement, FungibleTokenResolver {
     accounts: LookupMap<Balance>;
