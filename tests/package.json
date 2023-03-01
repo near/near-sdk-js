@@ -28,6 +28,7 @@
     "build:bigint-serialization": "near-sdk-js build src/bigint-serialization.ts build/bigint-serialization.wasm",
     "build:date-serialization": "near-sdk-js build src/date-serialization.ts build/date-serialization.wasm",
     "build:middlewares": "near-sdk-js build src/middlewares.ts build/middlewares.wasm",
+    "build:ignore-state": "near-sdk-js build src/ignore-state.ts build/ignore-state.wasm",
     "test": "ava",
     "test:context-api": "ava __tests__/test_context_api.ava.js",
     "test:math-api": "ava __tests__/test_math_api.ava.js",
@@ -51,6 +52,7 @@
     "test:date-serialization": "ava __tests__/test-date-serialization.ava.js",
     "test:serialization": "ava __tests__/test-serialization.ava.js",
     "test:constructor-validation": "ava __tests__/constructor_validation.ava.js",
+    "test:ignore-state": "ava __tests__/test-ignore-state.ava.js",
     "test:middlewares": "ava __tests__/test-middlewares.ava.js"
   },
   "author": "Near Inc <hello@nearprotocol.com>",

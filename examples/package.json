@@ -25,6 +25,7 @@
     "build:nft-receiver": "near-sdk-js build src/standard-nft/test-token-receiver.ts build/nft-receiver.wasm",
     "build:nft-approval-receiver": "near-sdk-js build src/standard-nft/test-approval-receiver.ts build/nft-approval-receiver.wasm",
     "build:ft": "near-sdk-js build src/standard-ft/my-ft.ts build/my-ft.wasm",
+    "build:state-migration": "near-sdk-js build src/state-migration.ts build/state-migration.wasm",
     "test": "ava && pnpm test:counter-lowlevel && pnpm test:counter-ts",
     "test:nft": "ava __tests__/standard-nft/*",
     "test:ft": "ava __tests__/standard-ft/*",
@@ -41,6 +42,7 @@
     "test:status-message-collections": "ava __tests__/test-status-message-collections.ava.js",
     "test:parking-lot": "ava __tests__/test-parking-lot.ava.js",
     "test:programmatic-update": "ava __tests__/test-programmatic-update.ava.js",
+    "test:state-migration": "ava __tests__/test-state-migration.ava.js",
     "test:nested-collections": "ava __tests__/test-nested-collections.ava.js"
   },
   "author": "Near Inc <hello@nearprotocol.com>",
