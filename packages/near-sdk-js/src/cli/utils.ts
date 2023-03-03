@@ -30,7 +30,7 @@ export async function executeCommand(
     signale.error(`Command failed: ${command}`);
 
     const failDueToNameConflict = stderr.match(/conflicting types for '([a-zA-Z0-9_]+)'/);
-    if (failDueToNameConflict.length > 1) {
+    if (failDueToNameConflict && failDueToNameConflict.length > 1) {
       signale.error(`'${failDueToNameConflict[1]}' is a reserved word, please use another name for contract method"`);
     }
   }
