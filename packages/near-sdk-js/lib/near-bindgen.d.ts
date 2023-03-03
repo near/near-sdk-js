@@ -1,6 +1,12 @@
 declare type EmptyParameterObject = Record<never, never>;
 declare type DecoratorFunction = <AnyFunction extends (...args: any) => any>(target: object, key: string | symbol, descriptor: TypedPropertyDescriptor<AnyFunction>) => void;
 /**
+ * Tells the SDK to use this function as the migration function of the contract.
+ * The migration function will ignore te existing state.
+ * @param _empty - An empty object.
+ */
+export declare function migrate(_empty: EmptyParameterObject): DecoratorFunction;
+/**
  * Tells the SDK to use this function as the initialization function of the contract.
  *
  * @param _empty - An empty object.

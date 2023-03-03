@@ -4,7 +4,7 @@ import test from "ava";
 test.beforeEach(async (t) => {
   const worker = await Worker.init();
   const root = worker.rootAccount;
-  const counter = await root.devDeploy("./build/ignore-state.wasm");
+  const counter = await root.devDeploy("./build/migrate.wasm");
 
   const ali = await root.createSubAccount("ali");
 
@@ -19,7 +19,7 @@ test.afterEach.always(async (t) => {
   });
 });
 
-test("ignore_state works", async (t) => {
+test("migration works", async (t) => {
   const { counter, ali } = t.context.accounts;
   
   const res1 = await counter.view("getCount", {});
@@ -30,6 +30,10 @@ test("ignore_state works", async (t) => {
   const res2 = await counter.view("getCount", {});
   t.is(res2, 1);
   
-  const res3 = await ali.call(counter, "migrate", {});
-  console.log("res", res3);
+  const migrationRes = await ali.callRaw(counter, "migrFuncValueTo18", {});
+
+  t.is(JSON.stringify(migrationRes).includes("Count: 0"), true);
+
+  const res3 = await counter.view("getCount", {});
+  t.is(res3, 18);
 });

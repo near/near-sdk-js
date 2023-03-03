@@ -8,7 +8,7 @@ const { Signale } = signal;
 /**
  * A list of supported method types/decorators.
  */
-const methodTypes = ["call", "view", "initialize"];
+const methodTypes = ["call", "view", "initialize", "migrate"];
 
 /**
  * A helper function that inserts a new throw Error statement with
@@ -34,7 +34,16 @@ function throwError(message: string): t.BlockStatement {
  *
  * @param classId - The class ID of the class which we are extending.
  */
-function readState(classId: t.Identifier): t.VariableDeclaration {
+function readState(classId: t.Identifier, methodType: string): t.VariableDeclaration {
+  if (methodType === "migrate") {
+    return t.variableDeclaration("const", [
+      t.variableDeclarator(
+        t.identifier("_state"),
+        t.nullLiteral()
+      ),
+    ]);
+  }
+
   return t.variableDeclaration("const", [
     t.variableDeclarator(
       t.identifier("_state"),
@@ -216,7 +225,7 @@ function saveToStorage(
   classId: t.Identifier,
   methodType: string
 ): t.EmptyStatement | t.ExpressionStatement {
-  if (!["initialize", "call"].includes(methodType)) {
+  if (!["initialize", "call", "migrate"].includes(methodType)) {
     return t.emptyStatement();
   }
 
@@ -315,7 +324,7 @@ function createDeclaration(
       t.blockStatement([
         // Read the state of the contract from storage.
         // const _state = Contract._getState();
-        readState(classId),
+        readState(classId, methodType),
         // Throw if initialized on any subsequent init function calls.
         // if (_state) { throw new Error('Contract already initialized'); }
         preventDoubleInit(methodType),

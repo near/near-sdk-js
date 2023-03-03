@@ -1,6 +1,17 @@
 import * as near from "./api";
 import { deserialize, serialize, bytes, encode } from "./utils";
 /**
+ * Tells the SDK to use this function as the migration function of the contract.
+ * The migration function will ignore te existing state.
+ * @param _empty - An empty object.
+ */
+export function migrate(_empty) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    return function (_target, _key, _descriptor
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    ) { };
+}
+/**
  * Tells the SDK to use this function as the initialization function of the contract.
  *
  * @param _empty - An empty object.
