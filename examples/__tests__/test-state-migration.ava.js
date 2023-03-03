@@ -21,10 +21,10 @@ test.afterEach.always(async (t) => {
 test("migration works", async (t) => {
     const { contract, ali } = t.context.accounts;
 
-    await contract.call(contract, "addMessage", { message: "hello" });
-    await contract.call(contract, "addMessage", { message: "world" });
-    await contract.call(contract, "addMessage", { message: "This is a long message that will be deleted on migration" });
-    await contract.call(contract, "addMessage", { message: "!" });
+    await ali.call(contract, "addMessage", { message: { sender: "ali", header: "h1", text: "hello" } });
+    await ali.call(contract, "addMessage", { message: { sender: "ali", header: "h2", text: "world" } });
+    await ali.call(contract, "addMessage", { message: { sender: "ali", header: "h3", text: "This message is too log for new standard" } });
+    await ali.call(contract, "addMessage", { message: { sender: "ali", header: "h4", text: "!" } });
 
     const res1 = await contract.view("countMessages", {});
     t.is(res1, 4);

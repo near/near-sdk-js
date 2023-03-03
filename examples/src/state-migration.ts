@@ -1,24 +1,30 @@
-// @ts-nocheck
 import { NearBindgen, view, near, migrate, call, Vector, assert } from 'near-sdk-js'
 import { AccountId } from 'near-sdk-js/lib/types'
 
-type Message = {
+type OldMessageFormat = {
     sender: AccountId,
     header: string,
-    message: string,
+    text: string,
+}
+
+type NewMessageFormat = {
+    sender: AccountId,
+    recipient?: AccountId,
+    header: string,
+    text: string,
 }
 
 @NearBindgen({})
 export class MigrationDemo {
-    messages: Vector
+    messages: Vector<NewMessageFormat>;
 
     constructor() {
-        this.messages = new Vector('messages'); // TODO: change
+        this.messages = new Vector<NewMessageFormat>('messages');
     }
 
     @call({ payableFunction: true })
     addMessage({ message }: {
-        message: Message
+        message: NewMessageFormat
     }): void {
         this.messages.push(message);
         near.log(`${near.signerAccountId()} added message ${JSON.stringify(message)}`);
@@ -31,22 +37,29 @@ export class MigrationDemo {
 
 
     @migrate({})
-    migrateState(): string {
+    migrateState(): Vector<NewMessageFormat> {
         assert(this.messages.toArray().length == 0, "Contract state should not be deserialized in @migrate");
         // retrieve the current state from the contract
         let raw_vector = JSON.parse(near.storageRead("STATE")).messages;
-        let old_messages: Vector<Message> = new Vector<Message>(raw_vector.prefix, raw_vector.length);
+        let old_messages: Vector<OldMessageFormat> = new Vector<OldMessageFormat>(raw_vector.prefix, raw_vector.length);
         near.log("old_messages: " + JSON.stringify(old_messages));
 
         // iterate through the state migrating it to the new version
-        let new_messages: Vector<Message> = new Vector('messages');
+        let new_messages: Vector<NewMessageFormat> = new Vector('messages');
 
-        for (let message of old_messages) {
-            if (message.length < 10) {
-                near.log(`adding ${message} to new_messages`);
-                new_messages.push(message);
+        for (let old_message of old_messages) {
+            near.log(`migrating ${JSON.stringify(old_message)}`);
+            const new_message: NewMessageFormat = {
+                sender: old_message.sender,
+                recipient: "Unknown",
+                header: old_message.header,
+                text: old_message.text,
+            };
+            if (new_message.text.length < 10) {
+                near.log(`adding ${new_message} to new_messages`);
+                new_messages.push(new_message);
             } else {
-                near.log(`${message} is too long, skipping`);
+                near.log(`${new_message} is too long, skipping`);
             }
         }
 
