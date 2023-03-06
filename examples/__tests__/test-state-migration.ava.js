@@ -4,7 +4,7 @@ import test from "ava";
 test.beforeEach(async (t) => {
     const worker = await Worker.init();
     const root = worker.rootAccount;
-    const contract = await root.devDeploy("./build/state-migration.wasm");
+    const contract = await root.devDeploy("./build/state-migration-original.wasm");
 
     const ali = await root.createSubAccount("ali");
 
@@ -28,6 +28,8 @@ test("migration works", async (t) => {
 
     const res1 = await contract.view("countMessages", {});
     t.is(res1, 4);
+
+    contract.deploy("./build/state-migration-new.wasm");
 
     await ali.call(contract, "migrateState", {});
 

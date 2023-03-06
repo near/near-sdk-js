@@ -7,6 +7,7 @@ type OldMessageFormat = {
     text: string,
 }
 
+// This is the new version of the Message type, it has an additional field
 type NewMessageFormat = {
     sender: AccountId,
     recipient?: AccountId,
