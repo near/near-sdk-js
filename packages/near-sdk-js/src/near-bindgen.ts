@@ -11,6 +11,21 @@ type DecoratorFunction = <AnyFunction extends (...args: any) => any>(
 ) => void;
 
 /**
+ * Tells the SDK to use this function as the migration function of the contract.
+ * The migration function will ignore te existing state.
+ * @param _empty - An empty object.
+ */
+export function migrate(_empty: EmptyParameterObject): DecoratorFunction {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return function <AnyFunction extends (...args: any) => any>(
+    _target: object,
+    _key: string | symbol,
+    _descriptor: TypedPropertyDescriptor<AnyFunction>
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+  ): void {};
+}
+
+/**
  * Tells the SDK to use this function as the initialization function of the contract.
  *
  * @param _empty - An empty object.
