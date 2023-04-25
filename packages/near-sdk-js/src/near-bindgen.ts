@@ -234,5 +234,5 @@ declare module "./" {
    *
    * @param pathToWasm - The path to the WASM file to read code from.
    */
-  export function includeBytes(pathToWasm: string): string;
+  export function includeBytes(pathToWasm: string): Uint8Array;
 }
