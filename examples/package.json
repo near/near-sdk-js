@@ -7,6 +7,7 @@
   "scripts": {
     "build": "run-s build:*",
     "build:status-message": "near-sdk-js build src/status-message.js build/status-message.wasm",
+    "build:status-message-borsh": "near-sdk-js build src/status-message-borsh.js build/status-message-borsh.wasm",
     "build:clean-state": "near-sdk-js build src/clean-state.js build/clean-state.wasm",
     "build:counter": "near-sdk-js build src/counter.js build/counter.wasm",
     "build:counter-lowlevel": "near-sdk-js build src/counter-lowlevel.js build/counter-lowlevel.wasm",
@@ -45,7 +46,8 @@
     "test:parking-lot": "ava __tests__/test-parking-lot.ava.js",
     "test:programmatic-update": "ava __tests__/test-programmatic-update.ava.js",
     "test:state-migration": "ava __tests__/test-state-migration.ava.js",
-    "test:nested-collections": "ava __tests__/test-nested-collections.ava.js"
+    "test:nested-collections": "ava __tests__/test-nested-collections.ava.js",
+    "test:status-message-borsh": "ava __tests__/test-status-message-borsh.ava.js"
   },
   "author": "Near Inc <hello@nearprotocol.com>",
   "license": "Apache-2.0",
@@ -53,7 +55,8 @@
     "lodash-es": "^4.17.21",
     "near-contract-standards": "workspace:*",
     "near-sdk-js": "workspace:*",
-    "typescript": "^4.7.4"
+    "typescript": "^4.7.4",
+    "borsh": "https://github.com/gagdiez/borsh-js#fb89acf7800a717f1048f104acded64693bba2ca"
   },
   "devDependencies": {
     "@types/lodash-es": "^4.17.6",
