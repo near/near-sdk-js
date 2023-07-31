@@ -145,8 +145,6 @@ export async function transpileJsAndBuildWasmCom(target, { verbose = false }) {
     await createMethodsHeaderFile(getRollupTarget(target), verbose);
     signale.await(`Creating ${getContractTarget(target)} contract...`);
     await createWasmContract(getQjscTarget(target), getContractTarget(target), verbose);
-    signale.await("Executing wasi-stub...");
-    await wasiStubContract(getContractTarget(target), verbose);
     signale.success(`Generated ${getContractTarget(target)} contract successfully!`);
 }
 export async function buildCom(source, target, packageJson, tsConfig, { verbose = false, generateABI = false }) {
@@ -215,7 +213,7 @@ async function createMethodsHeaderFile(rollupTarget, verbose = false) {
 }
 async function createWasmContract(qjscTarget, contractTarget, verbose = false) {
     const WASI_SDK_PATH = `${NEAR_SDK_JS}/lib/cli/deps/wasi-sdk`;
-    const CC = `${WASI_SDK_PATH}/bin/clang --sysroot=${WASI_SDK_PATH}/share/wasi-sysroot`;
+    const CC = `${WASI_SDK_PATH}/bin/clang`;
     let DEFS = `-D_GNU_SOURCE '-DCONFIG_VERSION="2021-03-27"' -DCONFIG_BIGNUM`;
     if (process.env.NEAR_NIGHTLY) {
         DEFS = DEFS + " -DNIGHTLY";
@@ -228,9 +226,5 @@ async function createWasmContract(qjscTarget, contractTarget, verbose = false) {
     // copying builder.c file to the build folder
     fs.cpSync(ORIGINAL_BUILDER_PATH, NEW_BUILDER_PATH);
     fs.renameSync(qjscTarget, "build/code.h");
-    await executeCommand(`${CC} --target=wasm32-wasi -nostartfiles -Oz -flto ${DEFS} ${INCLUDES} ${SOURCES} ${LIBS} -Wl,--no-entry -Wl,--allow-undefined -Wl,-z,stack-size=${256 * 1024} -Wl,--lto-O3 -o ${contractTarget}`, verbose);
-}
-async function wasiStubContract(contractTarget, verbose = false) {
-    const WASI_STUB = `${NEAR_SDK_JS}/lib/cli/deps/binaryen/wasi-stub/run.sh`;
-    await executeCommand(`${WASI_STUB} ${contractTarget}`, verbose);
+    await executeCommand(`${CC} -mcpu=mvp -Oz -fno-strict-aliasing ${DEFS} ${INCLUDES} ${SOURCES} ${LIBS} -mexec-model=reactor -Wl,--allow-undefined -Wl,--stack-first,-z,stack-size=${256 * 1024 * 2} -Wl,--compress-relocations,--strip-debug -o ${contractTarget}`, verbose);
 }

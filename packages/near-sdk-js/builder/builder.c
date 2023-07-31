@@ -10,7 +10,6 @@ static JSContext *JS_NewCustomContext(JSRuntime *rt)
     return NULL;
   JS_AddIntrinsicBaseObjects(ctx);
   JS_AddIntrinsicDate(ctx);
-  JS_AddIntrinsicEval(ctx);
   JS_AddIntrinsicStringNormalize(ctx);
   JS_AddIntrinsicRegExp(ctx);
   JS_AddIntrinsicJSON(ctx);
@@ -22,8 +21,15 @@ static JSContext *JS_NewCustomContext(JSRuntime *rt)
   return ctx;
 }
 
+extern void _initialize(void);
+
 #define DEFINE_NEAR_METHOD(name) \
   void name () __attribute__((export_name(#name))) {\
+    static volatile int initialized = 0;\
+    if (initialized == 0) {\
+      _initialize();\
+      initialized = 1;\
+    }\
     JSRuntime *rt;\
     JSContext *ctx;\
     JSValue mod_obj, fun_obj, result, error, error_message, error_stack;\
@@ -1185,7 +1191,5 @@ static void js_add_near_host_functions(JSContext* ctx) {
 
 JSValue JS_Call(JSContext *ctx, JSValueConst func_obj, JSValueConst this_obj,
                 int argc, JSValueConst *argv);
-
-void _start() {}
 
 #include "methods.h"
