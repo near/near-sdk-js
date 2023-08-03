@@ -110,9 +110,6 @@ importers:
       '@typescript-eslint/parser':
         specifier: ^5.31.0
         version: 5.45.1(eslint@8.29.0)(typescript@4.7.4)
-      borsh:
-        specifier: https://github.com/gagdiez/borsh-js#fb89acf7800a717f1048f104acded64693bba2ca
-        version: git@github.com+gagdiez/borsh-js/fb89acf7800a717f1048f104acded64693bba2ca
       commander:
         specifier: ^9.4.1
         version: 9.4.1

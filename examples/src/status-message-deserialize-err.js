@@ -1,25 +1,9 @@
 import {NearBindgen, call, view, near} from "near-sdk-js";
-import * as borsh from 'borsh';
-
-const schema = {
-    struct: { records: {map: { key: 'string', value: 'string' }} }
-};
-
-function borshSerializeStatusMessage(statusMessage) {
-    return borsh.serialize(schema, statusMessage);
-}
-
-function borshDeserializeStatusMessage(value) {
-    return  borsh.deserialize(schema, value)
-}
 
 @NearBindgen({
-    serializer(value) {
-        return borshSerializeStatusMessage(value);
+    deserializer(_value) {
+        throw new Error('deserialize err')
     },
-    deserializer(value) {
-        return borshDeserializeStatusMessage(value);
-    }
 })
 export class StatusMessage {
     constructor() {
