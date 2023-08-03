@@ -1,15 +1,15 @@
-import {NearBindgen, call, view, near, borshSerialize, borshDeserialize} from "near-sdk-js";
+import {NearBindgen, call, view, near} from "near-sdk-js";
 
 const schema = {
     struct: { records: {map: { key: 'string', value: 'string' }} }
 };
 
 function borshSerializeStatusMessage(statusMessage) {
-    return borshSerialize(schema, statusMessage);
+    return borsh.serialize(schema, statusMessage);
 }
 
 function borshDeserializeStatusMessage(value) {
-    return  borshDeserialize(schema, value)
+    return  borsh.deserialize(schema, value)
 }
 
 @NearBindgen({
