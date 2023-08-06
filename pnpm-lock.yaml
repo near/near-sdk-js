@@ -34,8 +34,8 @@ importers:
   examples:
     dependencies:
       borsh:
-        specifier: https://github.com/gagdiez/borsh-js#fb89acf7800a717f1048f104acded64693bba2ca
-        version: git@github.com+gagdiez/borsh-js/fb89acf7800a717f1048f104acded64693bba2ca
+        specifier: ^v1.0.0
+        version: 1.0.0
       lodash-es:
         specifier: ^4.17.21
         version: 4.17.21
@@ -1194,6 +1194,10 @@ packages:
       bs58: 4.0.1
       text-encoding-utf-8: 1.0.2
     dev: true
+
+  /borsh@1.0.0:
+    resolution: {integrity: sha512-fSVWzzemnyfF89EPwlUNsrS5swF5CrtiN4e+h0/lLf4dz2he4L3ndM20PS9wj7ICSkXJe/TQUHdaPTq15b1mNQ==}
+    dev: false
 
   /brace-expansion@1.1.11:
     resolution: {integrity: sha512-iCuPHDFgrHX7H2vEI/5xpz07zSHB00TpugqhmYtVmMO6518mCuRMoOYFldEBl0g187ufozdaHgWKcYFb61qGiA==}
@@ -3678,9 +3682,3 @@ packages:
     resolution: {integrity: sha512-9bnSc/HEW2uRy67wc+T8UwauLuPJVn28jb+GtJY16iiKWyvmYJRXVT4UamsAEGQfPohgr2q4Tq0sQbQlxTfi1g==}
     engines: {node: '>=12.20'}
     dev: true
-
-  git@github.com+gagdiez/borsh-js/fb89acf7800a717f1048f104acded64693bba2ca:
-    resolution: {commit: fb89acf7800a717f1048f104acded64693bba2ca, repo: git@github.com:gagdiez/borsh-js.git, type: git}
-    name: borsh
-    version: 1.0.0
-    dev: false

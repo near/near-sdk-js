@@ -60,7 +60,7 @@
     "near-contract-standards": "workspace:*",
     "near-sdk-js": "workspace:*",
     "typescript": "^4.7.4",
-    "borsh": "https://github.com/gagdiez/borsh-js#fb89acf7800a717f1048f104acded64693bba2ca"
+    "borsh": "^v1.0.0"
   },
   "devDependencies": {
     "@types/lodash-es": "^4.17.6",
