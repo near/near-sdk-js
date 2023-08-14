@@ -5,20 +5,12 @@ const schema = {
     struct: { records: {map: { key: 'string', value: 'string' }} }
 };
 
-function borshSerializeStatusMessage(statusMessage) {
-    return borsh.serialize(schema, statusMessage);
-}
-
-function borshDeserializeStatusMessage(value) {
-    return  borsh.deserialize(schema, value)
-}
-
 @NearBindgen({
-    serializer(value) {
-        return borshSerializeStatusMessage(value);
+    serializer(statusMessage) {
+        return borsh.serialize(schema, statusMessage);
     },
     deserializer(value) {
-        return borshDeserializeStatusMessage(value);
+        return borsh.deserialize(schema, value);
     }
 })
 export class StatusMessage {
