@@ -7,6 +7,7 @@
   "scripts": {
     "build": "run-s build:*",
     "build:status-message": "near-sdk-js build src/status-message.js build/status-message.wasm",
+    "build:status-message-migrate-add-field": "near-sdk-js build src/status-message-migrate-add-field.js build/status-message-migrate-add-field.wasm",
     "build:status-message-borsh": "near-sdk-js build src/status-message-borsh.js build/status-message-borsh.wasm",
     "build:status-message-serialize-err": "near-sdk-js build src/status-message-serialize-err.js build/status-message-serialize-err.wasm",
     "build:status-message-deserialize-err": "near-sdk-js build src/status-message-deserialize-err.js build/status-message-deserialize-err.wasm",
@@ -35,6 +36,7 @@
     "test:nft": "ava __tests__/standard-nft/*",
     "test:ft": "ava __tests__/standard-ft/*",
     "test:status-message": "ava __tests__/test-status-message.ava.js",
+    "test:status-message-migrate-add-field": "ava __tests__/test-state-message-migration-add-filed.ava.js",
     "test:clean-state": "ava __tests__/test-clean-state.ava.js",
     "test:counter": "ava __tests__/test-counter.ava.js",
     "test:counter-lowlevel": "COUNTER_LOWLEVEL=1 ava __tests__/test-counter.ava.js",
