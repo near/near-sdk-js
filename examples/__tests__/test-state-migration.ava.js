@@ -29,7 +29,7 @@ test("migration works", async (t) => {
     const res1 = await contract.view("countMessages", {});
     t.is(res1, 4);
 
-    contract.deploy("./build/state-migration-new.wasm");
+    await contract.deploy("./build/state-migration-new.wasm");
 
     await ali.call(contract, "migrateState", {});
 
