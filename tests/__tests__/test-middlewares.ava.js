@@ -9,7 +9,8 @@ test.beforeEach(async (t) => {
   const root = worker.rootAccount;
 
   // Deploy the contract.
-  const middlewares = await root.devDeploy("build/middlewares.wasm");
+  const middlewares = await root.createSubAccount("middlewares-contract");
+  await middlewares.deploy("build/middlewares.wasm");
 
   // Create the init args.
   const args = JSON.stringify({ randomData: "anything" });

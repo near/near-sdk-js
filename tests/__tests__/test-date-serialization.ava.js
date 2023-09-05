@@ -9,7 +9,8 @@ test.beforeEach(async (t) => {
   const root = worker.rootAccount;
 
   // Create and deploy test contract
-  const dsContract = await root.devDeploy("build/date-serialization.wasm");
+  const dsContract = await root.createSubAccount("ds-contract");
+  await dsContract.deploy("build/date-serialization.wasm");
 
   // Save state for test runs
   t.context.worker = worker;

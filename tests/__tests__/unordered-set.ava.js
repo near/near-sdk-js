@@ -9,7 +9,8 @@ test.beforeEach(async (t) => {
   const root = worker.rootAccount;
 
   // Deploy the test contract.
-  const unorderedSetContract = await root.devDeploy("build/unordered-set.wasm");
+  const unorderedSetContract = await root.createSubAccount("unordered-set-contract");
+  await unorderedSetContract.deploy("build/unordered-set.wasm");
 
   // Test users
   const ali = await root.createSubAccount("ali");

@@ -27,7 +27,7 @@ test("migration works", async (t) => {
         "hello"
     );
 
-    contract.deploy("./build/status-message-migrate-add-field.wasm");
+    await contract.deploy("./build/status-message-migrate-add-field.wasm");
     await ali.call(contract, "migrateState", {});
 
     t.is(
