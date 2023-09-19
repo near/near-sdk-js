@@ -139,11 +139,9 @@ extern void validator_total_stake(uint64_t stake_ptr);
 // #############
 // # Alt BN128 #
 // #############
-#ifdef NIGHTLY
 extern void alt_bn128_g1_multiexp(uint64_t value_len, uint64_t value_ptr, uint64_t register_id);
 extern void alt_bn128_g1_sum(uint64_t value_len, uint64_t value_ptr, uint64_t register_id);
 extern uint64_t alt_bn128_pairing_check(uint64_t value_len, uint64_t value_ptr);
-#endif
 
 static uint8_t* JS_Uint8Array_to_C(JSContext *ctx, JSValue array, size_t *len) {
   uint8_t *ptr;

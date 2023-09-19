@@ -364,11 +364,7 @@ async function createWasmContract(
   const WASI_SDK_PATH = `${NEAR_SDK_JS}/lib/cli/deps/wasi-sdk`;
 
   const CC = `${WASI_SDK_PATH}/bin/clang --sysroot=${WASI_SDK_PATH}/share/wasi-sysroot`;
-  let DEFS = `-D_GNU_SOURCE '-DCONFIG_VERSION="2021-03-27"' -DCONFIG_BIGNUM`;
-
-  if (process.env.NEAR_NIGHTLY) {
-    DEFS = DEFS + " -DNIGHTLY";
-  }
+  const DEFS = `-D_GNU_SOURCE '-DCONFIG_VERSION="2021-03-27"' -DCONFIG_BIGNUM`;
 
   const INCLUDES = `-I${QJSC_DIR} -I.`;
   const ORIGINAL_BUILDER_PATH = `${NEAR_SDK_JS}/builder/builder.c`;
