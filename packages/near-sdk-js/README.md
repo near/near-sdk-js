@@ -77,13 +77,6 @@ import { near } from "near-sdk-js";
 let signer = near.signerAccountId();
 ```
 
-To use nightly host functions, such as `altBn128G1Sum`, your contract need to be built with nightly enabled. Use:
-
-```
-export NEAR_NIGHTLY=1
-pnpm build
-```
-
 ### About Type
 
 NEAR-SDK-JS is written in TypeScript, so every API function has a type specified by signature that looks familiar to JavaScript/TypeScript Developers. Two types in the signature need a special attention:
@@ -120,6 +113,9 @@ function usedGas(): bigint;
 ### Math API
 
 ```
+function altBn128G1Multiexp(value: Uint8Array): Uint8Array;
+function altBn128G1Sum(value: Uint8Array): Uint8Array;
+function altBn128PairingCheck(value: Uint8Array): boolean;
 function randomSeed(): Uint8Array;
 function sha256(value: Uint8Array): Uint8Array;
 function keccak256(value: Uint8Array): Uint8Array;
