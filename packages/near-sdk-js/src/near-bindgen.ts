@@ -180,7 +180,6 @@ export function NearBindgen({
         return new target();
       }
 
-      /// 如何return Class而不是json
       static _getState(): unknown | null {
         const rawState = near.storageReadRaw(bytes("STATE"));
         return rawState ? this._deserialize(rawState) : null;

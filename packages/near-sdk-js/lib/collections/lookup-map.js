@@ -28,7 +28,7 @@ export class LookupMap {
     get(key, options) {
         const storageKey = this.keyPrefix + key;
         const value = near.storageReadRaw(encode(storageKey));
-        return getValueWithOptions(value, options);
+        return getValueWithOptions(value, options, true);
     }
     /**
      * Removes and retrieves the element with the provided key.

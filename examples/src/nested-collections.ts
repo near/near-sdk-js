@@ -1,22 +1,24 @@
-import { NearBindgen, near, call, view, UnorderedMap } from "near-sdk-js";
+import {NearBindgen, near, call, view, UnorderedMap, LookupMap, LookupSet, UnorderedSet, Vector} from "near-sdk-js";
 
 @NearBindgen({})
 export class Contract {
   outerMap: UnorderedMap<UnorderedMap<string>>;
   groups: UnorderedMap<UnorderedMap<UnorderedMap<string>>>;
+  outerLkpSet: UnorderedMap<LookupSet<string>>;
+  outerSet: UnorderedMap<UnorderedSet<string>>;
+  outerVec: UnorderedMap<Vector<string>>;
 
   constructor() {
     this.outerMap = new UnorderedMap("o");
     this.groups = new UnorderedMap("gs");
+    this.outerLkpSet = new UnorderedMap("ols");
+    this.outerSet = new UnorderedMap("os");
+    this.outerVec = new UnorderedMap("ov");
   }
 
-  // Using some type-awared format instead of standard JSON.stringify
   @call({})
   add({ id, text }: { id: string; text: string }) {
-    // But car.run() doesn't work, because SDK only know how to deserialize it as a plain object, not a Car instance.
-    // This problem is particularly painful when class is nested, for example collection class instance LookupMap containing Car class instance. Currently SDK mitigate this problem by requires user to manually reconstruct the JS object to an instance of the original class.
     const innerMap = this.outerMap.get(id, {
-      // reconstructor: UnorderedMap.reconstruct,
       defaultValue: new UnorderedMap<string>("i_" + id + "_"),
     });
     innerMap.set(near.signerAccountId(), text);
@@ -25,9 +27,7 @@ export class Contract {
 
   @view({})
   get({ id, accountId }: { id: string; accountId: string }) {
-    const innerMap = this.outerMap.get(id, {
-      reconstructor: UnorderedMap.reconstruct,
-    });
+    const innerMap = this.outerMap.get(id);
     if (innerMap === null) {
       return null;
     }
@@ -45,11 +45,9 @@ export class Contract {
     text: string;
   }) {
     const groupMap = this.groups.get(group, {
-      // reconstructor: UnorderedMap.reconstruct,
       defaultValue: new UnorderedMap<UnorderedMap<string>>("g_" + group + "_"),
     });
     const innerMap = groupMap.get(id, {
-      // reconstructor: UnorderedMap.reconstruct,
       defaultValue: new UnorderedMap<string>("gi_" + group + "_" + id + "_"),
     });
     innerMap.set(near.signerAccountId(), text);
@@ -67,18 +65,32 @@ export class Contract {
     id: string;
     accountId: string;
   }) {
-    const groupMap = this.groups.get(group, {
-      // reconstructor: UnorderedMap.reconstruct,
-    });
+    const groupMap = this.groups.get(group);
     if (groupMap === null) {
       return null;
     }
-    const innerMap = groupMap.get(id, {
-      // reconstructor: UnorderedMap.reconstruct,
-    });
+    const innerMap = groupMap.get(id);
     if (innerMap === null) {
       return null;
     }
     return innerMap.get(accountId);
+  }
+
+  @call({})
+  add_lk_set({ id }: { id: string }) {
+    const innerSet = this.outerLkpSet.get(id, {
+      defaultValue: new LookupSet<string>("i_" + id + "_"),
+    });
+    innerSet.set(near.signerAccountId());
+    this.outerLkpSet.set(id, innerSet);
+  }
+
+  @view({})
+  get_lk_set({ id, accountId }: { id: string; accountId: string }) {
+    const innerMap = this.outerLkpSet.get(id);
+    if (innerMap === null) {
+      return null;
+    }
+    return innerMap.contains(accountId);
   }
 }

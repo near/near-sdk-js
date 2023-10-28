@@ -120,3 +120,19 @@ test("sets then gets nested nested collection", async (t) => {
     "dog"
   );
 });
+
+test("Ali add_lk_sets then get_lk_set", async (t) => {
+  const { ali, nestedCollections } = t.context.accounts;
+  await ali.call(nestedCollections, "add_lk_set", { id: "1" });
+  await ali.call(nestedCollections, "add_lk_set", { id: "2" });
+
+  t.is(
+      await nestedCollections.view("get_lk_set", { id: "1", accountId: ali.accountId }),
+      true
+  );
+
+  t.is(
+      await nestedCollections.view("get_lk_set", { id: "2", accountId: ali.accountId }),
+      true
+  );
+});

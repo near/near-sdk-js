@@ -38,7 +38,7 @@ export class LookupMap<DataType> {
     const storageKey = this.keyPrefix + key;
     const value = near.storageReadRaw(encode(storageKey));
 
-    return getValueWithOptions(value, options);
+    return getValueWithOptions(value, options, true);
   }
 
   /**

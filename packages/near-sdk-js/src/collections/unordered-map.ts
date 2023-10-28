@@ -12,7 +12,6 @@ import { LookupMap } from "./lookup-map";
 import { GetOptions } from "../types/collections";
 
 type ValueAndIndex = [value: string, index: number];
-
 /**
  * An unordered map that stores data in NEAR storage.
  */
