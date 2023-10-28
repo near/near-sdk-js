@@ -37,7 +37,7 @@ export class UnorderedMap {
             return options?.defaultValue ?? null;
         }
         const [value] = valueAndIndex;
-        return getValueWithOptions(encode(value), options);
+        return getValueWithOptions(encode(value), options, true);
     }
     /**
      * Store a new value at the provided key.

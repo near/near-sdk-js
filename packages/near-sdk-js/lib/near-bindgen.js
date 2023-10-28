@@ -81,6 +81,7 @@ export function NearBindgen({ requireInit = false, serializer = serialize, deser
             static _create() {
                 return new target();
             }
+            /// 如何return Class而不是json
             static _getState() {
                 const rawState = near.storageReadRaw(bytes("STATE"));
                 return rawState ? this._deserialize(rawState) : null;

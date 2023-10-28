@@ -60,7 +60,7 @@ export class UnorderedMap<DataType> {
 
     const [value] = valueAndIndex;
 
-    return getValueWithOptions(encode(value), options);
+    return getValueWithOptions(encode(value), options, true);
   }
 
   /**

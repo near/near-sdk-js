@@ -10,10 +10,13 @@ export class Contract {
     this.groups = new UnorderedMap("gs");
   }
 
+  // Using some type-awared format instead of standard JSON.stringify
   @call({})
   add({ id, text }: { id: string; text: string }) {
+    // But car.run() doesn't work, because SDK only know how to deserialize it as a plain object, not a Car instance.
+    // This problem is particularly painful when class is nested, for example collection class instance LookupMap containing Car class instance. Currently SDK mitigate this problem by requires user to manually reconstruct the JS object to an instance of the original class.
     const innerMap = this.outerMap.get(id, {
-      reconstructor: UnorderedMap.reconstruct,
+      // reconstructor: UnorderedMap.reconstruct,
       defaultValue: new UnorderedMap<string>("i_" + id + "_"),
     });
     innerMap.set(near.signerAccountId(), text);
@@ -42,11 +45,11 @@ export class Contract {
     text: string;
   }) {
     const groupMap = this.groups.get(group, {
-      reconstructor: UnorderedMap.reconstruct,
+      // reconstructor: UnorderedMap.reconstruct,
       defaultValue: new UnorderedMap<UnorderedMap<string>>("g_" + group + "_"),
     });
     const innerMap = groupMap.get(id, {
-      reconstructor: UnorderedMap.reconstruct,
+      // reconstructor: UnorderedMap.reconstruct,
       defaultValue: new UnorderedMap<string>("gi_" + group + "_" + id + "_"),
     });
     innerMap.set(near.signerAccountId(), text);
@@ -65,13 +68,13 @@ export class Contract {
     accountId: string;
   }) {
     const groupMap = this.groups.get(group, {
-      reconstructor: UnorderedMap.reconstruct,
+      // reconstructor: UnorderedMap.reconstruct,
     });
     if (groupMap === null) {
       return null;
     }
     const innerMap = groupMap.get(id, {
-      reconstructor: UnorderedMap.reconstruct,
+      // reconstructor: UnorderedMap.reconstruct,
     });
     if (innerMap === null) {
       return null;

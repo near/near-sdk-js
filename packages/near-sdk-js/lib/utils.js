@@ -1,3 +1,4 @@
+import { UnorderedMap } from "./collections";
 // make PromiseIndex a nominal typing
 var PromiseIndexBrand;
 (function (PromiseIndexBrand) {
@@ -37,7 +38,7 @@ export function assert(expression, message) {
 }
 export function getValueWithOptions(value, options = {
     deserializer: deserialize,
-}) {
+}, check_reconstruct) {
     if (value === null) {
         return options?.defaultValue ?? null;
     }
@@ -47,6 +48,13 @@ export function getValueWithOptions(value, options = {
     }
     if (options?.reconstructor) {
         return options.reconstructor(deserialized);
+    }
+    else if (check_reconstruct) {
+        if (deserialized["prefix"] && deserialized["_keys"] && deserialized["values"]) {
+            const f = UnorderedMap.reconstruct;
+            // @ts-ignore
+            return f(deserialized);
+        }
     }
     return deserialized;
 }

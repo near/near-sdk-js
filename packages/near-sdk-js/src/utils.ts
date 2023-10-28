@@ -1,4 +1,5 @@
 import { GetOptions } from "./types/collections";
+import {UnorderedMap} from "./collections";
 
 export interface Env {
   uint8array_to_latin1_string(a: Uint8Array): string;
@@ -73,7 +74,8 @@ export function getValueWithOptions<DataType>(
   value: Uint8Array | null,
   options: Omit<GetOptions<DataType>, "serializer"> = {
     deserializer: deserialize,
-  }
+  },
+  check_reconstruct?: boolean,
 ): DataType | null {
   if (value === null) {
     return options?.defaultValue ?? null;
@@ -87,6 +89,12 @@ export function getValueWithOptions<DataType>(
 
   if (options?.reconstructor) {
     return options.reconstructor(deserialized);
+  } else if (check_reconstruct) {
+    if (deserialized["prefix"] && deserialized["_keys"] && deserialized["values"]) {
+      const f: unknown = UnorderedMap.reconstruct;
+      // @ts-ignore
+      return f(deserialized) as DataType;
+    }
   }
 
   return deserialized as DataType;
