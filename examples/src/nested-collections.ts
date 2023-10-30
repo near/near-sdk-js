@@ -7,6 +7,7 @@ export class Contract {
   outerLkpSet: UnorderedMap<LookupSet<string>>;
   outerSet: UnorderedMap<UnorderedSet<string>>;
   outerVec: UnorderedMap<Vector<string>>;
+  outerLkMap: UnorderedMap<LookupMap<string>>;
 
   constructor() {
     this.outerMap = new UnorderedMap("o");
@@ -14,6 +15,7 @@ export class Contract {
     this.outerLkpSet = new UnorderedMap("ols");
     this.outerSet = new UnorderedMap("os");
     this.outerVec = new UnorderedMap("ov");
+    this.outerLkMap = new UnorderedMap("olk");
   }
 
   @call({})
@@ -92,5 +94,43 @@ export class Contract {
       return null;
     }
     return innerMap.contains(accountId);
+  }
+
+  @call({})
+  add_lk_vec({ id, value }: { id: string, value: string }) {
+    const innerVec = this.outerVec.get(id, {
+      defaultValue: new Vector<string>("i_" + id + "_"),
+    });
+    innerVec.push(value);
+    this.outerVec.set(id, innerVec);
+  }
+
+  @view({})
+  get_lk_vec({ id, index }: { id: string; index: number }) {
+    const innerVec = this.outerVec.get(id);
+    if (innerVec === null) {
+      return null;
+    }
+    return innerVec.get(index);
+  }
+
+  @call({})
+  add_lk_map({ id, text }: { id: string; text: string }) {
+    const innerMap = this.outerLkMap.get(id, {
+      defaultValue: new LookupMap<string>("i_" + id + "_"),
+    });
+    innerMap.set(near.signerAccountId(), text);
+    this.outerLkMap.set(id, innerMap);
+  }
+
+  @view({})
+  get_lk_map({ id, accountId }: { id: string; accountId: string }) {
+    const innerMap = this.outerLkMap.get(id, {
+      reconstructor: LookupMap.reconstruct,
+    });
+    if (innerMap === null) {
+      return null;
+    }
+    return innerMap.get(accountId);
   }
 }

@@ -53,7 +53,7 @@ export class Vector<DataType> {
     const storageKey = indexToKey(this.prefix, index);
     const value = near.storageReadRaw(bytes(storageKey));
 
-    return getValueWithOptions(value, options);
+    return getValueWithOptions(value, options, true);
   }
 
   /**

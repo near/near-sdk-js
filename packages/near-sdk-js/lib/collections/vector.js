@@ -37,7 +37,7 @@ export class Vector {
         }
         const storageKey = indexToKey(this.prefix, index);
         const value = near.storageReadRaw(bytes(storageKey));
-        return getValueWithOptions(value, options);
+        return getValueWithOptions(value, options, true);
     }
     /**
      * Removes an element from the vector and returns it in serialized form.

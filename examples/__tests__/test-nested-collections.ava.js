@@ -136,3 +136,35 @@ test("Ali add_lk_sets then get_lk_set", async (t) => {
       true
   );
 });
+
+test("Ali add_lk_vec then get_lk_vec", async (t) => {
+  const { ali, nestedCollections } = t.context.accounts;
+  await ali.call(nestedCollections, "add_lk_vec", { id: "1", value: "hello" });
+  await ali.call(nestedCollections, "add_lk_vec", { id: "1", value: "world" });
+
+  t.is(
+      await nestedCollections.view("get_lk_vec", { id: "1", index: 0 }),
+      "hello"
+  );
+
+  t.is(
+      await nestedCollections.view("get_lk_vec", { id: "1", index: 1 }),
+      "world"
+  );
+});
+
+test("Ali add_lk_map then get_lk_map text", async (t) => {
+  const { ali, nestedCollections } = t.context.accounts;
+  await ali.call(nestedCollections, "add_lk_map", { id: "1", text: "hello" });
+  await ali.call(nestedCollections, "add_lk_map", { id: "2", text: "world" });
+
+  t.is(
+      await nestedCollections.view("get_lk_map", { id: "1", accountId: ali.accountId }),
+      "hello"
+  );
+
+  t.is(
+      await nestedCollections.view("get_lk_map", { id: "2", accountId: ali.accountId }),
+      "world"
+  );
+});

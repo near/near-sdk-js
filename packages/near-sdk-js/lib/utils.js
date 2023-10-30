@@ -1,4 +1,4 @@
-import { LookupSet, UnorderedMap } from "./collections";
+import { LookupSet, UnorderedMap, Vector } from "./collections";
 // make PromiseIndex a nominal typing
 var PromiseIndexBrand;
 (function (PromiseIndexBrand) {
@@ -50,7 +50,6 @@ export function getValueWithOptions(value, options = {
         return options.reconstructor(deserialized);
     }
     else if (check_reconstruct) {
-        // log("deserialized=", deserialized);
         if (deserialized["prefix"] &&
             deserialized["_keys"] &&
             deserialized["values"]) {
@@ -58,8 +57,12 @@ export function getValueWithOptions(value, options = {
             return f(deserialized);
         }
         else if (deserialized["keyPrefix"]) {
-            // log("decode LookupSet");
+            // log("decode LookupSet|LooupMap");
             const f = LookupSet.reconstruct;
+            return f(deserialized);
+        }
+        else if (deserialized["prefix"] && deserialized["length"]) {
+            const f = Vector.reconstruct;
             return f(deserialized);
         }
     }
