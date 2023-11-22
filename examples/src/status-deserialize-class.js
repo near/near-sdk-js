@@ -1,4 +1,4 @@
-import {NearBindgen, call, view, near, UnorderedMap, serialize, decode, deserialize} from "near-sdk-js";
+import {NearBindgen, call, view, near, UnorderedMap, serialize, decode, deserialize, encode} from "near-sdk-js";
 import lodash from "lodash-es";
 
 function decode_obj2class(class_instance, obj) {
@@ -22,12 +22,12 @@ function decode_obj2class(class_instance, obj) {
                     class_instance[key].push(decode_obj2class(new ty["array"]["value"](), value[k]));
                 }
             } else if (ty !== undefined && ty.hasOwnProperty("unorder_map")) {
-                instance[key].constructor.schema = ty;
+                class_instance[key].constructor.schema = ty;
                 let subtype_value = ty["unorder_map"]["value"];
-                instance[key].subtype = function () {
+                class_instance[key].subtype = function () {
                     return subtype_value;
                 }
-                instance[key] = decodeNested2(instance[key], obj[key]);
+                class_instance[key] = decode_obj2class(class_instance[key], obj[key]);
             } else if (ty !== undefined && ty.hasOwnProperty("vector")) {
                 // todo: imple
             } else if (ty !== undefined && ty.hasOwnProperty("unorder_set")) {
@@ -106,6 +106,12 @@ export class StatusDeserializeClass {
         this.messages = decode(data);
     }
 
+    @view({})
+    is_message_inited({}) {
+        near.log(`query is_message_inited`);
+        return this.messages.length != 0;
+    }
+
     @call({})
     set_record({ message }) {
         let account_id = near.signerAccountId();
@@ -119,7 +125,7 @@ export class StatusDeserializeClass {
 
     @view({})
     get_record({ account_id }) {
-        near.log(`get_status for account_id ${account_id}`);
+        near.log(`get_record for account_id ${account_id}`);
         let obj = deserialize(encode(this.messages));
         let inst = decode_obj2class(new InnerStatusDeserializeClass(), obj);
         return inst.records[account_id] || null;
