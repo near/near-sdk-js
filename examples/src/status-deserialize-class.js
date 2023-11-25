@@ -217,4 +217,20 @@ export class StatusDeserializeClass {
             defaultValue: new UnorderedMap("i_" + id + "_"),
         }).get(account_id);
     }
+
+    @view({})
+    get_subtype_of_efficient_recordes({  }) {
+        near.log(`get_subtype_of_efficient_recordes`);
+        let obj = deserialize(encode(this.messages));
+        let inst = decode_obj2class(new InnerStatusDeserializeClass(), obj);
+        return inst.efficient_recordes.subtype();
+    }
+
+    @view({})
+    get_subtype_of_nested_efficient_recordes({  }) {
+        near.log(`get_subtype_of_nested_efficient_recordes`);
+        let obj = deserialize(encode(this.messages));
+        let inst = decode_obj2class(new InnerStatusDeserializeClass(), obj);
+        return inst.nested_efficient_recordes.subtype();
+    }
 }

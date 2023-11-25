@@ -86,3 +86,21 @@ test("Ali set_nested_efficient_recordes then get_nested_efficient_recordes text"
       "world"
   );
 });
+
+test("View get_subtype_of_efficient_recordes", async (t) => {
+  const { statusMessage } = t.context.accounts;
+
+  t.is(
+      await statusMessage.view("get_subtype_of_efficient_recordes", { }),
+      'string'
+  );
+});
+
+test("View get_subtype_of_nested_efficient_recordes", async (t) => {
+  const { statusMessage } = t.context.accounts;
+
+  t.is(
+      JSON.stringify(await statusMessage.view("get_subtype_of_nested_efficient_recordes", { })),
+      '{"unorder_map":{"value":"string"}}'
+  );
+});
