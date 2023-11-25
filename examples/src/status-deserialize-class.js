@@ -14,12 +14,20 @@ function decode_obj2class(class_instance, obj) {
             if (ty !== undefined && ty.hasOwnProperty("map")) {
                 near.log("map type");
                 for (let mkey in value) {
-                    class_instance[key][mkey] = decode_obj2class(new ty["map"]["value"](), value[mkey]);
+                    if (ty["map"]["value"]==='string') {
+                        class_instance[key][mkey] = value[mkey];
+                    } else {
+                        class_instance[key][mkey] = decode_obj2class(new ty["map"]["value"](), value[mkey]);
+                    }
                 }
             } else if (ty !== undefined && ty.hasOwnProperty("array")) {
                 near.log("vector type");
                 for (let k in value) {
-                    class_instance[key].push(decode_obj2class(new ty["array"]["value"](), value[k]));
+                    if (ty["array"]["value"]==='string') {
+                        class_instance[key].push(value[k]);
+                    } else {
+                        class_instance[key].push(decode_obj2class(new ty["array"]["value"](), value[k]));
+                    }
                 }
             } else if (ty !== undefined && ty.hasOwnProperty("unorder_map")) {
                 class_instance[key].constructor.schema = ty;
@@ -129,6 +137,8 @@ export class StatusDeserializeClass {
         let obj = deserialize(encode(this.messages));
         let inst = decode_obj2class(new InnerStatusDeserializeClass(), obj);
         return inst.records[account_id] || null;
+        near.log("obj", obj);
+        return true;
     }
 
     @call({})
