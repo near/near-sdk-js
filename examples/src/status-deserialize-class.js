@@ -35,7 +35,7 @@ function decode_obj2class(class_instance, obj) {
                 class_instance[key].subtype = function () {
                     return subtype_value;
                 }
-                class_instance[key] = decode_obj2class(class_instance[key], obj[key]);
+                // class_instance[key] = decode_obj2class(class_instance[key], obj[key]);
             } else if (ty !== undefined && ty.hasOwnProperty("vector")) {
                 // todo: imple
             } else if (ty !== undefined && ty.hasOwnProperty("unorder_set")) {
@@ -182,18 +182,18 @@ export class StatusDeserializeClass {
     }
 
     @call({})
-    set_efficient_recordes({ message, id }) {
+    set_nested_efficient_recordes({ message, id }) {
         let account_id = near.signerAccountId();
-        near.log(`${account_id} set_efficient_recordes with message ${message},id ${id}`);
+        near.log(`${account_id} set_nested_efficient_recordes with message ${message},id ${id}`);
         let obj = deserialize(encode(this.messages));
         let inst = decode_obj2class(new InnerStatusDeserializeClass(), obj);
         inst.efficient_recordes.set(account_id, message);
         const nestedMap = inst.nested_efficient_recordes.get(id, {
             reconstructor: UnorderedMap.reconstruct,
-            defaultValue: new UnorderedMap<string>("i_" + id + "_"),
+            defaultValue: new UnorderedMap("i_" + id + "_"),
         });
         nestedMap.set(near.signerAccountId(), message);
-        inst.set(id, nestedMap);
+        inst.nested_efficient_recordes.set(id, nestedMap);
 
         let data = serialize(inst)
         this.messages = decode(data);
@@ -214,7 +214,7 @@ export class StatusDeserializeClass {
         let inst = decode_obj2class(new InnerStatusDeserializeClass(), obj);
         return inst.nested_efficient_recordes.get(id, {
             reconstructor: UnorderedMap.reconstruct,
-            defaultValue: new UnorderedMap<string>("i_" + id + "_"),
+            defaultValue: new UnorderedMap("i_" + id + "_"),
         }).get(account_id);
     }
 }
