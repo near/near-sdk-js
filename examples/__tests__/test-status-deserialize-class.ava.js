@@ -51,3 +51,16 @@ test("Ali set_car_info and get_car_info", async (t) => {
       carName + " run with speed " + speed
   );
 });
+
+test("Ali push_message and get_messages", async (t) => {
+  const { ali, statusMessage } = t.context.accounts;
+  let message1 = 'Hello';
+  let message2 = 'World';
+  await ali.call(statusMessage, "push_message", { message: message1 }, {gas: new BN(200 * 10**12)});
+  await ali.call(statusMessage, "push_message", { message: message2 }, {gas: new BN(200 * 10**12)});
+
+  t.is(
+      await statusMessage.view("get_messages", { }),
+      'Hello,World'
+  );
+});

@@ -82,12 +82,14 @@ class InnerStatusDeserializeClass {
     static schema = {
         records: {map: { key: 'string', value: 'string' }},
         car: Car,
+        messages: {array: {value: 'string'}},
         efficient_recordes: {unorder_map: {value: 'string'}},
         nested_efficient_recordes: {unorder_map: {value: { unorder_map: {value: 'string'}}}}
     };
     constructor() {
         this.records = {};
         this.car = new Car();
+        this.messages = [];
         // account_id -> message
         this.efficient_recordes = new UnorderedMap("a");
         // id -> account_id -> message
@@ -158,6 +160,25 @@ export class StatusDeserializeClass {
         let obj = deserialize(encode(this.messages));
         let inst = decode_obj2class(new InnerStatusDeserializeClass(), obj);
         return inst.car.info();
+    }
+
+    @call({})
+    push_message({ message }) {
+        let account_id = near.signerAccountId();
+        near.log(`${account_id} push_message message ${message}`);
+        let obj = deserialize(encode(this.messages));
+        let inst = decode_obj2class(new InnerStatusDeserializeClass(), obj);
+        inst.messages.push(message);
+        let data = serialize(inst)
+        this.messages = decode(data);
+    }
+
+    @view({})
+    get_messages({ }) {
+        near.log(`get_messages`);
+        let obj = deserialize(encode(this.messages));
+        let inst = decode_obj2class(new InnerStatusDeserializeClass(), obj);
+        return inst.messages.join(',');
     }
 
     @call({})
