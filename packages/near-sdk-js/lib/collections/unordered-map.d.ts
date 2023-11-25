@@ -21,6 +21,7 @@ export declare class UnorderedMap<DataType> {
      * Checks whether the collection is empty.
      */
     isEmpty(): boolean;
+    subtype(): any;
     /**
      * Get the data stored at the provided key.
      *

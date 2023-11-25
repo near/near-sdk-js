@@ -189,7 +189,6 @@ export class StatusDeserializeClass {
         let inst = decode_obj2class(new InnerStatusDeserializeClass(), obj);
         inst.efficient_recordes.set(account_id, message);
         const nestedMap = inst.nested_efficient_recordes.get(id, {
-            reconstructor: UnorderedMap.reconstruct,
             defaultValue: new UnorderedMap("i_" + id + "_"),
         });
         nestedMap.set(near.signerAccountId(), message);
@@ -213,7 +212,6 @@ export class StatusDeserializeClass {
         let obj = deserialize(encode(this.messages));
         let inst = decode_obj2class(new InnerStatusDeserializeClass(), obj);
         return inst.nested_efficient_recordes.get(id, {
-            reconstructor: UnorderedMap.reconstruct,
             defaultValue: new UnorderedMap("i_" + id + "_"),
         }).get(account_id);
     }

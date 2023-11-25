@@ -42,6 +42,11 @@ export class UnorderedMap<DataType> {
     return this._keys.isEmpty();
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  subtype(): any {
+
+  }
+
   /**
    * Get the data stored at the provided key.
    *
@@ -56,6 +61,13 @@ export class UnorderedMap<DataType> {
 
     if (valueAndIndex === null) {
       return options?.defaultValue ?? null;
+    }
+    if (options == undefined || (options.reconstructor == undefined)) {
+      // eslint-disable-next-line no-prototype-builtins
+      if (this.subtype() != undefined && this.subtype().hasOwnProperty("unorder_map")) {
+        // @ts-ignore
+        options.reconstructor = UnorderedMap.reconstruct;
+      }
     }
 
     const [value] = valueAndIndex;
