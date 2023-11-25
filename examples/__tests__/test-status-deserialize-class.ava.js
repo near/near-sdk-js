@@ -39,3 +39,15 @@ test("Ali sets then gets status", async (t) => {
     "hello"
   );
 });
+
+test("Ali set_car_info and get_car_info", async (t) => {
+  const { ali, statusMessage } = t.context.accounts;
+  let carName = "Mercedes-Benz";
+  let speed = 240;
+  await ali.call(statusMessage, "set_car_info", { name: carName, speed: speed }, {gas: new BN(200 * 10**12)});
+
+  t.is(
+      await statusMessage.view("get_car_info", { }),
+      carName + " run with speed " + speed
+  );
+});

@@ -73,8 +73,8 @@ class Car {
         this.speed = 0;
     }
 
-    run() {
-        return this.name + " run with speed: " + this.speed.toString()
+    info() {
+        return this.name + " run with speed " + this.speed.toString()
     }
 }
 
@@ -137,8 +137,27 @@ export class StatusDeserializeClass {
         let obj = deserialize(encode(this.messages));
         let inst = decode_obj2class(new InnerStatusDeserializeClass(), obj);
         return inst.records[account_id] || null;
-        near.log("obj", obj);
-        return true;
+    }
+
+
+    @call({})
+    set_car_info({ name, speed }) {
+        let account_id = near.signerAccountId();
+        near.log(`${account_id} set_car_info name ${name}, speed ${speed}`);
+        let obj = deserialize(encode(this.messages));
+        let inst = decode_obj2class(new InnerStatusDeserializeClass(), obj);
+        inst.car.name = name;
+        inst.car.speed = speed;
+        let data = serialize(inst)
+        this.messages = decode(data);
+    }
+
+    @view({})
+    get_car_info({ }) {
+        near.log(`get_car_info`);
+        let obj = deserialize(encode(this.messages));
+        let inst = decode_obj2class(new InnerStatusDeserializeClass(), obj);
+        return inst.car.info();
     }
 
     @call({})
