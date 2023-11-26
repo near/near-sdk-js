@@ -19,6 +19,10 @@ export class LookupMap {
         const storageKey = this.keyPrefix + key;
         return near.storageHasKey(storageKey);
     }
+    /* eslint-disable @typescript-eslint/no-explicit-any */
+    /* eslint-disable @typescript-eslint/no-empty-function */
+    subtype() {
+    }
     /**
      * Get the data stored at the provided key.
      *
@@ -28,6 +32,14 @@ export class LookupMap {
     get(key, options) {
         const storageKey = this.keyPrefix + key;
         const value = near.storageReadRaw(encode(storageKey));
+        if (options == undefined || (options.reconstructor == undefined)) {
+            // eslint-disable-next-line no-prototype-builtins
+            if (this.subtype() != undefined && this.subtype().hasOwnProperty("lookup_map")) {
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                options.reconstructor = LookupMap.reconstruct;
+            }
+        }
         return getValueWithOptions(value, options);
     }
     /**

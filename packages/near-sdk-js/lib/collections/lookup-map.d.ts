@@ -14,6 +14,7 @@ export declare class LookupMap<DataType> {
      * @param key - The value for which to check the presence.
      */
     containsKey(key: string): boolean;
+    subtype(): any;
     /**
      * Get the data stored at the provided key.
      *

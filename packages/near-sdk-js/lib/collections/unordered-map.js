@@ -25,7 +25,8 @@ export class UnorderedMap {
     isEmpty() {
         return this._keys.isEmpty();
     }
-    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    /* eslint-disable @typescript-eslint/no-explicit-any */
+    /* eslint-disable @typescript-eslint/no-empty-function */
     subtype() {
     }
     /**
@@ -39,11 +40,18 @@ export class UnorderedMap {
         if (valueAndIndex === null) {
             return options?.defaultValue ?? null;
         }
-        if (options == undefined || (options.reconstructor == undefined)) {
+        if ((options == undefined || (options.reconstructor == undefined)) && this.subtype() != undefined) {
             // eslint-disable-next-line no-prototype-builtins
-            if (this.subtype() != undefined && this.subtype().hasOwnProperty("unorder_map")) {
+            if (this.subtype().hasOwnProperty("unorder_map")) {
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-ignore
                 options.reconstructor = UnorderedMap.reconstruct;
+                // eslint-disable-next-line no-prototype-builtins
+            }
+            else if (this.subtype().hasOwnProperty("lookup_map")) {
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                options.reconstructor = LookupMap.reconstruct;
             }
         }
         const [value] = valueAndIndex;

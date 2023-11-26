@@ -85,6 +85,16 @@ test("Ali set_nested_efficient_recordes then get_nested_efficient_recordes text"
       await statusMessage.view("get_nested_efficient_recordes", { id: "2", account_id: bob.accountId }),
       "world"
   );
+
+  t.is(
+      await statusMessage.view("get_nested_lookup_recordes", { id: "1", account_id: bob.accountId }),
+      "hello"
+  );
+
+  t.is(
+      await statusMessage.view("get_nested_lookup_recordes", { id: "2", account_id: bob.accountId }),
+      "world"
+  );
 });
 
 test("View get_subtype_of_efficient_recordes", async (t) => {

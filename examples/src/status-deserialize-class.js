@@ -1,4 +1,15 @@
-import {NearBindgen, call, view, near, UnorderedMap, serialize, decode, deserialize, encode} from "near-sdk-js";
+import {
+    NearBindgen,
+    call,
+    view,
+    near,
+    UnorderedMap,
+    serialize,
+    decode,
+    deserialize,
+    encode,
+    LookupMap
+} from "near-sdk-js";
 import lodash from "lodash-es";
 
 function decode_obj2class(class_instance, obj) {
@@ -41,7 +52,11 @@ function decode_obj2class(class_instance, obj) {
             } else if (ty !== undefined && ty.hasOwnProperty("unorder_set")) {
                 // todo: imple
             } else if (ty !== undefined && ty.hasOwnProperty("lookup_map")) {
-                // todo: impl
+                class_instance[key].constructor.schema = ty;
+                let subtype_value = ty["lookup_map"]["value"];
+                class_instance[key].subtype = function () {
+                    return subtype_value;
+                }
             } else if (ty !== undefined && ty.hasOwnProperty("lookup_set")) {
                 // todo: impl
             } else {
@@ -84,7 +99,8 @@ class InnerStatusDeserializeClass {
         car: Car,
         messages: {array: {value: 'string'}},
         efficient_recordes: {unorder_map: {value: 'string'}},
-        nested_efficient_recordes: {unorder_map: {value: { unorder_map: {value: 'string'}}}}
+        nested_efficient_recordes: {unorder_map: {value: { unorder_map: {value: 'string'}}}},
+        nested_lookup_recordes: {unorder_map: {value: { lookup_map: {value: 'string'}}}},
     };
     constructor() {
         this.records = {};
@@ -94,6 +110,8 @@ class InnerStatusDeserializeClass {
         this.efficient_recordes = new UnorderedMap("a");
         // id -> account_id -> message
         this.nested_efficient_recordes = new UnorderedMap("b");
+        // id -> account_id -> message
+        this.nested_lookup_recordes = new UnorderedMap("c");
     }
 }
 
@@ -194,6 +212,12 @@ export class StatusDeserializeClass {
         nestedMap.set(near.signerAccountId(), message);
         inst.nested_efficient_recordes.set(id, nestedMap);
 
+        const nestedLookup = inst.nested_lookup_recordes.get(id, {
+            defaultValue: new LookupMap("li_" + id + "_"),
+        });
+        nestedLookup.set(near.signerAccountId(), message);
+        inst.nested_lookup_recordes.set(id, nestedLookup);
+
         let data = serialize(inst)
         this.messages = decode(data);
     }
@@ -217,6 +241,16 @@ export class StatusDeserializeClass {
     }
 
     @view({})
+    get_nested_lookup_recordes({ account_id, id }) {
+        near.log(`get_nested_lookup_recordes for account_id ${account_id}, id ${id}`);
+        let obj = deserialize(encode(this.messages));
+        let inst = decode_obj2class(new InnerStatusDeserializeClass(), obj);
+        return inst.nested_lookup_recordes.get(id, {
+            defaultValue: new LookupMap("li_" + id + "_"),
+        }).get(account_id);
+    }
+
+    @view({})
     get_subtype_of_efficient_recordes({  }) {
         near.log(`get_subtype_of_efficient_recordes`);
         let obj = deserialize(encode(this.messages));
@@ -230,5 +264,13 @@ export class StatusDeserializeClass {
         let obj = deserialize(encode(this.messages));
         let inst = decode_obj2class(new InnerStatusDeserializeClass(), obj);
         return inst.nested_efficient_recordes.subtype();
+    }
+
+    @view({})
+    get_subtype_of_nested_lookup_recordes({  }) {
+        near.log(`get_subtype_of_nested_lookup_recordes`);
+        let obj = deserialize(encode(this.messages));
+        let inst = decode_obj2class(new InnerStatusDeserializeClass(), obj);
+        return inst.nested_lookup_recordes.subtype();
     }
 }
