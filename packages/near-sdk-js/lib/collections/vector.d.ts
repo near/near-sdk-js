@@ -15,6 +15,7 @@ export declare class Vector<DataType> {
      * Checks whether the collection is empty.
      */
     isEmpty(): boolean;
+    subtype(): any;
     /**
      * Get the data stored at the provided index.
      *

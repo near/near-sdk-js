@@ -1,5 +1,10 @@
 import * as near from "../api";
 import { assert, getValueWithOptions, serializeValueWithOptions, ERR_INCONSISTENT_STATE, ERR_INDEX_OUT_OF_BOUNDS, str, bytes, } from "../utils";
+import { UnorderedMap } from "./unordered-map";
+import { LookupMap } from "./lookup-map";
+import { LookupSet } from "./lookup-set";
+import { UnorderedSet } from "./unordered-set";
+import { LOOKUP_MAP_SCHE, LOOKUP_SET_SCHE, UNORDERED_MAP_SCHE, UNORDERED_SET_SCHE, VECTOR_SCHE } from "./subtype";
 function indexToKey(prefix, index) {
     const data = new Uint32Array([index]);
     const array = new Uint8Array(data.buffer);
@@ -25,6 +30,10 @@ export class Vector {
     isEmpty() {
         return this.length === 0;
     }
+    /* eslint-disable @typescript-eslint/no-explicit-any */
+    /* eslint-disable @typescript-eslint/no-empty-function */
+    subtype() {
+    }
     /**
      * Get the data stored at the provided index.
      *
@@ -37,6 +46,38 @@ export class Vector {
         }
         const storageKey = indexToKey(this.prefix, index);
         const value = near.storageReadRaw(bytes(storageKey));
+        if ((options == undefined || (options.reconstructor == undefined)) && this.subtype() != undefined) {
+            // eslint-disable-next-line no-prototype-builtins
+            if (this.subtype().hasOwnProperty(UNORDERED_MAP_SCHE)) {
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                options.reconstructor = UnorderedMap.reconstruct;
+                // eslint-disable-next-line no-prototype-builtins
+            }
+            else if (this.subtype().hasOwnProperty(LOOKUP_MAP_SCHE)) {
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                options.reconstructor = LookupMap.reconstruct;
+                // eslint-disable-next-line no-prototype-builtins
+            }
+            else if (this.subtype().hasOwnProperty(LOOKUP_SET_SCHE)) {
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                options.reconstructor = LookupSet.reconstruct;
+                // eslint-disable-next-line no-prototype-builtins
+            }
+            else if (this.subtype().hasOwnProperty(UNORDERED_SET_SCHE)) {
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                options.reconstructor = UnorderedSet.reconstruct;
+                // eslint-disable-next-line no-prototype-builtins
+            }
+            else if (this.subtype().hasOwnProperty(VECTOR_SCHE)) {
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                options.reconstructor = Vector.reconstruct;
+            }
+        }
         return getValueWithOptions(value, options);
     }
     /**

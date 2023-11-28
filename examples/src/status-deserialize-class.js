@@ -8,7 +8,7 @@ import {
     decode,
     deserialize,
     encode,
-    LookupMap
+    LookupMap, UNORDERED_MAP_SCHE, VECTOR_SCHE, UNORDERED_SET_SCHE, LOOKUP_MAP_SCHE, LOOKUP_SET_SCHE
 } from "near-sdk-js";
 import lodash from "lodash-es";
 
@@ -40,24 +40,24 @@ function decode_obj2class(class_instance, obj) {
                         class_instance[key].push(decode_obj2class(new ty["array"]["value"](), value[k]));
                     }
                 }
-            } else if (ty !== undefined && ty.hasOwnProperty("unorder_map")) {
+            } else if (ty !== undefined && ty.hasOwnProperty(UNORDERED_MAP_SCHE)) {
                 class_instance[key].constructor.schema = ty;
-                let subtype_value = ty["unorder_map"]["value"];
+                let subtype_value = ty[UNORDERED_MAP_SCHE]["value"];
                 class_instance[key].subtype = function () {
                     return subtype_value;
                 }
                 // class_instance[key] = decode_obj2class(class_instance[key], obj[key]);
-            } else if (ty !== undefined && ty.hasOwnProperty("vector")) {
+            } else if (ty !== undefined && ty.hasOwnProperty(VECTOR_SCHE)) {
                 // todo: imple
-            } else if (ty !== undefined && ty.hasOwnProperty("unorder_set")) {
+            } else if (ty !== undefined && ty.hasOwnProperty(UNORDERED_SET_SCHE)) {
                 // todo: imple
-            } else if (ty !== undefined && ty.hasOwnProperty("lookup_map")) {
+            } else if (ty !== undefined && ty.hasOwnProperty(LOOKUP_MAP_SCHE)) {
                 class_instance[key].constructor.schema = ty;
-                let subtype_value = ty["lookup_map"]["value"];
+                let subtype_value = ty[LOOKUP_MAP_SCHE]["value"];
                 class_instance[key].subtype = function () {
                     return subtype_value;
                 }
-            } else if (ty !== undefined && ty.hasOwnProperty("lookup_set")) {
+            } else if (ty !== undefined && ty.hasOwnProperty(LOOKUP_SET_SCHE)) {
                 // todo: impl
             } else {
                 // normal case
@@ -98,9 +98,9 @@ class InnerStatusDeserializeClass {
         records: {map: { key: 'string', value: 'string' }},
         car: Car,
         messages: {array: {value: 'string'}},
-        efficient_recordes: {unorder_map: {value: 'string'}},
-        nested_efficient_recordes: {unorder_map: {value: { unorder_map: {value: 'string'}}}},
-        nested_lookup_recordes: {unorder_map: {value: { lookup_map: {value: 'string'}}}},
+        efficient_recordes: {unordered_map: {value: 'string'}},
+        nested_efficient_recordes: {unordered_map: {value: { unordered_map: {value: 'string'}}}},
+        nested_lookup_recordes: {unordered_map: {value: { lookup_map: {value: 'string'}}}},
     };
     constructor() {
         this.records = {};

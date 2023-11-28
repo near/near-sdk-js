@@ -9,6 +9,11 @@ import {
   bytes,
 } from "../utils";
 import { GetOptions } from "../types/collections";
+import {UnorderedMap} from "./unordered-map";
+import {LookupMap} from "./lookup-map";
+import {LookupSet} from "./lookup-set";
+import {UnorderedSet} from "./unordered-set";
+import {LOOKUP_MAP_SCHE, LOOKUP_SET_SCHE, UNORDERED_MAP_SCHE, UNORDERED_SET_SCHE, VECTOR_SCHE} from "./subtype";
 
 function indexToKey(prefix: string, index: number): string {
   const data = new Uint32Array([index]);
@@ -36,6 +41,12 @@ export class Vector<DataType> {
     return this.length === 0;
   }
 
+  /* eslint-disable @typescript-eslint/no-explicit-any */
+  /* eslint-disable @typescript-eslint/no-empty-function */
+  subtype(): any {
+
+  }
+
   /**
    * Get the data stored at the provided index.
    *
@@ -52,7 +63,34 @@ export class Vector<DataType> {
 
     const storageKey = indexToKey(this.prefix, index);
     const value = near.storageReadRaw(bytes(storageKey));
-
+    if ((options == undefined || (options.reconstructor == undefined)) && this.subtype() != undefined) {
+      // eslint-disable-next-line no-prototype-builtins
+      if (this.subtype().hasOwnProperty(UNORDERED_MAP_SCHE)) {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        options.reconstructor = UnorderedMap.reconstruct;
+        // eslint-disable-next-line no-prototype-builtins
+      } else if (this.subtype().hasOwnProperty(LOOKUP_MAP_SCHE)) {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        options.reconstructor = LookupMap.reconstruct;
+        // eslint-disable-next-line no-prototype-builtins
+      } else if (this.subtype().hasOwnProperty(LOOKUP_SET_SCHE)) {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        options.reconstructor = LookupSet.reconstruct;
+        // eslint-disable-next-line no-prototype-builtins
+      } else if (this.subtype().hasOwnProperty(UNORDERED_SET_SCHE)) {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        options.reconstructor = UnorderedSet.reconstruct;
+        // eslint-disable-next-line no-prototype-builtins
+      } else if (this.subtype().hasOwnProperty(VECTOR_SCHE)) {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        options.reconstructor = Vector.reconstruct;
+      }
+    }
     return getValueWithOptions(value, options);
   }
 

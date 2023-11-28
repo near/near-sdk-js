@@ -1,14 +1,16 @@
 import { assert, ERR_INCONSISTENT_STATE, getValueWithOptions, serializeValueWithOptions, encode, decode, } from "../utils";
 import { Vector, VectorIterator } from "./vector";
 import { LookupMap } from "./lookup-map";
+import { SubType } from "./subtype";
 /**
  * An unordered map that stores data in NEAR storage.
  */
-export class UnorderedMap {
+export class UnorderedMap extends SubType {
     /**
      * @param prefix - The byte prefix to use when storing elements inside this collection.
      */
     constructor(prefix) {
+        super();
         this.prefix = prefix;
         this._keys = new Vector(`${prefix}u`); // intentional different prefix with old UnorderedMap
         this.values = new LookupMap(`${prefix}m`);
@@ -25,10 +27,6 @@ export class UnorderedMap {
     isEmpty() {
         return this._keys.isEmpty();
     }
-    /* eslint-disable @typescript-eslint/no-explicit-any */
-    /* eslint-disable @typescript-eslint/no-empty-function */
-    subtype() {
-    }
     /**
      * Get the data stored at the provided key.
      *
@@ -40,20 +38,7 @@ export class UnorderedMap {
         if (valueAndIndex === null) {
             return options?.defaultValue ?? null;
         }
-        if ((options == undefined || (options.reconstructor == undefined)) && this.subtype() != undefined) {
-            // eslint-disable-next-line no-prototype-builtins
-            if (this.subtype().hasOwnProperty("unorder_map")) {
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-ignore
-                options.reconstructor = UnorderedMap.reconstruct;
-                // eslint-disable-next-line no-prototype-builtins
-            }
-            else if (this.subtype().hasOwnProperty("lookup_map")) {
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-ignore
-                options.reconstructor = LookupMap.reconstruct;
-            }
-        }
+        options = this.set_reconstructor(options);
         const [value] = valueAndIndex;
         return getValueWithOptions(encode(value), options);
     }

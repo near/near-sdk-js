@@ -10,13 +10,14 @@ import {
 import { Vector, VectorIterator } from "./vector";
 import { LookupMap } from "./lookup-map";
 import { GetOptions } from "../types/collections";
+import {SubType} from "./subtype";
 
 type ValueAndIndex = [value: string, index: number];
 
 /**
  * An unordered map that stores data in NEAR storage.
  */
-export class UnorderedMap<DataType> {
+export class UnorderedMap<DataType> extends SubType<DataType> {
   readonly _keys: Vector<string>;
   readonly values: LookupMap<ValueAndIndex>;
 
@@ -24,6 +25,7 @@ export class UnorderedMap<DataType> {
    * @param prefix - The byte prefix to use when storing elements inside this collection.
    */
   constructor(readonly prefix: string) {
+    super();
     this._keys = new Vector<string>(`${prefix}u`); // intentional different prefix with old UnorderedMap
     this.values = new LookupMap<ValueAndIndex>(`${prefix}m`);
   }
@@ -42,12 +44,6 @@ export class UnorderedMap<DataType> {
     return this._keys.isEmpty();
   }
 
-  /* eslint-disable @typescript-eslint/no-explicit-any */
-  /* eslint-disable @typescript-eslint/no-empty-function */
-  subtype(): any {
-
-  }
-
   /**
    * Get the data stored at the provided key.
    *
@@ -63,19 +59,7 @@ export class UnorderedMap<DataType> {
     if (valueAndIndex === null) {
       return options?.defaultValue ?? null;
     }
-    if ((options == undefined || (options.reconstructor == undefined)) && this.subtype() != undefined) {
-      // eslint-disable-next-line no-prototype-builtins
-      if (this.subtype().hasOwnProperty("unorder_map")) {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        options.reconstructor = UnorderedMap.reconstruct;
-        // eslint-disable-next-line no-prototype-builtins
-      } else if (this.subtype().hasOwnProperty("lookup_map")) {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        options.reconstructor = LookupMap.reconstruct;
-      }
-    }
+    options = this.set_reconstructor(options);
 
     const [value] = valueAndIndex;
 

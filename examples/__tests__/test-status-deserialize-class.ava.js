@@ -111,6 +111,6 @@ test("View get_subtype_of_nested_efficient_recordes", async (t) => {
 
   t.is(
       JSON.stringify(await statusMessage.view("get_subtype_of_nested_efficient_recordes", { })),
-      '{"unorder_map":{"value":"string"}}'
+      '{"unordered_map":{"value":"string"}}'
   );
 });

@@ -1,11 +1,12 @@
 import { Vector } from "./vector";
 import { LookupMap } from "./lookup-map";
 import { GetOptions } from "../types/collections";
+import { SubType } from "./subtype";
 declare type ValueAndIndex = [value: string, index: number];
 /**
  * An unordered map that stores data in NEAR storage.
  */
-export declare class UnorderedMap<DataType> {
+export declare class UnorderedMap<DataType> extends SubType<DataType> {
     readonly prefix: string;
     readonly _keys: Vector<string>;
     readonly values: LookupMap<ValueAndIndex>;
@@ -21,7 +22,6 @@ export declare class UnorderedMap<DataType> {
      * Checks whether the collection is empty.
      */
     isEmpty(): boolean;
-    subtype(): any;
     /**
      * Get the data stored at the provided key.
      *
