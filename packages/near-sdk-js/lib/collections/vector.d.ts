@@ -16,6 +16,7 @@ export declare class Vector<DataType> {
      */
     isEmpty(): boolean;
     subtype(): any;
+    set_reconstructor(options?: Omit<GetOptions<DataType>, "serializer">): Omit<GetOptions<DataType>, "serializer">;
     /**
      * Get the data stored at the provided index.
      *

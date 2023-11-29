@@ -14,7 +14,10 @@ export class SubType {
     subtype() {
     }
     set_reconstructor(options) {
-        if ((options == undefined || (options.reconstructor == undefined)) && this.subtype() != undefined) {
+        if (options == undefined) {
+            options = {};
+        }
+        if (((options.reconstructor == undefined)) && this.subtype() != undefined) {
             // eslint-disable-next-line no-prototype-builtins
             if (this.subtype().hasOwnProperty(UNORDERED_MAP_SCHE)) {
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment

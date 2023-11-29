@@ -8,7 +8,14 @@ import {
     decode,
     deserialize,
     encode,
-    LookupMap, UNORDERED_MAP_SCHE, VECTOR_SCHE, UNORDERED_SET_SCHE, LOOKUP_MAP_SCHE, LOOKUP_SET_SCHE
+    LookupMap,
+    UNORDERED_MAP_SCHE,
+    VECTOR_SCHE,
+    UNORDERED_SET_SCHE,
+    LOOKUP_MAP_SCHE,
+    LOOKUP_SET_SCHE,
+    Vector,
+    UnorderedSet
 } from "near-sdk-js";
 import lodash from "lodash-es";
 
@@ -41,16 +48,26 @@ function decode_obj2class(class_instance, obj) {
                     }
                 }
             } else if (ty !== undefined && ty.hasOwnProperty(UNORDERED_MAP_SCHE)) {
+                class_instance[key]._keys.length = obj[key]._keys.length;
                 class_instance[key].constructor.schema = ty;
                 let subtype_value = ty[UNORDERED_MAP_SCHE]["value"];
                 class_instance[key].subtype = function () {
                     return subtype_value;
                 }
-                // class_instance[key] = decode_obj2class(class_instance[key], obj[key]);
             } else if (ty !== undefined && ty.hasOwnProperty(VECTOR_SCHE)) {
-                // todo: imple
+                class_instance[key].length = obj[key].length;
+                class_instance[key].constructor.schema = ty;
+                let subtype_value = ty[VECTOR_SCHE]["value"];
+                class_instance[key].subtype = function () {
+                    return subtype_value;
+                }
             } else if (ty !== undefined && ty.hasOwnProperty(UNORDERED_SET_SCHE)) {
-                // todo: imple
+                class_instance[key]._elements.length = obj[key]._elements.length;
+                class_instance[key].constructor.schema = ty;
+                let subtype_value = ty[UNORDERED_SET_SCHE]["value"];
+                class_instance[key].subtype = function () {
+                    return subtype_value;
+                }
             } else if (ty !== undefined && ty.hasOwnProperty(LOOKUP_MAP_SCHE)) {
                 class_instance[key].constructor.schema = ty;
                 let subtype_value = ty[LOOKUP_MAP_SCHE]["value"];
@@ -101,6 +118,9 @@ class InnerStatusDeserializeClass {
         efficient_recordes: {unordered_map: {value: 'string'}},
         nested_efficient_recordes: {unordered_map: {value: { unordered_map: {value: 'string'}}}},
         nested_lookup_recordes: {unordered_map: {value: { lookup_map: {value: 'string'}}}},
+        vector_nested_group: {vector: {value: { lookup_map: {value: 'string'}}}},
+        lookup_nest_vec: {lookup_map: {value: { vector: { value: 'string' }}}},
+        unordered_set: {unordered_set: {value: 'string'}},
     };
     constructor() {
         this.records = {};
@@ -112,6 +132,11 @@ class InnerStatusDeserializeClass {
         this.nested_efficient_recordes = new UnorderedMap("b");
         // id -> account_id -> message
         this.nested_lookup_recordes = new UnorderedMap("c");
+        // index -> account_id -> message
+        this.vector_nested_group = new Vector("d");
+        // account_id -> index -> message
+        this.lookup_nest_vec = new LookupMap("e");
+        this.unordered_set = new UnorderedSet("f");
     }
 }
 
@@ -209,14 +234,33 @@ export class StatusDeserializeClass {
         const nestedMap = inst.nested_efficient_recordes.get(id, {
             defaultValue: new UnorderedMap("i_" + id + "_"),
         });
-        nestedMap.set(near.signerAccountId(), message);
+        nestedMap.set(account_id, message);
         inst.nested_efficient_recordes.set(id, nestedMap);
 
         const nestedLookup = inst.nested_lookup_recordes.get(id, {
             defaultValue: new LookupMap("li_" + id + "_"),
         });
-        nestedLookup.set(near.signerAccountId(), message);
+        nestedLookup.set(account_id, message);
         inst.nested_lookup_recordes.set(id, nestedLookup);
+
+        // vector_nested_group: {vector: {value: { lookup_map: {value: 'string'}}}},
+        const vecNestedLookup = inst.vector_nested_group.get(0, {
+            defaultValue: new LookupMap("di_0_"),
+        });
+        vecNestedLookup.set(account_id, message);
+        if (inst.vector_nested_group.isEmpty()) {
+            inst.vector_nested_group.push(vecNestedLookup);
+        } else {
+            inst.vector_nested_group.replace(0, vecNestedLookup);
+        }
+
+        const lookupNestVec = inst.lookup_nest_vec.get(account_id, {
+            defaultValue: new Vector("ei_" + account_id + "_"),
+        });
+        lookupNestVec.push(message);
+        inst.lookup_nest_vec.set(account_id, lookupNestVec);
+
+        inst.unordered_set.set(account_id);
 
         let data = serialize(inst)
         this.messages = decode(data);
@@ -243,11 +287,37 @@ export class StatusDeserializeClass {
     @view({})
     get_nested_lookup_recordes({ account_id, id }) {
         near.log(`get_nested_lookup_recordes for account_id ${account_id}, id ${id}`);
+        near.log(this.messages);
         let obj = deserialize(encode(this.messages));
         let inst = decode_obj2class(new InnerStatusDeserializeClass(), obj);
         return inst.nested_lookup_recordes.get(id, {
             defaultValue: new LookupMap("li_" + id + "_"),
         }).get(account_id);
+    }
+
+    @view({})
+    get_vector_nested_group({ idx, account_id }) {
+        near.log(`get_vector_nested_group for idx ${idx}, account_id ${account_id}`);
+        near.log(this.messages);
+        let obj = deserialize(encode(this.messages));
+        let inst = decode_obj2class(new InnerStatusDeserializeClass(), obj);
+        return inst.vector_nested_group.get(idx).get(account_id);
+    }
+
+    @view({})
+    get_lookup_nested_vec({ account_id, idx }) {
+        near.log(`get_looup_nested_vec for account_id ${account_id}, idx ${idx}`);
+        let obj = deserialize(encode(this.messages));
+        let inst = decode_obj2class(new InnerStatusDeserializeClass(), obj);
+        return inst.lookup_nest_vec.get(account_id).get(idx);
+    }
+
+    @view({})
+    get_is_contains_user({ account_id }) {
+        near.log(`get_is_contains_user for account_id ${account_id}`);
+        let obj = deserialize(encode(this.messages));
+        let inst = decode_obj2class(new InnerStatusDeserializeClass(), obj);
+        return inst.unordered_set.contains(account_id);
     }
 
     @view({})

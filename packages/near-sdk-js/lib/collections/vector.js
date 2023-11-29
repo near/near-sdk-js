@@ -34,19 +34,11 @@ export class Vector {
     /* eslint-disable @typescript-eslint/no-empty-function */
     subtype() {
     }
-    /**
-     * Get the data stored at the provided index.
-     *
-     * @param index - The index at which to look for the data.
-     * @param options - Options for retrieving the data.
-     */
-    get(index, options) {
-        if (index >= this.length) {
-            return options?.defaultValue ?? null;
+    set_reconstructor(options) {
+        if (options == undefined) {
+            options = {};
         }
-        const storageKey = indexToKey(this.prefix, index);
-        const value = near.storageReadRaw(bytes(storageKey));
-        if ((options == undefined || (options.reconstructor == undefined)) && this.subtype() != undefined) {
+        if (((options.reconstructor == undefined)) && this.subtype() != undefined) {
             // eslint-disable-next-line no-prototype-builtins
             if (this.subtype().hasOwnProperty(UNORDERED_MAP_SCHE)) {
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -78,6 +70,21 @@ export class Vector {
                 options.reconstructor = Vector.reconstruct;
             }
         }
+        return options;
+    }
+    /**
+     * Get the data stored at the provided index.
+     *
+     * @param index - The index at which to look for the data.
+     * @param options - Options for retrieving the data.
+     */
+    get(index, options) {
+        if (index >= this.length) {
+            return options?.defaultValue ?? null;
+        }
+        const storageKey = indexToKey(this.prefix, index);
+        const value = near.storageReadRaw(bytes(storageKey));
+        options = this.set_reconstructor(options);
         return getValueWithOptions(value, options);
     }
     /**
@@ -97,6 +104,7 @@ export class Vector {
         const last = this.pop(options);
         assert(near.storageWriteRaw(bytes(key), serializeValueWithOptions(last, options)), ERR_INCONSISTENT_STATE);
         const value = near.storageGetEvictedRaw();
+        options = this.set_reconstructor(options);
         return getValueWithOptions(value, options);
     }
     /**
@@ -138,6 +146,7 @@ export class Vector {
         const key = indexToKey(this.prefix, index);
         assert(near.storageWriteRaw(bytes(key), serializeValueWithOptions(element, options)), ERR_INCONSISTENT_STATE);
         const value = near.storageGetEvictedRaw();
+        options = this.set_reconstructor(options);
         return getValueWithOptions(value, options);
     }
     /**

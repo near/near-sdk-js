@@ -48,7 +48,10 @@ export class LookupMap<DataType> {
   ): DataType | null {
     const storageKey = this.keyPrefix + key;
     const value = near.storageReadRaw(encode(storageKey));
-    if ((options == undefined || (options.reconstructor == undefined)) && this.subtype() != undefined) {
+    if (options == undefined) {
+      options = {};
+    }
+    if (((options.reconstructor == undefined)) && this.subtype() != undefined) {
       // eslint-disable-next-line no-prototype-builtins
       if (this.subtype().hasOwnProperty(UNORDERED_MAP_SCHE)) {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment

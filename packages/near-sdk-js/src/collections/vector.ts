@@ -47,23 +47,11 @@ export class Vector<DataType> {
 
   }
 
-  /**
-   * Get the data stored at the provided index.
-   *
-   * @param index - The index at which to look for the data.
-   * @param options - Options for retrieving the data.
-   */
-  get(
-    index: number,
-    options?: Omit<GetOptions<DataType>, "serializer">
-  ): DataType | null {
-    if (index >= this.length) {
-      return options?.defaultValue ?? null;
+  set_reconstructor(options?: Omit<GetOptions<DataType>, "serializer">): Omit<GetOptions<DataType>, "serializer"> {
+    if (options == undefined) {
+      options = {};
     }
-
-    const storageKey = indexToKey(this.prefix, index);
-    const value = near.storageReadRaw(bytes(storageKey));
-    if ((options == undefined || (options.reconstructor == undefined)) && this.subtype() != undefined) {
+    if (((options.reconstructor == undefined)) && this.subtype() != undefined) {
       // eslint-disable-next-line no-prototype-builtins
       if (this.subtype().hasOwnProperty(UNORDERED_MAP_SCHE)) {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -91,6 +79,26 @@ export class Vector<DataType> {
         options.reconstructor = Vector.reconstruct;
       }
     }
+    return options;
+  }
+
+  /**
+   * Get the data stored at the provided index.
+   *
+   * @param index - The index at which to look for the data.
+   * @param options - Options for retrieving the data.
+   */
+  get(
+    index: number,
+    options?: Omit<GetOptions<DataType>, "serializer">
+  ): DataType | null {
+    if (index >= this.length) {
+      return options?.defaultValue ?? null;
+    }
+
+    const storageKey = indexToKey(this.prefix, index);
+    const value = near.storageReadRaw(bytes(storageKey));
+    options = this.set_reconstructor(options);
     return getValueWithOptions(value, options);
   }
 
@@ -121,6 +129,7 @@ export class Vector<DataType> {
     );
 
     const value = near.storageGetEvictedRaw();
+    options = this.set_reconstructor(options);
 
     return getValueWithOptions(value, options);
   }
@@ -189,6 +198,7 @@ export class Vector<DataType> {
     );
 
     const value = near.storageGetEvictedRaw();
+    options = this.set_reconstructor(options);
 
     return getValueWithOptions(value, options);
   }
