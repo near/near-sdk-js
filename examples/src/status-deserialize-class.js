@@ -24,13 +24,10 @@ function decode_obj2class(class_instance, obj) {
     for (key in obj) {
         // @ts-ignore
         let value = obj[key];
-        near.log("decodeNested filed, key:  ", key, " value: ", value, "instance[", key, "]: ", class_instance[key]);
         if (typeof value == 'object') {
-            near.log("object fields, object key: ", key, " value: ", value);
             // @ts-ignore
             let ty = class_instance.constructor.schema[key];
             if (ty !== undefined && ty.hasOwnProperty("map")) {
-                near.log("map type");
                 for (let mkey in value) {
                     if (ty["map"]["value"]==='string') {
                         class_instance[key][mkey] = value[mkey];
@@ -39,7 +36,6 @@ function decode_obj2class(class_instance, obj) {
                     }
                 }
             } else if (ty !== undefined && ty.hasOwnProperty("array")) {
-                near.log("vector type");
                 for (let k in value) {
                     if (ty["array"]["value"]==='string') {
                         class_instance[key].push(value[k]);
@@ -75,13 +71,16 @@ function decode_obj2class(class_instance, obj) {
                     return subtype_value;
                 }
             } else if (ty !== undefined && ty.hasOwnProperty(LOOKUP_SET_SCHE)) {
-                // todo: impl
+                class_instance[key].constructor.schema = ty;
+                let subtype_value = ty[LOOKUP_SET_SCHE]["value"];
+                class_instance[key].subtype = function () {
+                    return subtype_value;
+                }
             } else {
-                // normal case
+                // normal class
                 class_instance[key].constructor.schema = class_instance.constructor.schema[key];
                 class_instance[key] = decode_obj2class(class_instance[key], obj[key]);
             }
-            near.log("instance[key] value", class_instance[key]);
         }
     }
     const instance_tmp = lodash.cloneDeep(class_instance);
