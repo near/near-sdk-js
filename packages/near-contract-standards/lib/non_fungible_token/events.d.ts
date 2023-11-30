@@ -16,7 +16,7 @@
 import { AccountId } from "near-sdk-js";
 import { NearEvent } from "../event";
 import { TokenId } from "./token";
-export type Nep171EventKind = NftMint[] | NftTransfer[] | NftBurn[];
+export declare type Nep171EventKind = NftMint[] | NftTransfer[] | NftBurn[];
 export declare class Nep171Event extends NearEvent {
     version: string;
     event_kind: Nep171EventKind;

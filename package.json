@@ -15,6 +15,6 @@
   "devDependencies": {
     "turbo": "^1.4.5",
     "typedoc": "^0.25.3",
-    "typescript": "5.2.x"
+    "typescript": "^4.7.4"
   }
 }
