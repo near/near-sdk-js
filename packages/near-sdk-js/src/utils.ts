@@ -1,4 +1,6 @@
 import { GetOptions } from "./types/collections";
+import lodash from "lodash";
+import {LOOKUP_MAP_SCHE, LOOKUP_SET_SCHE, UNORDERED_MAP_SCHE, UNORDERED_SET_SCHE, VECTOR_SCHE} from "./collections";
 
 export interface Env {
   uint8array_to_latin1_string(a: Uint8Array): string;
@@ -145,6 +147,87 @@ export function deserialize(valueToDeserialize: Uint8Array): unknown {
 
     return value;
   });
+}
+
+export function decodeObj2class(class_instance, obj) {
+  let key;
+  for (key in obj) {
+    // @ts-ignore
+    let value = obj[key];
+    if (typeof value == 'object') {
+      // @ts-ignore
+      const ty = class_instance.constructor.schema[key];
+      // eslint-disable-next-line no-prototype-builtins
+      if (ty !== undefined && ty.hasOwnProperty("map")) {
+        for (const mkey in value) {
+          if (ty["map"]["value"]==='string') {
+            class_instance[key][mkey] = value[mkey];
+          } else {
+            class_instance[key][mkey] = decodeObj2class(new ty["map"]["value"](), value[mkey]);
+          }
+        }
+        // eslint-disable-next-line no-prototype-builtins
+      } else if (ty !== undefined && ty.hasOwnProperty("array")) {
+        for (const k in value) {
+          if (ty["array"]["value"]==='string') {
+            class_instance[key].push(value[k]);
+          } else {
+            class_instance[key].push(decodeObj2class(new ty["array"]["value"](), value[k]));
+          }
+        }
+        // eslint-disable-next-line no-prototype-builtins
+      } else if (ty !== undefined && ty.hasOwnProperty(UNORDERED_MAP_SCHE)) {
+        class_instance[key]._keys.length = obj[key]._keys.length;
+        class_instance[key].constructor.schema = ty;
+        const subtype_value = ty[UNORDERED_MAP_SCHE]["value"];
+        class_instance[key].subtype = function () {
+          return subtype_value;
+        }
+        // eslint-disable-next-line no-prototype-builtins
+      } else if (ty !== undefined && ty.hasOwnProperty(VECTOR_SCHE)) {
+        class_instance[key].length = obj[key].length;
+        class_instance[key].constructor.schema = ty;
+        const subtype_value = ty[VECTOR_SCHE]["value"];
+        class_instance[key].subtype = function () {
+          return subtype_value;
+        }
+        // eslint-disable-next-line no-prototype-builtins
+      } else if (ty !== undefined && ty.hasOwnProperty(UNORDERED_SET_SCHE)) {
+        class_instance[key]._elements.length = obj[key]._elements.length;
+        class_instance[key].constructor.schema = ty;
+        const subtype_value = ty[UNORDERED_SET_SCHE]["value"];
+        class_instance[key].subtype = function () {
+          return subtype_value;
+        }
+        // eslint-disable-next-line no-prototype-builtins
+      } else if (ty !== undefined && ty.hasOwnProperty(LOOKUP_MAP_SCHE)) {
+        class_instance[key].constructor.schema = ty;
+        const subtype_value = ty[LOOKUP_MAP_SCHE]["value"];
+        class_instance[key].subtype = function () {
+          return subtype_value;
+        }
+        // eslint-disable-next-line no-prototype-builtins
+      } else if (ty !== undefined && ty.hasOwnProperty(LOOKUP_SET_SCHE)) {
+        class_instance[key].constructor.schema = ty;
+        const subtype_value = ty[LOOKUP_SET_SCHE]["value"];
+        class_instance[key].subtype = function () {
+          return subtype_value;
+        }
+      } else {
+        // normal class
+        class_instance[key].constructor.schema = class_instance.constructor.schema[key];
+        class_instance[key] = decodeObj2class(class_instance[key], obj[key]);
+      }
+    }
+  }
+  const instance_tmp = lodash.cloneDeep(class_instance);
+  class_instance = Object.assign(class_instance, obj);
+  for (key in obj) {
+    if (typeof class_instance[key] == 'object') {
+      class_instance[key] = instance_tmp[key];
+    }
+  }
+  return class_instance;
 }
 
 /**

@@ -43,6 +43,7 @@ export declare function getValueWithOptions<DataType>(value: Uint8Array | null, 
 export declare function serializeValueWithOptions<DataType>(value: DataType, { serializer }?: Pick<GetOptions<DataType>, "serializer">): Uint8Array;
 export declare function serialize(valueToSerialize: unknown): Uint8Array;
 export declare function deserialize(valueToDeserialize: Uint8Array): unknown;
+export declare function decodeObj2class(class_instance: any, obj: any): any;
 /**
  * Validates the Account ID according to the NEAR protocol
  * [Account ID rules](https://nomicon.io/DataStructures/Account#account-id-rules).
