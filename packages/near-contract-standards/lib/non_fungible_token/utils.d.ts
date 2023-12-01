@@ -8,4 +8,4 @@ export declare function hash_account_id(account_id: AccountId): Uint8Array;
 export declare function assert_at_least_one_yocto(): void;
 /** Assert that exactly 1 yoctoNEAR was attached */
 export declare function assert_one_yocto(): void;
-export type Option<T> = T | null;
+export declare type Option<T> = T | null;

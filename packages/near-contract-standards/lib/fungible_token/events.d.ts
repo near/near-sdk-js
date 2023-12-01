@@ -17,7 +17,7 @@
 import { NearEvent } from "../event";
 import { Option } from "../non_fungible_token/utils";
 import { AccountId, Balance } from "near-sdk-js";
-export type Nep141EventKind = FtMint[] | FtTransfer[] | FtBurn[];
+export declare type Nep141EventKind = FtMint[] | FtTransfer[] | FtBurn[];
 export declare class Nep141Event extends NearEvent {
     version: string;
     event_kind: Nep141EventKind;
