@@ -85,7 +85,7 @@ export class Vector {
         const storageKey = indexToKey(this.prefix, index);
         const value = near.storageReadRaw(bytes(storageKey));
         options = this.set_reconstructor(options);
-        return getValueWithOptions(value, options);
+        return getValueWithOptions(this.subtype(), value, options);
     }
     /**
      * Removes an element from the vector and returns it in serialized form.
@@ -105,7 +105,7 @@ export class Vector {
         assert(near.storageWriteRaw(bytes(key), serializeValueWithOptions(last, options)), ERR_INCONSISTENT_STATE);
         const value = near.storageGetEvictedRaw();
         options = this.set_reconstructor(options);
-        return getValueWithOptions(value, options);
+        return getValueWithOptions(this.subtype(), value, options);
     }
     /**
      * Adds data to the collection.
@@ -132,7 +132,7 @@ export class Vector {
         this.length -= 1;
         assert(near.storageRemoveRaw(bytes(lastKey)), ERR_INCONSISTENT_STATE);
         const value = near.storageGetEvictedRaw();
-        return getValueWithOptions(value, options);
+        return getValueWithOptions(this.subtype(), value, options);
     }
     /**
      * Replaces the data stored at the provided index with the provided data and returns the previously stored data.
@@ -147,7 +147,7 @@ export class Vector {
         assert(near.storageWriteRaw(bytes(key), serializeValueWithOptions(element, options)), ERR_INCONSISTENT_STATE);
         const value = near.storageGetEvictedRaw();
         options = this.set_reconstructor(options);
-        return getValueWithOptions(value, options);
+        return getValueWithOptions(this.subtype(), value, options);
     }
     /**
      * Extends the current collection with the passed in array of elements.

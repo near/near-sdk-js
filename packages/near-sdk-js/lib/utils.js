@@ -1,5 +1,5 @@
-import lodash from "lodash";
 import { LOOKUP_MAP_SCHE, LOOKUP_SET_SCHE, UNORDERED_MAP_SCHE, UNORDERED_SET_SCHE, VECTOR_SCHE } from "./collections";
+import { cloneDeep } from "lodash-es";
 // make PromiseIndex a nominal typing
 var PromiseIndexBrand;
 (function (PromiseIndexBrand) {
@@ -37,18 +37,50 @@ export function assert(expression, message) {
         throw new Error("assertion failed: " + message);
     }
 }
-export function getValueWithOptions(value, options = {
+export function getValueWithOptions(datatype, value, options = {
     deserializer: deserialize,
 }) {
     if (value === null) {
         return options?.defaultValue ?? null;
     }
-    const deserialized = deserialize(value);
+    // 这里是一个obj
+    let deserialized = deserialize(value);
     if (deserialized === undefined || deserialized === null) {
         return options?.defaultValue ?? null;
     }
     if (options?.reconstructor) {
         return options.reconstructor(deserialized);
+    }
+    if (datatype !== undefined) {
+        // subtype info is a class constructor
+        if (typeof datatype === "function") {
+            deserialized = decodeObj2class(new datatype(), deserialized);
+        }
+        else if (typeof datatype === "object") {
+            // normal collections of array, map; subtype will be:
+            //  {map: { key: 'string', value: 'string' }} or {array: {value: 'string'}} ..
+            // eslint-disable-next-line no-prototype-builtins
+            if (datatype.hasOwnProperty("map")) {
+                // @ts-ignore
+                for (const mkey in deserialized) {
+                    if (datatype["map"]["value"] !== 'string') {
+                        deserialized[mkey] = decodeObj2class(new datatype["map"]["value"](), value[mkey]);
+                    }
+                }
+                // eslint-disable-next-line no-prototype-builtins
+            }
+            else if (datatype.hasOwnProperty("array")) {
+                const new_vec = [];
+                // @ts-ignore
+                for (const k in deserialized) {
+                    if (datatype["array"]["value"] !== 'string') {
+                        new_vec.push(decodeObj2class(new datatype["array"]["value"](), value[k]));
+                    }
+                }
+                deserialized = new_vec;
+                // eslint-disable-next-line no-prototype-builtins
+            }
+        }
     }
     return deserialized;
 }
@@ -93,6 +125,9 @@ export function deserialize(valueToDeserialize) {
     });
 }
 export function decodeObj2class(class_instance, obj) {
+    if (typeof obj != 'object') {
+        return obj;
+    }
     let key;
     for (key in obj) {
         // @ts-ignore
@@ -172,7 +207,7 @@ export function decodeObj2class(class_instance, obj) {
             }
         }
     }
-    const instance_tmp = lodash.cloneDeep(class_instance);
+    const instance_tmp = cloneDeep(class_instance);
     class_instance = Object.assign(class_instance, obj);
     for (key in obj) {
         if (typeof class_instance[key] == 'object') {

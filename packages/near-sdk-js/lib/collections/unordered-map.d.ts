@@ -96,6 +96,7 @@ declare class UnorderedMapIterator<DataType> {
      * @param options - Options for retrieving and storing data.
      */
     constructor(unorderedMap: UnorderedMap<DataType>, options?: GetOptions<DataType>);
+    subtype(): any;
     next(): {
         value: [string | null, DataType | null];
         done: boolean;

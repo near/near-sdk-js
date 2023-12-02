@@ -9,90 +9,10 @@ import {
     deserialize,
     encode,
     LookupMap,
-    UNORDERED_MAP_SCHE,
-    VECTOR_SCHE,
-    UNORDERED_SET_SCHE,
-    LOOKUP_MAP_SCHE,
-    LOOKUP_SET_SCHE,
     Vector,
-    UnorderedSet
+    UnorderedSet, decodeObj2class
 } from "near-sdk-js";
 import lodash from "lodash-es";
-
-function decode_obj2class(class_instance, obj) {
-    let key;
-    for (key in obj) {
-        // @ts-ignore
-        let value = obj[key];
-        if (typeof value == 'object') {
-            // @ts-ignore
-            let ty = class_instance.constructor.schema[key];
-            if (ty !== undefined && ty.hasOwnProperty("map")) {
-                for (let mkey in value) {
-                    if (ty["map"]["value"]==='string') {
-                        class_instance[key][mkey] = value[mkey];
-                    } else {
-                        class_instance[key][mkey] = decode_obj2class(new ty["map"]["value"](), value[mkey]);
-                    }
-                }
-            } else if (ty !== undefined && ty.hasOwnProperty("array")) {
-                for (let k in value) {
-                    if (ty["array"]["value"]==='string') {
-                        class_instance[key].push(value[k]);
-                    } else {
-                        class_instance[key].push(decode_obj2class(new ty["array"]["value"](), value[k]));
-                    }
-                }
-            } else if (ty !== undefined && ty.hasOwnProperty(UNORDERED_MAP_SCHE)) {
-                class_instance[key]._keys.length = obj[key]._keys.length;
-                class_instance[key].constructor.schema = ty;
-                let subtype_value = ty[UNORDERED_MAP_SCHE]["value"];
-                class_instance[key].subtype = function () {
-                    return subtype_value;
-                }
-            } else if (ty !== undefined && ty.hasOwnProperty(VECTOR_SCHE)) {
-                class_instance[key].length = obj[key].length;
-                class_instance[key].constructor.schema = ty;
-                let subtype_value = ty[VECTOR_SCHE]["value"];
-                class_instance[key].subtype = function () {
-                    return subtype_value;
-                }
-            } else if (ty !== undefined && ty.hasOwnProperty(UNORDERED_SET_SCHE)) {
-                class_instance[key]._elements.length = obj[key]._elements.length;
-                class_instance[key].constructor.schema = ty;
-                let subtype_value = ty[UNORDERED_SET_SCHE]["value"];
-                class_instance[key].subtype = function () {
-                    return subtype_value;
-                }
-            } else if (ty !== undefined && ty.hasOwnProperty(LOOKUP_MAP_SCHE)) {
-                class_instance[key].constructor.schema = ty;
-                let subtype_value = ty[LOOKUP_MAP_SCHE]["value"];
-                class_instance[key].subtype = function () {
-                    return subtype_value;
-                }
-            } else if (ty !== undefined && ty.hasOwnProperty(LOOKUP_SET_SCHE)) {
-                class_instance[key].constructor.schema = ty;
-                let subtype_value = ty[LOOKUP_SET_SCHE]["value"];
-                class_instance[key].subtype = function () {
-                    return subtype_value;
-                }
-            } else {
-                // normal class
-                class_instance[key].constructor.schema = class_instance.constructor.schema[key];
-                class_instance[key] = decode_obj2class(class_instance[key], obj[key]);
-            }
-        }
-    }
-    const instance_tmp = lodash.cloneDeep(class_instance);
-    class_instance = Object.assign(class_instance, obj);
-    for (key in obj) {
-        if (typeof class_instance[key] == 'object') {
-            class_instance[key] = instance_tmp[key];
-        }
-    }
-    near.log("current instance: ", class_instance);
-    return class_instance;
-}
 
 class Car {
     static schema = {
@@ -169,7 +89,7 @@ export class StatusDeserializeClass {
         let account_id = near.signerAccountId();
         near.log(`${account_id} set_status with message ${message}`);
         let obj = deserialize(encode(this.messages));
-        let inst = decode_obj2class(new InnerStatusDeserializeClass(), obj);
+        let inst = decodeObj2class(new InnerStatusDeserializeClass(), obj);
         inst.records[account_id] = message;
         let data = serialize(inst)
         this.messages = decode(data);
@@ -179,7 +99,7 @@ export class StatusDeserializeClass {
     get_record({ account_id }) {
         near.log(`get_record for account_id ${account_id}`);
         let obj = deserialize(encode(this.messages));
-        let inst = decode_obj2class(new InnerStatusDeserializeClass(), obj);
+        let inst = decodeObj2class(new InnerStatusDeserializeClass(), obj);
         return inst.records[account_id] || null;
     }
 
@@ -189,7 +109,7 @@ export class StatusDeserializeClass {
         let account_id = near.signerAccountId();
         near.log(`${account_id} set_car_info name ${name}, speed ${speed}`);
         let obj = deserialize(encode(this.messages));
-        let inst = decode_obj2class(new InnerStatusDeserializeClass(), obj);
+        let inst = decodeObj2class(new InnerStatusDeserializeClass(), obj);
         inst.car.name = name;
         inst.car.speed = speed;
         let data = serialize(inst)
@@ -200,7 +120,7 @@ export class StatusDeserializeClass {
     get_car_info({ }) {
         near.log(`get_car_info`);
         let obj = deserialize(encode(this.messages));
-        let inst = decode_obj2class(new InnerStatusDeserializeClass(), obj);
+        let inst = decodeObj2class(new InnerStatusDeserializeClass(), obj);
         return inst.car.info();
     }
 
@@ -209,7 +129,7 @@ export class StatusDeserializeClass {
         let account_id = near.signerAccountId();
         near.log(`${account_id} push_message message ${message}`);
         let obj = deserialize(encode(this.messages));
-        let inst = decode_obj2class(new InnerStatusDeserializeClass(), obj);
+        let inst = decodeObj2class(new InnerStatusDeserializeClass(), obj);
         inst.messages.push(message);
         let data = serialize(inst)
         this.messages = decode(data);
@@ -219,7 +139,7 @@ export class StatusDeserializeClass {
     get_messages({ }) {
         near.log(`get_messages`);
         let obj = deserialize(encode(this.messages));
-        let inst = decode_obj2class(new InnerStatusDeserializeClass(), obj);
+        let inst = decodeObj2class(new InnerStatusDeserializeClass(), obj);
         return inst.messages.join(',');
     }
 
@@ -228,7 +148,7 @@ export class StatusDeserializeClass {
         let account_id = near.signerAccountId();
         near.log(`${account_id} set_nested_efficient_recordes with message ${message},id ${id}`);
         let obj = deserialize(encode(this.messages));
-        let inst = decode_obj2class(new InnerStatusDeserializeClass(), obj);
+        let inst = decodeObj2class(new InnerStatusDeserializeClass(), obj);
         inst.efficient_recordes.set(account_id, message);
         const nestedMap = inst.nested_efficient_recordes.get(id, {
             defaultValue: new UnorderedMap("i_" + id + "_"),
@@ -269,7 +189,7 @@ export class StatusDeserializeClass {
     get_efficient_recordes({ account_id }) {
         near.log(`get_efficient_recordes for account_id ${account_id}`);
         let obj = deserialize(encode(this.messages));
-        let inst = decode_obj2class(new InnerStatusDeserializeClass(), obj);
+        let inst = decodeObj2class(new InnerStatusDeserializeClass(), obj);
         return inst.efficient_recordes.get(account_id);
     }
 
@@ -277,7 +197,7 @@ export class StatusDeserializeClass {
     get_nested_efficient_recordes({ account_id, id }) {
         near.log(`get_nested_efficient_recordes for account_id ${account_id}, id ${id}`);
         let obj = deserialize(encode(this.messages));
-        let inst = decode_obj2class(new InnerStatusDeserializeClass(), obj);
+        let inst = decodeObj2class(new InnerStatusDeserializeClass(), obj);
         return inst.nested_efficient_recordes.get(id, {
             defaultValue: new UnorderedMap("i_" + id + "_"),
         }).get(account_id);
@@ -288,7 +208,7 @@ export class StatusDeserializeClass {
         near.log(`get_nested_lookup_recordes for account_id ${account_id}, id ${id}`);
         near.log(this.messages);
         let obj = deserialize(encode(this.messages));
-        let inst = decode_obj2class(new InnerStatusDeserializeClass(), obj);
+        let inst = decodeObj2class(new InnerStatusDeserializeClass(), obj);
         return inst.nested_lookup_recordes.get(id, {
             defaultValue: new LookupMap("li_" + id + "_"),
         }).get(account_id);
@@ -299,7 +219,7 @@ export class StatusDeserializeClass {
         near.log(`get_vector_nested_group for idx ${idx}, account_id ${account_id}`);
         near.log(this.messages);
         let obj = deserialize(encode(this.messages));
-        let inst = decode_obj2class(new InnerStatusDeserializeClass(), obj);
+        let inst = decodeObj2class(new InnerStatusDeserializeClass(), obj);
         return inst.vector_nested_group.get(idx).get(account_id);
     }
 
@@ -307,7 +227,7 @@ export class StatusDeserializeClass {
     get_lookup_nested_vec({ account_id, idx }) {
         near.log(`get_looup_nested_vec for account_id ${account_id}, idx ${idx}`);
         let obj = deserialize(encode(this.messages));
-        let inst = decode_obj2class(new InnerStatusDeserializeClass(), obj);
+        let inst = decodeObj2class(new InnerStatusDeserializeClass(), obj);
         return inst.lookup_nest_vec.get(account_id).get(idx);
     }
 
@@ -315,7 +235,7 @@ export class StatusDeserializeClass {
     get_is_contains_user({ account_id }) {
         near.log(`get_is_contains_user for account_id ${account_id}`);
         let obj = deserialize(encode(this.messages));
-        let inst = decode_obj2class(new InnerStatusDeserializeClass(), obj);
+        let inst = decodeObj2class(new InnerStatusDeserializeClass(), obj);
         return inst.unordered_set.contains(account_id);
     }
 
@@ -323,7 +243,7 @@ export class StatusDeserializeClass {
     get_subtype_of_efficient_recordes({  }) {
         near.log(`get_subtype_of_efficient_recordes`);
         let obj = deserialize(encode(this.messages));
-        let inst = decode_obj2class(new InnerStatusDeserializeClass(), obj);
+        let inst = decodeObj2class(new InnerStatusDeserializeClass(), obj);
         return inst.efficient_recordes.subtype();
     }
 
@@ -331,7 +251,7 @@ export class StatusDeserializeClass {
     get_subtype_of_nested_efficient_recordes({  }) {
         near.log(`get_subtype_of_nested_efficient_recordes`);
         let obj = deserialize(encode(this.messages));
-        let inst = decode_obj2class(new InnerStatusDeserializeClass(), obj);
+        let inst = decodeObj2class(new InnerStatusDeserializeClass(), obj);
         return inst.nested_efficient_recordes.subtype();
     }
 
@@ -339,7 +259,7 @@ export class StatusDeserializeClass {
     get_subtype_of_nested_lookup_recordes({  }) {
         near.log(`get_subtype_of_nested_lookup_recordes`);
         let obj = deserialize(encode(this.messages));
-        let inst = decode_obj2class(new InnerStatusDeserializeClass(), obj);
+        let inst = decodeObj2class(new InnerStatusDeserializeClass(), obj);
         return inst.nested_lookup_recordes.subtype();
     }
 }

@@ -80,7 +80,7 @@ export class LookupMap<DataType> {
       }
     }
 
-    return getValueWithOptions(value, options);
+    return getValueWithOptions(this.subtype(), value, options);
   }
 
   /**
@@ -101,7 +101,7 @@ export class LookupMap<DataType> {
 
     const value = near.storageGetEvictedRaw();
 
-    return getValueWithOptions(value, options);
+    return getValueWithOptions(this.subtype(), value, options);
   }
 
   /**
@@ -125,7 +125,7 @@ export class LookupMap<DataType> {
 
     const value = near.storageGetEvictedRaw();
 
-    return getValueWithOptions(value, options);
+    return getValueWithOptions(this.subtype(), value, options);
   }
 
   /**

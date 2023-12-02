@@ -99,7 +99,7 @@ export class Vector<DataType> {
     const storageKey = indexToKey(this.prefix, index);
     const value = near.storageReadRaw(bytes(storageKey));
     options = this.set_reconstructor(options);
-    return getValueWithOptions(value, options);
+    return getValueWithOptions(this.subtype(), value, options);
   }
 
   /**
@@ -131,7 +131,7 @@ export class Vector<DataType> {
     const value = near.storageGetEvictedRaw();
     options = this.set_reconstructor(options);
 
-    return getValueWithOptions(value, options);
+    return getValueWithOptions(this.subtype(), value, options);
   }
 
   /**
@@ -171,7 +171,7 @@ export class Vector<DataType> {
 
     const value = near.storageGetEvictedRaw();
 
-    return getValueWithOptions(value, options);
+    return getValueWithOptions(this.subtype(), value, options);
   }
 
   /**
@@ -200,7 +200,7 @@ export class Vector<DataType> {
     const value = near.storageGetEvictedRaw();
     options = this.set_reconstructor(options);
 
-    return getValueWithOptions(value, options);
+    return getValueWithOptions(this.subtype(), value, options);
   }
 
   /**

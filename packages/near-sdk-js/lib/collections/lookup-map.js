@@ -72,7 +72,7 @@ export class LookupMap {
                 options.reconstructor = Vector.reconstruct;
             }
         }
-        return getValueWithOptions(value, options);
+        return getValueWithOptions(this.subtype(), value, options);
     }
     /**
      * Removes and retrieves the element with the provided key.
@@ -86,7 +86,7 @@ export class LookupMap {
             return options?.defaultValue ?? null;
         }
         const value = near.storageGetEvictedRaw();
-        return getValueWithOptions(value, options);
+        return getValueWithOptions(this.subtype(), value, options);
     }
     /**
      * Store a new value at the provided key.
@@ -102,7 +102,7 @@ export class LookupMap {
             return options?.defaultValue ?? null;
         }
         const value = near.storageGetEvictedRaw();
-        return getValueWithOptions(value, options);
+        return getValueWithOptions(this.subtype(), value, options);
     }
     /**
      * Extends the current collection with the passed in array of key-value pairs.
