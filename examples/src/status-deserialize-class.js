@@ -40,6 +40,7 @@ class InnerStatusDeserializeClass {
         vector_nested_group: {vector: {value: { lookup_map: {value: 'string'}}}},
         lookup_nest_vec: {lookup_map: {value: { vector: { value: 'string' }}}},
         unordered_set: {unordered_set: {value: 'string'}},
+        user_car_map: {unordered_map: {value: Car }},
     };
     constructor() {
         this.records = {};
@@ -56,6 +57,7 @@ class InnerStatusDeserializeClass {
         // account_id -> index -> message
         this.lookup_nest_vec = new LookupMap("e");
         this.unordered_set = new UnorderedSet("f");
+        this.user_car_map = new UnorderedMap("g");
     }
 }
 
@@ -110,8 +112,11 @@ export class StatusDeserializeClass {
         near.log(`${account_id} set_car_info name ${name}, speed ${speed}`);
         let obj = deserialize(encode(this.messages));
         let inst = decodeObj2class(new InnerStatusDeserializeClass(), obj);
-        inst.car.name = name;
-        inst.car.speed = speed;
+        let car = new Car();
+        car.name = name;
+        car.speed = speed;
+        inst.car = car;
+        inst.user_car_map.set(account_id, car);
         let data = serialize(inst)
         this.messages = decode(data);
     }
@@ -122,6 +127,18 @@ export class StatusDeserializeClass {
         let obj = deserialize(encode(this.messages));
         let inst = decodeObj2class(new InnerStatusDeserializeClass(), obj);
         return inst.car.info();
+    }
+
+    @view({})
+    get_user_car_info({ account_id }) {
+        near.log(`get_user_car_info for account_id ${account_id}`);
+        let obj = deserialize(encode(this.messages));
+        let inst = decodeObj2class(new InnerStatusDeserializeClass(), obj);
+        let car = inst.user_car_map.get(account_id);
+        if (car == null) {
+            return null;
+        }
+        return inst.user_car_map.get(account_id).info();
     }
 
     @call({})

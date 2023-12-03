@@ -73,7 +73,7 @@ export function assert(
 export type Mutable<T> = { -readonly [P in keyof T]: T[P] };
 
 export function getValueWithOptions<DataType>(
-  datatype: any,
+  datatype: unknown,
   value: Uint8Array | null,
   options: Omit<GetOptions<DataType>, "serializer"> = {
     deserializer: deserialize,
@@ -97,12 +97,15 @@ export function getValueWithOptions<DataType>(
   if (datatype !== undefined) {
     // subtype info is a class constructor
     if (typeof datatype === "function") {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
       deserialized = decodeObj2class(new datatype(), deserialized);
     } else if (typeof datatype === "object") {
       // normal collections of array, map; subtype will be:
       //  {map: { key: 'string', value: 'string' }} or {array: {value: 'string'}} ..
       // eslint-disable-next-line no-prototype-builtins
       if (datatype.hasOwnProperty("map")) {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         for (const mkey in deserialized) {
           if (datatype["map"]["value"] !=='string') {
@@ -112,6 +115,7 @@ export function getValueWithOptions<DataType>(
         // eslint-disable-next-line no-prototype-builtins
       } else if (datatype.hasOwnProperty("array")) {
         const new_vec = [];
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         for (const k in deserialized) {
           if (datatype["array"]["value"] !=='string') {
@@ -188,9 +192,11 @@ export function decodeObj2class(class_instance, obj) {
   }
   let key;
   for (key in obj) {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    let value = obj[key];
+    const value = obj[key];
     if (typeof value == 'object') {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       const ty = class_instance.constructor.schema[key];
       // eslint-disable-next-line no-prototype-builtins

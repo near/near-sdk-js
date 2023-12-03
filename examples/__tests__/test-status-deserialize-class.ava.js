@@ -50,6 +50,11 @@ test("Ali set_car_info and get_car_info", async (t) => {
       await statusMessage.view("get_car_info", { }),
       carName + " run with speed " + speed
   );
+
+  t.is(
+      await statusMessage.view("get_user_car_info", { account_id: ali.accountId }),
+      carName + " run with speed " + speed
+  );
 });
 
 test("Ali push_message and get_messages", async (t) => {
