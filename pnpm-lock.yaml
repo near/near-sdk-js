@@ -1,5 +1,9 @@
 lockfileVersion: '6.0'
 
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
 importers:
 
   .:
@@ -161,9 +165,6 @@ importers:
       '@types/eslint':
         specifier: ^8.4.6
         version: 8.44.7
-      '@types/lodash':
-        specifier: ^4.14.202
-        version: 4.14.202
       '@types/node':
         specifier: ^17.0.38
         version: 17.0.45
@@ -3957,7 +3958,3 @@ packages:
     resolution: {integrity: sha512-9bnSc/HEW2uRy67wc+T8UwauLuPJVn28jb+GtJY16iiKWyvmYJRXVT4UamsAEGQfPohgr2q4Tq0sQbQlxTfi1g==}
     engines: {node: '>=12.20'}
     dev: true
-
-settings:
-  autoInstallPeers: true
-  excludeLinksFromLockfile: false
