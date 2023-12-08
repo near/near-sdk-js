@@ -216,7 +216,7 @@ export function decodeObj2class(class_instance, obj) {
     const instance_tmp = cloneDeep(class_instance);
     class_instance = Object.assign(class_instance, obj);
     for (key in obj) {
-        if (typeof class_instance[key] == 'object') {
+        if (typeof class_instance[key] == 'object' && !(class_instance[key] instanceof Date)) {
             class_instance[key] = instance_tmp[key];
         }
     }

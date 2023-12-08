@@ -117,6 +117,17 @@ test("Ali set_nested_efficient_recordes then get_nested_efficient_recordes text"
   );
 });
 
+test("Ali set_big_num_and_date then gets", async (t) => {
+  const { ali, bob, statusMessage } = t.context.accounts;
+  await ali.call(statusMessage, "set_big_num_and_date", { bigint_num: `${10n}`, new_date: new Date('August 19, 2023 23:15:30 GMT+00:00') }, {gas: new BN(200 * 10**12)});
+
+
+  const afterSetNum = await statusMessage.view("get_big_num", { });
+  t.is(afterSetNum, `${10n}`);
+  const afterSetDate =  await statusMessage.view("get_date", { });
+  t.is(afterSetDate.toString(), '2023-08-19T23:15:30.000Z');
+});
+
 test("View get_subtype_of_efficient_recordes", async (t) => {
   const { statusMessage } = t.context.accounts;
 

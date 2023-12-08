@@ -41,6 +41,8 @@ class InnerStatusDeserializeClass {
         lookup_nest_vec: {lookup_map: {value: { vector: { value: 'string' }}}},
         unordered_set: {unordered_set: {value: 'string'}},
         user_car_map: {unordered_map: {value: Car }},
+        big_num: 'bigint',
+        date: 'date'
     };
     constructor() {
         this.records = {};
@@ -58,6 +60,8 @@ class InnerStatusDeserializeClass {
         this.lookup_nest_vec = new LookupMap("e");
         this.unordered_set = new UnorderedSet("f");
         this.user_car_map = new UnorderedMap("g");
+        this.big_num = 1n;
+        this.date = new Date();
     }
 }
 
@@ -200,6 +204,34 @@ export class StatusDeserializeClass {
 
         let data = serialize(inst)
         this.messages = decode(data);
+    }
+
+    @call({})
+    set_big_num_and_date({ bigint_num, new_date }) {
+        let account_id = near.signerAccountId();
+        near.log(`${account_id} set_bigint_and_date bigint_num ${bigint_num}, new_date: ${new_date}`);
+        let obj = deserialize(encode(this.messages));
+        let inst = decodeObj2class(new InnerStatusDeserializeClass(), obj);
+        inst.big_num = bigint_num;
+        inst.date = new_date;
+        let data = serialize(inst)
+        this.messages = decode(data);
+    }
+
+    @view({})
+    get_big_num({ }) {
+        near.log(`get_big_num}`);
+        let obj = deserialize(encode(this.messages));
+        let inst = decodeObj2class(new InnerStatusDeserializeClass(), obj);
+        return inst.big_num;
+    }
+
+    @view({})
+    get_date({ }) {
+        near.log(`get_date`);
+        let obj = deserialize(encode(this.messages));
+        let inst = decodeObj2class(new InnerStatusDeserializeClass(), obj);
+        return inst.date;
     }
 
     @view({})
