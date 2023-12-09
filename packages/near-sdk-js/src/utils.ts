@@ -187,7 +187,7 @@ export function deserialize(valueToDeserialize: Uint8Array): unknown {
 }
 
 export function decodeObj2class(class_instance, obj) {
-  if (typeof obj != 'object') {
+  if (typeof obj != 'object' || class_instance.constructor.schema === undefined) {
     return obj;
   }
   let key;
