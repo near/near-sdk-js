@@ -1,6 +1,12 @@
 import { GetOptions } from "./types/collections";
-import {LOOKUP_MAP_SCHE, LOOKUP_SET_SCHE, UNORDERED_MAP_SCHE, UNORDERED_SET_SCHE, VECTOR_SCHE} from "./collections";
-import {cloneDeep} from "lodash-es";
+import {
+  LOOKUP_MAP_SCHE,
+  LOOKUP_SET_SCHE,
+  UNORDERED_MAP_SCHE,
+  UNORDERED_SET_SCHE,
+  VECTOR_SCHE,
+} from "./collections";
+import { cloneDeep } from "lodash-es";
 // import lodash from 'lodash';
 
 export interface Env {
@@ -108,8 +114,11 @@ export function getValueWithOptions<DataType>(
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         for (const mkey in deserialized) {
-          if (datatype["map"]["value"] !=='string') {
-            deserialized[mkey] = decodeObj2class(new datatype["map"]["value"](), value[mkey]);
+          if (datatype["map"]["value"] !== "string") {
+            deserialized[mkey] = decodeObj2class(
+              new datatype["map"]["value"](),
+              value[mkey]
+            );
           }
         }
         // eslint-disable-next-line no-prototype-builtins
@@ -118,8 +127,10 @@ export function getValueWithOptions<DataType>(
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         for (const k in deserialized) {
-          if (datatype["array"]["value"] !=='string') {
-            new_vec.push(decodeObj2class(new datatype["array"]["value"](), value[k]));
+          if (datatype["array"]["value"] !== "string") {
+            new_vec.push(
+              decodeObj2class(new datatype["array"]["value"](), value[k])
+            );
           }
         }
         deserialized = new_vec;
@@ -187,7 +198,10 @@ export function deserialize(valueToDeserialize: Uint8Array): unknown {
 }
 
 export function decodeObj2class(class_instance, obj) {
-  if (typeof obj != 'object' || class_instance.constructor.schema === undefined) {
+  if (
+    typeof obj != "object" ||
+    class_instance.constructor.schema === undefined
+  ) {
     return obj;
   }
   let key;
@@ -195,26 +209,31 @@ export function decodeObj2class(class_instance, obj) {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     const value = obj[key];
-    if (typeof value == 'object') {
+    if (typeof value == "object") {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       const ty = class_instance.constructor.schema[key];
       // eslint-disable-next-line no-prototype-builtins
       if (ty !== undefined && ty.hasOwnProperty("map")) {
         for (const mkey in value) {
-          if (ty["map"]["value"]==='string') {
+          if (ty["map"]["value"] === "string") {
             class_instance[key][mkey] = value[mkey];
           } else {
-            class_instance[key][mkey] = decodeObj2class(new ty["map"]["value"](), value[mkey]);
+            class_instance[key][mkey] = decodeObj2class(
+              new ty["map"]["value"](),
+              value[mkey]
+            );
           }
         }
         // eslint-disable-next-line no-prototype-builtins
       } else if (ty !== undefined && ty.hasOwnProperty("array")) {
         for (const k in value) {
-          if (ty["array"]["value"]==='string') {
+          if (ty["array"]["value"] === "string") {
             class_instance[key].push(value[k]);
           } else {
-            class_instance[key].push(decodeObj2class(new ty["array"]["value"](), value[k]));
+            class_instance[key].push(
+              decodeObj2class(new ty["array"]["value"](), value[k])
+            );
           }
         }
         // eslint-disable-next-line no-prototype-builtins
@@ -224,7 +243,7 @@ export function decodeObj2class(class_instance, obj) {
         const subtype_value = ty[UNORDERED_MAP_SCHE]["value"];
         class_instance[key].subtype = function () {
           return subtype_value;
-        }
+        };
         // eslint-disable-next-line no-prototype-builtins
       } else if (ty !== undefined && ty.hasOwnProperty(VECTOR_SCHE)) {
         class_instance[key].length = obj[key].length;
@@ -232,7 +251,7 @@ export function decodeObj2class(class_instance, obj) {
         const subtype_value = ty[VECTOR_SCHE]["value"];
         class_instance[key].subtype = function () {
           return subtype_value;
-        }
+        };
         // eslint-disable-next-line no-prototype-builtins
       } else if (ty !== undefined && ty.hasOwnProperty(UNORDERED_SET_SCHE)) {
         class_instance[key]._elements.length = obj[key]._elements.length;
@@ -240,24 +259,25 @@ export function decodeObj2class(class_instance, obj) {
         const subtype_value = ty[UNORDERED_SET_SCHE]["value"];
         class_instance[key].subtype = function () {
           return subtype_value;
-        }
+        };
         // eslint-disable-next-line no-prototype-builtins
       } else if (ty !== undefined && ty.hasOwnProperty(LOOKUP_MAP_SCHE)) {
         class_instance[key].constructor.schema = ty;
         const subtype_value = ty[LOOKUP_MAP_SCHE]["value"];
         class_instance[key].subtype = function () {
           return subtype_value;
-        }
+        };
         // eslint-disable-next-line no-prototype-builtins
       } else if (ty !== undefined && ty.hasOwnProperty(LOOKUP_SET_SCHE)) {
         class_instance[key].constructor.schema = ty;
         const subtype_value = ty[LOOKUP_SET_SCHE]["value"];
         class_instance[key].subtype = function () {
           return subtype_value;
-        }
+        };
       } else {
         // normal class
-        class_instance[key].constructor.schema = class_instance.constructor.schema[key];
+        class_instance[key].constructor.schema =
+          class_instance.constructor.schema[key];
         class_instance[key] = decodeObj2class(class_instance[key], obj[key]);
       }
     }
@@ -265,7 +285,10 @@ export function decodeObj2class(class_instance, obj) {
   const instance_tmp = cloneDeep(class_instance);
   class_instance = Object.assign(class_instance, obj);
   for (key in obj) {
-    if (typeof class_instance[key] == 'object' && !(class_instance[key] instanceof Date)) {
+    if (
+      typeof class_instance[key] == "object" &&
+      !(class_instance[key] instanceof Date)
+    ) {
       class_instance[key] = instance_tmp[key];
     }
   }

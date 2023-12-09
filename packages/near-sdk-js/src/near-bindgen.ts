@@ -1,5 +1,11 @@
 import * as near from "./api";
-import { deserialize, serialize, bytes, encode } from "./utils";
+import {
+  deserialize,
+  serialize,
+  bytes,
+  encode,
+  decodeObj2class,
+} from "./utils";
 
 type EmptyParameterObject = Record<never, never>;
 type AnyObject = Record<string, unknown>;
@@ -210,15 +216,21 @@ export function NearBindgen({
       }
 
       static _reconstruct(classObject: object, plainObject: AnyObject): object {
-        for (const item in classObject) {
-          const reconstructor = classObject[item].constructor?.reconstruct;
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        if (classObject.constructor.schema === undefined) {
+          for (const item in classObject) {
+            const reconstructor = classObject[item].constructor?.reconstruct;
 
-          classObject[item] = reconstructor
-            ? reconstructor(plainObject[item])
-            : plainObject[item];
+            classObject[item] = reconstructor
+              ? reconstructor(plainObject[item])
+              : plainObject[item];
+          }
+
+          return classObject;
         }
 
-        return classObject;
+        return decodeObj2class(classObject, plainObject);
       }
 
       static _requireInit(): boolean {

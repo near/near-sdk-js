@@ -1,4 +1,4 @@
-import {BN, Worker} from "near-workspaces";
+import {Worker} from "near-workspaces";
 import test from "ava";
 
 test.before(async (t) => {
@@ -11,9 +11,10 @@ test.before(async (t) => {
   // Deploy the contract.
   const statusMessage = await root.devDeploy("./build/status-deserialize-class.wasm");
 
-  await root.call(statusMessage, "init_messages", {}, {gas: new BN(200 * 10**12)});
-  const result = await statusMessage.view("is_message_inited", {});
+  await root.call(statusMessage, "init_contract", {});
+  const result = await statusMessage.view("is_contract_inited", {});
   t.is(result, true);
+
   // Create test users
   const ali = await root.createSubAccount("ali");
   const bob = await root.createSubAccount("bob");
@@ -32,7 +33,7 @@ test.after.always(async (t) => {
 
 test("Ali sets then gets status", async (t) => {
   const { ali, statusMessage } = t.context.accounts;
-  await ali.call(statusMessage, "set_record", { message: "hello" }, {gas: new BN(200 * 10**12)});
+  await ali.call(statusMessage, "set_record", { message: "hello" });
 
   t.is(
     await statusMessage.view("get_record", { account_id: ali.accountId }),
@@ -44,7 +45,7 @@ test("Ali set_car_info and get_car_info", async (t) => {
   const { ali, statusMessage } = t.context.accounts;
   let carName = "Mercedes-Benz";
   let speed = 240;
-  await ali.call(statusMessage, "set_car_info", { name: carName, speed: speed }, {gas: new BN(200 * 10**12)});
+  await ali.call(statusMessage, "set_car_info", { name: carName, speed: speed });
 
   t.is(
       await statusMessage.view("get_car_info", { }),
@@ -61,8 +62,8 @@ test("Ali push_message and get_messages", async (t) => {
   const { ali, statusMessage } = t.context.accounts;
   let message1 = 'Hello';
   let message2 = 'World';
-  await ali.call(statusMessage, "push_message", { message: message1 }, {gas: new BN(200 * 10**12)});
-  await ali.call(statusMessage, "push_message", { message: message2 }, {gas: new BN(200 * 10**12)});
+  await ali.call(statusMessage, "push_message", { message: message1 });
+  await ali.call(statusMessage, "push_message", { message: message2 });
 
   t.is(
       await statusMessage.view("get_messages", { }),
@@ -72,9 +73,9 @@ test("Ali push_message and get_messages", async (t) => {
 
 test("Ali set_nested_efficient_recordes then get_nested_efficient_recordes text", async (t) => {
   const { ali, bob, statusMessage } = t.context.accounts;
-  await ali.call(statusMessage, "set_nested_efficient_recordes", { id: "1", message: "hello" }, {gas: new BN(200 * 10**12)});
-  await bob.call(statusMessage, "set_nested_efficient_recordes", { id: "1", message: "hello" }, {gas: new BN(200 * 10**12)});
-  await bob.call(statusMessage, "set_nested_efficient_recordes", { id: "2", message: "world" }, {gas: new BN(200 * 10**12)});
+  await ali.call(statusMessage, "set_nested_efficient_recordes", { id: "1", message: "hello" });
+  await bob.call(statusMessage, "set_nested_efficient_recordes", { id: "1", message: "hello" });
+  await bob.call(statusMessage, "set_nested_efficient_recordes", { id: "2", message: "world" });
 
   t.is(
       await statusMessage.view("get_efficient_recordes", { account_id: ali.accountId }),
@@ -119,7 +120,7 @@ test("Ali set_nested_efficient_recordes then get_nested_efficient_recordes text"
 
 test("Ali set_big_num_and_date then gets", async (t) => {
   const { ali, bob, statusMessage } = t.context.accounts;
-  await ali.call(statusMessage, "set_big_num_and_date", { bigint_num: `${10n}`, new_date: new Date('August 19, 2023 23:15:30 GMT+00:00') }, {gas: new BN(200 * 10**12)});
+  await ali.call(statusMessage, "set_big_num_and_date", { bigint_num: `${10n}`, new_date: new Date('August 19, 2023 23:15:30 GMT+00:00') });
 
 
   const afterSetNum = await statusMessage.view("get_big_num", { });

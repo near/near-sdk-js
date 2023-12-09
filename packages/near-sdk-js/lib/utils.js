@@ -1,4 +1,4 @@
-import { LOOKUP_MAP_SCHE, LOOKUP_SET_SCHE, UNORDERED_MAP_SCHE, UNORDERED_SET_SCHE, VECTOR_SCHE } from "./collections";
+import { LOOKUP_MAP_SCHE, LOOKUP_SET_SCHE, UNORDERED_MAP_SCHE, UNORDERED_SET_SCHE, VECTOR_SCHE, } from "./collections";
 import { cloneDeep } from "lodash-es";
 // make PromiseIndex a nominal typing
 var PromiseIndexBrand;
@@ -66,7 +66,7 @@ export function getValueWithOptions(datatype, value, options = {
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-ignore
                 for (const mkey in deserialized) {
-                    if (datatype["map"]["value"] !== 'string') {
+                    if (datatype["map"]["value"] !== "string") {
                         deserialized[mkey] = decodeObj2class(new datatype["map"]["value"](), value[mkey]);
                     }
                 }
@@ -77,7 +77,7 @@ export function getValueWithOptions(datatype, value, options = {
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-ignore
                 for (const k in deserialized) {
-                    if (datatype["array"]["value"] !== 'string') {
+                    if (datatype["array"]["value"] !== "string") {
                         new_vec.push(decodeObj2class(new datatype["array"]["value"](), value[k]));
                     }
                 }
@@ -129,7 +129,8 @@ export function deserialize(valueToDeserialize) {
     });
 }
 export function decodeObj2class(class_instance, obj) {
-    if (typeof obj != 'object' || class_instance.constructor.schema === undefined) {
+    if (typeof obj != "object" ||
+        class_instance.constructor.schema === undefined) {
         return obj;
     }
     let key;
@@ -137,14 +138,14 @@ export function decodeObj2class(class_instance, obj) {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         const value = obj[key];
-        if (typeof value == 'object') {
+        if (typeof value == "object") {
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
             const ty = class_instance.constructor.schema[key];
             // eslint-disable-next-line no-prototype-builtins
             if (ty !== undefined && ty.hasOwnProperty("map")) {
                 for (const mkey in value) {
-                    if (ty["map"]["value"] === 'string') {
+                    if (ty["map"]["value"] === "string") {
                         class_instance[key][mkey] = value[mkey];
                     }
                     else {
@@ -155,7 +156,7 @@ export function decodeObj2class(class_instance, obj) {
             }
             else if (ty !== undefined && ty.hasOwnProperty("array")) {
                 for (const k in value) {
-                    if (ty["array"]["value"] === 'string') {
+                    if (ty["array"]["value"] === "string") {
                         class_instance[key].push(value[k]);
                     }
                     else {
@@ -208,7 +209,8 @@ export function decodeObj2class(class_instance, obj) {
             }
             else {
                 // normal class
-                class_instance[key].constructor.schema = class_instance.constructor.schema[key];
+                class_instance[key].constructor.schema =
+                    class_instance.constructor.schema[key];
                 class_instance[key] = decodeObj2class(class_instance[key], obj[key]);
             }
         }
@@ -216,7 +218,8 @@ export function decodeObj2class(class_instance, obj) {
     const instance_tmp = cloneDeep(class_instance);
     class_instance = Object.assign(class_instance, obj);
     for (key in obj) {
-        if (typeof class_instance[key] == 'object' && !(class_instance[key] instanceof Date)) {
+        if (typeof class_instance[key] == "object" &&
+            !(class_instance[key] instanceof Date)) {
             class_instance[key] = instance_tmp[key];
         }
     }

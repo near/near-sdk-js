@@ -4,7 +4,7 @@ import { UnorderedMap } from "./unordered-map";
 import { LookupMap } from "./lookup-map";
 import { LookupSet } from "./lookup-set";
 import { UnorderedSet } from "./unordered-set";
-import { LOOKUP_MAP_SCHE, LOOKUP_SET_SCHE, UNORDERED_MAP_SCHE, UNORDERED_SET_SCHE, VECTOR_SCHE } from "./subtype";
+import { LOOKUP_MAP_SCHE, LOOKUP_SET_SCHE, UNORDERED_MAP_SCHE, UNORDERED_SET_SCHE, VECTOR_SCHE, } from "./subtype";
 function indexToKey(prefix, index) {
     const data = new Uint32Array([index]);
     const array = new Uint8Array(data.buffer);
@@ -32,13 +32,12 @@ export class Vector {
     }
     /* eslint-disable @typescript-eslint/no-explicit-any */
     /* eslint-disable @typescript-eslint/no-empty-function */
-    subtype() {
-    }
+    subtype() { }
     set_reconstructor(options) {
         if (options == undefined) {
             options = {};
         }
-        if (((options.reconstructor == undefined)) && this.subtype() != undefined) {
+        if (options.reconstructor == undefined && this.subtype() != undefined) {
             // eslint-disable-next-line no-prototype-builtins
             if (this.subtype().hasOwnProperty(UNORDERED_MAP_SCHE)) {
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment

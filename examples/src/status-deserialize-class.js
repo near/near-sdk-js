@@ -4,15 +4,10 @@ import {
     view,
     near,
     UnorderedMap,
-    serialize,
-    decode,
-    deserialize,
-    encode,
     LookupMap,
     Vector,
-    UnorderedSet, decodeObj2class
+    UnorderedSet,
 } from "near-sdk-js";
-import lodash from "lodash-es";
 
 class Car {
     static schema = {
@@ -29,8 +24,10 @@ class Car {
     }
 }
 
-class InnerStatusDeserializeClass {
+@NearBindgen({})
+export class StatusDeserializeClass {
     static schema = {
+        is_inited: "bool",
         records: {map: { key: 'string', value: 'string' }},
         car: Car,
         messages: {array: {value: 'string'}},
@@ -45,6 +42,7 @@ class InnerStatusDeserializeClass {
         date: 'date'
     };
     constructor() {
+        this.is_inited = false;
         this.records = {};
         this.car = new Car();
         this.messages = [];
@@ -63,50 +61,33 @@ class InnerStatusDeserializeClass {
         this.big_num = 1n;
         this.date = new Date();
     }
-}
-
-@NearBindgen({})
-export class StatusDeserializeClass {
-    constructor() {
-        this.messages = "";
-    }
 
     @call({})
-    init_messages({ }) {
-        if (this.messages.length != 0) {
+    init_contract({ }) {
+        if (this.is_inited) {
             near.log(`message inited`);
             return;
         }
-        let account_id = near.signerAccountId();
-        near.log(`${account_id} init_messages`);
-        let status = new InnerStatusDeserializeClass();
-        let data = serialize(status)
-        this.messages = decode(data);
+        this.is_inited = true;
     }
 
     @view({})
-    is_message_inited({}) {
-        near.log(`query is_message_inited`);
-        return this.messages.length != 0;
+    is_contract_inited({}) {
+        near.log(`query is_contract_inited`);
+        return this.is_inited;
     }
 
     @call({})
     set_record({ message }) {
         let account_id = near.signerAccountId();
         near.log(`${account_id} set_status with message ${message}`);
-        let obj = deserialize(encode(this.messages));
-        let inst = decodeObj2class(new InnerStatusDeserializeClass(), obj);
-        inst.records[account_id] = message;
-        let data = serialize(inst)
-        this.messages = decode(data);
+        this.records[account_id] = message;
     }
 
     @view({})
     get_record({ account_id }) {
         near.log(`get_record for account_id ${account_id}`);
-        let obj = deserialize(encode(this.messages));
-        let inst = decodeObj2class(new InnerStatusDeserializeClass(), obj);
-        return inst.records[account_id] || null;
+        return this.records[account_id] || null;
     }
 
 
@@ -114,140 +95,109 @@ export class StatusDeserializeClass {
     set_car_info({ name, speed }) {
         let account_id = near.signerAccountId();
         near.log(`${account_id} set_car_info name ${name}, speed ${speed}`);
-        let obj = deserialize(encode(this.messages));
-        let inst = decodeObj2class(new InnerStatusDeserializeClass(), obj);
         let car = new Car();
         car.name = name;
         car.speed = speed;
-        inst.car = car;
-        inst.user_car_map.set(account_id, car);
-        let data = serialize(inst)
-        this.messages = decode(data);
+        this.car = car;
+        this.user_car_map.set(account_id, car);
     }
 
     @view({})
     get_car_info({ }) {
         near.log(`get_car_info`);
-        let obj = deserialize(encode(this.messages));
-        let inst = decodeObj2class(new InnerStatusDeserializeClass(), obj);
-        return inst.car.info();
+        return this.car.info();
     }
 
     @view({})
     get_user_car_info({ account_id }) {
         near.log(`get_user_car_info for account_id ${account_id}`);
-        let obj = deserialize(encode(this.messages));
-        let inst = decodeObj2class(new InnerStatusDeserializeClass(), obj);
-        let car = inst.user_car_map.get(account_id);
+        let car = this.user_car_map.get(account_id);
         if (car == null) {
             return null;
         }
-        return inst.user_car_map.get(account_id).info();
+        return car.info();
     }
 
     @call({})
     push_message({ message }) {
         let account_id = near.signerAccountId();
         near.log(`${account_id} push_message message ${message}`);
-        let obj = deserialize(encode(this.messages));
-        let inst = decodeObj2class(new InnerStatusDeserializeClass(), obj);
-        inst.messages.push(message);
-        let data = serialize(inst)
-        this.messages = decode(data);
+        this.messages.push(message);
     }
 
     @view({})
     get_messages({ }) {
         near.log(`get_messages`);
-        let obj = deserialize(encode(this.messages));
-        let inst = decodeObj2class(new InnerStatusDeserializeClass(), obj);
-        return inst.messages.join(',');
+        return this.messages.join(',');
     }
 
     @call({})
     set_nested_efficient_recordes({ message, id }) {
         let account_id = near.signerAccountId();
         near.log(`${account_id} set_nested_efficient_recordes with message ${message},id ${id}`);
-        let obj = deserialize(encode(this.messages));
-        let inst = decodeObj2class(new InnerStatusDeserializeClass(), obj);
-        inst.efficient_recordes.set(account_id, message);
-        const nestedMap = inst.nested_efficient_recordes.get(id, {
+        this.efficient_recordes.set(account_id, message);
+        const nestedMap = this.nested_efficient_recordes.get(id, {
             defaultValue: new UnorderedMap("i_" + id + "_"),
         });
         nestedMap.set(account_id, message);
-        inst.nested_efficient_recordes.set(id, nestedMap);
+        this.nested_efficient_recordes.set(id, nestedMap);
 
-        const nestedLookup = inst.nested_lookup_recordes.get(id, {
+        const nestedLookup = this.nested_lookup_recordes.get(id, {
             defaultValue: new LookupMap("li_" + id + "_"),
         });
         nestedLookup.set(account_id, message);
-        inst.nested_lookup_recordes.set(id, nestedLookup);
+        this.nested_lookup_recordes.set(id, nestedLookup);
 
         // vector_nested_group: {vector: {value: { lookup_map: {value: 'string'}}}},
-        const vecNestedLookup = inst.vector_nested_group.get(0, {
+        const vecNestedLookup = this.vector_nested_group.get(0, {
             defaultValue: new LookupMap("di_0_"),
         });
         vecNestedLookup.set(account_id, message);
-        if (inst.vector_nested_group.isEmpty()) {
-            inst.vector_nested_group.push(vecNestedLookup);
+        if (this.vector_nested_group.isEmpty()) {
+            this.vector_nested_group.push(vecNestedLookup);
         } else {
-            inst.vector_nested_group.replace(0, vecNestedLookup);
+            this.vector_nested_group.replace(0, vecNestedLookup);
         }
 
-        const lookupNestVec = inst.lookup_nest_vec.get(account_id, {
+        const lookupNestVec = this.lookup_nest_vec.get(account_id, {
             defaultValue: new Vector("ei_" + account_id + "_"),
         });
         lookupNestVec.push(message);
-        inst.lookup_nest_vec.set(account_id, lookupNestVec);
+        this.lookup_nest_vec.set(account_id, lookupNestVec);
 
-        inst.unordered_set.set(account_id);
-
-        let data = serialize(inst)
-        this.messages = decode(data);
+        this.unordered_set.set(account_id);
     }
 
     @call({})
     set_big_num_and_date({ bigint_num, new_date }) {
         let account_id = near.signerAccountId();
         near.log(`${account_id} set_bigint_and_date bigint_num ${bigint_num}, new_date: ${new_date}`);
-        let obj = deserialize(encode(this.messages));
-        let inst = decodeObj2class(new InnerStatusDeserializeClass(), obj);
-        inst.big_num = bigint_num;
-        inst.date = new_date;
-        let data = serialize(inst)
-        this.messages = decode(data);
+        this.big_num = bigint_num;
+        this.date = new_date;
     }
 
     @view({})
     get_big_num({ }) {
         near.log(`get_big_num}`);
-        let obj = deserialize(encode(this.messages));
-        let inst = decodeObj2class(new InnerStatusDeserializeClass(), obj);
-        return inst.big_num;
+        return this.big_num;
     }
 
     @view({})
     get_date({ }) {
         near.log(`get_date`);
-        let obj = deserialize(encode(this.messages));
-        let inst = decodeObj2class(new InnerStatusDeserializeClass(), obj);
-        return inst.date;
+        return this.date;
     }
 
     @view({})
     get_efficient_recordes({ account_id }) {
         near.log(`get_efficient_recordes for account_id ${account_id}`);
-        let obj = deserialize(encode(this.messages));
-        let inst = decodeObj2class(new InnerStatusDeserializeClass(), obj);
-        return inst.efficient_recordes.get(account_id);
+        return this.efficient_recordes.get(account_id);
     }
 
     @view({})
     get_nested_efficient_recordes({ account_id, id }) {
         near.log(`get_nested_efficient_recordes for account_id ${account_id}, id ${id}`);
-        let obj = deserialize(encode(this.messages));
-        let inst = decodeObj2class(new InnerStatusDeserializeClass(), obj);
-        return inst.nested_efficient_recordes.get(id, {
+        return this.nested_efficient_recordes.get(id, {
             defaultValue: new UnorderedMap("i_" + id + "_"),
         }).get(account_id);
     }
@@ -255,10 +205,7 @@ export class StatusDeserializeClass {
     @view({})
     get_nested_lookup_recordes({ account_id, id }) {
         near.log(`get_nested_lookup_recordes for account_id ${account_id}, id ${id}`);
-        near.log(this.messages);
-        let obj = deserialize(encode(this.messages));
-        let inst = decodeObj2class(new InnerStatusDeserializeClass(), obj);
-        return inst.nested_lookup_recordes.get(id, {
+        return this.nested_lookup_recordes.get(id, {
             defaultValue: new LookupMap("li_" + id + "_"),
         }).get(account_id);
     }
@@ -266,49 +213,36 @@ export class StatusDeserializeClass {
     @view({})
     get_vector_nested_group({ idx, account_id }) {
         near.log(`get_vector_nested_group for idx ${idx}, account_id ${account_id}`);
-        near.log(this.messages);
-        let obj = deserialize(encode(this.messages));
-        let inst = decodeObj2class(new InnerStatusDeserializeClass(), obj);
-        return inst.vector_nested_group.get(idx).get(account_id);
+        return this.vector_nested_group.get(idx).get(account_id);
     }
 
     @view({})
     get_lookup_nested_vec({ account_id, idx }) {
         near.log(`get_looup_nested_vec for account_id ${account_id}, idx ${idx}`);
-        let obj = deserialize(encode(this.messages));
-        let inst = decodeObj2class(new InnerStatusDeserializeClass(), obj);
-        return inst.lookup_nest_vec.get(account_id).get(idx);
+        return this.lookup_nest_vec.get(account_id).get(idx);
     }
 
     @view({})
     get_is_contains_user({ account_id }) {
         near.log(`get_is_contains_user for account_id ${account_id}`);
-        let obj = deserialize(encode(this.messages));
-        let inst = decodeObj2class(new InnerStatusDeserializeClass(), obj);
-        return inst.unordered_set.contains(account_id);
+        return this.unordered_set.contains(account_id);
     }
 
     @view({})
     get_subtype_of_efficient_recordes({  }) {
         near.log(`get_subtype_of_efficient_recordes`);
-        let obj = deserialize(encode(this.messages));
-        let inst = decodeObj2class(new InnerStatusDeserializeClass(), obj);
-        return inst.efficient_recordes.subtype();
+        return this.efficient_recordes.subtype();
     }
 
     @view({})
     get_subtype_of_nested_efficient_recordes({  }) {
         near.log(`get_subtype_of_nested_efficient_recordes`);
-        let obj = deserialize(encode(this.messages));
-        let inst = decodeObj2class(new InnerStatusDeserializeClass(), obj);
-        return inst.nested_efficient_recordes.subtype();
+        return this.nested_efficient_recordes.subtype();
     }
 
     @view({})
     get_subtype_of_nested_lookup_recordes({  }) {
         near.log(`get_subtype_of_nested_lookup_recordes`);
-        let obj = deserialize(encode(this.messages));
-        let inst = decodeObj2class(new InnerStatusDeserializeClass(), obj);
-        return inst.nested_lookup_recordes.subtype();
+        return this.nested_lookup_recordes.subtype();
     }
 }

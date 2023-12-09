@@ -5,11 +5,17 @@ import {
   serializeValueWithOptions,
   encode,
 } from "../utils";
-import {UnorderedMap} from "./unordered-map";
-import {LookupSet} from "./lookup-set";
-import {UnorderedSet} from "./unordered-set";
-import {Vector} from "./vector";
-import {LOOKUP_MAP_SCHE, LOOKUP_SET_SCHE, UNORDERED_MAP_SCHE, UNORDERED_SET_SCHE, VECTOR_SCHE} from "./subtype";
+import { UnorderedMap } from "./unordered-map";
+import { LookupSet } from "./lookup-set";
+import { UnorderedSet } from "./unordered-set";
+import { Vector } from "./vector";
+import {
+  LOOKUP_MAP_SCHE,
+  LOOKUP_SET_SCHE,
+  UNORDERED_MAP_SCHE,
+  UNORDERED_SET_SCHE,
+  VECTOR_SCHE,
+} from "./subtype";
 
 /**
  * A lookup map that stores data in NEAR storage.
@@ -32,9 +38,7 @@ export class LookupMap<DataType> {
 
   /* eslint-disable @typescript-eslint/no-explicit-any */
   /* eslint-disable @typescript-eslint/no-empty-function */
-  subtype(): any {
-
-  }
+  subtype(): any {}
 
   /**
    * Get the data stored at the provided key.
@@ -51,7 +55,7 @@ export class LookupMap<DataType> {
     if (options == undefined) {
       options = {};
     }
-    if (((options.reconstructor == undefined)) && this.subtype() != undefined) {
+    if (options.reconstructor == undefined && this.subtype() != undefined) {
       // eslint-disable-next-line no-prototype-builtins
       if (this.subtype().hasOwnProperty(UNORDERED_MAP_SCHE)) {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment

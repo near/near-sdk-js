@@ -10,7 +10,7 @@ import {
 import { Vector, VectorIterator } from "./vector";
 import { LookupMap } from "./lookup-map";
 import { GetOptions } from "../types/collections";
-import {SubType} from "./subtype";
+import { SubType } from "./subtype";
 
 type ValueAndIndex = [value: string, index: number];
 
@@ -93,7 +93,7 @@ export class UnorderedMap<DataType> extends SubType<DataType> {
     const [oldValue, oldIndex] = valueAndIndex;
     this.values.set(key, [decode(serialized), oldIndex]);
 
-    return getValueWithOptions(this.subtype(),encode(oldValue), options);
+    return getValueWithOptions(this.subtype(), encode(oldValue), options);
   }
 
   /**
@@ -127,7 +127,7 @@ export class UnorderedMap<DataType> extends SubType<DataType> {
       this.values.set(swappedKey, [swappedValueAndIndex[0], index]);
     }
 
-    return getValueWithOptions(this.subtype(),encode(value), options);
+    return getValueWithOptions(this.subtype(), encode(value), options);
   }
 
   /**
@@ -254,9 +254,7 @@ class UnorderedMapIterator<DataType> {
 
   /* eslint-disable @typescript-eslint/no-explicit-any */
   /* eslint-disable @typescript-eslint/no-empty-function */
-  subtype(): any {
-
-  }
+  subtype(): any {}
 
   next(): { value: [string | null, DataType | null]; done: boolean } {
     const key = this.keys.next();
@@ -273,7 +271,11 @@ class UnorderedMapIterator<DataType> {
       done: key.done,
       value: [
         key.value,
-        getValueWithOptions(this.subtype(), encode(valueAndIndex[0]), this.options),
+        getValueWithOptions(
+          this.subtype(),
+          encode(valueAndIndex[0]),
+          this.options
+        ),
       ],
     };
   }

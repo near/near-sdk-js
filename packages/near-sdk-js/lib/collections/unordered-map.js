@@ -183,8 +183,7 @@ class UnorderedMapIterator {
     }
     /* eslint-disable @typescript-eslint/no-explicit-any */
     /* eslint-disable @typescript-eslint/no-empty-function */
-    subtype() {
-    }
+    subtype() { }
     next() {
         const key = this.keys.next();
         if (key.done) {

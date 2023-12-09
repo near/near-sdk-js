@@ -1,5 +1,5 @@
 import * as near from "./api";
-import { deserialize, serialize, bytes, encode } from "./utils";
+import { deserialize, serialize, bytes, encode, decodeObj2class, } from "./utils";
 /**
  * Tells the SDK to use this function as the migration function of the contract.
  * The migration function will ignore te existing state.
@@ -101,13 +101,18 @@ export function NearBindgen({ requireInit = false, serializer = serialize, deser
                 return deserializer(value);
             }
             static _reconstruct(classObject, plainObject) {
-                for (const item in classObject) {
-                    const reconstructor = classObject[item].constructor?.reconstruct;
-                    classObject[item] = reconstructor
-                        ? reconstructor(plainObject[item])
-                        : plainObject[item];
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                if (classObject.constructor.schema === undefined) {
+                    for (const item in classObject) {
+                        const reconstructor = classObject[item].constructor?.reconstruct;
+                        classObject[item] = reconstructor
+                            ? reconstructor(plainObject[item])
+                            : plainObject[item];
+                    }
+                    return classObject;
                 }
-                return classObject;
+                return decodeObj2class(classObject, plainObject);
             }
             static _requireInit() {
                 return requireInit;
