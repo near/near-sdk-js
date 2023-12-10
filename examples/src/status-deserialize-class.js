@@ -27,7 +27,7 @@ class Car {
 @NearBindgen({})
 export class StatusDeserializeClass {
     static schema = {
-        is_inited: "bool",
+        is_inited: "boolean",
         records: {map: { key: 'string', value: 'string' }},
         car: Car,
         messages: {array: {value: 'string'}},
