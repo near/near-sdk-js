@@ -16,17 +16,22 @@
 import { AccountId } from "near-sdk-js";
 import { NearEvent } from "../event";
 import { TokenId } from "./token";
+import { toSnakeCase } from "../util";
 
 export type Nep171EventKind = NftMint[] | NftTransfer[] | NftBurn[];
 
 export class Nep171Event extends NearEvent {
+  standard: string;
   version: string;
-  event_kind: Nep171EventKind;
+  event: string;
+  data: Nep171EventKind;
 
   constructor(version: string, event_kind: Nep171EventKind) {
     super();
-    this.version = version;
-    this.event_kind = event_kind;
+    this.standard = "nep171"
+    this.version = version
+    this.event = toSnakeCase(event_kind[0].constructor.name)
+    this.data = event_kind
   }
 }
 
