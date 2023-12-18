@@ -27,10 +27,10 @@ import { NonFungibleTokenCore } from "./core";
 import { NonFungibleTokenApproval } from "./approval";
 import { NonFungibleTokenEnumeration } from "./enumeration";
 
-const GAS_FOR_RESOLVE_TRANSFER = 15_000_000_000_000n;
+const GAS_FOR_RESOLVE_TRANSFER = 16_000_000_000_000n;
 const GAS_FOR_NFT_TRANSFER_CALL =
   30_000_000_000_000n + GAS_FOR_RESOLVE_TRANSFER;
-const GAS_FOR_NFT_APPROVE = 20_000_000_000_000n;
+const GAS_FOR_NFT_APPROVE = 21_000_000_000_000n;
 
 function repeat(str: string, n: number) {
   return Array(n + 1).join(str);
