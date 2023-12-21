@@ -275,9 +275,7 @@ export function decodeObj2class(class_instance, obj) {
           return subtype_value;
         };
       } else {
-        // normal class
-        class_instance[key].constructor.schema =
-          class_instance.constructor.schema[key];
+        // normal case with nested Class, such as field is truck: Truck,
         class_instance[key] = decodeObj2class(class_instance[key], obj[key]);
       }
     } else {

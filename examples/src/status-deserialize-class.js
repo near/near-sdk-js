@@ -24,12 +24,29 @@ class Car {
     }
 }
 
+class Truck {
+    static schema = {
+        name: "string",
+        speed: "number",
+        loads: {unordered_map: {value: 'string'}}
+    };
+    constructor() {
+        this.name = "";
+        this.speed = 0;
+        this.loads = new UnorderedMap("tra");
+    }
+
+    info() {
+        return this.name + " run with speed " + this.speed.toString() + " with loads length: " + this.loads.toArray().length;
+    }
+}
+
 @NearBindgen({})
 export class StatusDeserializeClass {
     static schema = {
         is_inited: "boolean",
         records: {map: { key: 'string', value: 'string' }},
-        car: Car,
+        truck: Truck,
         messages: {array: {value: 'string'}},
         efficient_recordes: {unordered_map: {value: 'string'}},
         nested_efficient_recordes: {unordered_map: {value: { unordered_map: {value: 'string'}}}},
@@ -44,7 +61,7 @@ export class StatusDeserializeClass {
     constructor() {
         this.is_inited = false;
         this.records = {};
-        this.car = new Car();
+        this.truck = new Truck();
         this.messages = [];
         // account_id -> message
         this.efficient_recordes = new UnorderedMap("a");
@@ -92,20 +109,31 @@ export class StatusDeserializeClass {
 
 
     @call({})
-    set_car_info({ name, speed }) {
+    set_truck_info({ name, speed }) {
         let account_id = near.signerAccountId();
-        near.log(`${account_id} set_car_info name ${name}, speed ${speed}`);
+        near.log(`${account_id} set_truck_info name ${name}, speed ${speed}`);
+        let truck = new Truck();
+        truck.name = name;
+        truck.speed = speed;
+        truck.loads = this.truck.loads;
+        this.truck = truck;
         let car = new Car();
         car.name = name;
         car.speed = speed;
-        this.car = car;
         this.user_car_map.set(account_id, car);
     }
 
+    @call({})
+    add_truck_load({ name, load }) {
+        let account_id = near.signerAccountId();
+        near.log(`${account_id} add_truck_load name ${name}, load ${load}`);
+        this.truck.loads.set(name, load);
+    }
+
     @view({})
-    get_car_info({ }) {
-        near.log(`get_car_info`);
-        return this.car.info();
+    get_truck_info({ }) {
+        near.log(`get_truck_info`);
+        return this.truck.info();
     }
 
     @view({})

@@ -41,15 +41,18 @@ test("Ali sets then gets status", async (t) => {
   );
 });
 
-test("Ali set_car_info and get_car_info", async (t) => {
+test.only("Ali set_truck_info and get_truck_info", async (t) => {
   const { ali, statusMessage } = t.context.accounts;
   let carName = "Mercedes-Benz";
   let speed = 240;
-  await ali.call(statusMessage, "set_car_info", { name: carName, speed: speed });
+  await ali.call(statusMessage, "set_truck_info", { name: carName, speed: speed });
+
+  await ali.call(statusMessage, "add_truck_load", { name: "alice", load: "a box" });
+  await ali.call(statusMessage, "add_truck_load", { name: "bob", load: "a packet" });
 
   t.is(
-      await statusMessage.view("get_car_info", { }),
-      carName + " run with speed " + speed
+      await statusMessage.view("get_truck_info", { }),
+      carName + " run with speed " + speed + " with loads length: 2"
   );
 
   t.is(
