@@ -41,7 +41,7 @@ test("Ali sets then gets status", async (t) => {
   );
 });
 
-test.only("Ali set_truck_info and get_truck_info", async (t) => {
+test("Ali set_truck_info and get_truck_info", async (t) => {
   const { ali, statusMessage } = t.context.accounts;
   let carName = "Mercedes-Benz";
   let speed = 240;
@@ -130,6 +130,24 @@ test("Ali set_big_num_and_date then gets", async (t) => {
   t.is(afterSetNum, `${10n}`);
   const afterSetDate =  await statusMessage.view("get_date", { });
   t.is(afterSetDate.toString(), '2023-08-19T23:15:30.000Z');
+});
+
+test("Ali set_extra_data without schema defined then gets", async (t) => {
+  const { ali, statusMessage } = t.context.accounts;
+  await ali.call(statusMessage, "set_extra_data", { message: "Hello world!", number: 100 });
+
+  const messageWithoutSchemaDefined = await statusMessage.view("get_extra_msg", { });
+  t.is(messageWithoutSchemaDefined, "Hello world!");
+  const numberWithoutSchemaDefined =  await statusMessage.view("get_extra_number", { });
+  t.is(numberWithoutSchemaDefined, 100);
+});
+
+test("Ali set_extra_record without schema defined then gets", async (t) => {
+  const { ali, statusMessage } = t.context.accounts;
+  await ali.call(statusMessage, "set_extra_record", { message: "Hello world!"});
+
+  const recordWithoutSchemaDefined = await statusMessage.view("get_extra_record", { account_id: ali.accountId });
+  t.is(recordWithoutSchemaDefined, "Hello world!");
 });
 
 test("View get_subtype_of_efficient_recordes", async (t) => {

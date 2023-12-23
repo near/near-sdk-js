@@ -77,6 +77,9 @@ export class StatusDeserializeClass {
         this.user_car_map = new UnorderedMap("g");
         this.big_num = 1n;
         this.date = new Date();
+        this.message_without_schema_defined = "";
+        this.number_without_schema_defined = 0;
+        this.records_without_schema_defined = {};
     }
 
     @call({})
@@ -254,6 +257,39 @@ export class StatusDeserializeClass {
     get_is_contains_user({ account_id }) {
         near.log(`get_is_contains_user for account_id ${account_id}`);
         return this.unordered_set.contains(account_id);
+    }
+
+    @call({})
+    set_extra_data({ message, number }) {
+        let account_id = near.signerAccountId();
+        near.log(`${account_id} set_extra_data message ${message}, number: ${number}`);
+        this.message_without_schema_defined = message;
+        this.number_without_schema_defined = number;
+    }
+
+    @view({})
+    get_extra_msg({ }) {
+        near.log(`get_extra_msg`);
+        return this.message_without_schema_defined;
+    }
+
+    @view({})
+    get_extra_number({ }) {
+        near.log(`get_extra_number`);
+        return this.number_without_schema_defined;
+    }
+
+    @call({})
+    set_extra_record({ message }) {
+        let account_id = near.signerAccountId();
+        near.log(`${account_id} set_extra_record with message ${message}`);
+        this.records_without_schema_defined[account_id] = message;
+    }
+
+    @view({})
+    get_extra_record({ account_id }) {
+        near.log(`get_extra_record for account_id ${account_id}`);
+        return this.records_without_schema_defined[account_id] || null;
     }
 
     @view({})

@@ -53,13 +53,12 @@ add_a_car(car: Car) {
 ### The schema format
 #### We support multiple type in schema:
 * build-in non object types: `string`, `number`, `boolean`
-* build-in object types: `date`, `bigint`
+* build-in object types: `Date`, `BigInt`. And we can skip those two build-in object types in schema info
 * build-in collection types: `array`, `map`
   * for `array` type, we need to declare it in the format of `{array: {value: valueType}}`
   * for `map` type, we need to declare it in the format of `{map: {key: 'KeyType', value: 'valueType'}}`
 * Custom Class types: `Car` or any class types
-* Near collection types: `Vector`, `LookupMap`, `LookupSet`, `UnorderedMap`, `UnorderedSet`
-  * 
+* Near collection types: `Vector`, `LookupMap`, `LookupSet`, `UnorderedMap`, `UnorderedSet`  
 We have a test example which contains all those types in one schema: [status-deserialize-class.js](./examples/src/status-deserialize-class.js)
 ```js
 class StatusDeserializeClass {
@@ -101,6 +100,27 @@ class StatusDeserializeClass {
     }
     // other methods
 }
+```
+#### Logic of auto reconstruct by json schema
+The `_reconstruct` method in [near-bindgen.ts](./packages/near-sdk-js/src/near-bindgen.ts) will check whether there exit a schema in smart contract class, if there exist a static schema info, it will be decoded to class by invoking `decodeObj2class`, or it will fallback to previous behavior:
+```typescript
+  static _reconstruct(classObject: object, plainObject: AnyObject): object {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    if (classObject.constructor.schema === undefined) {
+      for (const item in classObject) {
+        const reconstructor = classObject[item].constructor?.reconstruct;
+  
+        classObject[item] = reconstructor
+                ? reconstructor(plainObject[item])
+                : plainObject[item];
+      }
+  
+      return classObject;
+    }
+  
+    return decodeObj2class(classObject, plainObject);
+  }
 ```
 #### no need to announce GetOptions.reconstructor in decoding nested collections
 In this other hand, after we set schema for the Near collections with nested collections, we don't need to announce `reconstructor` when we need to get and decode a nested collections because the data type info in the schema will tell sdk what the nested data type.  
