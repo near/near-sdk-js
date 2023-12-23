@@ -1,9 +1,10 @@
 import { GetOptions } from "../types/collections";
+import { SubType } from "./subtype";
 /**
  * An iterable implementation of vector that stores its content on the trie.
  * Uses the following map: index -> element
  */
-export declare class Vector<DataType> {
+export declare class Vector<DataType> extends SubType<DataType> {
     readonly prefix: string;
     length: number;
     /**
@@ -15,8 +16,6 @@ export declare class Vector<DataType> {
      * Checks whether the collection is empty.
      */
     isEmpty(): boolean;
-    subtype(): any;
-    set_reconstructor(options?: Omit<GetOptions<DataType>, "serializer">): Omit<GetOptions<DataType>, "serializer">;
     /**
      * Get the data stored at the provided index.
      *

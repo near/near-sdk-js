@@ -209,7 +209,7 @@ export class StatusDeserializeClass {
 
     @view({})
     get_big_num({ }) {
-        near.log(`get_big_num}`);
+        near.log(`get_big_num`);
         return this.big_num;
     }
 
