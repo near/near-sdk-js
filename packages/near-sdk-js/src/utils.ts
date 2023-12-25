@@ -1,11 +1,4 @@
 import { GetOptions } from "./types/collections";
-import {
-  LOOKUP_MAP_SCHE,
-  LOOKUP_SET_SCHE,
-  UNORDERED_MAP_SCHE,
-  UNORDERED_SET_SCHE,
-  VECTOR_SCHE,
-} from "./collections";
 import { cloneDeep } from "lodash-es";
 
 export interface Env {
@@ -236,43 +229,14 @@ export function decodeObj2class(class_instance, obj) {
           }
         }
         // eslint-disable-next-line no-prototype-builtins
-      } else if (ty !== undefined && ty.hasOwnProperty(UNORDERED_MAP_SCHE)) {
-        class_instance[key]._keys.length = obj[key]._keys.length;
+      } else if (ty !== undefined && ty.hasOwnProperty("collection")) {
+        class_instance[key] = ty["collection"]["reconstructor"](obj[key]);
         class_instance[key].constructor.schema = ty;
-        const subtype_value = ty[UNORDERED_MAP_SCHE]["value"];
+        const subtype_value = ty["collection"]["value"];
         class_instance[key].subtype = function () {
           return subtype_value;
         };
         // eslint-disable-next-line no-prototype-builtins
-      } else if (ty !== undefined && ty.hasOwnProperty(VECTOR_SCHE)) {
-        class_instance[key].length = obj[key].length;
-        class_instance[key].constructor.schema = ty;
-        const subtype_value = ty[VECTOR_SCHE]["value"];
-        class_instance[key].subtype = function () {
-          return subtype_value;
-        };
-        // eslint-disable-next-line no-prototype-builtins
-      } else if (ty !== undefined && ty.hasOwnProperty(UNORDERED_SET_SCHE)) {
-        class_instance[key]._elements.length = obj[key]._elements.length;
-        class_instance[key].constructor.schema = ty;
-        const subtype_value = ty[UNORDERED_SET_SCHE]["value"];
-        class_instance[key].subtype = function () {
-          return subtype_value;
-        };
-        // eslint-disable-next-line no-prototype-builtins
-      } else if (ty !== undefined && ty.hasOwnProperty(LOOKUP_MAP_SCHE)) {
-        class_instance[key].constructor.schema = ty;
-        const subtype_value = ty[LOOKUP_MAP_SCHE]["value"];
-        class_instance[key].subtype = function () {
-          return subtype_value;
-        };
-        // eslint-disable-next-line no-prototype-builtins
-      } else if (ty !== undefined && ty.hasOwnProperty(LOOKUP_SET_SCHE)) {
-        class_instance[key].constructor.schema = ty;
-        const subtype_value = ty[LOOKUP_SET_SCHE]["value"];
-        class_instance[key].subtype = function () {
-          return subtype_value;
-        };
       } else {
         // normal case with nested Class, such as field is truck: Truck,
         class_instance[key] = decodeObj2class(class_instance[key], obj[key]);

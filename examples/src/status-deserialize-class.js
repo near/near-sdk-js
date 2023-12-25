@@ -28,7 +28,7 @@ class Truck {
     static schema = {
         name: "string",
         speed: "number",
-        loads: {unordered_map: {value: 'string'}}
+        loads: {collection: {reconstructor: UnorderedMap.reconstruct, value: 'string'}}
     };
     constructor() {
         this.name = "";
@@ -48,13 +48,13 @@ export class StatusDeserializeClass {
         records: {map: { key: 'string', value: 'string' }},
         truck: Truck,
         messages: {array: {value: 'string'}},
-        efficient_recordes: {unordered_map: {value: 'string'}},
-        nested_efficient_recordes: {unordered_map: {value: { unordered_map: {value: 'string'}}}},
-        nested_lookup_recordes: {unordered_map: {value: { lookup_map: {value: 'string'}}}},
-        vector_nested_group: {vector: {value: { lookup_map: {value: 'string'}}}},
-        lookup_nest_vec: {lookup_map: {value: { vector: { value: 'string' }}}},
-        unordered_set: {unordered_set: {value: 'string'}},
-        user_car_map: {unordered_map: {value: Car }},
+        efficient_recordes: {collection: {reconstructor: UnorderedMap.reconstruct, value: 'string'}},
+        nested_efficient_recordes: {collection: {reconstructor: UnorderedMap.reconstruct, value: { collection: {reconstructor: UnorderedMap.reconstruct, value: 'string'}}}},
+        nested_lookup_recordes: {collection: {reconstructor: UnorderedMap.reconstruct, value: { collection: {reconstructor: LookupMap.reconstruct, value: 'string'}}}},
+        vector_nested_group: {collection: {reconstructor: Vector.reconstruct, value: { collection: {reconstructor: LookupMap.reconstruct, value: 'string'}}}},
+        lookup_nest_vec: {collection: {reconstructor: LookupMap.reconstruct, value: { collection: { reconstructor: Vector.reconstruct, value: 'string' }}}},
+        unordered_set: {collection: {reconstructor: UnorderedSet.reconstruct, value: 'string'}},
+        user_car_map: {collection: {reconstructor: UnorderedMap.reconstruct, value: Car }},
         big_num: 'bigint',
         date: 'date'
     };
