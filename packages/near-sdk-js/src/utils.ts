@@ -1,5 +1,6 @@
 import { GetOptions } from "./types/collections";
 import { cloneDeep } from "lodash-es";
+import * as near from "./api";
 
 export interface Env {
   uint8array_to_latin1_string(a: Uint8Array): string;
@@ -71,7 +72,7 @@ export function assert(
 export type Mutable<T> = { -readonly [P in keyof T]: T[P] };
 
 export function getValueWithOptions<DataType>(
-  datatype: unknown,
+  subDatatype: unknown,
   value: Uint8Array | null,
   options: Omit<GetOptions<DataType>, "serializer"> = {
     deserializer: deserialize,
@@ -89,39 +90,56 @@ export function getValueWithOptions<DataType>(
   }
 
   if (options?.reconstructor) {
-    return options.reconstructor(deserialized);
-  }
-
-  if (datatype !== undefined) {
-    // subtype info is a class constructor
-    if (typeof datatype === "function") {
+    near.log(deserialized);
+    // example: // { collection: {reconstructor: LookupMap.reconstruct, value: 'string'}}
+    const collection = options.reconstructor(deserialized);
+    // eslint-disable-next-line no-prototype-builtins
+    if (
+      subDatatype !== undefined &&
+      subDatatype.hasOwnProperty("collection") &&
+      subDatatype["collection"].hasOwnProperty("value")
+    ) {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
-      deserialized = decodeObj2class(new datatype(), deserialized);
-    } else if (typeof datatype === "object") {
+      collection.subtype = function () {
+        // example: { collection: {reconstructor: LookupMap.reconstruct, value: 'string'}}
+        return subDatatype["collection"]["value"];
+      };
+    }
+    return collection;
+  }
+
+  // example: { collection: {reconstructor: LookupMap.reconstruct, value: 'string'}}
+  if (subDatatype !== undefined) {
+    // subtype info is a class constructor, Such as Car
+    if (typeof subDatatype === "function") {
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      deserialized = decodeObj2class(new subDatatype(), deserialized);
+    } else if (typeof subDatatype === "object") {
       // normal collections of array, map; subtype will be:
       //  {map: { key: 'string', value: 'string' }} or {array: {value: 'string'}} ..
       // eslint-disable-next-line no-prototype-builtins
-      if (datatype.hasOwnProperty("map")) {
+      if (subDatatype.hasOwnProperty("map")) {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         for (const mkey in deserialized) {
-          if (datatype["map"]["value"] !== "string") {
+          if (subDatatype["map"]["value"] !== "string") {
             deserialized[mkey] = decodeObj2class(
-              new datatype["map"]["value"](),
+              new subDatatype["map"]["value"](),
               value[mkey]
             );
           }
         }
         // eslint-disable-next-line no-prototype-builtins
-      } else if (datatype.hasOwnProperty("array")) {
+      } else if (subDatatype.hasOwnProperty("array")) {
         const new_vec = [];
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
         for (const k in deserialized) {
-          if (datatype["array"]["value"] !== "string") {
+          if (subDatatype["array"]["value"] !== "string") {
             new_vec.push(
-              decodeObj2class(new datatype["array"]["value"](), value[k])
+              decodeObj2class(new subDatatype["array"]["value"](), value[k])
             );
           }
         }
@@ -230,10 +248,12 @@ export function decodeObj2class(class_instance, obj) {
         }
         // eslint-disable-next-line no-prototype-builtins
       } else if (ty !== undefined && ty.hasOwnProperty("collection")) {
+        // nested_lookup_recordes: {collection: {reconstructor: UnorderedMap.reconstruct, value: { collection: {reconstructor: LookupMap.reconstruct, value: 'string'}}}},
+        // {collection: {reconstructor:
         class_instance[key] = ty["collection"]["reconstructor"](obj[key]);
-        class_instance[key].constructor.schema = ty;
         const subtype_value = ty["collection"]["value"];
         class_instance[key].subtype = function () {
+          // example: { collection: {reconstructor: LookupMap.reconstruct, value: 'string'}}
           return subtype_value;
         };
         // eslint-disable-next-line no-prototype-builtins
