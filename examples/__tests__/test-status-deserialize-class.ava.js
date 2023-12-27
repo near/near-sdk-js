@@ -74,7 +74,7 @@ test("Ali push_message and get_messages", async (t) => {
   );
 });
 
-test.only("Ali set_nested_efficient_recordes then get_nested_efficient_recordes text", async (t) => {
+test("Ali set_nested_efficient_recordes then get_nested_efficient_recordes text", async (t) => {
   const { ali, bob, statusMessage } = t.context.accounts;
   await ali.call(statusMessage, "set_nested_efficient_recordes", { id: "1", message: "hello" }, { gas: 35_000_000_000_000n });
   await bob.call(statusMessage, "set_nested_efficient_recordes", { id: "1", message: "hello" }, { gas: 35_000_000_000_000n });

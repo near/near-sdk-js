@@ -1,5 +1,4 @@
 import { cloneDeep } from "lodash-es";
-import * as near from "./api";
 // make PromiseIndex a nominal typing
 var PromiseIndexBrand;
 (function (PromiseIndexBrand) {
@@ -49,11 +48,13 @@ export function getValueWithOptions(subDatatype, value, options = {
         return options?.defaultValue ?? null;
     }
     if (options?.reconstructor) {
-        near.log(deserialized);
         // example: // { collection: {reconstructor: LookupMap.reconstruct, value: 'string'}}
         const collection = options.reconstructor(deserialized);
-        // eslint-disable-next-line no-prototype-builtins
-        if (subDatatype !== undefined && subDatatype.hasOwnProperty("collection") && subDatatype["collection"].hasOwnProperty("value")) {
+        if (subDatatype !== undefined &&
+            // eslint-disable-next-line no-prototype-builtins
+            subDatatype.hasOwnProperty("collection") &&
+            // eslint-disable-next-line no-prototype-builtins
+            subDatatype["collection"].hasOwnProperty("value")) {
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore
             collection.subtype = function () {
@@ -187,7 +188,6 @@ export function decodeObj2class(class_instance, obj) {
                     // example: { collection: {reconstructor: LookupMap.reconstruct, value: 'string'}}
                     return subtype_value;
                 };
-                // eslint-disable-next-line no-prototype-builtins
             }
             else {
                 // normal case with nested Class, such as field is truck: Truck,

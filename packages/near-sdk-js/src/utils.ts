@@ -1,6 +1,5 @@
 import { GetOptions } from "./types/collections";
 import { cloneDeep } from "lodash-es";
-import * as near from "./api";
 
 export interface Env {
   uint8array_to_latin1_string(a: Uint8Array): string;
@@ -90,13 +89,13 @@ export function getValueWithOptions<DataType>(
   }
 
   if (options?.reconstructor) {
-    near.log(deserialized);
     // example: // { collection: {reconstructor: LookupMap.reconstruct, value: 'string'}}
     const collection = options.reconstructor(deserialized);
-    // eslint-disable-next-line no-prototype-builtins
     if (
       subDatatype !== undefined &&
+      // eslint-disable-next-line no-prototype-builtins
       subDatatype.hasOwnProperty("collection") &&
+      // eslint-disable-next-line no-prototype-builtins
       subDatatype["collection"].hasOwnProperty("value")
     ) {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -256,7 +255,6 @@ export function decodeObj2class(class_instance, obj) {
           // example: { collection: {reconstructor: LookupMap.reconstruct, value: 'string'}}
           return subtype_value;
         };
-        // eslint-disable-next-line no-prototype-builtins
       } else {
         // normal case with nested Class, such as field is truck: Truck,
         class_instance[key] = decodeObj2class(class_instance[key], obj[key]);

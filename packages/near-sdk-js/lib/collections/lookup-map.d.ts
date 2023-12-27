@@ -1,8 +1,9 @@
 import { GetOptions } from "../types/collections";
+import { SubType } from "./subtype";
 /**
  * A lookup map that stores data in NEAR storage.
  */
-export declare class LookupMap<DataType> {
+export declare class LookupMap<DataType> extends SubType<DataType> {
     readonly keyPrefix: string;
     /**
      * @param keyPrefix - The byte prefix to use when storing elements inside this collection.
@@ -14,7 +15,6 @@ export declare class LookupMap<DataType> {
      * @param key - The value for which to check the presence.
      */
     containsKey(key: string): boolean;
-    subtype(): any;
     /**
      * Get the data stored at the provided key.
      *

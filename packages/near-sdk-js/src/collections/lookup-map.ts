@@ -5,26 +5,18 @@ import {
   serializeValueWithOptions,
   encode,
 } from "../utils";
-import { UnorderedMap } from "./unordered-map";
-import { LookupSet } from "./lookup-set";
-import { UnorderedSet } from "./unordered-set";
-import { Vector } from "./vector";
-import {
-  LOOKUP_MAP_SCHE,
-  LOOKUP_SET_SCHE,
-  UNORDERED_MAP_SCHE,
-  UNORDERED_SET_SCHE,
-  VECTOR_SCHE,
-} from "./subtype";
+import { SubType } from "./subtype";
 
 /**
  * A lookup map that stores data in NEAR storage.
  */
-export class LookupMap<DataType> {
+export class LookupMap<DataType> extends SubType<DataType> {
   /**
    * @param keyPrefix - The byte prefix to use when storing elements inside this collection.
    */
-  constructor(readonly keyPrefix: string) {}
+  constructor(readonly keyPrefix: string) {
+    super();
+  }
 
   /**
    * Checks whether the collection contains the value.
@@ -35,10 +27,6 @@ export class LookupMap<DataType> {
     const storageKey = this.keyPrefix + key;
     return near.storageHasKey(storageKey);
   }
-
-  /* eslint-disable @typescript-eslint/no-explicit-any */
-  /* eslint-disable @typescript-eslint/no-empty-function */
-  subtype(): any {}
 
   /**
    * Get the data stored at the provided key.
@@ -55,34 +43,7 @@ export class LookupMap<DataType> {
     if (options == undefined) {
       options = {};
     }
-    if (options.reconstructor == undefined && this.subtype() != undefined) {
-      // eslint-disable-next-line no-prototype-builtins
-      if (this.subtype().hasOwnProperty(UNORDERED_MAP_SCHE)) {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        options.reconstructor = UnorderedMap.reconstruct;
-        // eslint-disable-next-line no-prototype-builtins
-      } else if (this.subtype().hasOwnProperty(LOOKUP_MAP_SCHE)) {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        options.reconstructor = LookupMap.reconstruct;
-        // eslint-disable-next-line no-prototype-builtins
-      } else if (this.subtype().hasOwnProperty(LOOKUP_SET_SCHE)) {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        options.reconstructor = LookupSet.reconstruct;
-        // eslint-disable-next-line no-prototype-builtins
-      } else if (this.subtype().hasOwnProperty(UNORDERED_SET_SCHE)) {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        options.reconstructor = UnorderedSet.reconstruct;
-        // eslint-disable-next-line no-prototype-builtins
-      } else if (this.subtype().hasOwnProperty(VECTOR_SCHE)) {
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-ignore
-        options.reconstructor = Vector.reconstruct;
-      }
-    }
+    options = this.set_reconstructor(options);
 
     return getValueWithOptions(this.subtype(), value, options);
   }
