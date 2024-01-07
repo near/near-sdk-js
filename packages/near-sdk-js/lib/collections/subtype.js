@@ -8,14 +8,19 @@ export class SubType {
         }
         const subtype = this.subtype();
         if (options.reconstructor == undefined &&
-            subtype != undefined &&
+            subtype != undefined) {
+            if (
             // eslint-disable-next-line no-prototype-builtins
-            subtype.hasOwnProperty("collection") &&
-            typeof this.subtype().collection.reconstructor === "function") {
-            // { collection: {reconstructor: LookupMap.reconstruct, value: 'string'}}
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            options.reconstructor = this.subtype().collection.reconstructor;
+            subtype.hasOwnProperty("class") &&
+                typeof subtype.class.reconstructor === "function") {
+                // { collection: {reconstructor: LookupMap.reconstruct, value: 'string'}}
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                options.reconstructor = subtype.class.reconstructor;
+            }
+            else if (subtype.reconstructor === "function") {
+                options.reconstructor = subtype.reconstructor;
+            }
         }
         return options;
     }

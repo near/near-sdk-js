@@ -138,7 +138,7 @@ export function deserialize(valueToDeserialize) {
     });
 }
 export function decodeObj2class(class_instance, obj) {
-    if (typeof obj != "object" ||
+    if (typeof obj != "object" || typeof obj === "bigint" || obj instanceof Date ||
         class_instance.constructor.schema === undefined) {
         return obj;
     }
@@ -174,15 +174,19 @@ export function decodeObj2class(class_instance, obj) {
                 }
                 // eslint-disable-next-line no-prototype-builtins
             }
-            else if (ty !== undefined && ty.hasOwnProperty("collection")) {
+            else if (ty !== undefined && ty.hasOwnProperty("class")) {
                 // nested_lookup_recordes: {collection: {reconstructor: UnorderedMap.reconstruct, value: { collection: {reconstructor: LookupMap.reconstruct, value: 'string'}}}},
                 // {collection: {reconstructor:
-                class_instance[key] = ty["collection"]["reconstructor"](obj[key]);
-                const subtype_value = ty["collection"]["value"];
+                class_instance[key] = ty["class"].reconstruct(obj[key]);
+                const subtype_value = ty["value"];
                 class_instance[key].subtype = function () {
                     // example: { collection: {reconstructor: LookupMap.reconstruct, value: 'string'}}
+                    // example: UnorderedMap
                     return subtype_value;
                 };
+            }
+            else if (ty !== undefined && typeof ty.reconstruct === "function") {
+                class_instance[key] = ty.reconstruct(obj[key]);
             }
             else {
                 // normal case with nested Class, such as field is truck: Truck,
