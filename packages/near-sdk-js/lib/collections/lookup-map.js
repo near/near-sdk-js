@@ -1,13 +1,15 @@
 import * as near from "../api";
 import { getValueWithOptions, serializeValueWithOptions, encode, } from "../utils";
+import { SubType } from "./subtype";
 /**
  * A lookup map that stores data in NEAR storage.
  */
-export class LookupMap {
+export class LookupMap extends SubType {
     /**
      * @param keyPrefix - The byte prefix to use when storing elements inside this collection.
      */
     constructor(keyPrefix) {
+        super();
         this.keyPrefix = keyPrefix;
     }
     /**
@@ -28,7 +30,11 @@ export class LookupMap {
     get(key, options) {
         const storageKey = this.keyPrefix + key;
         const value = near.storageReadRaw(encode(storageKey));
-        return getValueWithOptions(value, options);
+        if (options == undefined) {
+            options = {};
+        }
+        options = this.set_reconstructor(options);
+        return getValueWithOptions(this.subtype(), value, options);
     }
     /**
      * Removes and retrieves the element with the provided key.
@@ -42,7 +48,7 @@ export class LookupMap {
             return options?.defaultValue ?? null;
         }
         const value = near.storageGetEvictedRaw();
-        return getValueWithOptions(value, options);
+        return getValueWithOptions(this.subtype(), value, options);
     }
     /**
      * Store a new value at the provided key.
@@ -58,7 +64,7 @@ export class LookupMap {
             return options?.defaultValue ?? null;
         }
         const value = near.storageGetEvictedRaw();
-        return getValueWithOptions(value, options);
+        return getValueWithOptions(this.subtype(), value, options);
     }
     /**
      * Extends the current collection with the passed in array of key-value pairs.

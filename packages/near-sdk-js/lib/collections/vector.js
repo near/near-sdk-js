@@ -1,5 +1,6 @@
 import * as near from "../api";
 import { assert, getValueWithOptions, serializeValueWithOptions, ERR_INCONSISTENT_STATE, ERR_INDEX_OUT_OF_BOUNDS, str, bytes, } from "../utils";
+import { SubType } from "./subtype";
 function indexToKey(prefix, index) {
     const data = new Uint32Array([index]);
     const array = new Uint8Array(data.buffer);
@@ -10,12 +11,13 @@ function indexToKey(prefix, index) {
  * An iterable implementation of vector that stores its content on the trie.
  * Uses the following map: index -> element
  */
-export class Vector {
+export class Vector extends SubType {
     /**
      * @param prefix - The byte prefix to use when storing elements inside this collection.
      * @param length - The initial length of the collection. By default 0.
      */
     constructor(prefix, length = 0) {
+        super();
         this.prefix = prefix;
         this.length = length;
     }
@@ -37,7 +39,8 @@ export class Vector {
         }
         const storageKey = indexToKey(this.prefix, index);
         const value = near.storageReadRaw(bytes(storageKey));
-        return getValueWithOptions(value, options);
+        options = this.set_reconstructor(options);
+        return getValueWithOptions(this.subtype(), value, options);
     }
     /**
      * Removes an element from the vector and returns it in serialized form.
@@ -56,7 +59,8 @@ export class Vector {
         const last = this.pop(options);
         assert(near.storageWriteRaw(bytes(key), serializeValueWithOptions(last, options)), ERR_INCONSISTENT_STATE);
         const value = near.storageGetEvictedRaw();
-        return getValueWithOptions(value, options);
+        options = this.set_reconstructor(options);
+        return getValueWithOptions(this.subtype(), value, options);
     }
     /**
      * Adds data to the collection.
@@ -83,7 +87,7 @@ export class Vector {
         this.length -= 1;
         assert(near.storageRemoveRaw(bytes(lastKey)), ERR_INCONSISTENT_STATE);
         const value = near.storageGetEvictedRaw();
-        return getValueWithOptions(value, options);
+        return getValueWithOptions(this.subtype(), value, options);
     }
     /**
      * Replaces the data stored at the provided index with the provided data and returns the previously stored data.
@@ -97,7 +101,8 @@ export class Vector {
         const key = indexToKey(this.prefix, index);
         assert(near.storageWriteRaw(bytes(key), serializeValueWithOptions(element, options)), ERR_INCONSISTENT_STATE);
         const value = near.storageGetEvictedRaw();
-        return getValueWithOptions(value, options);
+        options = this.set_reconstructor(options);
+        return getValueWithOptions(this.subtype(), value, options);
     }
     /**
      * Extends the current collection with the passed in array of elements.

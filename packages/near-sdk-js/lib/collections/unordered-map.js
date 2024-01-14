@@ -1,14 +1,16 @@
 import { assert, ERR_INCONSISTENT_STATE, getValueWithOptions, serializeValueWithOptions, encode, decode, } from "../utils";
 import { Vector, VectorIterator } from "./vector";
 import { LookupMap } from "./lookup-map";
+import { SubType } from "./subtype";
 /**
  * An unordered map that stores data in NEAR storage.
  */
-export class UnorderedMap {
+export class UnorderedMap extends SubType {
     /**
      * @param prefix - The byte prefix to use when storing elements inside this collection.
      */
     constructor(prefix) {
+        super();
         this.prefix = prefix;
         this._keys = new Vector(`${prefix}u`); // intentional different prefix with old UnorderedMap
         this.values = new LookupMap(`${prefix}m`);
@@ -36,8 +38,9 @@ export class UnorderedMap {
         if (valueAndIndex === null) {
             return options?.defaultValue ?? null;
         }
+        options = this.set_reconstructor(options);
         const [value] = valueAndIndex;
-        return getValueWithOptions(encode(value), options);
+        return getValueWithOptions(this.subtype(), encode(value), options);
     }
     /**
      * Store a new value at the provided key.
@@ -57,7 +60,7 @@ export class UnorderedMap {
         }
         const [oldValue, oldIndex] = valueAndIndex;
         this.values.set(key, [decode(serialized), oldIndex]);
-        return getValueWithOptions(encode(oldValue), options);
+        return getValueWithOptions(this.subtype(), encode(oldValue), options);
     }
     /**
      * Removes and retrieves the element with the provided key.
@@ -80,7 +83,7 @@ export class UnorderedMap {
             assert(swappedValueAndIndex !== null, ERR_INCONSISTENT_STATE);
             this.values.set(swappedKey, [swappedValueAndIndex[0], index]);
         }
-        return getValueWithOptions(encode(value), options);
+        return getValueWithOptions(this.subtype(), encode(value), options);
     }
     /**
      * Remove all of the elements stored within the collection.
@@ -176,7 +179,11 @@ class UnorderedMapIterator {
         this.options = options;
         this.keys = new VectorIterator(unorderedMap._keys);
         this.map = unorderedMap.values;
+        this.subtype = unorderedMap.subtype;
     }
+    /* eslint-disable @typescript-eslint/no-explicit-any */
+    /* eslint-disable @typescript-eslint/no-empty-function */
+    subtype() { }
     next() {
         const key = this.keys.next();
         if (key.done) {
@@ -188,7 +195,7 @@ class UnorderedMapIterator {
             done: key.done,
             value: [
                 key.value,
-                getValueWithOptions(encode(valueAndIndex[0]), this.options),
+                getValueWithOptions(this.subtype(), encode(valueAndIndex[0]), this.options),
             ],
         };
     }

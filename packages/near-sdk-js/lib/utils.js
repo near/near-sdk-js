@@ -1,3 +1,4 @@
+import { cloneDeep } from "lodash-es";
 // make PromiseIndex a nominal typing
 var PromiseIndexBrand;
 (function (PromiseIndexBrand) {
@@ -35,18 +36,69 @@ export function assert(expression, message) {
         throw new Error("assertion failed: " + message);
     }
 }
-export function getValueWithOptions(value, options = {
+export function getValueWithOptions(subDatatype, value, options = {
     deserializer: deserialize,
 }) {
     if (value === null) {
         return options?.defaultValue ?? null;
     }
-    const deserialized = deserialize(value);
+    // here is an obj
+    let deserialized = deserialize(value);
     if (deserialized === undefined || deserialized === null) {
         return options?.defaultValue ?? null;
     }
     if (options?.reconstructor) {
-        return options.reconstructor(deserialized);
+        // example: // { collection: {reconstructor: LookupMap.reconstruct, value: 'string'}}
+        const collection = options.reconstructor(deserialized);
+        if (subDatatype !== undefined &&
+            // eslint-disable-next-line no-prototype-builtins
+            subDatatype.hasOwnProperty("collection") &&
+            // eslint-disable-next-line no-prototype-builtins
+            subDatatype["collection"].hasOwnProperty("value")) {
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            collection.subtype = function () {
+                // example: { collection: {reconstructor: LookupMap.reconstruct, value: 'string'}}
+                return subDatatype["collection"]["value"];
+            };
+        }
+        return collection;
+    }
+    // example: { collection: {reconstructor: LookupMap.reconstruct, value: 'string'}}
+    if (subDatatype !== undefined) {
+        // subtype info is a class constructor, Such as Car
+        if (typeof subDatatype === "function") {
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            deserialized = decodeObj2class(new subDatatype(), deserialized);
+        }
+        else if (typeof subDatatype === "object") {
+            // normal collections of array, map; subtype will be:
+            //  {map: { key: 'string', value: 'string' }} or {array: {value: 'string'}} ..
+            // eslint-disable-next-line no-prototype-builtins
+            if (subDatatype.hasOwnProperty("map")) {
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                for (const mkey in deserialized) {
+                    if (subDatatype["map"]["value"] !== "string") {
+                        deserialized[mkey] = decodeObj2class(new subDatatype["map"]["value"](), value[mkey]);
+                    }
+                }
+                // eslint-disable-next-line no-prototype-builtins
+            }
+            else if (subDatatype.hasOwnProperty("array")) {
+                const new_vec = [];
+                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                // @ts-ignore
+                for (const k in deserialized) {
+                    if (subDatatype["array"]["value"] !== "string") {
+                        new_vec.push(decodeObj2class(new subDatatype["array"]["value"](), value[k]));
+                    }
+                }
+                deserialized = new_vec;
+                // eslint-disable-next-line no-prototype-builtins
+            }
+        }
     }
     return deserialized;
 }
@@ -89,6 +141,71 @@ export function deserialize(valueToDeserialize) {
         }
         return value;
     });
+}
+export function decodeObj2class(class_instance, obj) {
+    if (typeof obj != "object" ||
+        class_instance.constructor.schema === undefined) {
+        return obj;
+    }
+    let key;
+    for (key in obj) {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        const value = obj[key];
+        if (typeof value == "object") {
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-ignore
+            const ty = class_instance.constructor.schema[key];
+            // eslint-disable-next-line no-prototype-builtins
+            if (ty !== undefined && ty.hasOwnProperty("map")) {
+                for (const mkey in value) {
+                    if (ty["map"]["value"] === "string") {
+                        class_instance[key][mkey] = value[mkey];
+                    }
+                    else {
+                        class_instance[key][mkey] = decodeObj2class(new ty["map"]["value"](), value[mkey]);
+                    }
+                }
+                // eslint-disable-next-line no-prototype-builtins
+            }
+            else if (ty !== undefined && ty.hasOwnProperty("array")) {
+                for (const k in value) {
+                    if (ty["array"]["value"] === "string") {
+                        class_instance[key].push(value[k]);
+                    }
+                    else {
+                        class_instance[key].push(decodeObj2class(new ty["array"]["value"](), value[k]));
+                    }
+                }
+                // eslint-disable-next-line no-prototype-builtins
+            }
+            else if (ty !== undefined && ty.hasOwnProperty("collection")) {
+                // nested_lookup_recordes: {collection: {reconstructor: UnorderedMap.reconstruct, value: { collection: {reconstructor: LookupMap.reconstruct, value: 'string'}}}},
+                // {collection: {reconstructor:
+                class_instance[key] = ty["collection"]["reconstructor"](obj[key]);
+                const subtype_value = ty["collection"]["value"];
+                class_instance[key].subtype = function () {
+                    // example: { collection: {reconstructor: LookupMap.reconstruct, value: 'string'}}
+                    return subtype_value;
+                };
+            }
+            else {
+                // normal case with nested Class, such as field is truck: Truck,
+                class_instance[key] = decodeObj2class(class_instance[key], obj[key]);
+            }
+        }
+        else {
+            class_instance[key] = obj[key];
+        }
+    }
+    const instance_tmp = cloneDeep(class_instance);
+    for (key in obj) {
+        if (typeof class_instance[key] == "object" &&
+            !(class_instance[key] instanceof Date)) {
+            class_instance[key] = instance_tmp[key];
+        }
+    }
+    return class_instance;
 }
 /**
  * Validates the Account ID according to the NEAR protocol

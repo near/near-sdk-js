@@ -1,5 +1,9 @@
 lockfileVersion: '6.0'
 
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
 importers:
 
   .:
@@ -121,6 +125,9 @@ importers:
       json-schema:
         specifier: 0.4.0
         version: 0.4.0
+      lodash-es:
+        specifier: ^4.17.21
+        version: 4.17.21
       near-abi:
         specifier: ^0.1.0
         version: 0.1.1
@@ -3949,7 +3956,3 @@ packages:
     resolution: {integrity: sha512-9bnSc/HEW2uRy67wc+T8UwauLuPJVn28jb+GtJY16iiKWyvmYJRXVT4UamsAEGQfPohgr2q4Tq0sQbQlxTfi1g==}
     engines: {node: '>=12.20'}
     dev: true
-
-settings:
-  autoInstallPeers: true
-  excludeLinksFromLockfile: false

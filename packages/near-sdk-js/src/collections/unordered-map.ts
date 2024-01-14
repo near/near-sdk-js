@@ -10,13 +10,14 @@ import {
 import { Vector, VectorIterator } from "./vector";
 import { LookupMap } from "./lookup-map";
 import { GetOptions } from "../types/collections";
+import { SubType } from "./subtype";
 
 type ValueAndIndex = [value: string, index: number];
 
 /**
  * An unordered map that stores data in NEAR storage.
  */
-export class UnorderedMap<DataType> {
+export class UnorderedMap<DataType> extends SubType<DataType> {
   readonly _keys: Vector<string>;
   readonly values: LookupMap<ValueAndIndex>;
 
@@ -24,6 +25,7 @@ export class UnorderedMap<DataType> {
    * @param prefix - The byte prefix to use when storing elements inside this collection.
    */
   constructor(readonly prefix: string) {
+    super();
     this._keys = new Vector<string>(`${prefix}u`); // intentional different prefix with old UnorderedMap
     this.values = new LookupMap<ValueAndIndex>(`${prefix}m`);
   }
@@ -57,10 +59,11 @@ export class UnorderedMap<DataType> {
     if (valueAndIndex === null) {
       return options?.defaultValue ?? null;
     }
+    options = this.set_reconstructor(options);
 
     const [value] = valueAndIndex;
 
-    return getValueWithOptions(encode(value), options);
+    return getValueWithOptions(this.subtype(), encode(value), options);
   }
 
   /**
@@ -90,7 +93,7 @@ export class UnorderedMap<DataType> {
     const [oldValue, oldIndex] = valueAndIndex;
     this.values.set(key, [decode(serialized), oldIndex]);
 
-    return getValueWithOptions(encode(oldValue), options);
+    return getValueWithOptions(this.subtype(), encode(oldValue), options);
   }
 
   /**
@@ -124,7 +127,7 @@ export class UnorderedMap<DataType> {
       this.values.set(swappedKey, [swappedValueAndIndex[0], index]);
     }
 
-    return getValueWithOptions(encode(value), options);
+    return getValueWithOptions(this.subtype(), encode(value), options);
   }
 
   /**
@@ -246,7 +249,12 @@ class UnorderedMapIterator<DataType> {
   ) {
     this.keys = new VectorIterator(unorderedMap._keys);
     this.map = unorderedMap.values;
+    this.subtype = unorderedMap.subtype;
   }
+
+  /* eslint-disable @typescript-eslint/no-explicit-any */
+  /* eslint-disable @typescript-eslint/no-empty-function */
+  subtype(): any {}
 
   next(): { value: [string | null, DataType | null]; done: boolean } {
     const key = this.keys.next();
@@ -263,7 +271,11 @@ class UnorderedMapIterator<DataType> {
       done: key.done,
       value: [
         key.value,
-        getValueWithOptions(encode(valueAndIndex[0]), this.options),
+        getValueWithOptions(
+          this.subtype(),
+          encode(valueAndIndex[0]),
+          this.options
+        ),
       ],
     };
   }

@@ -32,6 +32,7 @@
     "build:state-migration": "run-s build:state-migration:*",
     "build:state-migration:original": "near-sdk-js build src/state-migration-original.ts build/state-migration-original.wasm",
     "build:state-migration:new": "near-sdk-js build src/state-migration-new.ts build/state-migration-new.wasm",
+    "build:status-deserialize-class": "near-sdk-js build src/status-deserialize-class.js build/status-deserialize-class.wasm",
     "test": "ava && pnpm test:counter-lowlevel && pnpm test:counter-ts",
     "test:nft": "ava __tests__/standard-nft/*",
     "test:ft": "ava __tests__/standard-ft/*",
@@ -53,7 +54,8 @@
     "test:nested-collections": "ava __tests__/test-nested-collections.ava.js",
     "test:status-message-borsh": "ava __tests__/test-status-message-borsh.ava.js",
     "test:status-message-serialize-err": "ava __tests__/test-status-message-serialize-err.ava.js",
-    "test:status-message-deserialize-err": "ava __tests__/test-status-message-deserialize-err.ava.js"
+    "test:status-message-deserialize-err": "ava __tests__/test-status-message-deserialize-err.ava.js",
+    "test:status-deserialize-class": "ava __tests__/test-status-deserialize-class.ava.js"
   },
   "author": "Near Inc <hello@nearprotocol.com>",
   "license": "Apache-2.0",

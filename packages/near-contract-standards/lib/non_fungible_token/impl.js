@@ -3,9 +3,9 @@ import { TokenMetadata } from "./metadata";
 import { refund_storage_deposit, refund_deposit, refund_deposit_to_account, assert_at_least_one_yocto, assert_one_yocto, } from "./utils";
 import { NftMint, NftTransfer } from "./events";
 import { Token } from "./token";
-const GAS_FOR_RESOLVE_TRANSFER = 15000000000000n;
+const GAS_FOR_RESOLVE_TRANSFER = 16000000000000n;
 const GAS_FOR_NFT_TRANSFER_CALL = 30000000000000n + GAS_FOR_RESOLVE_TRANSFER;
-const GAS_FOR_NFT_APPROVE = 20000000000000n;
+const GAS_FOR_NFT_APPROVE = 21000000000000n;
 function repeat(str, n) {
     return Array(n + 1).join(str);
 }

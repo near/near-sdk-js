@@ -5,15 +5,18 @@ import {
   serializeValueWithOptions,
   encode,
 } from "../utils";
+import { SubType } from "./subtype";
 
 /**
  * A lookup map that stores data in NEAR storage.
  */
-export class LookupMap<DataType> {
+export class LookupMap<DataType> extends SubType<DataType> {
   /**
    * @param keyPrefix - The byte prefix to use when storing elements inside this collection.
    */
-  constructor(readonly keyPrefix: string) {}
+  constructor(readonly keyPrefix: string) {
+    super();
+  }
 
   /**
    * Checks whether the collection contains the value.
@@ -37,8 +40,12 @@ export class LookupMap<DataType> {
   ): DataType | null {
     const storageKey = this.keyPrefix + key;
     const value = near.storageReadRaw(encode(storageKey));
+    if (options == undefined) {
+      options = {};
+    }
+    options = this.set_reconstructor(options);
 
-    return getValueWithOptions(value, options);
+    return getValueWithOptions(this.subtype(), value, options);
   }
 
   /**
@@ -59,7 +66,7 @@ export class LookupMap<DataType> {
 
     const value = near.storageGetEvictedRaw();
 
-    return getValueWithOptions(value, options);
+    return getValueWithOptions(this.subtype(), value, options);
   }
 
   /**
@@ -83,7 +90,7 @@ export class LookupMap<DataType> {
 
     const value = near.storageGetEvictedRaw();
 
-    return getValueWithOptions(value, options);
+    return getValueWithOptions(this.subtype(), value, options);
   }
 
   /**

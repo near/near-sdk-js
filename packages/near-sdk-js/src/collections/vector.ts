@@ -9,6 +9,7 @@ import {
   bytes,
 } from "../utils";
 import { GetOptions } from "../types/collections";
+import { SubType } from "./subtype";
 
 function indexToKey(prefix: string, index: number): string {
   const data = new Uint32Array([index]);
@@ -22,12 +23,14 @@ function indexToKey(prefix: string, index: number): string {
  * An iterable implementation of vector that stores its content on the trie.
  * Uses the following map: index -> element
  */
-export class Vector<DataType> {
+export class Vector<DataType> extends SubType<DataType> {
   /**
    * @param prefix - The byte prefix to use when storing elements inside this collection.
    * @param length - The initial length of the collection. By default 0.
    */
-  constructor(readonly prefix: string, public length = 0) {}
+  constructor(readonly prefix: string, public length = 0) {
+    super();
+  }
 
   /**
    * Checks whether the collection is empty.
@@ -52,8 +55,8 @@ export class Vector<DataType> {
 
     const storageKey = indexToKey(this.prefix, index);
     const value = near.storageReadRaw(bytes(storageKey));
-
-    return getValueWithOptions(value, options);
+    options = this.set_reconstructor(options);
+    return getValueWithOptions(this.subtype(), value, options);
   }
 
   /**
@@ -83,8 +86,9 @@ export class Vector<DataType> {
     );
 
     const value = near.storageGetEvictedRaw();
+    options = this.set_reconstructor(options);
 
-    return getValueWithOptions(value, options);
+    return getValueWithOptions(this.subtype(), value, options);
   }
 
   /**
@@ -124,7 +128,7 @@ export class Vector<DataType> {
 
     const value = near.storageGetEvictedRaw();
 
-    return getValueWithOptions(value, options);
+    return getValueWithOptions(this.subtype(), value, options);
   }
 
   /**
@@ -151,8 +155,9 @@ export class Vector<DataType> {
     );
 
     const value = near.storageGetEvictedRaw();
+    options = this.set_reconstructor(options);
 
-    return getValueWithOptions(value, options);
+    return getValueWithOptions(this.subtype(), value, options);
   }
 
   /**
