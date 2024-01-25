@@ -7,19 +7,17 @@ export class SubType {
             options = {};
         }
         const subtype = this.subtype();
-        if (options.reconstructor == undefined &&
-            subtype != undefined) {
+        if (options.reconstructor == undefined && subtype != undefined) {
             if (
             // eslint-disable-next-line no-prototype-builtins
             subtype.hasOwnProperty("class") &&
-                typeof subtype.class.reconstructor === "function") {
-                // { collection: {reconstructor: LookupMap.reconstruct, value: 'string'}}
+                typeof subtype.class.reconstruct === "function") {
                 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
                 // @ts-ignore
-                options.reconstructor = subtype.class.reconstructor;
+                options.reconstructor = subtype.class.reconstruct;
             }
-            else if (subtype.reconstructor === "function") {
-                options.reconstructor = subtype.reconstructor;
+            else if (typeof subtype.reconstruct === "function") {
+                options.reconstructor = subtype.reconstruct;
             }
         }
         return options;
