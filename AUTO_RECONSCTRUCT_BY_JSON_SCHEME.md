@@ -58,46 +58,49 @@ add_a_car(car: Car) {
   * for `array` type, we need to declare it in the format of `{array: {value: valueType}}`
   * for `map` type, we need to declare it in the format of `{map: {key: 'KeyType', value: 'valueType'}}`
 * Custom Class types: `Car` or any class types
-* Near collection types: `Vector`, `LookupMap`, `LookupSet`, `UnorderedMap`, `UnorderedSet`  
+* Near collection class types: `Vector`, `LookupMap`, `LookupSet`, `UnorderedMap`, `UnorderedSet`, need to declare in the format of `{class: ClassType, value: ValueType}`
+  * we can ignore `value` field if we don't need to auto reconstruct value to specific class. we often ignore `value` field if value tye are `string`, `number`, `boolean`
 We have a test example which contains all those types in one schema: [status-deserialize-class.js](./examples/src/status-deserialize-class.js)
 ```js
-class StatusDeserializeClass {
-    static schema = {
-        is_inited: "boolean",
-        records: {map: {key: 'string', value: 'string'}},
-        car: Car,
-        messages: {array: {value: 'string'}},
-        efficient_recordes: {unordered_map: {value: 'string'}},
-        nested_efficient_recordes: {unordered_map: {value: {unordered_map: {value: 'string'}}}},
-        nested_lookup_recordes: {unordered_map: {value: {lookup_map: {value: 'string'}}}},
-        vector_nested_group: {vector: {value: {lookup_map: {value: 'string'}}}},
-        lookup_nest_vec: {lookup_map: {value: {vector: {value: 'string'}}}},
-        unordered_set: {unordered_set: {value: 'string'}},
-        user_car_map: {unordered_map: {value: Car}},
-        big_num: 'bigint',
-        date: 'date'
-    };
-
-    constructor() {
-        this.is_inited = false;
-        this.records = {};
-        this.car = new Car();
-        this.messages = [];
-        // account_id -> message
-        this.efficient_recordes = new UnorderedMap("a");
-        // id -> account_id -> message
-        this.nested_efficient_recordes = new UnorderedMap("b");
-        // id -> account_id -> message
-        this.nested_lookup_recordes = new UnorderedMap("c");
-        // index -> account_id -> message
-        this.vector_nested_group = new Vector("d");
-        // account_id -> index -> message
-        this.lookup_nest_vec = new LookupMap("e");
-        this.unordered_set = new UnorderedSet("f");
-        this.user_car_map = new UnorderedMap("g");
-        this.big_num = 1n;
-        this.date = new Date();
-    }
+export class StatusDeserializeClass {
+  static schema = {
+    is_inited: "boolean",
+    records: {map: { key: 'string', value: 'string' }},
+    truck: Truck,
+    messages: {array: {value: 'string'}},
+    efficient_recordes: {class: UnorderedMap},
+    nested_efficient_recordes: {class: UnorderedMap, value: UnorderedMap},
+    nested_lookup_recordes:  {class: UnorderedMap, value: {class: LookupMap }},
+    vector_nested_group: {class: Vector, value: { class: LookupMap }},
+    lookup_nest_vec: { class: LookupMap, value: Vector },
+    unordered_set: {class: UnorderedSet },
+    user_car_map: {class: UnorderedMap, value: Car },
+    big_num: 'bigint',
+    date: 'date'
+  };
+  constructor() {
+    this.is_inited = false;
+    this.records = {};
+    this.truck = new Truck();
+    this.messages = [];
+    // account_id -> message
+    this.efficient_recordes = new UnorderedMap("a");
+    // id -> account_id -> message
+    this.nested_efficient_recordes = new UnorderedMap("b");
+    // id -> account_id -> message
+    this.nested_lookup_recordes = new UnorderedMap("c");
+    // index -> account_id -> message
+    this.vector_nested_group = new Vector("d");
+    // account_id -> index -> message
+    this.lookup_nest_vec = new LookupMap("e");
+    this.unordered_set = new UnorderedSet("f");
+    this.user_car_map = new UnorderedMap("g");
+    this.big_num = 1n;
+    this.date = new Date();
+    this.message_without_schema_defined = "";
+    this.number_without_schema_defined = 0;
+    this.records_without_schema_defined = {};
+  }
     // other methods
 }
 ```
@@ -146,12 +149,12 @@ export class Contract {
     }
 }
 ```
-After we set schema info we don't need to set `reconstructor` in `GetOptions`, sdk can infer which reconstructor should be took by the schema:
+After we set schema info we don't need to set `reconstructor` in `GetOptions` anymore, sdk can infer which reconstructor should be taken by the schema:
 ```typescript
 @NearBindgen({})
 export class Contract {
     static schema = {
-      outerMap: {unordered_map: {value: { unordered_map: {value: 'string'}}}}
+      outerMap: {class: UnorderedMap, value: UnorderedMap}
     };
     
     outerMap: UnorderedMap<UnorderedMap<string>>;
@@ -162,9 +165,7 @@ export class Contract {
 
     @view({})
     get({id, accountId}: { id: string; accountId: string }) {
-        const innerMap = this.outerMap.get(id, {
-            reconstructor: UnorderedMap.reconstruct,  // we need to announce reconstructor explicit, reconstructor can be infered from static schema
-        });
+        const innerMap = this.outerMap.get(id);  // reconstructor can be infered from static schema
         if (innerMap === null) {
             return null;
         }
