@@ -10,14 +10,10 @@ export interface Env {
 
 declare const env: Env;
 
-// make PromiseIndex a nominal typing
-enum PromiseIndexBrand {
-  _ = -1,
-}
 /**
  * A PromiseIndex which represents the ID of a NEAR Promise.
  */
-export type PromiseIndex = (number | bigint) & PromiseIndexBrand;
+export type PromiseIndex = number | bigint ;
 /**
  * A number that specifies the amount of NEAR in yoctoNEAR.
  */
