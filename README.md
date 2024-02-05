@@ -17,7 +17,7 @@
   </a>
 </p>
 
-A JavaScript library for writing NEAR smart contracts.
+A JavaScript library and tool for writing NEAR smart contracts.
 
 ## Prerequisites
 
