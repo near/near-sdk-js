@@ -13,7 +13,7 @@ declare const env: Env;
 /**
  * A PromiseIndex which represents the ID of a NEAR Promise.
  */
-export type PromiseIndex = number | bigint ;
+export type PromiseIndex = number | bigint;
 /**
  * A number that specifies the amount of NEAR in yoctoNEAR.
  */
