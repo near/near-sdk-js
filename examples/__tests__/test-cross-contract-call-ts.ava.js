@@ -43,7 +43,7 @@ test.afterEach.always(async (t) => {
 test("Nobody is on-call in the beginning", async (t) => {
   const { onCall } = t.context.accounts;
   const result = await onCall.view("person_on_call", {});
-  t.is(result, "undefined");
+  t.is(result, "");
 });
 
 test("Person can be set on-call if AVAILABLE", async (t) => {
