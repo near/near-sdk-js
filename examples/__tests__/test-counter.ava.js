@@ -8,14 +8,31 @@ test.beforeEach(async (t) => {
   // Prepare sandbox for tests, create accounts, deploy contracts, etc.
   const root = worker.rootAccount;
 
+  let counterContract;
+
+  switch (process.env.COUNTER_CONTRACT_TYPE) {
+    case "COUNTER_LOW_LEVEL": {
+      counterContract = "./build/counter-lowlevel.wasm";
+      break;
+    }
+    case "COUNTER_TS": {
+      counterContract = "./build/counter-ts.wasm";
+      break;
+    }
+    case "COUNTER_JS": {
+      counterContract = "./build/counter.wasm";
+      break;
+    }
+    case "COUNTER_EXTENDED": {
+      counterContract = "./build/counter-extended.wasm";
+      break;
+    }
+    default:
+      throw Error("Unknown COUNTER_CONTRACT_TYPE");
+  }
+
   // Deploy the counter contract.
-  const counter = await root.devDeploy(
-    process.env["COUNTER_LOWLEVEL"]
-      ? "./build/counter-lowlevel.wasm"
-      : process.env["COUNTER_TS"]
-      ? "./build/counter-ts.wasm"
-      : "./build/counter.wasm"
-  );
+  const counter = await root.devDeploy(counterContract);
 
   // Test users
   const ali = await root.createSubAccount("ali");
