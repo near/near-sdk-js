@@ -5,13 +5,10 @@ export interface Env {
     latin1_string_to_uint8array(s: string): Uint8Array;
     utf8_string_to_uint8array(s: string): Uint8Array;
 }
-declare enum PromiseIndexBrand {
-    _ = -1
-}
 /**
  * A PromiseIndex which represents the ID of a NEAR Promise.
  */
-export declare type PromiseIndex = (number | bigint) & PromiseIndexBrand;
+export declare type PromiseIndex = number | bigint;
 /**
  * A number that specifies the amount of NEAR in yoctoNEAR.
  */
@@ -95,4 +92,3 @@ export declare function decode(a: Uint8Array): string;
 export interface IntoStorageKey {
     into_storage_key(): string;
 }
-export {};

@@ -1,9 +1,4 @@
 import { cloneDeep } from "lodash-es";
-// make PromiseIndex a nominal typing
-var PromiseIndexBrand;
-(function (PromiseIndexBrand) {
-    PromiseIndexBrand[PromiseIndexBrand["_"] = -1] = "_";
-})(PromiseIndexBrand || (PromiseIndexBrand = {}));
 const TYPE_KEY = "typeInfo";
 var TypeBrand;
 (function (TypeBrand) {
