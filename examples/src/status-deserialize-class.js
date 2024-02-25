@@ -28,8 +28,7 @@ class Truck {
     static schema = {
         name: "string",
         speed: "number",
-        // loads: {collection: {reconstructor: UnorderedMap.reconstruct, value: 'string'}}
-        loads: {class: UnorderedMap }
+        loads: UnorderedMap
     };
     constructor() {
         this.name = "";
@@ -48,16 +47,13 @@ class Truck {
 @NearBindgen({})
 export class StatusDeserializeClass {
     static schema = {
-        is_inited: "boolean",
-        records: {map: { key: 'string', value: 'string' }},
         truck: Truck,
-        messages: {array: {value: 'string'}},
-        efficient_recordes: {class: UnorderedMap},
+        efficient_recordes: UnorderedMap,
         nested_efficient_recordes: {class: UnorderedMap, value: UnorderedMap},
-        nested_lookup_recordes:  {class: UnorderedMap, value: {class: LookupMap }},
-        vector_nested_group: {class: Vector, value: { class: LookupMap }},
+        nested_lookup_recordes:  {class: UnorderedMap, value: LookupMap},
+        vector_nested_group: {class: Vector, value: LookupMap},
         lookup_nest_vec: { class: LookupMap, value: Vector },
-        unordered_set: {class: UnorderedSet },
+        unordered_set: UnorderedSet,
         user_car_map: {class: UnorderedMap, value: Car },
         big_num: 'bigint',
         date: 'date'

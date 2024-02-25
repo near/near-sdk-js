@@ -70,29 +70,26 @@ this.car.run() # This now works!
 ## The schema format
 The Schema supports multiple types: 
 
-* Primitive types: `string`, `number`, `boolean`
+* Primitive types: `string`, `number`, `boolean`. We can remove schema format of `Primitive types` since is no need to reconstruct them.
 * Built-in object types: `Date`, `BigInt`.
 * Built-in collections: `array`, `map`
-  * Arrays need to be declared as `{array: {value: valueType}}` 
-  * Maps need to declared as `{map: {key: 'keyType', value: 'valueType'}}`
+  * Arrays need to be declared as `{array: {value: valueType}}`, there are no reconstruct for `Primitive types`, for the value type is `Primitive types`, we can remove this field.
+  * Maps need to declared as `{map: {key: 'keyType', value: 'valueType'}}`, there are no reconstruct for `Primitive types`, for the key and value type are `Primitive types`, we can remove this field.
 * Custom classes are denoted by their name, e.g. `Car`
-* Near SDK Collections (i.e. `Vector`, `LookupMap`, `LookupSet`, `UnorderedMap`, `UnorderedSet`) need to be declared as `{class: ClassType, value: ValueType}`
+* Near SDK Collections (i.e. `Vector`, `LookupMap`, `LookupSet`, `UnorderedMap`, `UnorderedSet`) need to be declared as `{class: ClassType, value: ValueType}` if we need to reconstruct value or we can simplify to mark `ClassType` if we no need to reconstruct value for `Primitive types`.
 
-You can see a complete example in the [status-deserialize-class](./examples/src/status-deserialize-class.js) file, which containts the following Class declaration:
+You can see a complete example in the [status-deserialize-class](./examples/src/status-deserialize-class.js) file, which contains the following Class declaration:
 
 ```js
 export class StatusDeserializeClass {
   static schema = {
-    is_inited: "boolean",
-    records: {map: { key: 'string', value: 'string' }},
     truck: Truck,
-    messages: {array: {value: 'string'}},
-    efficient_recordes: {class: UnorderedMap},
+    efficient_recordes: UnorderedMap,
     nested_efficient_recordes: {class: UnorderedMap, value: UnorderedMap},
-    nested_lookup_recordes:  {class: UnorderedMap, value: {class: LookupMap }},
-    vector_nested_group: {class: Vector, value: { class: LookupMap }},
+    nested_lookup_recordes:  {class: UnorderedMap, value: LookupMap},
+    vector_nested_group: {class: Vector, value: LookupMap},
     lookup_nest_vec: { class: LookupMap, value: Vector },
-    unordered_set: {class: UnorderedSet },
+    unordered_set: UnorderedSet,
     user_car_map: {class: UnorderedMap, value: Car },
     big_num: 'bigint',
     date: 'date'
@@ -103,15 +100,10 @@ export class StatusDeserializeClass {
     this.records = {};
     this.truck = new Truck();
     this.messages = [];
-    // account_id -> message
     this.efficient_recordes = new UnorderedMap("a");
-    // id -> account_id -> message
     this.nested_efficient_recordes = new UnorderedMap("b");
-    // id -> account_id -> message
     this.nested_lookup_recordes = new UnorderedMap("c");
-    // index -> account_id -> message
     this.vector_nested_group = new Vector("d");
-    // account_id -> index -> message
     this.lookup_nest_vec = new LookupMap("e");
     this.unordered_set = new UnorderedSet("f");
     this.user_car_map = new UnorderedMap("g");
