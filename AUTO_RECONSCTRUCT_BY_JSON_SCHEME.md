@@ -2,7 +2,7 @@
 
 A limitation that we early detected in the `near-sdk-js` is that Classes and Nested Structures (e.g. Vectors of Maps) are valid to declare as attributes of a contract, but hard to correctly deserialize.
 
-This file explains a new solution currently implemented in the SDK and how to use it to simplify hanlding stored Classes and Nested Structures.
+This doc explains a new solution currently implemented in the SDK and how to use it to simplify hanlding stored Classes and Nested Structures.
 
 ## The Problem
 NEAR smart contracts store information in their state, which they read when an execution starts and write when an execution finished. In particular, all the information stored in the contract is (de)serialized as a `utf8` `JSON-String`.
