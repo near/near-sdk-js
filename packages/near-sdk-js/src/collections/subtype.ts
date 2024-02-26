@@ -12,17 +12,18 @@ export abstract class SubType<DataType> {
       options = {};
     }
     const subtype = this.subtype();
-    if (
-      options.reconstructor == undefined &&
-      subtype != undefined &&
-      // eslint-disable-next-line no-prototype-builtins
-      subtype.hasOwnProperty("collection") &&
-      typeof this.subtype().collection.reconstructor === "function"
-    ) {
-      // { collection: {reconstructor: LookupMap.reconstruct, value: 'string'}}
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      options.reconstructor = this.subtype().collection.reconstructor;
+    if (options.reconstructor == undefined && subtype != undefined) {
+      if (
+        // eslint-disable-next-line no-prototype-builtins
+        subtype.hasOwnProperty("class") &&
+        typeof subtype.class.reconstruct === "function"
+      ) {
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-ignore
+        options.reconstructor = subtype.class.reconstruct;
+      } else if (typeof subtype.reconstruct === "function") {
+        options.reconstructor = subtype.reconstruct;
+      }
     }
     return options;
   }

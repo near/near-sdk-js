@@ -90,15 +90,15 @@ export function getValueWithOptions<DataType>(
     if (
       subDatatype !== undefined &&
       // eslint-disable-next-line no-prototype-builtins
-      subDatatype.hasOwnProperty("collection") &&
+      subDatatype.hasOwnProperty("class") &&
       // eslint-disable-next-line no-prototype-builtins
-      subDatatype["collection"].hasOwnProperty("value")
+      subDatatype["class"].hasOwnProperty("value")
     ) {
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       collection.subtype = function () {
-        // example: { collection: {reconstructor: LookupMap.reconstruct, value: 'string'}}
-        return subDatatype["collection"]["value"];
+        // example: {class: UnorderedMap, value: UnorderedMap}
+        return subDatatype["class"]["value"];
       };
     }
     return collection;
@@ -205,6 +205,8 @@ export function deserialize(valueToDeserialize: Uint8Array): unknown {
 export function decodeObj2class(class_instance, obj) {
   if (
     typeof obj != "object" ||
+    typeof obj === "bigint" ||
+    obj instanceof Date ||
     class_instance.constructor.schema === undefined
   ) {
     return obj;
@@ -242,15 +244,20 @@ export function decodeObj2class(class_instance, obj) {
           }
         }
         // eslint-disable-next-line no-prototype-builtins
-      } else if (ty !== undefined && ty.hasOwnProperty("collection")) {
-        // nested_lookup_recordes: {collection: {reconstructor: UnorderedMap.reconstruct, value: { collection: {reconstructor: LookupMap.reconstruct, value: 'string'}}}},
-        // {collection: {reconstructor:
-        class_instance[key] = ty["collection"]["reconstructor"](obj[key]);
-        const subtype_value = ty["collection"]["value"];
-        class_instance[key].subtype = function () {
-          // example: { collection: {reconstructor: LookupMap.reconstruct, value: 'string'}}
-          return subtype_value;
-        };
+      } else if (ty !== undefined && ty.hasOwnProperty("class")) {
+        // => nested_lookup_recordes:  {class: UnorderedMap, value: {class: LookupMap }},
+        class_instance[key] = ty["class"].reconstruct(obj[key]);
+        // eslint-disable-next-line no-prototype-builtins
+        if (ty.hasOwnProperty("value")) {
+          const subtype_value = ty["value"];
+          class_instance[key].subtype = function () {
+            // example: { collection: {reconstructor: LookupMap.reconstruct, value: 'string'}}
+            // example: UnorderedMap or {class: UnorderedMap, value: 'string'}
+            return subtype_value;
+          };
+        }
+      } else if (ty !== undefined && typeof ty.reconstruct === "function") {
+        class_instance[key] = ty.reconstruct(obj[key]);
       } else {
         // normal case with nested Class, such as field is truck: Truck,
         class_instance[key] = decodeObj2class(class_instance[key], obj[key]);

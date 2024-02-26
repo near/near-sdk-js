@@ -28,7 +28,7 @@ class Truck {
     static schema = {
         name: "string",
         speed: "number",
-        loads: {collection: {reconstructor: UnorderedMap.reconstruct, value: 'string'}}
+        loads: UnorderedMap
     };
     constructor() {
         this.name = "";
@@ -41,20 +41,20 @@ class Truck {
     }
 }
 
+// sdk should first try if UnorderedMap has a static schema and use it to recursively decode.
+// In this case, UnorderedMap doesn't.
+// So sdk should next try call UnorderedMap.reconstruct.
 @NearBindgen({})
 export class StatusDeserializeClass {
     static schema = {
-        is_inited: "boolean",
-        records: {map: { key: 'string', value: 'string' }},
         truck: Truck,
-        messages: {array: {value: 'string'}},
-        efficient_recordes: {collection: {reconstructor: UnorderedMap.reconstruct, value: 'string'}},
-        nested_efficient_recordes: {collection: {reconstructor: UnorderedMap.reconstruct, value: { collection: {reconstructor: UnorderedMap.reconstruct, value: 'string'}}}},
-        nested_lookup_recordes: {collection: {reconstructor: UnorderedMap.reconstruct, value: { collection: {reconstructor: LookupMap.reconstruct, value: 'string'}}}},
-        vector_nested_group: {collection: {reconstructor: Vector.reconstruct, value: { collection: {reconstructor: LookupMap.reconstruct, value: 'string'}}}},
-        lookup_nest_vec: {collection: {reconstructor: LookupMap.reconstruct, value: { collection: { reconstructor: Vector.reconstruct, value: 'string' }}}},
-        unordered_set: {collection: {reconstructor: UnorderedSet.reconstruct, value: 'string'}},
-        user_car_map: {collection: {reconstructor: UnorderedMap.reconstruct, value: Car }},
+        efficient_recordes: UnorderedMap,
+        nested_efficient_recordes: {class: UnorderedMap, value: UnorderedMap},
+        nested_lookup_recordes:  {class: UnorderedMap, value: LookupMap},
+        vector_nested_group: {class: Vector, value: LookupMap},
+        lookup_nest_vec: { class: LookupMap, value: Vector },
+        unordered_set: UnorderedSet,
+        user_car_map: {class: UnorderedMap, value: Car },
         big_num: 'bigint',
         date: 'date'
     };

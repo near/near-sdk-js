@@ -1,7 +1,14 @@
-# Auto reconstruct by json schema
-## Problem Solved: Could not decode contract state to class instance in early version of sdk
-JS SDK decode contract as utf-8 and parse it as JSON, results in a JS Object.  
-One thing not intuitive is objects are recovered as Object, not class instance. For example, Assume an instance of this class is stored in contract state:
+# JSON Schemas for Automatic Decoding of the State
+
+A limitation that we early detected in the `near-sdk-js` is that Classes and Nested Structures (e.g. Vectors of Maps) are valid to declare as attributes of a contract, but hard to correctly deserialize.
+
+This doc explains a new solution currently implemented in the SDK and how to use it to simplify hanlding stored Classes and Nested Structures.
+
+## The Problem
+NEAR smart contracts store information in their state, which they read when an execution starts and write when an execution finished. In particular, all the information stored in the contract is (de)serialized as a `utf8` `JSON-String`.
+
+Since Javascript does **not** handle types, it is actually very hard to infer the type of the data that is stored when the contract is loaded at the start of an execution. Imagine for example a contract storing a class `Car` defined as follows:
+
 ```typescript
 Class Car {
     name: string;
@@ -12,119 +19,109 @@ Class Car {
     }
 }
 ```
-When load it back, the SDK gives us something like:
+
+A particular instance of that Car (e.g. new Car("Audi", 200)) will be stored in the contract as the JSON string:
+
 ```json
 {"name": "Audi", "speed": 200}
 ```
-However this is a JS Object, not an instance of Car Class, and therefore you cannot call run method on it.  
-This also applies to when user passes a JSON argument to a contract method. If the contract is written in TypeScript, although it may look like:
-```typescript
-add_a_car(car: Car) {
-  car.run(); // doesn't work
-  this.some_collection.set(car.name, car);
-}
+
+Next time the contract is called, the state will be parsed using `JSON.parse()`, and the result will be an `Object {name: "Audi", speed:200}`, which is an instance of `object` and **not an instance of Car**. This would happen both if the user wrote the contract in `javascript` or `typescript`, since casting in `Typescript` is just sugarcoating, it does not actually cast the object! What this means is that:
+
+```js
+// the SDK parses the String into an Object
+this.car.run() # This will fail!
 ```
-But car.run() doesn't work, because SDK only know how to deserialize it as a plain object, not a Car instance.  
-This problem is particularly painful when class is nested, for example collection class instance LookupMap containing Car class instance. Currently SDK mitigate this problem by requires user to manually reconstruct the JS object to an instance of the original class.
-## A method to decode string to class instance by json schema file
-we just need to add static member in the class type.
-```typescript
+
+This problem is particularly painful when the class is nested in another Class, e.g. a `LookupMap` of `Cars`.
+
+## The (non-elegant) Solution
+Before, the SDK mitigated this problem by requiring the user to manually reconstruct the JS `Object` to an instance of the original class.
+
+## A More Elegant Solution: JSON Schemas
+To help the SDK know which type it should decode, we can add a `static schema` map, which tells the SDK what type of data it should read:
+
+```ts
 Class Car {
+    // Schema to (de)serialize
     static schema = {
         name: "string",
         speed: "number",
     };
+
+    // Properties
     name: string;
     speed: number;
-    
+
+    // methods
     run() {
       // ...
     }
 }
 ```
-After we add static member in the class type in our smart contract, it will auto reconstruct smart contract and it's member to class instance recursive by sdk.  
-And we can call class's functions directly after it deserialized.
-```js
-add_a_car(car: Car) {
-  car.run(); // it works!
-  this.some_collection.set(car.name, car);
-}
-```
-### The schema format
-#### We support multiple type in schema:
-* build-in non object types: `string`, `number`, `boolean`
-* build-in object types: `Date`, `BigInt`. And we can skip those two build-in object types in schema info
-* build-in collection types: `array`, `map`
-  * for `array` type, we need to declare it in the format of `{array: {value: valueType}}`
-  * for `map` type, we need to declare it in the format of `{map: {key: 'KeyType', value: 'valueType'}}`
-* Custom Class types: `Car` or any class types
-* Near collection types: `Vector`, `LookupMap`, `LookupSet`, `UnorderedMap`, `UnorderedSet`  
-We have a test example which contains all those types in one schema: [status-deserialize-class.js](./examples/src/status-deserialize-class.js)
-```js
-class StatusDeserializeClass {
-    static schema = {
-        is_inited: "boolean",
-        records: {map: {key: 'string', value: 'string'}},
-        car: Car,
-        messages: {array: {value: 'string'}},
-        efficient_recordes: {unordered_map: {value: 'string'}},
-        nested_efficient_recordes: {unordered_map: {value: {unordered_map: {value: 'string'}}}},
-        nested_lookup_recordes: {unordered_map: {value: {lookup_map: {value: 'string'}}}},
-        vector_nested_group: {vector: {value: {lookup_map: {value: 'string'}}}},
-        lookup_nest_vec: {lookup_map: {value: {vector: {value: 'string'}}}},
-        unordered_set: {unordered_set: {value: 'string'}},
-        user_car_map: {unordered_map: {value: Car}},
-        big_num: 'bigint',
-        date: 'date'
-    };
 
-    constructor() {
-        this.is_inited = false;
-        this.records = {};
-        this.car = new Car();
-        this.messages = [];
-        // account_id -> message
-        this.efficient_recordes = new UnorderedMap("a");
-        // id -> account_id -> message
-        this.nested_efficient_recordes = new UnorderedMap("b");
-        // id -> account_id -> message
-        this.nested_lookup_recordes = new UnorderedMap("c");
-        // index -> account_id -> message
-        this.vector_nested_group = new Vector("d");
-        // account_id -> index -> message
-        this.lookup_nest_vec = new LookupMap("e");
-        this.unordered_set = new UnorderedSet("f");
-        this.user_car_map = new UnorderedMap("g");
-        this.big_num = 1n;
-        this.date = new Date();
-    }
+If a `Class` defines an schema, the SDK will recursively reconstruct it, by creating a new instance of `Car` and filling its attributes with the right values. In this way, the deserialized object will effectively be **an instance of the Class**. This means that we can call all its methods:
+
+```js
+// the SDK iteratively reconstructs the Car
+this.car.run() # This now works!
+```
+
+## The schema format
+The Schema supports multiple types: 
+
+* Primitive types: `string`, `number`, `boolean`. We can remove schema format of `Primitive types` since is no need to reconstruct them.
+* Built-in object types: `Date`, `BigInt`.
+* Built-in collections: `array`, `map`
+  * Arrays need to be declared as `{array: {value: valueType}}`, there are no reconstruct for `Primitive types`, for the value type is `Primitive types`, we can remove this field.
+  * Maps need to declared as `{map: {key: 'keyType', value: 'valueType'}}`, there are no reconstruct for `Primitive types`, for the key and value type are `Primitive types`, we can remove this field.
+* Custom classes are denoted by their name, e.g. `Car`
+* Near SDK Collections (i.e. `Vector`, `LookupMap`, `LookupSet`, `UnorderedMap`, `UnorderedSet`) need to be declared as `{class: ClassType, value: ValueType}` if we need to reconstruct value or we can simplify to mark `ClassType` if we no need to reconstruct value for `Primitive types`.
+
+You can see a complete example in the [status-deserialize-class](./examples/src/status-deserialize-class.js) file, which contains the following Class declaration:
+
+```js
+export class StatusDeserializeClass {
+  static schema = {
+    truck: Truck,
+    efficient_recordes: UnorderedMap,
+    nested_efficient_recordes: {class: UnorderedMap, value: UnorderedMap},
+    nested_lookup_recordes:  {class: UnorderedMap, value: LookupMap},
+    vector_nested_group: {class: Vector, value: LookupMap},
+    lookup_nest_vec: { class: LookupMap, value: Vector },
+    unordered_set: UnorderedSet,
+    user_car_map: {class: UnorderedMap, value: Car },
+    big_num: 'bigint',
+    date: 'date'
+  };
+
+  constructor() {
+    this.is_inited = false;
+    this.records = {};
+    this.truck = new Truck();
+    this.messages = [];
+    this.efficient_recordes = new UnorderedMap("a");
+    this.nested_efficient_recordes = new UnorderedMap("b");
+    this.nested_lookup_recordes = new UnorderedMap("c");
+    this.vector_nested_group = new Vector("d");
+    this.lookup_nest_vec = new LookupMap("e");
+    this.unordered_set = new UnorderedSet("f");
+    this.user_car_map = new UnorderedMap("g");
+    this.big_num = 1n;
+    this.date = new Date();
+    this.message_without_schema_defined = "";
+    this.number_without_schema_defined = 0;
+    this.records_without_schema_defined = {};
+  }
     // other methods
 }
 ```
-#### Logic of auto reconstruct by json schema
-The `_reconstruct` method in [near-bindgen.ts](./packages/near-sdk-js/src/near-bindgen.ts) will check whether there exit a schema in smart contract class, if there exist a static schema info, it will be decoded to class by invoking `decodeObj2class`, or it will fallback to previous behavior:
-```typescript
-  static _reconstruct(classObject: object, plainObject: AnyObject): object {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    if (classObject.constructor.schema === undefined) {
-      for (const item in classObject) {
-        const reconstructor = classObject[item].constructor?.reconstruct;
-  
-        classObject[item] = reconstructor
-                ? reconstructor(plainObject[item])
-                : plainObject[item];
-      }
-  
-      return classObject;
-    }
-  
-    return decodeObj2class(classObject, plainObject);
-  }
-```
-#### no need to announce GetOptions.reconstructor in decoding nested collections
-In this other hand, after we set schema for the Near collections with nested collections, we don't need to announce `reconstructor` when we need to get and decode a nested collections because the data type info in the schema will tell sdk what the nested data type.  
-Before we set schema if we need to get a nested collection we need to set `reconstructor` in `GetOptions`:
+
+---
+
+#### What happens with the old `reconstructor`?
+Until now, users needed to call a `reconstructor` method in order for **Nested Collections** to be properly decoded: 
+
 ```typescript
 @NearBindgen({})
 export class Contract {
@@ -146,12 +143,14 @@ export class Contract {
     }
 }
 ```
-After we set schema info we don't need to set `reconstructor` in `GetOptions`, sdk can infer which reconstructor should be took by the schema:
+
+With schemas, this is no longer needed, as the SDK can correctly infer how to decode the Nested Collections:
+
 ```typescript
 @NearBindgen({})
 export class Contract {
     static schema = {
-      outerMap: {unordered_map: {value: { unordered_map: {value: 'string'}}}}
+      outerMap: {class: UnorderedMap, value: UnorderedMap}
     };
     
     outerMap: UnorderedMap<UnorderedMap<string>>;
@@ -162,9 +161,7 @@ export class Contract {
 
     @view({})
     get({id, accountId}: { id: string; accountId: string }) {
-        const innerMap = this.outerMap.get(id, {
-            reconstructor: UnorderedMap.reconstruct,  // we need to announce reconstructor explicit, reconstructor can be infered from static schema
-        });
+        const innerMap = this.outerMap.get(id);  // reconstructor can be infered from static schema
         if (innerMap === null) {
             return null;
         }
@@ -172,3 +169,29 @@ export class Contract {
     }
 }
 ```
+
+---
+
+#### How Does the Reconstruction Work?
+The `_reconstruct` method in [near-bindgen.ts](./packages/near-sdk-js/src/near-bindgen.ts) will check whether an schema exists in the **contract's class**. If such schema exists, it will try to decode it by invoking `decodeObj2class`:
+
+```typescript
+  static _reconstruct(classObject: object, plainObject: AnyObject): object {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    if (classObject.constructor.schema === undefined) {
+      for (const item in classObject) {
+        const reconstructor = classObject[item].constructor?.reconstruct;
+  
+        classObject[item] = reconstructor
+                ? reconstructor(plainObject[item])
+                : plainObject[item];
+      }
+  
+      return classObject;
+    }
+  
+    return decodeObj2class(classObject, plainObject);
+  }
+```
+
