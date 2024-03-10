@@ -62,11 +62,12 @@
   "author": "Near Inc <hello@nearprotocol.com>",
   "license": "Apache-2.0",
   "dependencies": {
+    "borsh": "^v1.0.0",
+    "borsher": "^3.5.0",
     "lodash-es": "^4.17.21",
     "near-contract-standards": "workspace:*",
     "near-sdk-js": "workspace:*",
-    "typescript": "^4.7.4",
-    "borsh": "^v1.0.0"
+    "typescript": "^4.7.4"
   },
   "devDependencies": {
     "@types/lodash-es": "^4.17.6",

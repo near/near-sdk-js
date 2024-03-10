@@ -7,12 +7,14 @@ import {
     LookupMap,
     Vector,
     UnorderedSet,
+    // BorshSchema,
 } from "near-sdk-js";
+import { BorshSchema, borshSerialize, borshDeserialize } from 'borsher';
 
 class Car {
     static schema = {
-        name: "string",
-        speed: "number",
+        name: BorshSchema.String,
+        speed: BorshSchema.u64,
     };
     constructor() {
         this.name = "";
@@ -26,9 +28,9 @@ class Car {
 
 class Truck {
     static schema = {
-        name: "string",
-        speed: "number",
-        loads: UnorderedMap
+        name: BorshSchema.String,
+        speed: BorshSchema.u64,
+        loads: BorshSchema.Struct(UnorderedMap)
     };
     constructor() {
         this.name = "";
@@ -47,8 +49,8 @@ class Truck {
 @NearBindgen({})
 export class StatusDeserializeClass {
     static schema = {
-        truck: Truck,
-        efficient_recordes: UnorderedMap,
+        truck: BorshSchema.Struct(Truck),
+        efficient_recordes: BorshSchema.Struct(UnorderedMap),
         nested_efficient_recordes: {class: UnorderedMap, value: UnorderedMap},
         nested_lookup_recordes:  {class: UnorderedMap, value: LookupMap},
         vector_nested_group: {class: Vector, value: LookupMap},
