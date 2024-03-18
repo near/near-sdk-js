@@ -19,8 +19,10 @@ import { Option } from "../non_fungible_token/utils";
 import { AccountId, Balance } from "near-sdk-js";
 export declare type Nep141EventKind = FtMint[] | FtTransfer[] | FtBurn[];
 export declare class Nep141Event extends NearEvent {
+    standard: string;
     version: string;
-    event_kind: Nep141EventKind;
+    event: string;
+    data: Nep141EventKind;
     constructor(version: string, event_kind: Nep141EventKind);
 }
 /** Data to log for an FT mint event. To log this event, call [`.emit()`](FtMint::emit). */

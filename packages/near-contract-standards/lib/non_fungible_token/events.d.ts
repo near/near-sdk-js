@@ -16,10 +16,12 @@
 import { AccountId } from "near-sdk-js";
 import { NearEvent } from "../event";
 import { TokenId } from "./token";
-export declare type Nep171EventKind = NftMint[] | NftTransfer[] | NftBurn[];
+export declare type Nep171EventKind = NftMint[] | NftTransfer[] | NftBurn[] | NftContractMetadataUpdate[];
 export declare class Nep171Event extends NearEvent {
+    standard: string;
     version: string;
-    event_kind: Nep171EventKind;
+    event: string;
+    data: Nep171EventKind;
     constructor(version: string, event_kind: Nep171EventKind);
 }
 /** Data to log for an NFT mint event. To log this event, call `.emit()` */
@@ -64,4 +66,15 @@ export declare class NftBurn {
     /** Emits an nft burn event, through `near.log`,
      * where each [`NftBurn`] represents the data of each burn. */
     static emit_many(data: NftBurn[]): void;
+}
+/** Data to log for an NFT contract metadata updates. To log this event, call [`.emit()`](NftContractMetadataUpdate.emit). */
+export declare class NftContractMetadataUpdate {
+    memo?: string;
+    constructor(memo?: string);
+    /** Logs the event to the host. This is required to ensure that the event is triggered
+     * and to consume the event. */
+    emit(): void;
+    /** Emits an contract metadata update event, through `near.log`,
+     * where each [`NftBurn`] represents the data of each burn. */
+    static emit_many(data: NftContractMetadataUpdate[]): void;
 }

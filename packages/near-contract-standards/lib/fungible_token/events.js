@@ -15,11 +15,14 @@
  * or [`FtBurn::emit_many`] respectively.
  */
 import { NearEvent } from "../event";
+import { toSnakeCase } from "../util";
 export class Nep141Event extends NearEvent {
     constructor(version, event_kind) {
         super();
+        this.standard = "nep141";
         this.version = version;
-        this.event_kind = event_kind;
+        this.event = toSnakeCase(event_kind[0].constructor.name);
+        this.data = event_kind;
     }
 }
 /** Data to log for an FT mint event. To log this event, call [`.emit()`](FtMint::emit). */
