@@ -92,6 +92,4 @@ test("ecrecover", async (t) => {
   );
 });
 
-// As of Jun 24, 2022, near-sandbox is using 97c0410de519ecaca369aaee26f0ca5eb9e7de06, in which alt_bn256 is still
-// under nightly protocol feature. As near-sandbox is built without nightly protocol feature, alt_bn256 operations
-// cannot be tested yet
+// TODO add test for alt_bn256 functions
