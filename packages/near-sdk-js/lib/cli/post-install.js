@@ -24,7 +24,7 @@ if (!SUPPORTED_ARCH.includes(ARCH)) {
     process.exit(1);
 }
 signale.await("Installing wasi-stub...");
-const BINARYEN_VERSION = `0.1.15`;
+const BINARYEN_VERSION = `0.1.16`;
 const BINARYEN_VERSION_TAG = `v${BINARYEN_VERSION}`;
 const BINARYEN_SYSTEM_NAME = PLATFORM === "linux"
     ? "Linux"
@@ -33,9 +33,9 @@ const BINARYEN_SYSTEM_NAME = PLATFORM === "linux"
         : PLATFORM === "win32"
             ? "windows"
             : "other";
-const BINARYEN_ARCH_NAME = ARCH === "x64" ? "X64" : ARCH === "arm64" ? "arm64" : "other";
+const BINARYEN_ARCH_NAME = (ARCH == 'aarch64') ? 'ARM64' : ARCH.toUpperCase();
 const BINARYEN_TAR_NAME = `binaryen-${BINARYEN_SYSTEM_NAME}-${BINARYEN_ARCH_NAME}.tar.gz`;
-await download(`https://github.com/near/binaryen/releases/download/${BINARYEN_VERSION_TAG}/${BINARYEN_TAR_NAME}`);
+await download(`https://github.com/ailisp/binaryen/releases/download/${BINARYEN_VERSION_TAG}/${BINARYEN_TAR_NAME}`);
 fs.mkdirSync("binaryen");
 await executeCommand(`tar xvf ${BINARYEN_TAR_NAME} --directory binaryen`);
 fs.rmSync(BINARYEN_TAR_NAME);
