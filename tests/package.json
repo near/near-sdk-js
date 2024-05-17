@@ -53,7 +53,8 @@
     "test:serialization": "ava __tests__/test-serialization.ava.js",
     "test:constructor-validation": "ava __tests__/constructor_validation.ava.js",
     "test:migrate": "ava __tests__/decorators/migrate.ava.js",
-    "test:middlewares": "ava __tests__/test-middlewares.ava.js"
+    "test:middlewares": "ava __tests__/test-middlewares.ava.js",
+    "test:abi": "ava __tests__/abi/abi.ava.js"
   },
   "author": "Near Inc <hello@nearprotocol.com>",
   "license": "Apache-2.0",
