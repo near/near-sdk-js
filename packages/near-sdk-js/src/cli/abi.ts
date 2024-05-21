@@ -236,7 +236,7 @@ export function runAbiCompilerPlugin(
             type_schema: schema,
           };
         }
-        let abiFunction: abi.AbiFunction = {
+        const abiFunction: abi.AbiFunction = {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           name: (methodDeclaration.name as any).text,
           kind: isView ? abi.AbiFunctionKind.View : abi.AbiFunctionKind.Call,
