@@ -137,8 +137,10 @@ export function runAbiCompilerPlugin(tsFile, packageJsonPath, tsConfigJsonPath) 
                     }
                     if (decoratorName === "view")
                         isView = true;
-                    if (decoratorName === "initialize")
+                    if (decoratorName === "initialize") {
                         isInit = true;
+                        abiModifiers.push(abi.AbiFunctionModifier.Init);
+                    }
                 });
                 const nearDecoratorsCount = [isCall, isView, isInit].filter((b) => b).length;
                 if (nearDecoratorsCount > 1) {

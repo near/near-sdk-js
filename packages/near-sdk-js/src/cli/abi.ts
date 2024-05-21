@@ -169,7 +169,10 @@ export function runAbiCompilerPlugin(
             });
           }
           if (decoratorName === "view") isView = true;
-          if (decoratorName === "initialize") isInit = true;
+          if (decoratorName === "initialize") {
+            isInit = true;
+            abiModifiers.push(abi.AbiFunctionModifier.Init);
+          }
         });
         const nearDecoratorsCount = [isCall, isView, isInit].filter(
           (b) => b

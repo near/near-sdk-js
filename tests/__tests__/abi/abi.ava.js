@@ -171,3 +171,20 @@ test("JSON Schema", async (t) => {
   }])
 })
 
+test("Modifiers function", async (t) => {
+  const abi = await generateAbiSnippet("modifiers.ts");
+  t.is(abi.body.functions[0].kind, 'view');
+  t.deepEqual(abi.body.functions[0].modifiers, []);
+
+  t.is(abi.body.functions[1].kind, 'call');
+  t.deepEqual(abi.body.functions[1].modifiers, []);
+
+  t.is(abi.body.functions[2].kind, 'call');
+  t.deepEqual(abi.body.functions[2].modifiers, ['init']);
+
+  t.is(abi.body.functions[3].kind, 'call');
+  t.deepEqual(abi.body.functions[3].modifiers, ['payable']);
+
+  t.is(abi.body.functions[4].kind, 'call');
+  t.deepEqual(abi.body.functions[4].modifiers, ['private']);
+});
