@@ -96,10 +96,78 @@ test("JSON Schema", async (t) => {
   t.deepEqual(abi.body.functions[4].params.args, [{
     name: 'a',
     type_schema: {
-      items: {type: 'boolean' },
+      items: { type: 'boolean' },
       type: 'array'
     },
   }])
 
-  console.log(abi.body.functions[5].params.args)
+
+  // typescript use structural type, so no ref to Pair
+  t.deepEqual(abi.body.functions[5].params.args, [{
+    name: 'a',
+    type_schema: {
+      items: [{ type: 'number' }, { type: 'number' }],
+      type: 'array',
+      minItems: 2, maxItems: 2
+    },
+  },
+  { name: 'b', type_schema: { '$ref': '#/definitions/PairNamed' } }
+  ])
+  t.deepEqual(abi.body.root_schema.definitions['PairNamed'], {
+    properties: {
+      first: {
+        type: 'number',
+      },
+      second: {
+        type: 'number',
+      },
+    },
+    type: 'object',
+  })
+
+  t.deepEqual(abi.body.root_schema.definitions['IpAddrKind'], {
+    enum: [0, 1],
+    type: 'number'
+  })
+  t.deepEqual(abi.body.root_schema.definitions['IpV4'], {
+    type: 'object',
+    properties: {
+      kind: {
+        $ref: '#/definitions/IpAddrKind.V4',
+      },
+      octets: {
+        items: [{ type: 'number' }, { type: 'number' }, { type: 'number' }, { type: 'number' }],
+        maxItems: 4,
+        minItems: 4,
+        type: 'array',
+      },
+    },
+  })
+  t.deepEqual(abi.body.root_schema.definitions['IpV6'], {
+    type: 'object',
+    properties: {
+      kind: {
+        $ref: '#/definitions/IpAddrKind.V6',
+      },
+      address: {
+        type: 'string',
+      },
+    },
+  })
+  t.deepEqual(abi.body.functions[6].params.args, [{
+    name: 'simple',
+    type_schema: { '$ref': '#/definitions/IpAddrKind' }
+  }, {
+    name: 'complex', type_schema: {
+      anyOf: [
+        {
+          $ref: '#/definitions/IpV4',
+        },
+        {
+          $ref: '#/definitions/IpV6',
+        },
+      ]
+    }
+  }])
 })
+

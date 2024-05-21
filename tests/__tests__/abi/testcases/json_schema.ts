@@ -1,5 +1,29 @@
 import { NearBindgen, near, call, view } from "near-sdk-js";
-  
+
+type Pair = [number, number];
+
+interface PairNamed {
+    first: number;
+    second: number;
+};
+
+enum IpAddrKind {
+    V4,
+    V6
+};
+
+interface IpV4 {
+    kind: IpAddrKind.V4;
+    octets: [number, number, number, number];
+}
+
+interface IpV6 {
+    kind: IpAddrKind.V6;
+    address: string;
+}
+
+type IpAddr = IpV4 | IpV6;
+
 @NearBindgen({})
 export class Contract {
   @view({})
@@ -18,5 +42,8 @@ export class Contract {
   schema_array({a}: {a: boolean[]}) {}
 
   @view({})
-  schema_struct({a}: {a: {first: number, second: number}}) {}
+  schema_struct({a, b}: {a: Pair, b: PairNamed}) {}
+
+  @view({})
+  schema_enum({simple, complex}: {simple: IpAddrKind, complex: IpAddr}) {}
 }
