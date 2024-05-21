@@ -53,9 +53,7 @@ export function get_random_seed() {
 }
 
 export function get_validator_stake() {
-  near.valueReturn(
-    near.validatorStake(near.signerAccountId()).toString()
-  );
+  near.valueReturn(near.validatorStake(near.signerAccountId()).toString());
 }
 
 export function get_total_stake() {

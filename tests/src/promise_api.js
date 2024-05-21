@@ -34,12 +34,12 @@ export function cross_contract_call_gas() {
 
 export function cross_contract_callback() {
   near.valueReturn(
-      JSON.stringify({
-        ...callingData(),
-        promiseResults: arrayN(near.promiseResultsCount()).map((i) =>
-          near.promiseResult(i)
-        ),
-      })
+    JSON.stringify({
+      ...callingData(),
+      promiseResults: arrayN(near.promiseResultsCount()).map((i) =>
+        near.promiseResult(i)
+      ),
+    })
   );
 }
 

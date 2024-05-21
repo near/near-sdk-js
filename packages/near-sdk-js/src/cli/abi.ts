@@ -236,17 +236,23 @@ export function runAbiCompilerPlugin(
             type_schema: schema,
           };
         }
-        const abiFunction: abi.AbiFunction = {
+        let abiFunction: abi.AbiFunction = {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           name: (methodDeclaration.name as any).text,
           kind: isView ? abi.AbiFunctionKind.View : abi.AbiFunctionKind.Call,
-          modifiers: abiModifiers,
-          params: {
+        };
+        if (abiModifiers.length > 0) {
+          abiFunction.modifiers = abiModifiers;
+        }
+        if (abiParams.length > 0) {
+          abiFunction.params = {
             serialization_type: abi.AbiSerializationType.Json,
             args: abiParams,
-          },
-          result: abiResult,
-        };
+          };
+        }
+        if (abiResult) {
+          abiFunction.result = abiResult;
+        }
         abiFunctions.push(abiFunction);
       } else {
         ts.forEachChild(node, (n) => inspect(n, tc));

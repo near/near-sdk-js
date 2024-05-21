@@ -9,7 +9,9 @@ test.beforeEach(async (t) => {
   const root = worker.rootAccount;
 
   // Deploy the test contract.
-  const unorderedSetContract = await root.createSubAccount("unordered-set-contract");
+  const unorderedSetContract = await root.createSubAccount(
+    "unordered-set-contract"
+  );
   await unorderedSetContract.deploy("build/unordered-set.wasm");
 
   // Test users
@@ -131,7 +133,7 @@ test("Add and check exist of object", async (t) => {
 });
 
 test("Enumerate and pagination of elements", async (t) => {
-  const {bob, unorderedSetContract} = t.context.accounts;
+  const { bob, unorderedSetContract } = t.context.accounts;
 
   await bob.callRaw(unorderedSetContract, "extend", {
     elements: ["aaa", "bbb", "ccc", "ddd"],
@@ -141,22 +143,22 @@ test("Enumerate and pagination of elements", async (t) => {
     "aaa",
     "bbb",
     "ccc",
-    "ddd"
+    "ddd",
   ]);
 
-  t.deepEqual(await unorderedSetContract.view("elements", {start: 1}), [
+  t.deepEqual(await unorderedSetContract.view("elements", { start: 1 }), [
     "bbb",
     "ccc",
-    "ddd"
+    "ddd",
   ]);
 
-  t.deepEqual(await unorderedSetContract.view("elements", {limit: 2}), [
+  t.deepEqual(await unorderedSetContract.view("elements", { limit: 2 }), [
     "aaa",
     "bbb",
   ]);
 
-  t.deepEqual(await unorderedSetContract.view("elements", {start: 1, limit: 2}), [
-    "bbb",
-    "ccc",
-  ]);
-})
+  t.deepEqual(
+    await unorderedSetContract.view("elements", { start: 1, limit: 2 }),
+    ["bbb", "ccc"]
+  );
+});

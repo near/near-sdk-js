@@ -72,7 +72,7 @@ export class UnorderedMapTestContract {
   }
 
   @view({})
-  keys({start, limit}) {
-    return this.unorderedMap.keys({start,limit});
+  keys({ start, limit }) {
+    return this.unorderedMap.keys({ start, limit });
   }
 }

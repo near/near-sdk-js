@@ -69,12 +69,7 @@ export class HighlevelPromiseContract {
   @call({})
   test_promise_then() {
     let promise = NearPromise.new("callee-contract.test.near")
-      .functionCall(
-        "cross_contract_callee",
-        "abc",
-        0,
-        2 * Math.pow(10, 13)
-      )
+      .functionCall("cross_contract_callee", "abc", 0, 2 * Math.pow(10, 13))
       .then(
         NearPromise.new("highlevel-promise.test.near").functionCall(
           "cross_contract_callback",
@@ -249,12 +244,7 @@ export class HighlevelPromiseContract {
   @call({})
   handle_error_in_promise_then_after_promise_and() {
     let promise = NearPromise.new("callee-contract.test.near")
-      .functionCall(
-        "cross_contract_callee",
-        "abc",
-        0,
-        2 * Math.pow(10, 13)
-      )
+      .functionCall("cross_contract_callee", "abc", 0, 2 * Math.pow(10, 13))
       .and(
         NearPromise.new("callee-contract.test.near").functionCall(
           "just_panic",

@@ -21,15 +21,15 @@ test.afterEach.always(async (t) => {
 
 test("migration works", async (t) => {
   const { counter, ali } = t.context.accounts;
-  
+
   const res1 = await counter.view("getCount", {});
   t.is(res1, 0);
-  
+
   await ali.call(counter, "increase", {});
-  
+
   const res2 = await counter.view("getCount", {});
   t.is(res2, 1);
-  
+
   const migrationRes = await ali.callRaw(counter, "migrFuncValueTo18", {});
 
   t.is(JSON.stringify(migrationRes).includes("Count: 0"), true);
