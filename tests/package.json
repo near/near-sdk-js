@@ -29,6 +29,7 @@
     "build:date-serialization": "near-sdk-js build src/date-serialization.ts build/date-serialization.wasm",
     "build:middlewares": "near-sdk-js build src/middlewares.ts build/middlewares.wasm",
     "build:migrate": "near-sdk-js build src/migrate.ts build/migrate.wasm",
+    "build:alt-bn128-api": "near-sdk-js build src/alt_bn128_api.js build/alt_bn128_api.wasm",
     "test": "ava",
     "test:context-api": "ava __tests__/test_context_api.ava.js",
     "test:math-api": "ava __tests__/test_math_api.ava.js",
@@ -54,7 +55,8 @@
     "test:constructor-validation": "ava __tests__/constructor_validation.ava.js",
     "test:migrate": "ava __tests__/decorators/migrate.ava.js",
     "test:middlewares": "ava __tests__/test-middlewares.ava.js",
-    "test:abi": "ava __tests__/abi/abi.ava.js"
+    "test:abi": "ava __tests__/abi/abi.ava.js",
+    "test:alt-bn128-api": "ava __tests__/test_alt_bn128_api.ava.js"
   },
   "author": "Near Inc <hello@nearprotocol.com>",
   "license": "Apache-2.0",
