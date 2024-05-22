@@ -4,7 +4,7 @@ import {
   call,
   view,
   initialize,
-  middleware
+  middleware,
 } from "near-sdk-js";
 
 @NearBindgen({ requireInit: true })

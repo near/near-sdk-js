@@ -8,7 +8,9 @@ test.before(async (t) => {
   // Prepare sandbox for tests, create accounts, deploy contracts, etx.
   const root = worker.rootAccount;
 
-  const functionParamsContract = await root.createSubAccount("function-params-contract");
+  const functionParamsContract = await root.createSubAccount(
+    "function-params-contract"
+  );
   await functionParamsContract.deploy("build/function-params.wasm");
 
   // Test users

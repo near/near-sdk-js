@@ -169,7 +169,10 @@ export function runAbiCompilerPlugin(
             });
           }
           if (decoratorName === "view") isView = true;
-          if (decoratorName === "initialize") isInit = true;
+          if (decoratorName === "initialize") {
+            isInit = true;
+            abiModifiers.push(abi.AbiFunctionModifier.Init);
+          }
         });
         const nearDecoratorsCount = [isCall, isView, isInit].filter(
           (b) => b
@@ -237,13 +240,19 @@ export function runAbiCompilerPlugin(
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           name: (methodDeclaration.name as any).text,
           kind: isView ? abi.AbiFunctionKind.View : abi.AbiFunctionKind.Call,
-          modifiers: abiModifiers,
-          params: {
+        };
+        if (abiModifiers.length > 0) {
+          abiFunction.modifiers = abiModifiers;
+        }
+        if (abiParams.length > 0) {
+          abiFunction.params = {
             serialization_type: abi.AbiSerializationType.Json,
             args: abiParams,
-          },
-          result: abiResult,
-        };
+          };
+        }
+        if (abiResult) {
+          abiFunction.result = abiResult;
+        }
         abiFunctions.push(abiFunction);
       } else {
         ts.forEachChild(node, (n) => inspect(n, tc));

@@ -9,7 +9,9 @@ test.beforeEach(async (t) => {
   const root = worker.rootAccount;
 
   // Deploy the test contract.
-  const unorderedMapContract = await root.createSubAccount("unordered-map-contract");
+  const unorderedMapContract = await root.createSubAccount(
+    "unordered-map-contract"
+  );
   await unorderedMapContract.deploy("build/unordered-map.wasm");
   // Test users
   const ali = await root.createSubAccount("ali");
@@ -159,30 +161,30 @@ test("UnorderedMap enumeration and pagination of keys", async (t) => {
       ["aaa", "world"],
       ["bbb", "world1"],
       ["ccc", "world2"],
-      ["ddd", "world3"]
+      ["ddd", "world3"],
     ],
-  }); 
+  });
 
   t.deepEqual(await unorderedMapContract.view("keys", {}), [
     "aaa",
     "bbb",
     "ccc",
-    "ddd"
+    "ddd",
   ]);
 
-  t.deepEqual(await unorderedMapContract.view("keys", {start: 1}), [
+  t.deepEqual(await unorderedMapContract.view("keys", { start: 1 }), [
     "bbb",
     "ccc",
-    "ddd"
+    "ddd",
   ]);
 
-  t.deepEqual(await unorderedMapContract.view("keys", {limit: 2}), [
+  t.deepEqual(await unorderedMapContract.view("keys", { limit: 2 }), [
     "aaa",
     "bbb",
   ]);
 
-  t.deepEqual(await unorderedMapContract.view("keys", {start: 1, limit: 2}), [
+  t.deepEqual(await unorderedMapContract.view("keys", { start: 1, limit: 2 }), [
     "bbb",
     "ccc",
   ]);
-})
+});

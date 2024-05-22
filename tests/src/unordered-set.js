@@ -44,8 +44,8 @@ export class UnorderedSetTestContract {
   }
 
   @view({})
-  elements({start, limit}) {
-    return this.unorderedSet.elements({start, limit})
+  elements({ start, limit }) {
+    return this.unorderedSet.elements({ start, limit });
   }
 
   @call({})
