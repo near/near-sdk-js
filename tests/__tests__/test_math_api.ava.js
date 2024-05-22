@@ -91,5 +91,3 @@ test("ecrecover", async (t) => {
     ])
   );
 });
-
-// TODO add test for alt_bn256 functions
