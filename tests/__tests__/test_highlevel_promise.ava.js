@@ -349,3 +349,33 @@ test("highlevel promise and", async (t) => {
     }
   );
 });
+
+test("highlevel promise not build and not return", async (t) => {
+  const { bob, highlevelPromise } = t.context.accounts;
+
+  let r = await bob.callRaw(highlevelPromise, "not_return_not_build", "", {
+    gas: "100 Tgas",
+  });
+
+  try {
+    let balance = await highlevelPromise.getSubAccount("b").balance();
+  } catch (e) {
+    t.is(e.type, "AccountDoesNotExist");
+  }
+});
+
+test("highlevel promise build and not return", async (t) => {
+  const { bob, highlevelPromise } = t.context.accounts;
+
+  let r = await bob.callRaw(highlevelPromise, "build_not_return", "", {
+    gas: "100 Tgas",
+  });
+  t.is(
+    r.result.receipts_outcome[1].outcome.executor_id,
+    highlevelPromise.getSubAccount("b").accountId
+  );
+  t.is(r.result.receipts_outcome[1].outcome.status.SuccessValue, "");
+
+  let balance = await highlevelPromise.getSubAccount("b").balance();
+  t.is(balance.total.toString(), "10000000000000000000000000");
+});

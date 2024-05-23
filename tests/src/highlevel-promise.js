@@ -263,4 +263,21 @@ export class HighlevelPromiseContract {
       );
     return promise;
   }
+
+  @call({})
+  not_return_not_build() {
+    // let promise = NearPromise.new("b.highlevel-promise.test.near")
+    //   .createAccount()
+    //   .transfer(10000000000000000000000000n);
+    // nothing happens
+  }
+
+  @call({})
+  build_not_return() {
+    let promise = NearPromise.new("b.highlevel-promise.test.near")
+      .createAccount()
+      .transfer(10000000000000000000000000n);
+    promise.build();
+    // doesn't return the promise, but promise should be created and executed
+  }
 }

@@ -484,4 +484,12 @@ export class NearPromise {
     onReturn() {
         this.asReturn().constructRecursively();
     }
+    /**
+     * Attach the promise to transaction but does not return it. The promise will be executed, but
+     * whether it success or not will not affect the transaction result. If you want the promise fail
+     * also makes the transaction fail, you can simply return the promise from a @call method.
+     */
+    build() {
+        return this.constructRecursively();
+    }
 }
