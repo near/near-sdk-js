@@ -1,6 +1,6 @@
 {
   "name": "near-sdk-js",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "description": "High Level JavaScript SDK for building smart contracts on NEAR",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
