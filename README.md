@@ -39,6 +39,7 @@ This will scaffold a basic template for you 😎
 - Find [source code examples](./examples) with common use cases
 - Lookup available features in [API reference](https://near.github.io/near-sdk-js/)
 - 🏠 Learn more about NEAR on our [Documentation website](https://docs.near.org/)
+- Breaking features diff from [SDK 2.0.0 to 1.0.0](near-sdk-js@2.0.0-diff-1.0.0.md)
 
 ## Contributing
 

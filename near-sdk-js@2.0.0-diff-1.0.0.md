@@ -1,4 +1,4 @@
-# Breaking features from SDK 2.0.0 diff from 1.0.0
+# Breaking features diff from SDK 2.0.0 to 1.0.0
 ## borsh data de/serializer for contract state
 * using for: new contracts or migrate from a borsh serialized contract
 [example](https://github.com/near/near-sdk-js/blob/develop/examples/src/status-message-borsh.js)
@@ -161,7 +161,7 @@ export class Contract {
     }
 }
 ```
-In [near-sdk-js 2.0.0](https://www.npmjs.com/package/near-sdk-js/v/2.0.0-0) With schemas, this is no longer needed, as the SDK can correctly infer how to decode the Nested Collections:
+In [near-sdk-js 2.0.0](https://www.npmjs.com/package/near-sdk-js/v/2.0.0) With schemas, this is no longer needed, as the SDK can correctly infer how to decode the Nested Collections:
 
 ```typescript
 @NearBindgen({})
