@@ -52,7 +52,7 @@ export class GuestBook {
     }
 
     @view({})
-    get_payments({ index }) {
+    get_payment({ index }) {
         return this.payments.get(index) || null;
     }
 }

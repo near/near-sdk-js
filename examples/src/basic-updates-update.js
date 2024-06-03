@@ -1,4 +1,6 @@
 import {NearBindgen, call, view, near, migrate, Vector, assert, UnorderedMap, LookupSet, ONE_NEAR} from "near-sdk-js";
+import {MigrationDemo} from "../build/state-migration-new.js";
+import {Contract} from "../build/nested-collections.js";
 
 const POINT_ONE = ONE_NEAR / 10000n;
 
@@ -10,6 +12,7 @@ class OldPostedMessage {
     }
 }
 
+@NearBindgen({})
 export class OldState {
     constructor() {
         this.messages = new Vector("a");
@@ -45,20 +48,38 @@ export class GuestBook {
     migrateState() {
         assert(this.messages !== undefined, "Contract state should not be deserialized in @migrate");
         // retrieve the current state from the contract
-        let old_state = JSON.parse(near.storageRead("STATE"));
+        const _state = OldState._getState();
+        const _contract = OldState._create();
+        if (_state) {
+            OldState._reconstruct(_contract, _state);
+        }
 
         let new_messages = new Vector("p");
 
-        old_state.messages.toArray().forEach((posted, idx) => {
-            let payment = old_state
+        _contract.messages.toArray().forEach((posted, idx) => {
+            let payment = _contract
                 .payments
-                .get(idx) || "0N";
+                .get(idx) || 0n;
             new_messages.push(PostedMessage.new(payment, posted.premium, posted.sender, posted.text));
         });
 
-        old_state.messages.clear();
-        old_state.payments.clear();
+        _contract.messages.clear();
+        _contract.payments.clear();
 
         this.messages = new_messages;
+    }
+
+    @call({payableFunction: true})
+    add_message({text}) {
+        const payment = near.attachedDeposit();
+        let premium = payment > POINT_ONE;
+        const sender = near.predecessorAccountId();
+        let message = PostedMessage.new(payment, premium, sender, text);
+        this.messages.push(message);
+    }
+
+    @view({})
+    get_message({ index }) {
+        return this.messages.get(index) || null;
     }
 }

@@ -59,7 +59,8 @@
     "test:status-message-borsh": "ava __tests__/test-status-message-borsh.ava.js",
     "test:status-message-serialize-err": "ava __tests__/test-status-message-serialize-err.ava.js",
     "test:status-message-deserialize-err": "ava __tests__/test-status-message-deserialize-err.ava.js",
-    "test:status-deserialize-class": "ava __tests__/test-status-deserialize-class.ava.js"
+    "test:status-deserialize-class": "ava __tests__/test-status-deserialize-class.ava.js",
+    "test:basic-updates": "ava __tests__/test-basic-updates.ava.js"
   },
   "author": "Near Inc <hello@nearprotocol.com>",
   "license": "Apache-2.0",
