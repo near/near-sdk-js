@@ -32,6 +32,7 @@ export class StatusMessage {
 ```
 
 ## js contract migration with data fields
+### example1
 * using for: contract state migrations
 * [example](https://github.com/near/near-sdk-js/blob/develop/examples/src/status-message-migrate-add-field.js)
 ```js
@@ -62,6 +63,12 @@ export class StatusMessage {
     this.new_fields = {};
   }
 }
+```
+### example2
+* another migration example can be found in [test-basic-updates.ava.js](https://github.com/near/near-sdk-js/blob/feat-migrate-example/examples/__tests__/test-basic-updates.ava.js) with [old state contract](https://github.com/near/near-sdk-js/blob/feat-migrate-example/examples/src/basic-updates-base.js) and new [new state contract](https://github.com/fospring/near-sdk-js/blob/feat-migrate-example/examples/src/basic-updates-update.js).  
+with the test command in [examples directory](./examples):
+```shell
+pnpm run test:basic-updates
 ```
 
 ## auto reconstruct class from object by static json schema
