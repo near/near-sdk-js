@@ -65,7 +65,7 @@ export class StatusMessage {
 }
 ```
 ### example2
-* another migration example can be found in [test-basic-updates.ava.js](https://github.com/near/near-sdk-js/blob/feat-migrate-example/examples/__tests__/test-basic-updates.ava.js) with [old state contract](https://github.com/near/near-sdk-js/blob/feat-migrate-example/examples/src/basic-updates-base.js) and new [new state contract](https://github.com/fospring/near-sdk-js/blob/feat-migrate-example/examples/src/basic-updates-update.js).  
+* another migration example can be found in [test-basic-updates.ava.js](./examples/__tests__/test-basic-updates.ava.js) with [old state contract](./examples/src/basic-updates-base.js) and new [new state contract](./examples/src/basic-updates-update.js).  
 with the test command in [examples directory](./examples):
 ```shell
 pnpm run test:basic-updates
