@@ -69,16 +69,16 @@ export type Mutable<T> = { -readonly [P in keyof T]: T[P] };
 export function getValueWithOptions<DataType>(
   subDatatype: unknown,
   value: Uint8Array | null,
-  options: Omit<GetOptions<DataType>, "serializer"> = {
-    deserializer: deserialize,
-  }
+  options: Omit<GetOptions<DataType>, "serializer"> = {}
 ): DataType | null {
   if (value === null) {
     return options?.defaultValue ?? null;
   }
 
+  const deserializer = options.deserializer || deserialize;
+
   // here is an obj
-  let deserialized = deserialize(value);
+  let deserialized = deserializer(value);
 
   if (deserialized === undefined || deserialized === null) {
     return options?.defaultValue ?? null;
