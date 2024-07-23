@@ -25,7 +25,7 @@ test.after.always(async (t) => {
 test('Root adds non-premium message then gets', async (t) => {
   const { guestBook, root } = t.context.accounts;
   const messagesBefore = await guestBook.view('get_messages', {});
-  t.is(messagesBefore, []);
+  t.is(messagesBefore.length, 0);
 
   await root.call(guestBook, 'add_message', { text: 'Some usual text' });
 
