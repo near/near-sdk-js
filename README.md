@@ -34,16 +34,16 @@ This will scaffold a basic template for you 😎
 
 ## Documentation
 
-- [Learn how to use](https://docs.near.org/sdk/js/introduction) the library in your project
+- [Learn how to use](https://docs.near.org/build/smart-contracts/quickstart) the library in your project
 - Check our [detailed examples and tutorials](https://docs.near.org/tutorials/welcome)
-- Find [source code examples](./examples) with common use cases
+- Find [source code examples](https://github.com/near/near-sdk-js/tree/develop/examples) with common use cases
 - Lookup available features in [API reference](https://near.github.io/near-sdk-js/)
 - 🏠 Learn more about NEAR on our [Documentation website](https://docs.near.org/)
-- Breaking features diff from [SDK 2.0.0 to 1.0.0](near-sdk-js@2.0.0-diff-1.0.0.md)
+- Breaking features diff from [SDK 2.0.0 to 1.0.0](https://github.com/near/near-sdk-js/tree/develop/near-sdk-js@2.0.0-diff-1.0.0.md)
 
 ## Contributing
 
-If you are interested in contributing, please look at the [contributing guidelines](CONTRIBUTING.md).
+If you are interested in contributing, please look at the [contributing guidelines](https://github.com/near/near-sdk-js/tree/develop/CONTRIBUTING.md).
 
  - [Report issues you encounter](https://github.com/near/near-sdk-js/issues) 🐞
  - [Provide suggestions or feedback](https://github.com/near/near-sdk-js/discussions) 💡
@@ -52,4 +52,4 @@ If you are interested in contributing, please look at the [contributing guidelin
 ## License
 
 This repository is distributed under the terms of both the [MIT license](https://github.com/near/near-sdk-js/blob/develop/LICENSE) and the [Apache License](https://github.com/near/near-sdk-js/blob/develop/LICENSE-APACHE) (Version 2.0).
-See [LICENSE](LICENSE) and [LICENSE-APACHE](LICENSE-APACHE) for details.
+See [LICENSE](https://github.com/near/near-sdk-js/tree/develop/LICENSE) and [LICENSE-APACHE](https://github.com/near/near-sdk-js/tree/develop/LICENSE-APACHE) for details.
