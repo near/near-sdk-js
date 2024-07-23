@@ -31,14 +31,13 @@ export function assert(expression, message) {
         throw new Error("assertion failed: " + message);
     }
 }
-export function getValueWithOptions(subDatatype, value, options = {
-    deserializer: deserialize,
-}) {
+export function getValueWithOptions(subDatatype, value, options = {}) {
     if (value === null) {
         return options?.defaultValue ?? null;
     }
+    const deserializer = options.deserializer || deserialize;
     // here is an obj
-    let deserialized = deserialize(value);
+    let deserialized = deserializer(value);
     if (deserialized === undefined || deserialized === null) {
         return options?.defaultValue ?? null;
     }
