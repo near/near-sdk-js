@@ -1,4 +1,4 @@
-import {NearBindgen, call, view, near, migrate, Vector, assert} from "near-sdk-js";
+import {NearBindgen, call, view, near, migrate, assert} from "near-sdk-js";
 
 class OldStatusMessage {
   constructor() {
