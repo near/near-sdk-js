@@ -1,6 +1,4 @@
-import {NearBindgen, call, view, near, migrate, Vector, assert, UnorderedMap, LookupSet, ONE_NEAR} from "near-sdk-js";
-import {MigrationDemo} from "../build/state-migration-new.js";
-import {Contract} from "../build/nested-collections.js";
+import {NearBindgen, call, view, near, migrate, Vector, assert, ONE_NEAR} from "near-sdk-js";
 
 const POINT_ONE = ONE_NEAR / 10000n;
 
