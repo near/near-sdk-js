@@ -11,7 +11,7 @@ import { Option } from '../non_fungible_token/utils';
  *     - StorageManager -- interface for NEP-145 for allocating storage per account. FungibleToken provides methods for it.
  *     - AccountRegistrar -- interface for an account to register and unregister
  *
- * For example usage, see examples/src/standard-ft/src/my-ft.ts
+ * For example usage, see examples/src/fungible-token/my-ft.ts
  */
 export declare class FungibleToken implements FungibleTokenCore, StorageManagement, FungibleTokenResolver {
     accounts: LookupMap<Balance>;

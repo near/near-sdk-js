@@ -1,7 +1,7 @@
 # Breaking features diff from SDK 2.0.0 to 1.0.0
 ## borsh data de/serializer for contract state
 * using for: new contracts or migrate from a borsh serialized contract
-[example](https://github.com/near/near-sdk-js/blob/develop/examples/src/status-message-borsh.js)
+[example](https://github.com/near/near-sdk-js/blob/develop/examples/src/status-message/status-message-borsh.js)
 ```js
 @NearBindgen({
     serializer(statusMessage) {
@@ -34,7 +34,7 @@ export class StatusMessage {
 ## js contract migration with data fields
 ### example1
 * using for: contract state migrations
-* [example](https://github.com/near/near-sdk-js/blob/develop/examples/src/status-message-migrate-add-field.js)
+* [example](https://github.com/near/near-sdk-js/blob/develop/examples/src/status-message/status-message-migrate-add-field.js)
 ```js
 import {NearBindgen, call, view, near, migrate, Vector, assert} from "near-sdk-js";
 
@@ -65,7 +65,7 @@ export class StatusMessage {
 }
 ```
 ### example2
-* another migration example can be found in [test-basic-updates.ava.js](./examples/__tests__/test-basic-updates.ava.js) with [old state contract](./examples/src/basic-updates-base.js) and new [new state contract](./examples/src/basic-updates-update.js).  
+* another migration example can be found in [test-basic-updates.ava.js](./examples/__tests__/test-basic-updates.ava.js) with [old state contract](./examples/src/basic-updates/basic-updates-base.js) and new [new state contract](./examples/src/basic-updates/basic-updates-update.js).  
 with the test command in [examples directory](./examples):
 ```shell
 pnpm run test:basic-updates
