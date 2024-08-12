@@ -42,6 +42,7 @@ See more in the [Anatomy of a Contract](https://docs.near.org/build/smart-contra
 
 ## Documentation
 
+- [Learn how to use](https://github.com/near/create-near-app/tree/master/templates)
 - [Learn by example with AgorApp](https://agorapp.dev/catalog/all?difficulty=&chains=near)
 - [Learn by example with NEAR Docs](https://docs.near.org/build/smart-contracts/quickstart)
 - Check our [detailed examples and tutorials](https://docs.near.org/tutorials/welcome)
@@ -54,6 +55,10 @@ See more in the [Anatomy of a Contract](https://docs.near.org/build/smart-contra
 
 - node >=14 <16.6.0 || >16.6.0
 - pnpm >=7
+- NEAR CLI
+```
+npm install -g near-cli
+```
 
 ## Quick Start
 
