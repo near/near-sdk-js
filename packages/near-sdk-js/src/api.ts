@@ -303,7 +303,7 @@ export function storageRead(key: string): string | null {
 }
 
 /**
- * Checks for the existance of a value under the provided key in NEAR storage.
+ * Checks for the existence of a value under the provided key in NEAR storage.
  *
  * @param key - The key to check for in storage.
  */
@@ -312,7 +312,7 @@ export function storageHasKeyRaw(key: Uint8Array): boolean {
 }
 
 /**
- * Checks for the existance of a value under the provided utf-8 string key in NEAR storage.
+ * Checks for the existence of a value under the provided utf-8 string key in NEAR storage.
  *
  * @param key - The utf-8 string key to check for in storage.
  */

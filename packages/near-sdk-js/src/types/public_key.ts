@@ -77,6 +77,8 @@ export class UnknownCurve extends ParsePublicKeyError {
 
 /**
  * A abstraction on top of the NEAR public key string.
+ * Public key in a binary format with base58 string serialization with human-readable curve.
+ * The key types currently supported are `secp256k1` and `ed25519`.
  */
 export class PublicKey {
   /**

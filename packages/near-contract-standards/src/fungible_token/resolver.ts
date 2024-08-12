@@ -1,5 +1,8 @@
 import { AccountId, Balance } from "near-sdk-js";
 
+/** 
+ * Provides token transfer resolve functionality.
+ */
 export interface FungibleTokenResolver {
     ft_resolve_transfer({
         sender_id,

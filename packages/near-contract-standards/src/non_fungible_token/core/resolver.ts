@@ -23,7 +23,7 @@ export interface NonFungibleTokenResolver {
    * @param previous_owner_id - The owner prior to the call to `nft_transfer_call`
    * @param receiver_id - The `receiver_id` argument given to `nft_transfer_call`
    * @param token_id - The `token_id` argument given to `ft_transfer_call`
-   * @param approvals - If using Approval Management, contract MUST provide
+   * @param approved_account_ids - If using Approval Management, contract MUST provide
    *        set of original approved accounts in this argument, and restore these
    *        approved accounts in case of revert.
    *
