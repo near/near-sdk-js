@@ -32,7 +32,7 @@ const ERR_TOTAL_SUPPLY_OVERFLOW: string = "Total supply overflow";
  *     - StorageManager -- interface for NEP-145 for allocating storage per account. FungibleToken provides methods for it.
  *     - AccountRegistrar -- interface for an account to register and unregister
  *
- * For example usage, see examples/src/standard-ft/src/my-ft.ts
+ * For example usage, see examples/src/fungible-token/my-ft.ts
  */
 export class FungibleToken implements FungibleTokenCore, StorageManagement, FungibleTokenResolver {
     // AccountID -> Account balance.
