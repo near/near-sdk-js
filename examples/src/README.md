@@ -32,7 +32,7 @@ This command will execute the test suites associated with each smart contract, e
 
 Below is a list of the smart contracts included in this directory
 
-- `basic-updates` - A simple smart contract that makes state updates.
+- `basic-updates` - A simple smart contract that can make basic state updates.
 - `counter` - A simple smart contract that demonstrates state management by implementing a basic counter with increment and decrement functionalities.
 - `cross-contract` - A smart contract that demonstrates how to perform cross-contract calls on the NEAR blockchain. This contract manages the assignment of a person on call by querying an external status message contract to check the availability of a given account.
 - `fungible-token` - Example implementation of a Fungible Token contract which uses [near-contract-standards](https://github.com/near/near-sdk-js/tree/develop/packages/near-contract-standards) including `storage_management`.
