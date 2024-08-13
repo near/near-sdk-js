@@ -1,5 +1,10 @@
 import { NearBindgen, call, near } from "near-sdk-js";
 
+/**
+ * ExpensiveCalc is connected to the expensive contract. More information for that
+ * can be found in the README.md
+ * - Computational expensive contract
+ */
 @NearBindgen({})
 export class ExpensiveCalc {
   @call({})

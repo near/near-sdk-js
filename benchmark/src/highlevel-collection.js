@@ -1,5 +1,9 @@
 import { NearBindgen, call, UnorderedMap } from "near-sdk-js";
 
+/**
+ * More information for that can be found in the README.md
+ * - Highlevel collection
+ */
 @NearBindgen({})
 export class HighlevelCollection {
   constructor() {

@@ -1,5 +1,7 @@
 import { near, bytes } from "near-sdk-js";
 
+// Functions consumed by the altBn128PairingCheck tests
+
 export function test_alt_bn128_g1_sum() {
   // Originated from https://github.com/near/nearcore/blob/8cd095ffc98a6507ed2d2a8982a6a3e42ebc1b62/runtime/near-test-contracts/estimator-contract/src/lib.rs#L557-L720
   let buffer = new Uint8Array([

@@ -967,7 +967,7 @@ export function validatorTotalStake(): bigint {
  * Computes multiexp on alt_bn128 curve using Pippenger's algorithm \sum_i
  * mul_i g_{1 i} should be equal result.
  *
- * @param value - equence of (g1:G1, fr:Fr), where
+ * @param value - sequence of (g1:G1, fr:Fr), where
  * G1 is point (x:Fq, y:Fq) on alt_bn128,
  * alt_bn128 is Y^2 = X^3 + 3 curve over Fq.
  * `value` is encoded as packed, little-endian

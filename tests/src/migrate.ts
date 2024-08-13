@@ -1,5 +1,14 @@
 import { NearBindgen, near, call, view, migrate } from "near-sdk-js";
 
+/**
+ * Simple class used for testing.
+ *  - `option.requireInit` set to `true` - Contract requires initialization.
+ * - Includes methods:
+ *  - `increase({ n })` - increases the count with the given `n`
+ *  - `getCount()` - get the current count
+ *  - `migrFuncValueTo18()` - set the current count to `18`
+ * @param count - Simple number used for testing.
+ */
 @NearBindgen({})
 export class Counter {
   count = 0;

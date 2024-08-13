@@ -1,7 +1,13 @@
 import { NearBindgen, call, view, near } from "near-sdk-js";
 
 /**
- * Simple contract to test function parameters
+ * Simple contract used to test function params.
+ * - Includes methods:
+ *  - `set_values({ param1, param2, param3 })` - change all the values.
+ *  - `get_values()` - returns an object containing all the values.
+ * @param val1 - Simple string used for testing.
+ * @param val2 - Simple string used for testing.
+ * @param val3 - Simple string used for testing.
  */
 @NearBindgen({})
 export class FunctionParamsTestContract {

@@ -84,7 +84,7 @@ export class FungibleToken {
         // Get the unused amount from the `ft_on_transfer` call result.
         let unused_amount;
         try {
-            const promise_result = near.promiseResult(0).replace(/"*/g, ''); //TODO: why promiseResult returnes result with brackets?
+            const promise_result = near.promiseResult(0).replace(/"*/g, ''); //TODO: why promiseResult returns result with brackets?
             unused_amount = this.bigIntMin(amount, BigInt(promise_result));
         }
         catch (e) {

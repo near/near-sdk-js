@@ -1,5 +1,7 @@
 import { near, bytes } from "near-sdk-js";
 
+// Functions consumed by the log panic tests
+
 export function log_expected_input_tests() {
   // log ascii string
   near.log("abc");

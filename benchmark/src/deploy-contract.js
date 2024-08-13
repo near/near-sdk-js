@@ -1,5 +1,10 @@
 import { near } from "near-sdk-js";
 
+/**
+ * Used for contract deployment. More information for that
+ * can be found in the README.md
+ * - Deploy and cross contract call
+ */
 export function deploy_contract() {
   let promiseId = near.promiseBatchCreate("a.caller.test.near");
   near.promiseBatchActionCreateAccount(promiseId);

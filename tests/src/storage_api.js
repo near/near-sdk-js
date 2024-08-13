@@ -1,5 +1,7 @@
 import { near, bytes } from "near-sdk-js";
 
+// Functions consumed by the storage api tests
+
 export function test_storage_write() {
   near.valueReturnRaw(
     bytes(
