@@ -151,8 +151,8 @@ importers:
         specifier: 7.18.1
         version: 7.18.1
       '@types/eslint':
-        specifier: 8.4.6
-        version: 8.4.6
+        specifier: 9.6.0
+        version: 9.6.0
       '@types/node':
         specifier: 17.0.38
         version: 17.0.38
@@ -517,8 +517,8 @@ packages:
   '@types/cacheable-request@6.0.3':
     resolution: {integrity: sha512-IQ3EbTzGxIigb1I3qPZc1rWJnH0BmSKv5QYTalEwweFvyBDLSAe24zP0le/hyi7ecGfZVlIVAg4BZqb8WBwKqw==}
 
-  '@types/eslint@8.4.6':
-    resolution: {integrity: sha512-/fqTbjxyFUaYNO7VcW5g+4npmqVACz1bB7RTHYuLj+PRjw9hrCwrUXVQFpChUS0JsyEFvMZ7U/PfmvWgxJhI9g==}
+  '@types/eslint@9.6.0':
+    resolution: {integrity: sha512-gi6WQJ7cHRgZxtkQEoyHMppPjq9Kxo5Tjn2prSKDSmZrCz8TZ3jSRCeTJm+WoM+oB0WG37bRqLzaaU3q7JypGg==}
 
   '@types/estree@0.0.39':
     resolution: {integrity: sha512-EYNwp3bU+98cpU4lAWYYL7Zz+2gryWH1qbdDTidVd6hkiR6weksdbMadyXKXNPEkQFhXM+hVO9ZygomHXp+AIw==}
@@ -2945,7 +2945,7 @@ snapshots:
       '@types/node': 17.0.38
       '@types/responselike': 1.0.3
 
-  '@types/eslint@8.4.6':
+  '@types/eslint@9.6.0':
     dependencies:
       '@types/estree': 1.0.0
       '@types/json-schema': 7.0.15
