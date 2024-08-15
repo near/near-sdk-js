@@ -13,8 +13,8 @@
     "docs:generate": "typedoc"
   },
   "devDependencies": {
-    "turbo": "1.4.5",
-    "typedoc": "0.25.3",
+    "turbo": "1.10.16",
+    "typedoc": "0.25.4",
     "typescript": "4.7.4"
   }
 }
