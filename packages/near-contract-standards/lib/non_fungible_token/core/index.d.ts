@@ -8,6 +8,53 @@ import { Option } from "../utils";
  * understand how the cross-contract call work.
  *
  * [core non-fungible token standard]: <https://nomicon.io/Standards/NonFungibleToken/Core.html>
+ * 
+ * # Examples
+ *
+ * ```typescript
+
+ * import { AccountId } from "near-sdk-js";
+ * import { Option } from "../non_fungible_token/utils";
+ * import { Token, TokenId } from "../token";
+ * import { NonFungibleTokenCore, NonFungibleToken } from "near-contract-standards/lib"
+ *
+ * @NearBindgen({ requireInit: false })
+ * export class Contract implements NonFungibleTokenCore {
+ *     private token: NonFungibleToken;
+ *
+ *     constructor() {
+ *         this.tokens = new NonFungibleToken();
+ *     }
+ *
+ *     @call({})
+ *      nft_transfer({ receiver_id, token_id, approval_id, memo }: {
+            receiver_id: AccountId;
+            token_id: TokenId;
+            approval_id?: bigint;
+            memo?: string;
+        }): any {
+ *         this.tokens.nft_transfer({ receiver_id, token_id, approval_id, memo });
+ *     }
+ *
+ *     @call({})
+ *     nft_transfer_call({ receiver_id, token_id, approval_id, memo }: {
+            receiver_id: AccountId;
+            token_id: TokenId;
+            approval_id?: bigint;
+            memo?: string;
+            msg: string;
+        }): any {
+ *         return this.tokens.nft_transfer_call({ receiver_id, token_id, approval_id, memo });
+ *     }
+ *
+ *     @view({})
+ *     nft_token({ token_id }: {
+        token_id: TokenId;
+        }): Option<Token> {
+            return this.tokens.nft_token({ token_id });
+        };
+ * }
+ * ```
  */
 export interface NonFungibleTokenCore {
     /** Simple transfer. Transfer a given `token_id` from current owner to

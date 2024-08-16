@@ -1,4 +1,8 @@
 import { Option } from "../non_fungible_token/utils";
+
+/**
+ * Return metadata for the token, up to contract to implement.
+ */
 export declare class FungibleTokenMetadata {
     spec: string;
     name: string;
