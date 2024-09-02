@@ -74,27 +74,27 @@ NEAR-SDK-JS is written in TypeScript, so every API function has a type specified
 
 ### Context API
 
- - `currentAccountId()` -- Returns the ID of the current contract - the contract that is being executed.
+- `currentAccountId()` -- Returns the ID of the current contract - the contract that is being executed.
 
- - `signerAccountId()` -- Returns the ID of the account that signed the transaction.
+- `signerAccountId()` -- Returns the ID of the account that signed the transaction.
 
- - `signerAccountPk()` -- Returns the public key of the account that signed the transaction.
+- `signerAccountPk()` -- Returns the public key of the account that signed the transaction.
 
- - `predecessorAccountId()` -- Returns the ID of the account that called the function.
+- `predecessorAccountId()` -- Returns the ID of the account that called the function.
 
- - `inputRaw()` -- Returns the arguments passed to the current smart contract call.
+- `inputRaw()` -- Returns the arguments passed to the current smart contract call.
 
- - `input()` -- Returns the arguments passed to the current smart contract call as utf-8 string.
+- `input()` -- Returns the arguments passed to the current smart contract call as utf-8 string.
 
- - `blockIndex()` -- Returns the current block index.
+- `blockIndex()` -- Returns the current block index.
 
- - `blockHeight()` -- Returns the current block height.
+- `blockHeight()` -- Returns the current block height.
 
- - `blockTimestamp()` -- Returns the current block timestamp.
+- `blockTimestamp()` -- Returns the current block timestamp.
 
- - `epochHeight()` -- Returns the current epoch height.
+- `epochHeight()` -- Returns the current epoch height.
 
- - `storageUsage()` -- Returns the current accounts NEAR storage usage.
+- `storageUsage()` -- Returns the current accounts NEAR storage usage.
 
 ### Economics API
 
@@ -134,7 +134,7 @@ NEAR-SDK-JS is written in TypeScript, so every API function has a type specified
 
 - `valueReturn(value: string)` -- Returns the utf-8 string value from the NEAR WASM virtual machine.
 
-- `panicUtf8(msg: Uint8Array)` -- Panic the transaction execution with given message. 
+- `panicUtf8(msg: Uint8Array)` -- Panic the transaction execution with given message.
 
 - `logUtf8(msg: Uint8Array)` -- Log the message in transaction logs.
 
@@ -160,13 +160,13 @@ Asynchronous cross-contract calls allow parallel execution of multiple contracts
 
 - `promiseBatchActionCreateAccount(promiseIndex: PromiseIndex)` -- Attach a create account promise action to the NEAR promise index with the provided promise index.
 
--  `promiseBatchActionDeployContract(promiseIndex: PromiseIndex, code: Uint8Array)` -- Attach a deploy contract promise action to the NEAR promise index with the provided promise index.
+- `promiseBatchActionDeployContract(promiseIndex: PromiseIndex, code: Uint8Array)` -- Attach a deploy contract promise action to the NEAR promise index with the provided promise index.
 
 - `promiseBatchActionFunctionCall(promiseIndex: PromiseIndex, methodName: string, args: string, amount: NearAmount, gas: NearAmount)` -- Attach a function call promise action to the NEAR promise index with the provided promise index.
 
 - `promiseBatchActionFunctionCallWeight(promiseIndex: PromiseIndex, methodName: string, args: string, amount: NearAmount, gas: NearAmount, weight: GasWeight)` -- Attach a function call with weight promise action to the NEAR promise index with the provided promise index.
 
-- `promiseBatchActionTransfer(promiseIndex: PromiseIndex, amount: NearAmount);` --  Attach a transfer promise action to the NEAR promise index with the provided promise index.
+- `promiseBatchActionTransfer(promiseIndex: PromiseIndex, amount: NearAmount);` -- Attach a transfer promise action to the NEAR promise index with the provided promise index.
 
 - `promiseBatchActionStake(promiseIndex: PromiseIndex, amount: NearAmount, publicKey: Uint8Array)` -- Attach a stake promise action to the NEAR promise index with the provided promise index.
 
@@ -210,7 +210,7 @@ Asynchronous cross-contract calls allow parallel execution of multiple contracts
 
 - `validatorStake(account_id: string)` -- Returns the number of staked NEAR of given validator, in yoctoNEAR.
 
-- `validatorTotalStake()` --  Returns the number of staked NEAR of all validators, in yoctoNEAR
+- `validatorTotalStake()` -- Returns the number of staked NEAR of all validators, in yoctoNEAR
 
 ### NearBindgen and other decorators
 
