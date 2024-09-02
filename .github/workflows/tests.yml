@@ -37,4 +37,4 @@ jobs:
       - name: Check that all build artifacts where commited
         run: test -z "$(git status --porcelain)"
       - name: Run tests
-        run: pnpm test
+        run: export NEAR_WORKSPACES_DEBUG=true && pnpm test
