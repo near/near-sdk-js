@@ -222,7 +222,7 @@ In order to do that, your contract must be a class decorated with `@NearBindgen(
 
 Your class must have a `constructor()`. You will not be able to call it, which is why it should not accept any parameters. You must declare all the parameters that you are planning to use in the constructor and set default values.
 
-The simplest example of the contract that follows all these rules can be found [here](https://github.com/near/near-sdk-js/blob/develop/examples/src/statys-message/status-message.js)
+The simplest example of the contract that follows all these rules can be found [here](https://github.com/near/near-sdk-js/blob/develop/examples/src/status-message/status-message.js)
 
 `NearBindgen` decorator can accept `requireInit parameter`.
 
