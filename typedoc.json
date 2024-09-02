@@ -1,12 +1,12 @@
 {
   "includeVersion": true,
   "entryPoints": [
-    "packages/near-sdk-js",
+      "packages/near-sdk-js"
   ],
   "entryPointStrategy": "packages",
   "githubPages": true,
   "validation": {
-    "notExported": false
+      "notExported": false
   },
   "out": "docs",
   "readme": "./README.md"
