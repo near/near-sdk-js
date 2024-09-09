@@ -34,6 +34,12 @@ test.before(async (t) => {
   };
 });
 
+test.after.always(async (t) => {
+  await t.context.worker.tearDown().catch((error) => {
+      console.log("Failed to tear down the worker:", error);
+  });
+});
+
 test("JS lookup map contract operations", async (t) => {
   const { ali, lookupMapContract } = t.context.accounts;
   
