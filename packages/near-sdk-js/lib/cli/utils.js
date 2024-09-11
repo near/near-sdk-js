@@ -90,3 +90,25 @@ export async function validateContract(contractPath, verbose = false) {
     }
     return true;
 }
+export function parseNamedArgs(args) {
+    return args.reduce((acc, arg) => {
+        const [key, value] = arg.split('=');
+        acc[key] = value;
+        return acc;
+    }, {});
+}
+export function logTotalGas(r) {
+    console.log('Total gas used: ', formatGas(r.result.transaction_outcome.outcome.gas_burnt +
+        r.result.receipts_outcome[0].outcome.gas_burnt +
+        r.result.receipts_outcome[1].outcome.gas_burnt), '\n');
+}
+export function formatGas(gas) {
+    if (gas < 10 ** 12) {
+        const tGas = gas / 10 ** 12;
+        const roundTGas = Math.round(tGas * 100000) / 100000;
+        return roundTGas + "T";
+    }
+    const tGas = gas / 10 ** 12;
+    const roundTGas = Math.round(tGas * 100) / 100;
+    return roundTGas + "T";
+}

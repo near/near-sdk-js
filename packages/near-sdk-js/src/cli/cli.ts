@@ -10,13 +10,14 @@ import { rollup } from "rollup";
 import { Command } from "commander";
 import signal from "signale";
 
-import { executeCommand, validateContract } from "./utils.js";
+import { executeCommand, logTotalGas, parseNamedArgs, validateContract } from "./utils.js";
 import { runAbiCompilerPlugin } from "./abi.js";
+import { Worker } from "near-workspaces";
 
 const { Signale } = signal;
 const PROJECT_DIR = process.cwd();
 const NEAR_SDK_JS = "node_modules/near-sdk-js";
-const TSC = "node_modules/.bin/tsc";
+const TSC = "node_modules/.bin/tsc";  
 const QJSC_DIR = `${NEAR_SDK_JS}/lib/cli/deps/quickjs`;
 const QJSC = `${NEAR_SDK_JS}/lib/cli/deps/qjsc`;
 
@@ -84,6 +85,21 @@ program
       )
       .option("--verbose", "Whether to print more verbose output.", false)
       .action(transpileJsAndBuildWasmCom)
+  )
+  .addCommand(
+    new Command("watchGas")
+      .usage("[target] [methodName params...] [methodName params...]")
+      .description(
+        "Measure gas used for a contract method. Run this command after deploying the contract."
+      )
+      .argument(
+        "[target]",
+        "Target file path and name. (e.g., ./build/counter.wasm)"
+      )
+      .argument(
+        "[...methodCalls]", "Method calls with their parameters (e.g., increase n=5 decrease n=2)"
+      )
+      .action(measureGas)
   )
   .parse();
 
@@ -388,4 +404,55 @@ async function createWasmContract(
 async function wasiStubContract(contractTarget: string, verbose = false) {
   const WASI_STUB = `${NEAR_SDK_JS}/lib/cli/deps/binaryen/wasi-stub/run.sh`;
   await executeCommand(`${WASI_STUB} ${contractTarget}`, verbose);
+}
+
+async function measureGas(target: string, ...methodCalls) {
+  let worker;
+  try {
+    worker = await Worker.init();
+    const root = worker.rootAccount;
+    const contract = await root.devDeploy(target);
+    const account = await root.createSubAccount("ali");
+
+    let currentMethod = null;
+    let methodParams = [];
+    const methodCallsArr = methodCalls.pop().args.slice(1);
+
+    for (let i = 0; i < methodCallsArr.length; i++) {
+      if (methodCallsArr[i].includes("=")) {
+        methodParams.push(methodCallsArr[i]);
+        continue;
+      }
+
+      if (currentMethod) {
+        await processMethod(account, contract, currentMethod, methodParams);
+      }
+      
+      currentMethod = methodCallsArr[i];
+      methodParams = [];
+    }
+  
+    if (currentMethod) {
+      await processMethod(account, contract, currentMethod, methodParams);
+    }
+  } catch (error) {
+    console.error(error);
+  } finally {
+    await worker?.tearDown();
+  }
+}
+
+async function processMethod(account, contract, method, params) {
+  const parsedParams = parseNamedArgs(params);
+  console.log(`Processing: ${method}(${JSON.stringify(parsedParams).replace(/"/g, '')})`);
+  const tx = await account.callRaw(contract, method, parsedParams);
+  
+  if (!tx.result.status.SuccessValue && tx.result.status.Failure) {
+    console.error(JSON.stringify(tx.result.status));
+    return;
+  }
+
+  const result = tx.result.status.SuccessValue ? Buffer.from(tx.result.status.SuccessValue, 'base64').toString() : "Success";
+  console.log(`Result:`, result);
+  logTotalGas(tx);
 }
