@@ -7,7 +7,7 @@ import { babel } from "@rollup/plugin-babel";
 import { rollup } from "rollup";
 import { Command } from "commander";
 import signal from "signale";
-import { executeCommand, logTotalGas, parseNamedArgs, validateContract } from "./utils.js";
+import { executeCommand, formatGas, parseNamedArgs, validateContract } from "./utils.js";
 import { runAbiCompilerPlugin } from "./abi.js";
 import { Worker } from "near-workspaces";
 const { Signale } = signal;
@@ -248,20 +248,28 @@ async function measureGas(target, ...methodCalls) {
         let currentMethod = null;
         let methodParams = [];
         const methodCallsArr = methodCalls.pop().args.slice(1);
+        const output = [];
         for (let i = 0; i < methodCallsArr.length; i++) {
             if (methodCallsArr[i].includes("=")) {
                 methodParams.push(methodCallsArr[i]);
                 continue;
             }
             if (currentMethod) {
-                await processMethod(account, contract, currentMethod, methodParams);
+                const res = await processMethod(account, contract, currentMethod, methodParams);
+                output.push(res);
             }
             currentMethod = methodCallsArr[i];
             methodParams = [];
         }
         if (currentMethod) {
-            await processMethod(account, contract, currentMethod, methodParams);
+            const res = await processMethod(account, contract, currentMethod, methodParams);
+            output.push(res);
         }
+        console.table(output.map(({ Method, Params, TotalGas }) => ({
+            Method,
+            Params: JSON.stringify(Params),
+            TotalGas
+        })));
     }
     catch (error) {
         console.error(error);
@@ -272,13 +280,16 @@ async function measureGas(target, ...methodCalls) {
 }
 async function processMethod(account, contract, method, params) {
     const parsedParams = parseNamedArgs(params);
-    console.log(`Processing: ${method}(${JSON.stringify(parsedParams).replace(/"/g, '')})`);
     const tx = await account.callRaw(contract, method, parsedParams);
     if (!tx.result.status.SuccessValue && tx.result.status.Failure) {
         console.error(JSON.stringify(tx.result.status));
-        return;
+        return {};
     }
-    const result = tx.result.status.SuccessValue ? Buffer.from(tx.result.status.SuccessValue, 'base64').toString() : "Success";
-    console.log(`Result:`, result);
-    logTotalGas(tx);
+    return {
+        Method: method,
+        Params: parsedParams,
+        TotalGas: formatGas(tx.result.transaction_outcome.outcome.gas_burnt +
+            tx.result.receipts_outcome[0].outcome.gas_burnt +
+            tx.result.receipts_outcome[1].outcome.gas_burnt)
+    };
 }
