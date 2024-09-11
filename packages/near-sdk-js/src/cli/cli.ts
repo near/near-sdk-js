@@ -17,7 +17,7 @@ import { Worker } from "near-workspaces";
 const { Signale } = signal;
 const PROJECT_DIR = process.cwd();
 const NEAR_SDK_JS = "node_modules/near-sdk-js";
-const TSC = "node_modules/.bin/tsc";  
+const TSC = "node_modules/.bin/tsc";
 const QJSC_DIR = `${NEAR_SDK_JS}/lib/cli/deps/quickjs`;
 const QJSC = `${NEAR_SDK_JS}/lib/cli/deps/qjsc`;
 
