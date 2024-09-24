@@ -62,7 +62,7 @@
   "license": "Apache-2.0",
   "devDependencies": {
     "ava": "^4.2.0",
-    "near-workspaces": "3.5.0",
+    "near-workspaces": "^4.0.0",
     "npm-run-all": "^4.1.5"
   },
   "dependencies": {
