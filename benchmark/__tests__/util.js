@@ -38,14 +38,16 @@ export function logGasDetail(r, t) {
   logGasBreakdown(map, t);
   t.log(
     "Gas used to refund unused gas: ",
-    formatGas(r.result.receipts_outcome[1].outcome.gas_burnt)
+    // TODO: fix after near-workspaces is updated
+    formatGas(r.result.receipts_outcome[1]?.outcome.gas_burnt || 0)
   );
   t.log(
     "Total gas used: ",
     formatGas(
       r.result.transaction_outcome.outcome.gas_burnt +
         r.result.receipts_outcome[0].outcome.gas_burnt +
-        r.result.receipts_outcome[1].outcome.gas_burnt
+        // TODO: fix after near-workspaces is updated
+        (r.result.receipts_outcome[1]?.outcome.gas_burnt || 0)
     )
   );
 }

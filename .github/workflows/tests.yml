@@ -16,11 +16,11 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 8
+          version: 9
       - name: Setup Node
         uses: actions/setup-node@v3
         with:
-          node-version: 16.x
+          node-version: 18.x
           cache: pnpm
       - name: Install dependencies
         run: pnpm install
@@ -37,4 +37,4 @@ jobs:
       - name: Check that all build artifacts where commited
         run: test -z "$(git status --porcelain)"
       - name: Run tests
-        run: pnpm test
+        run: export NEAR_WORKSPACES_DEBUG=true && pnpm test
