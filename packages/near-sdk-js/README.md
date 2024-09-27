@@ -86,7 +86,7 @@ NEAR-SDK-JS is written in TypeScript, so every API function has a type specified
 
 - `input()` -- Returns the arguments passed to the current smart contract call as utf-8 string.
 
-- `blockIndex()` -- Returns the current block index.
+- `blockIndex()` -- Returns the current block index. <span style="color:#d9534f;">**Deprecated**</span>
 
 - `blockHeight()` -- Returns the current block height.
 
