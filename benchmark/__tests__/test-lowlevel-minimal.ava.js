@@ -41,7 +41,7 @@ test("JS lowlevel minimal contract", async (t) => {
 test("RS lowlevel minimal contract", async (t) => {
   const { bob, lowlevelContractRs } = t.context.accounts;
   let r = await bob.callRaw(lowlevelContractRs, "empty", "");
-
+  
   t.is(r.result.status.SuccessValue, "");
   logGasDetail(r, t);
 });
