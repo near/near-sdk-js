@@ -74,118 +74,143 @@ NEAR-SDK-JS is written in TypeScript, so every API function has a type specified
 
 ### Context API
 
-```
-function currentAccountId(): string;
-function signerAccountId(): string;
-function signerAccountPk(): Uint8Array;
-function predecessorAccountId(): string;
-function inputRaw(): Uint8Array;
-function input(): string;
-function blockIndex(): bigint;
-function blockHeight(): bigint;
-function blockTimestamp(): bigint;
-function epochHeight(): bigint;
-function storageUsage(): bigint
-```
+- `currentAccountId()` -- Returns the ID of the current contract - the contract that is being executed.
+
+- `signerAccountId()` -- Returns the ID of the account that signed the transaction.
+
+- `signerAccountPk()` -- Returns the public key of the account that signed the transaction.
+
+- `predecessorAccountId()` -- Returns the ID of the account that called the function.
+
+- `inputRaw()` -- Returns the arguments passed to the current smart contract call.
+
+- `input()` -- Returns the arguments passed to the current smart contract call as utf-8 string.
+
+- `blockIndex()` -- Returns the current block index. <span style="color:#d9534f;">**Deprecated**</span>
+
+- `blockHeight()` -- Returns the current block height.
+
+- `blockTimestamp()` -- Returns the current block timestamp.
+
+- `epochHeight()` -- Returns the current epoch height.
+
+- `storageUsage()` -- Returns the current accounts NEAR storage usage.
 
 ### Economics API
 
-```
-function accountBalance(): bigint;
-function accountLockedBalance(): bigint;
-function attachedDeposit(): bigint;
-function prepaidGas(): bigint;
-function usedGas(): bigint;
-```
+- `accountBalance()` -- Returns the current account's account balance.
+
+- `accountLockedBalance()` -- Returns the current account's locked balance.
+
+- `attachedDeposit()` -- Returns the amount of NEAR attached to this function call. Can only be called in payable functions.
+
+- `prepaidGas()` -- Returns the amount of Gas that was attached to this function call.
+
+- `usedGas()` -- Returns the amount of Gas that has been used by this function call until now.
 
 ### Math API
 
-```
-function altBn128G1Multiexp(value: Uint8Array): Uint8Array;
-function altBn128G1Sum(value: Uint8Array): Uint8Array;
-function altBn128PairingCheck(value: Uint8Array): boolean;
-function randomSeed(): Uint8Array;
-function sha256(value: Uint8Array): Uint8Array;
-function keccak256(value: Uint8Array): Uint8Array;
-function keccak512(value: Uint8Array): Uint8Array;
-function ripemd160(value: Uint8Array): Uint8Array;
-function ecrecover(hash: Uint8Array, sign: Uint8Array, v: bigint, malleability_flag: bigint): Uint8Array | null;
-```
+- `altBn128G1Multiexp` -- Compute alt_bn128 g1 multiexp. `alt_bn128` is a specific curve from the Barreto-Naehrig(BN) family. It is particularly well-suited for ZK proofs.
+
+- `altBn128G1Sum` - Computes sum for signed g1 group elements on alt_bn128 curve.
+
+- `altBn128PairingCheck(value: Uint8Array)` -- Computes pairing check on alt_bn128 curve.
+
+- `randomSeed()` -- Returns a random string of bytes.
+
+- `sha256(value: Uint8Array)` - Returns sha256 hash of given value.
+
+- `keccak256(value: Uint8Array)` -- Returns keccak256 hash of given value.
+
+- `keccak512(value: Uint8Array)` -- Returns keccak512 hash of given value.
+
+- `ripemd160(value: Uint8Array)` -- Returns ripemd160 hash of given value.
+
+- `ecrecover(hash: Uint8Array, sign: Uint8Array, v: bigint, malleability_flag: bigint)` -- Recovers an ECDSA signer address from a 32-byte message hash and a corresponding signature along with v recovery byte. Takes in an additional flag to check for malleability of the signature which is generally only ideal for transactions.
 
 ### Miscellaneous API
 
-```
-function valueReturnRaw(value: Uint8Array);
-function valueReturn(value: string);
-function panic(msg?: string);
-function panicUtf8(msg: Uint8Array);
-function logUtf8(msg: Uint8Array);
-function logUtf16(msg: Uint8Array);
-function log(...params: unknown[]);
+- `valueReturnRaw(value: Uint8Array)` -- Returns the value from the NEAR WASM virtual machine.
 
-```
+- `valueReturn(value: string)` -- Returns the utf-8 string value from the NEAR WASM virtual machine.
+
+- `panicUtf8(msg: Uint8Array)` -- Panic the transaction execution with given message.
+
+- `logUtf8(msg: Uint8Array)` -- Log the message in transaction logs.
+
+- `logUtf16(msg: Uint8Array)` -- Log the message in transaction logs.
+
+- `log(...params: unknown[])` -- Logs parameters in the NEAR WASM virtual machine.
 
 ### Promises API
 
-```
-function promiseCreate(account_id: string, method_name: string, arguments: Uint8Array, amount: bigint, gas: bigint): bigint;
-function promiseThen(promise_index: bigint, account_id: string, method_name: string, arguments: Uint8Array, amount: bigint, gas: bigint): bigint;
-function promiseAnd(...promise_idx: bigint): bigint;
-function promiseBatchCreate(account_id: string): bigint;
-function promiseBatchThen(promise_index: bigint, account_id: string): bigint;
-```
+Asynchronous cross-contract calls allow parallel execution of multiple contracts in parallel with subsequent aggregation on another contract. env exposes the following methods:
+
+- `promiseCreate(account_id: string, method_name: string, arguments: Uint8Array, amount: bigint, gas: bigint)` -- schedules an execution of a function on some contract;
+
+- `promiseThen(promise_index: bigint, account_id: string, method_name: string, arguments: Uint8Array, amount: bigint, gas: bigint)` -- attaches the callback back to the current contract once the function is executed;
+
+- `promiseAnd(...promise_idx: bigint)` -- combinator, allows waiting on several promises simultaneously, before executing the callback
+
+- `promiseBatchCreate(account_id: string)` -- create a NEAR promise which will have multiple promise actions inside
+
+- `promiseBatchThen(promise_index: bigint, account_id: string)` -- attach a callback NEAR promise to a batch of NEAR promise actions
 
 ### Promise API actions
 
-```
-function promiseBatchActionCreateAccount(promise_index: PromiseIndex);
-function promiseBatchActionDeployContract(promise_index: PromiseIndex, code: Uint8Array);
-function promiseBatchActionFunctionCall(promise_index: PromiseIndex, method_name: string, arguments: Uint8Array, amount: bigint, gas: bigint);
-function promiseBatchActionFunctionCallWeight(promise_index: PromiseIndex, method_name: string, arguments: Uint8Array, amount: bigint, gas: bigint, weight: bigint);
-function promiseBatchActionTransfer(promise_index: PromiseIndex, amount: bigint);
-function promiseBatchActionStake(promise_index: PromiseIndex, amount: bigint, public_key: Uint8Array);
-function promiseBatchActionAddKeyWithFullAccess(promise_index: PromiseIndex, public_key: Uint8Array, nonce: bigint);
-function promiseBatchActionAddKeyWithFunctionCall(promise_index: PromiseIndex, public_key: Uint8Array, nonce: bigint, allowance: bigint, receiver_id: string, method_names: string);
-function promiseBatchActionDeleteKey(promise_index: PromiseIndex, public_key: Uint8Array);
-function promiseBatchActionDeleteAccount(promise_index: PromiseIndex, beneficiary_id: string);
-```
+- `promiseBatchActionCreateAccount(promiseIndex: PromiseIndex)` -- Attach a create account promise action to the NEAR promise index with the provided promise index.
+
+- `promiseBatchActionDeployContract(promiseIndex: PromiseIndex, code: Uint8Array)` -- Attach a deploy contract promise action to the NEAR promise index with the provided promise index.
+
+- `promiseBatchActionFunctionCall(promiseIndex: PromiseIndex, methodName: string, args: string, amount: NearAmount, gas: NearAmount)` -- Attach a function call promise action to the NEAR promise index with the provided promise index.
+
+- `promiseBatchActionFunctionCallWeight(promiseIndex: PromiseIndex, methodName: string, args: string, amount: NearAmount, gas: NearAmount, weight: GasWeight)` -- Attach a function call with weight promise action to the NEAR promise index with the provided promise index.
+
+- `promiseBatchActionTransfer(promiseIndex: PromiseIndex, amount: NearAmount);` -- Attach a transfer promise action to the NEAR promise index with the provided promise index.
+
+- `promiseBatchActionStake(promiseIndex: PromiseIndex, amount: NearAmount, publicKey: Uint8Array)` -- Attach a stake promise action to the NEAR promise index with the provided promise index.
+
+- `promiseBatchActionAddKeyWithFullAccess(promiseIndex: PromiseIndex, publicKey: Uint8Array, nonce: number | bigint)` -- Attach a add full access key promise action to the NEAR promise index with the provided promise index.
+
+- `promiseBatchActionAddKeyWithFunctionCall(promiseIndex: PromiseIndex, publicKey: Uint8Array, nonce: number | bigint, allowance: NearAmount, receiverId: string, methodNames: string)` -- Attach a add access key promise action to the NEAR promise index with the provided promise index.
+
+- `promiseBatchActionDeleteKey(promiseIndex: PromiseIndex, publicKey: Uint8Array)` -- Attach a delete key promise action to the NEAR promise index with the provided promise index.
+
+- `promiseBatchActionDeleteAccount(promiseIndex: PromiseIndex, beneficiaryId: string)` -- Attach a delete account promise action to the NEAR promise index with the provided promise index.
 
 ### Promise API results
 
-```
-function promiseResultsCount(): bigint;
-function promiseResultRaw(result_idx: PromiseIndex): Uint8Array;
-function promiseResult(result_idx: PromiseIndex): string;
-function promiseReturn(promise_idx: PromiseIndex);
-```
+- `promiseResultsCount()` -- Returns the number of promise results available.
+
+- `promiseResultRaw(promiseIndex: PromiseIndex)` -- Returns the result of the NEAR promise for the passed promise index.
+
+- `promiseResult(promiseIndex: PromiseIndex)` -- Returns the result of the NEAR promise for the passed promise index as utf-8 string.
+
+- `promiseReturn(promiseIndex: PromiseIndex)` -- Executes the promise in the NEAR WASM virtual machine.
 
 ### Storage API
 
-```
-function storageWriteRaw(key: Uint8Array, value: Uint8Array): boolean;
-function storageReadRaw(key: Uint8Array): Uint8Array | null;
-function storageRemoveRaw(key: Uint8Array): boolean;
-function storageHasKeyRaw(key: Uint8Array): boolean;
-function storageWrite(key: string, value: string): boolean;
-function storageRead(key: string): bigint;
-function storageRemove(key: string): bigint;
-function storageHasKey(key: string): bigint;
-```
+- `storageWriteRaw(key: Uint8Array, value: Uint8Array)` -- Writes the provided bytes to NEAR storage under the provided key.
+
+- `storageReadRaw(key: Uint8Array)` -- Reads the value from NEAR storage that is stored under the provided key.
+
+- `storageRemoveRaw(key: Uint8Array)` -- Removes the value of the provided key from NEAR storage.
+
+- `storageHasKeyRaw(key: Uint8Array)` -- Checks for the existence of a value under the provided key in NEAR storage.
+
+- `storageWrite(key: string, value: string)` -- Writes the provided utf-8 string to NEAR storage under the provided key.
+
+- `storageRead(key: string)` -- Reads the utf-8 string value from NEAR storage that is stored under the provided key.
+
+- `storageRemove(key: string)` -- Removes the value of the provided utf-8 string key from NEAR storage.
+
+- `storageHasKey(key: string)` -- Checks for the existence of a value under the provided utf-8 string key in NEAR storage.
 
 ### Validator API
 
-```
-function validatorStake(account_id: string): bigint;
-function validatorTotalStake(): bigint;
-```
+- `validatorStake(account_id: string)` -- Returns the number of staked NEAR of given validator, in yoctoNEAR.
 
-### Alt BN128
-
-```
-function altBn128G1Multiexp(value: Uint8Array): Uint8Array;
-function altBn128G1Sum(value: Uint8Array): Uint8Array;
-function altBn128PairingCheck(value: Uint8Array): boolean;
-```
+- `validatorTotalStake()` -- Returns the number of staked NEAR of all validators, in yoctoNEAR
 
 ### NearBindgen and other decorators
 
