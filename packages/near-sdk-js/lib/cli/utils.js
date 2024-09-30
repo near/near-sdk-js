@@ -100,7 +100,8 @@ export function parseNamedArgs(args) {
 export function logTotalGas(r) {
     console.log('Total gas used: ', formatGas(r.result.transaction_outcome.outcome.gas_burnt +
         r.result.receipts_outcome[0].outcome.gas_burnt +
-        r.result.receipts_outcome[1].outcome.gas_burnt), '\n');
+        // TODO: remove after near-workspaces is updated
+        (r.result.receipts_outcome[1].outcome.gas_burnt || 0)), '\n');
 }
 export function formatGas(gas) {
     if (gas < 10 ** 12) {

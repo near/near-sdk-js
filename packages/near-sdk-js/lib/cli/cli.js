@@ -290,6 +290,7 @@ async function processMethod(account, contract, method, params) {
         Params: parsedParams,
         TotalGas: formatGas(tx.result.transaction_outcome.outcome.gas_burnt +
             tx.result.receipts_outcome[0].outcome.gas_burnt +
-            tx.result.receipts_outcome[1].outcome.gas_burnt)
+            // TODO: remove after near-workspaces is updated
+            (tx.result.receipts_outcome[1].outcome.gas_burnt || 0))
     };
 }
