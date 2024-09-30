@@ -18,14 +18,14 @@ import { AccountId, PromiseOrValue } from "near-sdk-js";
  *         this.token = new FungibleToken();
  *     }
  *
- *     @call({})
+ *   @call({})
  *    ft_on_transfer({ sender_id, amount, msg }: {
-            sender_id: AccountId;
-            amount: number;
-            msg: String;
-    }): PromiseOrValue<number> {
-        return this.token.ft_on_transfer({ sender_id, amount, msg });
-    };
+ *           sender_id: AccountId;
+ *           amount: number;
+ *           msg: String;
+ *   }): PromiseOrValue<number> {
+ *       return this.token.ft_on_transfer({ sender_id, amount, msg });
+ *   };
  * }
  * ```
  */

@@ -7,9 +7,9 @@ import { AccountId, Balance } from "near-sdk-js";
  * ```typescript
  * import { AccountId, Balance, call } from "near-sdk-js";
  * import {
-    FungibleTokenCore,
-    FungibleTokenResolver,
-    FungibleToken,
+ *   FungibleTokenCore,
+ *   FungibleTokenResolver,
+ *   FungibleToken,
  * } from "near-contract-standards/lib"
  *
  * @NearBindgen({ requireInit: false })
