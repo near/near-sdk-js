@@ -55,10 +55,6 @@ See more in the [Anatomy of a Contract](https://docs.near.org/build/smart-contra
 
 - node >=14 <16.6.0 || >16.6.0
 - pnpm >=7
-- NEAR CLI
-```
-npm install -g near-cli
-```
 
 ## Quick Start
 
