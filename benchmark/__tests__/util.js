@@ -56,7 +56,7 @@ export function logTotalGas(prefix = '', r, t) {
     formatGas(
       r.result.transaction_outcome.outcome.gas_burnt +
       r.result.receipts_outcome[0].outcome.gas_burnt +
-      r.result.receipts_outcome[1].outcome.gas_burnt
+      (r.result.receipts_outcome[1]?.outcome.gas_burnt || 0)
     )
   );
 }
