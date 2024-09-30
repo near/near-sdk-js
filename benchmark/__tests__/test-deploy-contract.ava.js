@@ -78,7 +78,8 @@ test("JS promise batch deploy contract and call", async (t) => {
   );
   t.log(
     "Gas used to refund unused gas: ",
-    formatGas(r.result.receipts_outcome[3].outcome.gas_burnt)
+    // TODO: fix after near-workspaces is updated
+    formatGas(r.result.receipts_outcome[3]?.outcome.gas_burnt || 0)
   );
   t.log(
     "Total gas used: ",
@@ -87,7 +88,8 @@ test("JS promise batch deploy contract and call", async (t) => {
         r.result.receipts_outcome[0].outcome.gas_burnt +
         r.result.receipts_outcome[1].outcome.gas_burnt +
         r.result.receipts_outcome[2].outcome.gas_burnt +
-        r.result.receipts_outcome[3].outcome.gas_burnt
+        // TODO: fix after near-workspaces is updated
+        (r.result.receipts_outcome[3]?.outcome.gas_burnt || 0)
     )
   );
 });
@@ -129,7 +131,8 @@ test("RS promise batch deploy contract and call", async (t) => {
   );
   t.log(
     "Gas used to refund unused gas: ",
-    formatGas(r.result.receipts_outcome[3].outcome.gas_burnt)
+    // TODO: fix after near-workspaces is updated
+    formatGas(r.result.receipts_outcome[3]?.outcome.gas_burnt || 0)
   );
   t.log(
     "Total gas used: ",
@@ -138,7 +141,8 @@ test("RS promise batch deploy contract and call", async (t) => {
         r.result.receipts_outcome[0].outcome.gas_burnt +
         r.result.receipts_outcome[1].outcome.gas_burnt +
         r.result.receipts_outcome[2].outcome.gas_burnt +
-        r.result.receipts_outcome[3].outcome.gas_burnt
+        // TODO: fix after near-workspaces is updated
+        (r.result.receipts_outcome[3]?.outcome.gas_burnt || 0)
     )
   );
 });
