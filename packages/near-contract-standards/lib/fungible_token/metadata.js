@@ -1,6 +1,5 @@
 import { assert, } from "near-sdk-js";
 const FT_METADATA_SPEC = "ft-1.0.0";
-
 /**
  * Return metadata for the token, up to contract to implement.
  */

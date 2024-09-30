@@ -1,6 +1,5 @@
 import { AccountId, PromiseOrValue, Balance } from "near-sdk-js";
 import { Option } from "../non_fungible_token/utils";
-
 /**
  * The core methods for a basic fungible token. Extension standards may be
  * added in addition to this interface.
@@ -106,5 +105,5 @@ export interface FungibleTokenCore {
     /** Returns the balance of the account. If the account doesn't exist must returns `"0"`. */
     ft_balance_of({ account_id }: {
         account_id: AccountId;
-        }): Balance;
+    }): Balance;
 }

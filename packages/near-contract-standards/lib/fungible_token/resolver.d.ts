@@ -1,5 +1,4 @@
 import { AccountId, Balance } from "near-sdk-js";
-
 /**
  * Provides token transfer resolve functionality.
  *
@@ -41,22 +40,18 @@ import { AccountId, Balance } from "near-sdk-js";
  * ```
  */
 export interface FungibleTokenResolver {
-  /**
-   * Resolves the transfer of tokens between `sender_id` and `receiver_id`.
-   *
-   * @param sender_id - The account ID of the sender.
-   * @param receiver_id - The account ID of the receiver.
-   * @param amount - The amount of tokens to resolve in a decimal string representation.
-   *
-   * @returns The amount of tokens used during the transfer, returning the balance as a `Balance`.
-   */
-  ft_resolve_transfer({
-    sender_id,
-    receiver_id,
-    amount,
-  }: {
-    sender_id: AccountId;
-    receiver_id: AccountId;
-    amount: Balance;
-  }): Balance;
+    /**
+    * Resolves the transfer of tokens between `sender_id` and `receiver_id`.
+    *
+    * @param sender_id - The account ID of the sender.
+    * @param receiver_id - The account ID of the receiver.
+    * @param amount - The amount of tokens to resolve in a decimal string representation.
+    *
+    * @returns The amount of tokens used during the transfer, returning the balance as a `Balance`.
+    */
+    ft_resolve_transfer({ sender_id, receiver_id, amount, }: {
+        sender_id: AccountId;
+        receiver_id: AccountId;
+        amount: Balance;
+    }): Balance;
 }

@@ -1,8 +1,7 @@
 import { AccountId, PromiseOrValue } from "near-sdk-js";
-
 /**
  * Provides token transfer resolve functionality.
- * 
+ *
  * # Examples
  *
  * ```typescript

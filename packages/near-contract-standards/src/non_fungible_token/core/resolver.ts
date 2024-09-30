@@ -1,7 +1,43 @@
 import { AccountId } from "near-sdk-js";
 import { TokenId } from "../token";
 
-/** Used when an NFT is transferred using `nft_transfer_call`. This is the method that's called after `nft_on_transfer`. This interface is implemented on the NFT contract. */
+/** Used when an NFT is transferred using `nft_transfer_call`. This is the method that's called after `nft_on_transfer`. This interface is implemented on the NFT contract. 
+ * 
+ * # Examples
+ *
+ * ```typescript
+
+ * import { AccountId } from "near-sdk-js";
+ * import { TokenId } from "../token";
+ * import { NonFungibleTokenCore, NonFungibleToken, NonFungibleTokenResolver } from "near-contract-standards/lib"
+ *
+ * @NearBindgen({ requireInit: false })
+ * export class Contract implements NonFungibleTokenCore, NonFungibleTokenResolver {
+ *     private token: NonFungibleToken;
+ *
+ *     constructor() {
+ *         this.tokens = new NonFungibleToken();
+ *     }
+ *
+ *     @call({})
+ *     nft_resolve_transfer({ previous_owner_id, receiver_id, token_id, approved_account_ids, }: {
+            previous_owner_id: AccountId;
+            receiver_id: AccountId;
+            token_id: TokenId;
+            approved_account_ids?: {
+                [approval: AccountId]: bigint;
+            };
+    }): boolean; {
+        return this.tokens.nft_resolve_transfer({
+            previous_owner_id,
+            receiver_id,
+            token_id,
+            approved_account_ids,
+            });
+        }
+ * }
+ * ```
+*/
 export interface NonFungibleTokenResolver {
   /** Finalize an `nft_transfer_call` chain of cross-contract calls.
    *

@@ -8,7 +8,7 @@ import { Option } from "../utils";
  * understand how the cross-contract call work.
  *
  * [core non-fungible token standard]: <https://nomicon.io/Standards/NonFungibleToken/Core.html>
- * 
+ *
  * # Examples
  *
  * ```typescript
