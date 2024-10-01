@@ -15,7 +15,7 @@ export function refund_deposit_to_account(storage_used, account_id) {
         near.promiseReturn(promise_id);
     }
 }
-/** Assumes that the precedecessor will be refunded */
+/** Assumes that the predecessor will be refunded */
 export function refund_deposit(storage_used) {
     refund_deposit_to_account(storage_used, near.predecessorAccountId());
 }

@@ -63,7 +63,7 @@ export function view(_empty: EmptyParameterObject): DecoratorFunction {
 
 /**
  * Tells the SDK to expose this function as a call function.
- * Adds the neccessary checks if the function is private or payable.
+ * Adds the necessary checks if the function is private or payable.
  *
  * @param options - Options to configure the function behaviour.
  * @param options.privateFunction - Whether the function can be called by other contracts.

@@ -1,3 +1,5 @@
+// Functions consumed by the benchmark contracts tests
+
 export function formatGas(gas) {
   if (gas < 10 ** 12) {
     let tGas = gas / 10 ** 12;
@@ -48,4 +50,19 @@ export function logGasDetail(r, t) {
         (r.result.receipts_outcome[1]?.outcome.gas_burnt || 0)
     )
   );
+}
+
+export function logTotalGas(prefix = '', r, t) {
+  t.log(
+    prefix + ' - Total gas used: ',
+    formatGas(
+      r.result.transaction_outcome.outcome.gas_burnt +
+      r.result.receipts_outcome[0].outcome.gas_burnt +
+      (r.result.receipts_outcome[1]?.outcome.gas_burnt || 0)
+    )
+  );
+}
+
+export function randomInt(max) {
+  return Math.floor(Math.random() * max);
 }

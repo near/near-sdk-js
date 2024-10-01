@@ -2,6 +2,8 @@ import { near } from "near-sdk-js";
 import { CurveType, PublicKey } from "near-sdk-js";
 import { assert } from "near-sdk-js";
 
+// Functions consumed by the public key tests
+
 function runtime_validate_public_key(prefix, public_key) {
   let promiseId = near.promiseBatchCreate(prefix + ".pk.test.near");
   near.promiseBatchActionCreateAccount(promiseId);

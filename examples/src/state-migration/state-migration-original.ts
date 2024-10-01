@@ -1,4 +1,4 @@
-import { NearBindgen, view, near, migrate, call, Vector, assert } from 'near-sdk-js'
+import { NearBindgen, view, near, call, Vector } from 'near-sdk-js'
 import { AccountId } from 'near-sdk-js/lib/types'
 
 type Message = {

@@ -1,5 +1,7 @@
 import { near } from "near-sdk-js";
 
+// Functions consumed by the promise api tests
+
 function arrayN(n) {
   return [...Array(Number(n)).keys()];
 }

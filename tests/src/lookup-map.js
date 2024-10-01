@@ -1,6 +1,18 @@
 import { NearBindgen, call, view, LookupMap } from "near-sdk-js";
 import { House, Room } from "./model.js";
 
+/**
+ * Simple contract used to test `lookupMap` functionality.
+ * - Includes methods:
+ *  - `get({ key })` - Get the data stored at the provided key.
+ *  - `containsKey({ key })` - Checks whether the collection contains the value.
+ *  - `set({ key, value })` - Store a new value at the provided key.
+ *  - `remove_key({ key })` - Removes and retrieves the element with the provided key.
+ *  - `extend({ kvs })` - Extends the current collection with the passed in array of key-value pairs.
+ *  - `add_house()` - Adds a test `House` object in the `lookupMap`.
+ *  - `get_house()` - Returns a `string` containing the `house.describe()` + `room.describe()` results.
+ * @param lookupMap - Simple `LookupMap` used for testing.
+ */
 @NearBindgen({})
 export class LookupMapTestContract {
   constructor() {

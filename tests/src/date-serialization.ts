@@ -1,5 +1,13 @@
 import { near, NearBindgen, call, view } from "near-sdk-js";
 
+/**
+ * Simple class used for testing of the `dateField`.
+ * - Includes methods:
+ *  - `getDateField()` - returns the current `dateField` value.
+ *  - `setDateField(args: { dateField })` - used to change the current `dateField` value.
+ *  - `getDateFieldAsMilliseconds()` - returns the `dateField` value in milliseconds.
+ * @param dateField - Simple `Date` used for testing.
+ */
 @NearBindgen({})
 export class DateSerializationTest {
   dateField: Date;

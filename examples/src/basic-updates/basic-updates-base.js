@@ -3,12 +3,8 @@ import {
     call,
     view,
     near,
-    migrate,
     Vector,
-    assert,
-    UnorderedMap,
-    LookupSet,
-    validateAccountId, ONE_NEAR
+    ONE_NEAR
 } from "near-sdk-js";
 
 const POINT_ONE = ONE_NEAR / 10000n;

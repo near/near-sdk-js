@@ -5,7 +5,6 @@ import {
   initialize,
   near,
   LookupMap,
-  bytes,
   assert,
 } from "near-sdk-js";
 

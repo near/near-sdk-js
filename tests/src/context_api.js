@@ -1,5 +1,7 @@
 import { near, bytes } from "near-sdk-js";
 
+// Functions consumed by the context api tests
+
 export function get_current_account_id() {
   near.valueReturn(near.currentAccountId());
 }

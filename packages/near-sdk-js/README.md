@@ -15,17 +15,17 @@ Learn more in our [Quick Start guide](https://docs.near.org/develop/quickstart-g
 There are a couple of contract examples in the project:
 
 - [Clean contract state](https://github.com/near/near-sdk-js/tree/develop/examples/src/clean-state.js)
-- [Counter using low level API](https://github.com/near/near-sdk-js/tree/develop/examples/src/counter-lowlevel.js)
-- [Counter in JavaScript](https://github.com/near/near-sdk-js/tree/develop/examples/src/counter.js)
-- [Counter in TypeScript](https://github.com/near/near-sdk-js/tree/develop/examples/src/counter.ts)
-- [Doing cross contract call](https://github.com/near/near-sdk-js/tree/develop/examples/src/cross-contract-call.js)
-- [Fungible token](https://github.com/near/near-sdk-js/tree/develop/examples/src/fungible-token.js)
-- [Lockable fungible token](https://github.com/near/near-sdk-js/tree/develop/examples/src/fungible-token-lockable.js)
-- [Non fungible token](https://github.com/near/near-sdk-js/tree/develop/examples/src/non-fungible-token.js)
-- [Non fungible token receiver contract](https://github.com/near/near-sdk-js/tree/develop/examples/src/non-fungible-token-receiver.js)
-- [Status message board](https://github.com/near/near-sdk-js/tree/develop/examples/src/status-message.js)
-- [Status message board with unique messages](https://github.com/near/near-sdk-js/tree/develop/examples/src/status-message-collections.js)
-- [Programmatic Update After Locking The Contract](https://github.com/near/near-sdk-js/tree/develop/examples/src/programmatic-update.js)
+- [Counter using low level API](https://github.com/near/near-sdk-js/tree/develop/examples/src/counter/counter-lowlevel.js)
+- [Counter in JavaScript](https://github.com/near/near-sdk-js/tree/develop/examples/src/counter/counter.js)
+- [Counter in TypeScript](https://github.com/near/near-sdk-js/tree/develop/examples/src/counter/counter.ts)
+- [Doing cross contract call](https://github.com/near/near-sdk-js/tree/develop/examples/src//cross-contract-calls/cross-contract-call.js)
+- [Fungible token](https://github.com/near/near-sdk-js/tree/develop/examples/src/fungible-token/fungible-token.js)
+- [Lockable fungible token](https://github.com/near/near-sdk-js/tree/develop/examples/src/fungible-token/fungible-token-lockable.js)
+- [Non fungible token](https://github.com/near/near-sdk-js/tree/develop/examples/src/non-fungible-token/non-fungible-token.js)
+- [Non fungible token receiver contract](https://github.com/near/near-sdk-js/tree/develop/examples/src/non-fungible-token/non-fungible-token-receiver.js)
+- [Status message board](https://github.com/near/near-sdk-js/tree/develop/examples/src/status-message/status-message.js)
+- [Status message board with unique messages](https://github.com/near/near-sdk-js/tree/develop/examples/src/status-message/status-message-collections.js)
+- [Programmatic Update After Locking The Contract](https://github.com/near/near-sdk-js/tree/develop/examples/src/programmatic-updates/programmatic-update.js)
 
 To build all examples, run `pnpm build` in `examples/`. To test all examples, run `pnpm test`. You can also build and test one specific example with `pnpm build:<example-name>` and `pnpm test:<example-name>`, see `examples/package.json`.
 
@@ -61,7 +61,7 @@ All NEAR blockchain provided functionality (host functions) are defined in `src/
 ```js
 import { near } from "near-sdk-js";
 
-// near.<api doucmented below>. e.g.:
+// near.<api documented below>. e.g.:
 let signer = near.signerAccountId();
 ```
 
@@ -70,7 +70,7 @@ let signer = near.signerAccountId();
 NEAR-SDK-JS is written in TypeScript, so every API function has a type specified by signature that looks familiar to JavaScript/TypeScript Developers. Two types in the signature need a special attention:
 
 - Most of the API take `bigint` instead of Number as type. This because JavaScript Number cannot hold 64 bit and 128 bit integer without losing precision.
-- For those API that takes or returns raw bytes, it is a JavaScript `Uint8Array`. You can use standard `Uint8Array` methods on it or decode it to string with `decode` or `str`. The differece between `decode` and `str` is: `decode` decode the array as UTF-8 sequence. `str` simply converts each Uint8 to one char with that char code.
+- For those API that takes or returns raw bytes, it is a JavaScript `Uint8Array`. You can use standard `Uint8Array` methods on it or decode it to string with `decode` or `str`. The difference between `decode` and `str` is: `decode` decode the array as UTF-8 sequence. `str` simply converts each Uint8 to one char with that char code.
 
 ### Context API
 
@@ -214,7 +214,7 @@ Asynchronous cross-contract calls allow parallel execution of multiple contracts
 
 ### NearBindgen and other decorators
 
-You can write a simple smart contract by only using low-level APIs, such as `near.input()`, `near.storageRead()`, etc. In this case, the API of your contract will consist of all the exported JS functions. You can find an example of such a contract [here](https://github.com/near/near-sdk-js/blob/develop/examples/src/counter-lowlevel.js).
+You can write a simple smart contract by only using low-level APIs, such as `near.input()`, `near.storageRead()`, etc. In this case, the API of your contract will consist of all the exported JS functions. You can find an example of such a contract [here](https://github.com/near/near-sdk-js/blob/develop/examples/src/counter/counter-lowlevel.js).
 
 But if you want to build a more complex contracts with ease, you can use decorators from this SDK that will handle serialization, deserialization, and other boilerplate operations for you.
 
@@ -222,7 +222,7 @@ In order to do that, your contract must be a class decorated with `@NearBindgen(
 
 Your class must have a `constructor()`. You will not be able to call it, which is why it should not accept any parameters. You must declare all the parameters that you are planning to use in the constructor and set default values.
 
-The simplest example of the contract that follows all these rules can be found [here](https://github.com/near/near-sdk-js/blob/develop/examples/src/status-message.js)
+The simplest example of the contract that follows all these rules can be found [here](https://github.com/near/near-sdk-js/blob/develop/examples/src/status-message/status-message.js)
 
 `NearBindgen` decorator can accept `requireInit parameter`.
 
@@ -490,7 +490,7 @@ someMethod() {
 }
 ```
 
-### Highlevel Promise APIs
+### High level Promise APIs
 
 Within a contract class that decorated by `@Nearbindgen`, you can work a high level JavaScript class, called `NearPromise`. It's equivalently expressive as promise batch APIs but much shorter to write and can be chained like a JavaScript Promise.
 
@@ -552,7 +552,7 @@ return promise;
 
 ### Types
 
-NEAR-SDK-JS also includes type defintions that are equivalent to that in Rust SDK / nearcore. You can browse them in near-sdk-js/src/types. Most of them are just type alias to string and bigint.
+NEAR-SDK-JS also includes type definitions that are equivalent to that in Rust SDK / nearcore. You can browse them in near-sdk-js/src/types. Most of them are just type alias to string and bigint.
 
 #### Public Key
 
@@ -607,5 +607,5 @@ In order to use WSL2, follow the next steps:
 In case of any issues of setting up WSL2 make sure that:
 
 - Your Windows OS is up to date
-- Virtualisation is turned on in BIOS
+- Virtualization is turned on in BIOS
 - `Windows Subsystem for Linux` and `Virtual Machine Platform` are turned on in `Windows Features` (Start -> Search -> Turn Windows Feature On or Off)

@@ -1,5 +1,15 @@
 import { near, NearBindgen, call, view, initialize } from "near-sdk-js";
 
+/**
+ * Simple class used for testing of the `NearBindgen` decorator with `option.requireInit`,
+ * which identifies whether the contract requires initialization or not.
+ *  - `option.requireInit` set to `false` - Contract does not require initialization.
+ * - Includes methods:
+ *  - `init()` - used for initializing the class
+ *  - `getStatus()` - used to get the current status param
+ *  - `setStatus()` - used to change the current status
+ * @param status - Simple string used for testing.
+ */
 @NearBindgen({ requireInit: false })
 export class NBTest {
   status: string;

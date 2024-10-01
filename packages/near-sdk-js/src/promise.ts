@@ -185,7 +185,7 @@ export class FunctionCallWeightRaw extends PromiseAction {
  */
 export class Transfer extends PromiseAction {
   /**
-   * @param amount - The amount of NEAR to tranfer.
+   * @param amount - The amount of NEAR to transfer.
    */
   constructor(public amount: Balance) {
     super();
@@ -203,7 +203,7 @@ export class Transfer extends PromiseAction {
  */
 export class Stake extends PromiseAction {
   /**
-   * @param amount - The amount of NEAR to tranfer.
+   * @param amount - The amount of NEAR to transfer.
    * @param publicKey - The public key to use for staking.
    */
   constructor(public amount: Balance, public publicKey: PublicKey) {
@@ -252,7 +252,7 @@ export class AddAccessKey extends PromiseAction {
    * @param publicKey - The public key to add as a access key.
    * @param allowance - The allowance for the key in yoctoNEAR.
    * @param receiverId - The account ID of the receiver.
-   * @param functionNames - The names of funcitons to authorize.
+   * @param functionNames - The names of functions to authorize.
    * @param nonce - The nonce to use.
    */
   constructor(
@@ -301,7 +301,7 @@ export class DeleteKey extends PromiseAction {
  */
 export class DeleteAccount extends PromiseAction {
   /**
-   * @param beneficiaryId - The beneficiary of the account deletion - the account to recieve all of the remaining funds of the deleted account.
+   * @param beneficiaryId - The beneficiary of the account deletion - the account to receive all of the remaining funds of the deleted account.
    */
   constructor(public beneficiaryId: AccountId) {
     super();
@@ -486,7 +486,7 @@ export class NearPromise {
   /**
    * Creates a transfer promise action and adds it to the current promise.
    *
-   * @param amount - The amount of NEAR to tranfer.
+   * @param amount - The amount of NEAR to transfer.
    */
   transfer(amount: Balance): NearPromise {
     return this.addAction(new Transfer(amount));
@@ -495,7 +495,7 @@ export class NearPromise {
   /**
    * Creates a stake promise action and adds it to the current promise.
    *
-   * @param amount - The amount of NEAR to tranfer.
+   * @param amount - The amount of NEAR to transfer.
    * @param publicKey - The public key to use for staking.
    */
   stake(amount: Balance, publicKey: PublicKey): NearPromise {
@@ -530,7 +530,7 @@ export class NearPromise {
    * @param publicKey - The public key to add as a access key.
    * @param allowance - The allowance for the key in yoctoNEAR.
    * @param receiverId - The account ID of the receiver.
-   * @param functionNames - The names of funcitons to authorize.
+   * @param functionNames - The names of functions to authorize.
    */
   addAccessKey(
     publicKey: PublicKey,
@@ -554,7 +554,7 @@ export class NearPromise {
    * @param publicKey - The public key to add as a access key.
    * @param allowance - The allowance for the key in yoctoNEAR.
    * @param receiverId - The account ID of the receiver.
-   * @param functionNames - The names of funcitons to authorize.
+   * @param functionNames - The names of functions to authorize.
    * @param nonce - The nonce to use.
    */
   addAccessKeyWithNonce(
@@ -581,7 +581,7 @@ export class NearPromise {
   /**
    * Creates a delete account promise action and adds it to the current promise.
    *
-   * @param beneficiaryId - The beneficiary of the account deletion - the account to recieve all of the remaining funds of the deleted account.
+   * @param beneficiaryId - The beneficiary of the account deletion - the account to receive all of the remaining funds of the deleted account.
    */
   deleteAccount(beneficiaryId: AccountId): NearPromise {
     return this.addAction(new DeleteAccount(beneficiaryId));
