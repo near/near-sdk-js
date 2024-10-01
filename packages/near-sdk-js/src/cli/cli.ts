@@ -375,7 +375,7 @@ async function createWasmContract(
   // copying builder.c file to the build folder
   fs.cpSync(ORIGINAL_BUILDER_PATH, NEW_BUILDER_PATH);
 
-  fs.renameSync(qjscTarget, "build/code.h");
+  fs.renameSync(qjscTarget, qjscTarget.replace("build.h", "code.h"));
 
   await executeCommand(
     `${CC} --target=wasm32-wasi -nostartfiles -Oz -flto ${DEFS} ${INCLUDES} ${SOURCES} ${LIBS} -Wl,--no-entry -Wl,--allow-undefined -Wl,-z,stack-size=${
