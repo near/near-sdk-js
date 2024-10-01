@@ -7,3 +7,6 @@ export declare function download(url: string, verbose?: boolean): Promise<void>;
  * @param verbose - Whether to print verbose output.
  **/
 export declare function validateContract(contractPath: string, verbose?: boolean): Promise<boolean>;
+export declare function parseNamedArgs(args: any): any;
+export declare function logTotalGas(r: any): void;
+export declare function formatGas(gas: any): string;

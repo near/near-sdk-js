@@ -7,8 +7,9 @@ import { babel } from "@rollup/plugin-babel";
 import { rollup } from "rollup";
 import { Command } from "commander";
 import signal from "signale";
-import { executeCommand, validateContract } from "./utils.js";
+import { executeCommand, formatGas, parseNamedArgs, validateContract } from "./utils.js";
 import { runAbiCompilerPlugin } from "./abi.js";
+import { Worker } from "near-workspaces";
 const { Signale } = signal;
 const PROJECT_DIR = process.cwd();
 const NEAR_SDK_JS = "node_modules/near-sdk-js";
@@ -53,6 +54,12 @@ program
     .argument("[target]", "Target file path and name. The js file must correspond to the same path with the js extension.", "build/contract.wasm")
     .option("--verbose", "Whether to print more verbose output.", false)
     .action(transpileJsAndBuildWasmCom))
+    .addCommand(new Command("watchGas")
+    .usage("[target] [methodName params...] [methodName params...]")
+    .description("Measure gas used for a contract method. Run this command after deploying the contract.")
+    .argument("[target]", "Target file path and name. (e.g., ./build/counter.wasm)")
+    .argument("[...methodCalls]", "Method calls with their parameters (e.g., increase n=5 decrease n=2)")
+    .action(measureGas))
     .parse();
 function getTargetDir(target) {
     return dirname(target);
@@ -230,4 +237,60 @@ async function createWasmContract(qjscTarget, contractTarget, verbose = false) {
 async function wasiStubContract(contractTarget, verbose = false) {
     const WASI_STUB = `${NEAR_SDK_JS}/lib/cli/deps/binaryen/wasi-stub/run.sh`;
     await executeCommand(`${WASI_STUB} ${contractTarget}`, verbose);
+}
+async function measureGas(target, ...methodCalls) {
+    let worker;
+    try {
+        worker = await Worker.init();
+        const root = worker.rootAccount;
+        const contract = await root.devDeploy(target);
+        const account = await root.createSubAccount("ali");
+        let currentMethod = null;
+        let methodParams = [];
+        const methodCallsArr = methodCalls.pop().args.slice(1);
+        const output = [];
+        for (let i = 0; i < methodCallsArr.length; i++) {
+            if (methodCallsArr[i].includes("=")) {
+                methodParams.push(methodCallsArr[i]);
+                continue;
+            }
+            if (currentMethod) {
+                const res = await processMethod(account, contract, currentMethod, methodParams);
+                output.push(res);
+            }
+            currentMethod = methodCallsArr[i];
+            methodParams = [];
+        }
+        if (currentMethod) {
+            const res = await processMethod(account, contract, currentMethod, methodParams);
+            output.push(res);
+        }
+        console.table(output.map(({ Method, Params, TotalGas }) => ({
+            Method,
+            Params: JSON.stringify(Params),
+            TotalGas
+        })));
+    }
+    catch (error) {
+        console.error(error);
+    }
+    finally {
+        await worker?.tearDown();
+    }
+}
+async function processMethod(account, contract, method, params) {
+    const parsedParams = parseNamedArgs(params);
+    const tx = await account.callRaw(contract, method, parsedParams);
+    if (!tx.result.status.SuccessValue && tx.result.status.Failure) {
+        console.error(JSON.stringify(tx.result.status));
+        return {};
+    }
+    return {
+        Method: method,
+        Params: parsedParams,
+        TotalGas: formatGas(tx.result.transaction_outcome.outcome.gas_burnt +
+            tx.result.receipts_outcome[0].outcome.gas_burnt +
+            // TODO: remove after near-workspaces is updated
+            (tx.result.receipts_outcome[1].outcome.gas_burnt || 0))
+    };
 }
