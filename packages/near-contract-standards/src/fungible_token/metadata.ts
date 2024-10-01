@@ -6,6 +6,9 @@ import { Option } from "../non_fungible_token/utils";
 
 const FT_METADATA_SPEC: string = "ft-1.0.0";
 
+/**
+ * Return metadata for the token, up to contract to implement.
+ */
 export class FungibleTokenMetadata {
     spec: string;
     name: string;

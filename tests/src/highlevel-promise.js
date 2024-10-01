@@ -14,6 +14,9 @@ function arrayN(n) {
   return [...Array(Number(n)).keys()];
 }
 
+/**
+ * More information about this class, can be found in - benchmark/README.md/Highlevel collection
+ */
 @NearBindgen({})
 export class HighlevelPromiseContract {
   @call({})

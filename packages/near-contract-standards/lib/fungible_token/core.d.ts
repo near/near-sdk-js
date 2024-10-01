@@ -1,5 +1,56 @@
 import { AccountId, PromiseOrValue, Balance } from "near-sdk-js";
 import { Option } from "../non_fungible_token/utils";
+/**
+ * The core methods for a basic fungible token. Extension standards may be
+ * added in addition to this interface.
+ *
+ * # Examples
+ *
+ * ```typescript
+
+ * import { near, call, view, AccountId, PromiseOrValue, Balance } from "near-sdk-js";
+ * import { Option } from "../non_fungible_token/utils";
+ * import { FungibleTokenCore, FungibleToken } from "near-contract-standards/lib"
+ *
+ * @NearBindgen({ requireInit: false })
+ * export class Contract implements FungibleTokenCore {
+ *     private token: FungibleToken;
+ *
+ *     constructor() {
+ *         this.token = new FungibleToken();
+ *     }
+ *
+ *     @call({})
+ *     ft_transfer({ receiver_id, amount, memo }: {
+ *         receiver_id: AccountId,
+ *         amount: Balance,
+ *         memo?: String
+ *     }): void {
+ *         this.token.ft_transfer({ receiver_id, amount, memo });
+ *     }
+ *
+ *     @call({})
+ *     ft_transfer_call({ receiver_id, amount, memo, msg }: {
+ *         receiver_id: AccountId,
+ *         amount: Balance,
+ *         memo?: Option<String>,
+ *         msg: String
+ *     }): PromiseOrValue<bigint> {
+ *         return this.token.ft_transfer_call({ receiver_id, amount, memo, msg });
+ *     }
+ *
+ *     @view({})
+ *     ft_total_supply(): Balance {
+ *         return this.token.ft_total_supply();
+ *     }
+ *
+ *     @view({})
+ *     ft_balance_of({ account_id }: { account_id: AccountId }): Balance {
+ *         return this.token.ft_balance_of({ account_id });
+ *     }
+ * }
+ * ```
+ */
 export interface FungibleTokenCore {
     /**
      * Transfers positive `amount` of tokens from the `near.predecessorAccountId()` to `receiver_id`.

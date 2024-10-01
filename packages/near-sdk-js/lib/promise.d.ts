@@ -121,7 +121,7 @@ export declare class FunctionCallWeightRaw extends PromiseAction {
 export declare class Transfer extends PromiseAction {
     amount: Balance;
     /**
-     * @param amount - The amount of NEAR to tranfer.
+     * @param amount - The amount of NEAR to transfer.
      */
     constructor(amount: Balance);
     add(promiseIndex: PromiseIndex): void;
@@ -135,7 +135,7 @@ export declare class Stake extends PromiseAction {
     amount: Balance;
     publicKey: PublicKey;
     /**
-     * @param amount - The amount of NEAR to tranfer.
+     * @param amount - The amount of NEAR to transfer.
      * @param publicKey - The public key to use for staking.
      */
     constructor(amount: Balance, publicKey: PublicKey);
@@ -171,7 +171,7 @@ export declare class AddAccessKey extends PromiseAction {
      * @param publicKey - The public key to add as a access key.
      * @param allowance - The allowance for the key in yoctoNEAR.
      * @param receiverId - The account ID of the receiver.
-     * @param functionNames - The names of funcitons to authorize.
+     * @param functionNames - The names of functions to authorize.
      * @param nonce - The nonce to use.
      */
     constructor(publicKey: PublicKey, allowance: Balance, receiverId: AccountId, functionNames: string, nonce: Nonce);
@@ -198,7 +198,7 @@ export declare class DeleteKey extends PromiseAction {
 export declare class DeleteAccount extends PromiseAction {
     beneficiaryId: AccountId;
     /**
-     * @param beneficiaryId - The beneficiary of the account deletion - the account to recieve all of the remaining funds of the deleted account.
+     * @param beneficiaryId - The beneficiary of the account deletion - the account to receive all of the remaining funds of the deleted account.
      */
     constructor(beneficiaryId: AccountId);
     add(promiseIndex: PromiseIndex): void;
@@ -288,13 +288,13 @@ export declare class NearPromise {
     /**
      * Creates a transfer promise action and adds it to the current promise.
      *
-     * @param amount - The amount of NEAR to tranfer.
+     * @param amount - The amount of NEAR to transfer.
      */
     transfer(amount: Balance): NearPromise;
     /**
      * Creates a stake promise action and adds it to the current promise.
      *
-     * @param amount - The amount of NEAR to tranfer.
+     * @param amount - The amount of NEAR to transfer.
      * @param publicKey - The public key to use for staking.
      */
     stake(amount: Balance, publicKey: PublicKey): NearPromise;
@@ -320,7 +320,7 @@ export declare class NearPromise {
      * @param publicKey - The public key to add as a access key.
      * @param allowance - The allowance for the key in yoctoNEAR.
      * @param receiverId - The account ID of the receiver.
-     * @param functionNames - The names of funcitons to authorize.
+     * @param functionNames - The names of functions to authorize.
      */
     addAccessKey(publicKey: PublicKey, allowance: Balance, receiverId: AccountId, functionNames: string): NearPromise;
     /**
@@ -330,7 +330,7 @@ export declare class NearPromise {
      * @param publicKey - The public key to add as a access key.
      * @param allowance - The allowance for the key in yoctoNEAR.
      * @param receiverId - The account ID of the receiver.
-     * @param functionNames - The names of funcitons to authorize.
+     * @param functionNames - The names of functions to authorize.
      * @param nonce - The nonce to use.
      */
     addAccessKeyWithNonce(publicKey: PublicKey, allowance: Balance, receiverId: AccountId, functionNames: string, nonce: Nonce): NearPromise;
@@ -343,7 +343,7 @@ export declare class NearPromise {
     /**
      * Creates a delete account promise action and adds it to the current promise.
      *
-     * @param beneficiaryId - The beneficiary of the account deletion - the account to recieve all of the remaining funds of the deleted account.
+     * @param beneficiaryId - The beneficiary of the account deletion - the account to receive all of the remaining funds of the deleted account.
      */
     deleteAccount(beneficiaryId: AccountId): NearPromise;
     /**

@@ -1,5 +1,34 @@
 import { AccountId, PromiseOrValue } from "near-sdk-js";
 
+/**
+ * Provides token transfer resolve functionality.
+ * 
+ * # Examples
+ *
+ * ```typescript
+
+ * import { AccountId, PromiseOrValue } from "near-sdk-js";
+ * import { FungibleTokenCore, FungibleToken, FungibleTokenReceiver } from "near-contract-standards/lib"
+ *
+ * @NearBindgen({ requireInit: false })
+ * export class Contract implements FungibleTokenCore, FungibleTokenReceiver {
+ *     private token: FungibleToken;
+ *
+ *     constructor() {
+ *         this.token = new FungibleToken();
+ *     }
+ *
+ *   @call({})
+ *    ft_on_transfer({ sender_id, amount, msg }: {
+ *           sender_id: AccountId;
+ *           amount: number;
+ *           msg: String;
+ *   }): PromiseOrValue<number> {
+ *       return this.token.ft_on_transfer({ sender_id, amount, msg });
+ *   };
+ * }
+ * ```
+ */
 export interface FungibleTokenReceiver {
     /**
      * Called by fungible token contract after `ft_transfer_call` was initiated by

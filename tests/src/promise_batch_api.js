@@ -1,5 +1,7 @@
 import { near, includeBytes } from "near-sdk-js";
 
+// Functions consumed by the promise batch api tests
+
 export function test_promise_batch_stake() {
   let promiseId = near.promiseBatchCreate("caller2.test.near");
   near.promiseBatchActionStake(

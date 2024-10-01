@@ -3,7 +3,7 @@
  */
 export interface GetOptions<DataType> {
     /**
-     * A constructor function to call after deserializing a value. Tipically this is a constructor of the class you are storing.
+     * A constructor function to call after deserializing a value. Typically this is a constructor of the class you are storing.
      *
      * @param value - The value returned from deserialization - either the provided `deserializer` or default deserialization function.
      */

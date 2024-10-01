@@ -13,8 +13,8 @@ process.chdir(DEPS);
 const PLATFORM = os.platform();
 const ARCH = os.arch();
 console.log(`Current platform: ${PLATFORM}, current architecture: ${ARCH}`);
-const SUPPORTED_PLATFORMS = ["linux", "darwin"]; // Unsaported platforms: 'win32', 'aix', 'freebsd', 'openbsd', 'sunos', 'android'
-const SUPPORTED_ARCH = ["x64", "arm64"]; // Unsaported arch: 'arm', 'ia32', 'mips','mipsel', 'ppc', 'ppc64', 's390', 's390x', 'x32'
+const SUPPORTED_PLATFORMS = ["linux", "darwin"]; // Unsupported platforms: 'win32', 'aix', 'freebsd', 'openbsd', 'sunos', 'android'
+const SUPPORTED_ARCH = ["x64", "arm64"]; // Unsupported arch: 'arm', 'ia32', 'mips','mipsel', 'ppc', 'ppc64', 's390', 's390x', 'x32'
 if (!SUPPORTED_PLATFORMS.includes(PLATFORM)) {
     console.error(`Platform ${PLATFORM} is not supported at the moment`);
     process.exit(1);

@@ -61,7 +61,7 @@ All NEAR blockchain provided functionality (host functions) are defined in `src/
 ```js
 import { near } from "near-sdk-js";
 
-// near.<api doucmented below>. e.g.:
+// near.<api documented below>. e.g.:
 let signer = near.signerAccountId();
 ```
 
@@ -70,7 +70,7 @@ let signer = near.signerAccountId();
 NEAR-SDK-JS is written in TypeScript, so every API function has a type specified by signature that looks familiar to JavaScript/TypeScript Developers. Two types in the signature need a special attention:
 
 - Most of the API take `bigint` instead of Number as type. This because JavaScript Number cannot hold 64 bit and 128 bit integer without losing precision.
-- For those API that takes or returns raw bytes, it is a JavaScript `Uint8Array`. You can use standard `Uint8Array` methods on it or decode it to string with `decode` or `str`. The differece between `decode` and `str` is: `decode` decode the array as UTF-8 sequence. `str` simply converts each Uint8 to one char with that char code.
+- For those API that takes or returns raw bytes, it is a JavaScript `Uint8Array`. You can use standard `Uint8Array` methods on it or decode it to string with `decode` or `str`. The difference between `decode` and `str` is: `decode` decode the array as UTF-8 sequence. `str` simply converts each Uint8 to one char with that char code.
 
 ### Context API
 
@@ -490,7 +490,7 @@ someMethod() {
 }
 ```
 
-### Highlevel Promise APIs
+### High level Promise APIs
 
 Within a contract class that decorated by `@Nearbindgen`, you can work a high level JavaScript class, called `NearPromise`. It's equivalently expressive as promise batch APIs but much shorter to write and can be chained like a JavaScript Promise.
 
@@ -552,7 +552,7 @@ return promise;
 
 ### Types
 
-NEAR-SDK-JS also includes type defintions that are equivalent to that in Rust SDK / nearcore. You can browse them in near-sdk-js/src/types. Most of them are just type alias to string and bigint.
+NEAR-SDK-JS also includes type definitions that are equivalent to that in Rust SDK / nearcore. You can browse them in near-sdk-js/src/types. Most of them are just type alias to string and bigint.
 
 #### Public Key
 
@@ -607,5 +607,5 @@ In order to use WSL2, follow the next steps:
 In case of any issues of setting up WSL2 make sure that:
 
 - Your Windows OS is up to date
-- Virtualisation is turned on in BIOS
+- Virtualization is turned on in BIOS
 - `Windows Subsystem for Linux` and `Virtual Machine Platform` are turned on in `Windows Features` (Start -> Search -> Turn Windows Feature On or Off)

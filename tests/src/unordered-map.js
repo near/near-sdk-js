@@ -1,6 +1,22 @@
 import { NearBindgen, call, view, UnorderedMap } from "near-sdk-js";
 import { House, Room } from "./model.js";
 
+/**
+ * Simple contract used for testing the `unorderedMap`.
+ * - Includes methods:
+ *  - `len()` - Returns the current number of elements present in the map.
+ *  - `isEmpty()` - Checks whether the collection is empty.
+ *  - `get({ key })` - Get the data stored at the provided key.
+ *  - `set({ key, value })` - Store a new value at the provided key.
+ *  - `remove_key({ key })` - Removes and retrieves the element with the provided key.
+ *  - `clear()` - Remove all of the elements stored within the collection.
+ *  - `toArray()` - Return a JavaScript array of the data stored within the collection.
+ *  - `extend({ kvs })` - Extends the current collection with the passed in array of key-value pairs.
+ *  - `add_house()` - Store a new `House` object in the `unorderedMap` instance.
+ *  - `get_house()` - Retrieves the current `House` object from the `unorderedMap` and returns a string `house.describe() + room.describe()`
+ *  - `keys({ start, limit })` - Converts the deserialized data from storage to a JavaScript instance of the collection.
+ * @param unorderedMap - Simple `UnorderedMap` used for testing.
+ */
 @NearBindgen({})
 export class UnorderedMapTestContract {
   constructor() {

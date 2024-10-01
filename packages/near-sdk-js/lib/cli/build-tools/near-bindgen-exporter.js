@@ -124,7 +124,7 @@ function collectArguments(classId) {
     ]);
 }
 /**
- * A helper function that inserts a contract method call expresion.
+ * A helper function that inserts a contract method call expression.
  * It calls the appropriate contract method and passes the collected _\_args_.
  *
  * ```typescript
@@ -178,7 +178,7 @@ function executePromise(classId) {
     ]))));
 }
 /**
- * A helper function that inserts the overriden function declaration into the class.
+ * A helper function that inserts the overridden function declaration into the class.
  *
  * @param classId - The class ID of the class being extended.
  * @param methodName - The name of the method being called.

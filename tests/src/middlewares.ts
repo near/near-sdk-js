@@ -7,6 +7,11 @@ import {
   middleware,
 } from "near-sdk-js";
 
+/**
+ * Simple contract used for testing the `@middleware` decorator.
+ * The method that gets called with the same arguments that are passed to the function it is wrapping.
+ * @param args - Arguments that will be passed to the function - immutable.
+ */
 @NearBindgen({ requireInit: true })
 export class Contract {
   @initialize({})

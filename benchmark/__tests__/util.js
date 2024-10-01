@@ -1,3 +1,5 @@
+// Functions consumed by the benchmark contracts tests
+
 export function formatGas(gas) {
   if (gas < 10 ** 12) {
     let tGas = gas / 10 ** 12;
