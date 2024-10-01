@@ -51,3 +51,18 @@ export function logGasDetail(r, t) {
     )
   );
 }
+
+export function logTotalGas(prefix = '', r, t) {
+  t.log(
+    prefix + ' - Total gas used: ',
+    formatGas(
+      r.result.transaction_outcome.outcome.gas_burnt +
+      r.result.receipts_outcome[0].outcome.gas_burnt +
+      (r.result.receipts_outcome[1]?.outcome.gas_burnt || 0)
+    )
+  );
+}
+
+export function randomInt(max) {
+  return Math.floor(Math.random() * max);
+}
