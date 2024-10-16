@@ -40,15 +40,12 @@ jobs:
         run: pnpm docs:generate-markdown
     
       - name: Deploy to GitBook
-        env:
-          GITBOOK_TOKEN: ${{ secrets.GITBOOK_TOKEN }}
-          GH_PAT: ${{ secrets.GH_PAT }}
         run: |
-          git clone --branch=git-book https://near:${{ secrets.GH_PAT }}@github.com/near/near-sdk-js.git book
-          rsync -av --delete markdown-docs/ book/markdown-docs/
+          git clone --branch=git-book https://github.com/near/near-sdk-js.git book
+          rsync -av --delete markdown-docs/ book/
           cd book
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
-          git add markdown-docs/
+          git add .
           git commit -m "Update documentation [skip ci]"
-          git push https://near:${{ secrets.GH_PAT }}@github.com/near/near-sdk-js.git git-book
+          git push https://frol:${{ secrets.MY_GITHUB_TOKEN }}@github.com/near/near-sdk-js.git git-book
