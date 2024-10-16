@@ -1,0 +1,51 @@
+name: Deploy TypeDoc to GitBook
+
+on:
+  push:
+    branches:
+      - develop
+  
+env:
+  NODE_VERSION: 18.x
+  ENTRY_FILE: "packages"
+  CONFIG_PATH: "tsconfig.base.json"
+  USES_PNPM: "true"
+  
+jobs:
+  deploy:
+    concurrency: ci-${{ github.ref }}
+    runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, '[skip ci]')"
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+  
+      - uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+  
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+  
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile
+    
+      - name: Build project
+        run: pnpm build
+    
+      - name: Build documentation
+        run: pnpm docs:generate-markdown
+    
+      - name: Deploy to GitBook
+        run: |
+          git clone --branch=git-book https://github.com/near/near-sdk-js.git book
+          rsync -av --delete markdown-docs/ book/
+          cd book
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add .
+          git commit -m "Update documentation [skip ci]"
+          git push https://frol:${{ secrets.MY_GITHUB_TOKEN }}@github.com/near/near-sdk-js.git git-book

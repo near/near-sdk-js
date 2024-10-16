@@ -10,11 +10,13 @@
     "test": "turbo run test",
     "lint": "turbo run lint",
     "format": "turbo run format",
-    "docs:generate": "typedoc"
+    "docs:generate": "typedoc",
+    "docs:generate-markdown": "node generate-docs-markdown.js"
   },
   "devDependencies": {
     "turbo": "1.10.16",
-    "typedoc": "0.25.4",
+    "typedoc": "0.26.6",
+    "typedoc-plugin-markdown": "4.2.6",
     "typescript": "4.7.4"
   }
 }
