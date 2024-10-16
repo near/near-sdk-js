@@ -1,12 +1,15 @@
-import { NearBindgen, call, view, initialize, near, bytes } from "near-sdk-js";
+import { NearBindgen, call, view, initialize, near } from "near-sdk-js";
 
 @NearBindgen({ requireInit: true })
 export class OnCall {
-  personOnCall:string ="";
-  statusMessageContract:string ="";
+  constructor() {
+    this.personOnCall = "";
+    this.statusMessageContract = "";
+  }
 
   @initialize({})
   init({ statusMessageContract }) {
+    this.personOnCall = "undefined";
     this.statusMessageContract = statusMessageContract;
   }
 

@@ -130,7 +130,7 @@ export function storageRead(key) {
     return null;
 }
 /**
- * Checks for the existance of a value under the provided key in NEAR storage.
+ * Checks for the existence of a value under the provided key in NEAR storage.
  *
  * @param key - The key to check for in storage.
  */
@@ -138,7 +138,7 @@ export function storageHasKeyRaw(key) {
     return env.storage_has_key(key) === 1n;
 }
 /**
- * Checks for the existance of a value under the provided utf-8 string key in NEAR storage.
+ * Checks for the existence of a value under the provided utf-8 string key in NEAR storage.
  *
  * @param key - The utf-8 string key to check for in storage.
  */
@@ -572,7 +572,7 @@ export function validatorTotalStake() {
  * Computes multiexp on alt_bn128 curve using Pippenger's algorithm \sum_i
  * mul_i g_{1 i} should be equal result.
  *
- * @param value - equence of (g1:G1, fr:Fr), where
+ * @param value - sequence of (g1:G1, fr:Fr), where
  * G1 is point (x:Fq, y:Fq) on alt_bn128,
  * alt_bn128 is Y^2 = X^3 + 3 curve over Fq.
  * `value` is encoded as packed, little-endian

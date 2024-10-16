@@ -1,5 +1,7 @@
 import { near, bytes } from "near-sdk-js";
 
+// Functions consumed by the math api tests
+
 export function test_sha256() {
   near.valueReturnRaw(near.sha256(bytes("tesdsst")));
 }

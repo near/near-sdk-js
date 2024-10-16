@@ -1,5 +1,8 @@
 import { assert, } from "near-sdk-js";
 const FT_METADATA_SPEC = "ft-1.0.0";
+/**
+ * Return metadata for the token, up to contract to implement.
+ */
 export class FungibleTokenMetadata {
     constructor(spec, name, symbol, icon, referance, referance_hash, decimals) {
         this.spec = spec;
