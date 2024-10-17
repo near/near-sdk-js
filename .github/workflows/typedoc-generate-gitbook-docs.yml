@@ -42,7 +42,7 @@ jobs:
       - name: Deploy to GitBook
         run: |
           git clone --branch=git-book https://frol:${{ secrets.MY_GITHUB_TOKEN }}@github.com/near/near-sdk-js.git book
-          rsync -av --delete markdown-docs/ book/
+          rsync -av --delete --exclude=.git markdown-docs/ book/
           cd book
           git config user.name "GitHub Actions"
           git config user.email "actions@github.com"
