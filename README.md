@@ -1,3 +1,7 @@
+**near-sdk-js v2.0.0** • [**Docs**](packages.md)
+
+***
+
 # NEAR JavaScript SDK
 
 <p>

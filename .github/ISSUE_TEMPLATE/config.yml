@@ -1,5 +1,0 @@
-blank_issues_enabled: false
-contact_links:
-  - name: 🚀 Feature request & ❓ Questions
-    url: https://github.com/near/near-sdk-js/discussions
-    about: Use GitHub discussions for feature requests and questions.

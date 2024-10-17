@@ -1,5 +1,0 @@
-packages:
-  - "examples"
-  - "tests"
-  - "packages/*"
-  - "benchmark"
