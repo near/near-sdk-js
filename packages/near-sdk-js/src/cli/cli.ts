@@ -1,5 +1,7 @@
 #!/usr/bin/env node
 
+import { terser } from "rollup-plugin-terser";
+
 import fs from "fs";
 import path, { basename, dirname } from "path";
 
@@ -135,7 +137,7 @@ function ensureTargetDirExists(target: string): void {
   }
 
   signal.await(`Creating ${targetDir} directory...`);
-  fs.mkdirSync(targetDir, {});
+  fs.mkdirSync(targetDir);
 }
 
 export async function validateCom(
@@ -242,6 +244,8 @@ export async function transpileJsAndBuildWasmCom(
   signale.await("Executing wasi-stub...");
   await wasiStubContract(getContractTarget(target), verbose);
 
+  await optimizeWasmContract(target, verbose);
+
   signale.success(
     `Generated ${getContractTarget(target)} contract successfully!`
   );
@@ -298,7 +302,6 @@ async function createJsFileWithRullup(
         extensions: [".js", ".ts"],
       }),
       sourcemaps(),
-      // commonjs(),
       babel({
         babelHelpers: "bundled",
         extensions: [".ts", ".js", ".jsx", ".es6", ".es", ".mjs"],
@@ -311,6 +314,28 @@ async function createJsFileWithRullup(
           ],
           ["@babel/plugin-proposal-decorators", { version: "legacy" }],
         ],
+      }),
+      terser({
+        mangle: false,
+        compress: {
+          passes: 5,
+          hoist_vars: true,
+          reduce_funcs: true,
+          reduce_vars: true,
+          collapse_vars: true,
+          dead_code: true,
+          conditionals: true,
+          evaluate: true,
+          unused: true,
+          if_return: true,
+          join_vars: true,
+          sequences: true,
+          side_effects: true,
+          inline: true,
+          drop_console: true,
+          drop_debugger: true,
+          pure_funcs: ['console.log'],
+        },
       }),
     ],
   });
@@ -388,4 +413,12 @@ async function createWasmContract(
 async function wasiStubContract(contractTarget: string, verbose = false) {
   const WASI_STUB = `${NEAR_SDK_JS}/lib/cli/deps/binaryen/wasi-stub/run.sh`;
   await executeCommand(`${WASI_STUB} ${contractTarget}`, verbose);
+}
+
+async function optimizeWasmContract(contractTarget: string, verbose = false) {
+  const WASM_OPT = `${NEAR_SDK_JS}/lib/cli/deps/webassembly/bin/wasm-opt`;
+  await executeCommand(
+    `${WASM_OPT} -Oz -o ${contractTarget} ${contractTarget}`,
+    verbose
+  );
 }

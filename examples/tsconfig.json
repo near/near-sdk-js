@@ -1,8 +1,9 @@
 {
   "compilerOptions": {
     "experimentalDecorators": true,
-    "target": "es2020",
     "moduleResolution": "node",
+    "target": "es2020",
+    "skipLibCheck": true,
     "noEmit": true
   },
   "exclude": ["node_modules"]

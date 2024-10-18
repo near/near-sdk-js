@@ -1,4 +1,3 @@
-import { cloneDeep } from "lodash-es";
 const TYPE_KEY = "typeInfo";
 var TypeBrand;
 (function (TypeBrand) {
@@ -200,7 +199,7 @@ export function decodeObj2class(class_instance, obj) {
             class_instance[key] = obj[key];
         }
     }
-    const instance_tmp = cloneDeep(class_instance);
+    const instance_tmp = deepCopy(class_instance);
     for (key in obj) {
         if (typeof class_instance[key] == "object" &&
             !(class_instance[key] instanceof Date)) {
@@ -278,4 +277,49 @@ export function encode(s) {
  */
 export function decode(a) {
     return env.uint8array_to_utf8_string(a);
+}
+export function deepCopy(obj) {
+    // Handle primitives and null
+    if (obj === null || typeof obj !== "object") {
+        return obj;
+    }
+    // Handle Date objects
+    if (obj instanceof Date) {
+        return new Date(obj.getTime());
+    }
+    // Handle RegExp objects
+    if (obj instanceof RegExp) {
+        return new RegExp(obj.source, obj.flags);
+    }
+    // Handle Map objects
+    if (obj instanceof Map) {
+        const mapCopy = new Map();
+        obj.forEach((value, key) => {
+            mapCopy.set(deepCopy(key), deepCopy(value));
+        });
+        return mapCopy;
+    }
+    // Handle Set objects
+    if (obj instanceof Set) {
+        const setCopy = new Set();
+        obj.forEach((value) => {
+            setCopy.add(deepCopy(value));
+        });
+        return setCopy;
+    }
+    // Handle Arrays
+    if (Array.isArray(obj)) {
+        return obj.map((item) => deepCopy(item));
+    }
+    // Handle Objects
+    const copy = Object.create(Object.getPrototypeOf(obj));
+    Object.getOwnPropertyNames(obj).forEach((key) => {
+        copy[key] = deepCopy(obj[key]);
+    });
+    // Handle symbol properties
+    const symbols = Object.getOwnPropertySymbols(obj);
+    symbols.forEach((sym) => {
+        copy[sym] = deepCopy(obj[sym]);
+    });
+    return copy;
 }

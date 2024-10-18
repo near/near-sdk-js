@@ -27,7 +27,7 @@ signale.await("Installing wasi-stub...");
 const BINARYEN_VERSION = `0.1.16`;
 const BINARYEN_VERSION_TAG = `v${BINARYEN_VERSION}`;
 const BINARYEN_SYSTEM_NAME = PLATFORM === "linux"
-    ? "Linux"
+    ? "linux"
     : PLATFORM === "darwin"
         ? "macOS"
         : PLATFORM === "win32"
@@ -39,6 +39,26 @@ await download(`https://github.com/ailisp/binaryen/releases/download/${BINARYEN_
 fs.mkdirSync("binaryen");
 await executeCommand(`tar xvf ${BINARYEN_TAR_NAME} --directory binaryen`);
 fs.rmSync(BINARYEN_TAR_NAME);
+signale.await("Installing WebAssembly Binaryen...");
+const WEB_ASSEMBLY_BINARYEN_VERSION = `version_118`;
+const WEB_ASSEMBLY_BINARYEN_VERSION_TAG = WEB_ASSEMBLY_BINARYEN_VERSION;
+const WEB_ASSEMBLY_BINARYEN_SYSTEM_NAME = PLATFORM === "linux"
+    ? "linux"
+    : PLATFORM === "darwin"
+        ? "macos"
+        : PLATFORM === "win32"
+            ? "windows"
+            : "other";
+const WEB_ASSEMBLY_BINARYEN_ARCH_NAME = ARCH === "x64" ? "x86_64" : ARCH === "arm64" ? "arm64" : "unsupported";
+if (WEB_ASSEMBLY_BINARYEN_ARCH_NAME === "unsupported") {
+    console.error(`Architecture ${ARCH} is not supported for downloading binaries.`);
+    process.exit(1);
+}
+const WEB_ASSEMBLY_BINARYEN_TAR_NAME = `binaryen-${WEB_ASSEMBLY_BINARYEN_VERSION_TAG}-${WEB_ASSEMBLY_BINARYEN_ARCH_NAME}-${WEB_ASSEMBLY_BINARYEN_SYSTEM_NAME}.tar.gz`;
+await download(`https://github.com/WebAssembly/binaryen/releases/download/${WEB_ASSEMBLY_BINARYEN_VERSION_TAG}/${WEB_ASSEMBLY_BINARYEN_TAR_NAME}`);
+fs.mkdirSync("webassembly");
+await executeCommand(`tar --strip-components=1 -xvf ${WEB_ASSEMBLY_BINARYEN_TAR_NAME} --directory webassembly`);
+fs.rmSync(WEB_ASSEMBLY_BINARYEN_TAR_NAME);
 signale.await("Installing QuickJS...");
 const QUICK_JS_VERSION = `0.1.3`;
 const QUICK_JS_VERSION_TAG = `v${QUICK_JS_VERSION}`;

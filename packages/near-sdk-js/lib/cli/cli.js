@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { terser } from "rollup-plugin-terser";
 import fs from "fs";
 import path, { basename, dirname } from "path";
 import { nodeResolve } from "@rollup/plugin-node-resolve";
@@ -88,7 +89,7 @@ function ensureTargetDirExists(target) {
         return;
     }
     signal.await(`Creating ${targetDir} directory...`);
-    fs.mkdirSync(targetDir, {});
+    fs.mkdirSync(targetDir);
 }
 export async function validateCom(source, { verbose = false }) {
     const signale = new Signale({ scope: "validate", interactive: !verbose });
@@ -147,6 +148,7 @@ export async function transpileJsAndBuildWasmCom(target, { verbose = false }) {
     await createWasmContract(getQjscTarget(target), getContractTarget(target), verbose);
     signale.await("Executing wasi-stub...");
     await wasiStubContract(getContractTarget(target), verbose);
+    await optimizeWasmContract(target, verbose);
     signale.success(`Generated ${getContractTarget(target)} contract successfully!`);
 }
 export async function buildCom(source, target, packageJson, tsConfig, { verbose = false, generateABI = false }) {
@@ -174,7 +176,6 @@ async function createJsFileWithRullup(sourceFileWithPath, rollupTarget, verbose 
                 extensions: [".js", ".ts"],
             }),
             sourcemaps(),
-            // commonjs(),
             babel({
                 babelHelpers: "bundled",
                 extensions: [".ts", ".js", ".jsx", ".es6", ".es", ".mjs"],
@@ -187,6 +188,28 @@ async function createJsFileWithRullup(sourceFileWithPath, rollupTarget, verbose 
                     ],
                     ["@babel/plugin-proposal-decorators", { version: "legacy" }],
                 ],
+            }),
+            terser({
+                mangle: false,
+                compress: {
+                    passes: 5,
+                    hoist_vars: true,
+                    reduce_funcs: true,
+                    reduce_vars: true,
+                    collapse_vars: true,
+                    dead_code: true,
+                    conditionals: true,
+                    evaluate: true,
+                    unused: true,
+                    if_return: true,
+                    join_vars: true,
+                    sequences: true,
+                    side_effects: true,
+                    inline: true,
+                    drop_console: true,
+                    drop_debugger: true,
+                    pure_funcs: ['console.log'],
+                },
             }),
         ],
     });
@@ -230,4 +253,8 @@ async function createWasmContract(qjscTarget, contractTarget, verbose = false) {
 async function wasiStubContract(contractTarget, verbose = false) {
     const WASI_STUB = `${NEAR_SDK_JS}/lib/cli/deps/binaryen/wasi-stub/run.sh`;
     await executeCommand(`${WASI_STUB} ${contractTarget}`, verbose);
+}
+async function optimizeWasmContract(contractTarget, verbose = false) {
+    const WASM_OPT = `${NEAR_SDK_JS}/lib/cli/deps/webassembly/bin/wasm-opt`;
+    await executeCommand(`${WASM_OPT} -Oz -o ${contractTarget} ${contractTarget}`, verbose);
 }
