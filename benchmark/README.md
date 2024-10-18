@@ -2,455 +2,293 @@
 
 ## Summary
 
-NEAR-SDK-JS bundles a bytecode VM with the contract bytecode to a wasm file. Currently, the bytecode VM is the QuickJS runtime with interface to NEAR and the contract bytecode is compiled from JavaScript source code with QuickJS Compiler (QJSC).
+NEAR-SDK-JS bundles a bytecode VM with the contract bytecode to a wasm file. Currently, the bytecode VM is the QuickJS runtime with an interface to NEAR, and the contract bytecode is compiled from JavaScript source code with QuickJS Compiler (QJSC).
 
 This results in:
 
-- Size of a minimal contract is 500K, which is also the size of the bytecode VM.
-- Bytecode is more compact than wasm. Complex contract in JS adds less bytes to the equivalent wasm compiled from Rust, but due to the initial 500K size, the result contract is still bigger and within same order of magnitude: several hundred KB.
-- For contract that bottlenecks at calling the host functions are using similar gas in JS and Rust.
-- For contract that does a lot of computation in JS, the JS bytecode uses significantly more gas.
-- For a real world contract, if it doesn't including complex logic in JavaScript, it's usually sufficient, consider the complexity of the near contract standards.
-- For more complex logic, We suggest to bench the most expensive contract call, including most complex path of cross contract calls, to determine whether it fits 300T Gas limit.
+- Size of a minimal contract is `479K`, which is also the size of the bytecode VM.
+- Bytecode is more compact than wasm. Complex contract in JS adds fewer bytes to the equivalent wasm compiled from Rust, but due to the initial `479K` size, the resulting contract is still bigger and within the same order of magnitude: several hundred KB.
+- For contracts that bottleneck at calling the host functions, similar gas is used in JS and Rust.
+- For contracts that do a lot of computation in JS, the JS bytecode uses significantly more gas.
+- For a real-world contract, if it doesn't include complex logic in JavaScript, it's usually sufficient, considering the complexity of the NEAR contract standards.
+- For more complex logic, we suggest benching the most expensive contract call, including the most complex path of cross-contract calls, to determine whether it fits the 300T gas limit.
 
 ## Detailed gas benchmark
 
-### A minimal contract
+---
+### A Minimal Contract
 
-- RS lowlevel minimal contract
-  - Gas used to convert transaction to receipt: 2.43T
-  - Gas used to execute the receipt (actual contract call): 2.43T
-  -      CONTRACT_LOADING_BASE :  0.00004T
-  -      CONTRACT_LOADING_BYTES :  0.00005T
-  - Gas used to refund unused gas: 0.22318T
-  - Total gas used: 5.08T
-- JS lowlevel minimal contract
-  - Gas used to convert transaction to receipt: 2.43T
-  - Gas used to execute the receipt (actual contract call): 7.07T
-  -      CONTRACT_LOADING_BASE :  0.00004T
-  -      CONTRACT_LOADING_BYTES :  0.11132T
-  -      WASM_INSTRUCTION :  4.53T
-  - Gas used to refund unused gas: 0.22318T
-  - Total gas used: 9.72T
+| lowlevel minimal contract               | Rust                | JS Before Opt       | JS After Opt        | JS % Diff        |
+| :-------------------------------------- | ------------------: | ------------------: | ------------------: | ---------------: |
+| Convert transaction to receipt          | 2.43T               | 2.43T               | 2.43T               | 0%               |
+| Execute the receipt (actual contract call)  | 2.43T           | 7.07T               | 4.48T               | -36.6%           |
+| CONTRACT_LOADING_BASE                   | 0.00004T            | 0.00004T            | 0.00004T            | 0%               |
+| CONTRACT_LOADING_BYTES                  | 0.00005T            | 0.11132T            | 0.10399T            | -6.57%           |
+| WASM_INSTRUCTION                        | 0.00001T            | 4.53T               | 1.94T               | -57.19%          |
+| Refund unused gas                       | 0.22318T            | 0.22318T            | 0.22318T            | 0%               |
+| Total gas used                          | 5.08T               | 9.72T               | 7.13T               | -26.63%          |
 
-In the very minimal contract the JS adds about `1.8T` gas. The major difference is loading the QuickJS VM and near-sdk-js uses 4.53T Gas. The 500K contract loading just adds 0.1T Gas.
+In the very minimal contract, the optimized JS implementation adds about `2.05T` more gas compared to the Rust version. The significant difference is primarily due to the WASM_INSTRUCTION overhead associated with loading and executing the QuickJS VM, which accounts for `1.94T` gas in the optimized version.
 
-### A highlevel minimal contract (using nearbindgen)
+<br />
 
-- highlevel-minimal.ava › RS highlevel minimal contract
-  - Gas used to convert transaction to receipt: 2.43T
-  - Gas used to execute the receipt (actual contract call): 2.63T
-  -      BASE :  0.79G
-  -      CONTRACT_LOADING_BASE :  0.04G
-  -      CONTRACT_LOADING_BYTES :  35.46G
-  -      READ_CACHED_TRIE_NODE :  4.56G
-  -      READ_MEMORY_BASE :  7.83G
-  -      READ_MEMORY_BYTE :  0.04G
-  -      STORAGE_READ_BASE :  56.36G
-  -      STORAGE_READ_KEY_BYTE :  0.15G
-  -      STORAGE_WRITE_BASE :  64.2G
-  -      STORAGE_WRITE_KEY_BYTE :  0.35G
-  -      TOUCHING_TRIE_NODE :  32.2G
-  -      WASM_INSTRUCTION :  0.46G
-  -      WRITE_MEMORY_BASE :  2.8G
-  -      WRITE_MEMORY_BYTE :  0.04G
-  - Gas used to refund unused gas: 223.18G
-  - Total gas used: 5.28T
-- highlevel-minimal.ava › JS highlevel minimal contract
-  - Gas used to convert transaction to receipt: 2.43T
-  - Gas used to execute the receipt (actual contract call): 8.39T
-  -      BASE :  1.59G
-  -      CONTRACT_LOADING_BASE :  0.04G
-  -      CONTRACT_LOADING_BYTES :  112.03G
-  -      READ_CACHED_TRIE_NODE :  6.84G
-  -      READ_MEMORY_BASE :  7.83G
-  -      READ_MEMORY_BYTE :  0.05G
-  -      READ_REGISTER_BASE :  2.52G
-  -      READ_REGISTER_BYTE :  0G
-  -      STORAGE_READ_BASE :  56.36G
-  -      STORAGE_READ_KEY_BYTE :  0.15G
-  -      STORAGE_WRITE_BASE :  64.2G
-  -      STORAGE_WRITE_KEY_BYTE :  0.35G
-  -      STORAGE_WRITE_VALUE_BYTE :  0.06G
-  -      TOUCHING_TRIE_NODE :  48.31G
-  -      WASM_INSTRUCTION :  5.66T
-  -      WRITE_MEMORY_BASE :  5.61G
-  -      WRITE_MEMORY_BYTE :  0.05G
-  -      WRITE_REGISTER_BASE :  2.87G
-  -      WRITE_REGISTER_BYTE :  0.01G
-  - Gas used to refund unused gas: 223.18G
-  - Total gas used: 11.05T
+---
 
-JS `@NearBindgen` is more expensive, the major difference is in `WASM_INSTRUCTION`, because `@NearBindgen` does some class, object manipulation work, but Rust `near_bindgen` is a compile time code generation macro. Deduct the 4.5T loading VM and near-sdk-js, it's about 1T gas overhead.
+### A Highlevel Minimal Contract (using `@nearbindgen`)
 
-### Low level API
+| highlevel-minimal.ava                   | Rust                | JS Before Opt       | JS After Opt        | JS % Diff        |
+| :-------------------------------------- | ------------------: | ------------------: | ------------------: | ---------------: |
+| Convert transaction to receipt          | 2.43T               | 2.43T               | 2.43T               | 0%               |
+| Execute the receipt (actual contract call)  | 2.63T           | 8.39T               | 5.26T               | -37.33%          |
+| BASE                                    | 0.00079T            | 1.59T               | 0.00159T            | -99.9%           |
+| CONTRACT_LOADING_BASE                   | 0.00004T            | 0.00004T            | 0.00004T            | 0%               |
+| CONTRACT_LOADING_BYTES                  | 0.03546T            | 0.11203T            | 0.1048T             | -6.45%           |
+| READ_MEMORY_BASE                        | 0.00783T            | 7.83T               | 0.00783T            | -99.9%           |
+| READ_MEMORY_BYTE                        | 0.00004T            | 0.05T               | 0.00005T            | -99.9%           |
+| STORAGE_READ_BASE                       | 0.05636T            | 56.36T              | 0.05636T            | -99.9%           |
+| STORAGE_READ_KEY_BYTE                   | 0.00015T            | 0.15T               | 0.00015T            | -99.9%           |
+| STORAGE_WRITE_BASE                      | 0.0642T             | 64.2T               | 0.0642T             | -99.9%           |
+| STORAGE_WRITE_KEY_BYTE                  | 0.00035T            | 0.35T               | 0.00035T            | -99.9%           |
+| STORAGE_WRITE_VALUE_BYTE                | 0.00006T            | 0.06T               | 0.00006T            | -99.9%           |
+| TOUCHING_TRIE_NODE                      | 0.0322T             | 48.31T              | 0.0322T             | -99.9%           |
+| WASM_INSTRUCTION                        | 0.00052T            | 5.66T               | 2.56T               | -54.7%           |
+| WRITE_MEMORY_BASE                       | 0.0028T             | 5.61T               | 0.00561T            | -99.9%           |
+| WRITE_MEMORY_BYTE                       | 0.00004T            | 0.05T               | 0.00005T            | -99.9%           |
+| WRITE_REGISTER_BASE                     | 0.00287T            | 2.87T               | 0.00287T            | -99.9%           |
+| WRITE_REGISTER_BYTE                     | 0.00001T            | 0.01T               | 0.00001T            | -99.9%           |
+| Refund unused gas                       | 0.22318T            | 0.22318T            | 0.22318T            | 0%               |
+| Total gas used                          | 5.28T               | 11.05T              | 7.91T               | -28.4%           |
 
-- RS lowlevel API contract
-  - Gas used to convert transaction to receipt: 2.43T
-  - Gas used to execute the receipt (actual contract call): 2.53T
-  -      BASE :  0.00026T
-  -      CONTRACT_LOADING_BASE :  0.00004T
-  -      CONTRACT_LOADING_BYTES :  0.00008T
-  -      READ_MEMORY_BASE :  0.00522T
-  -      READ_MEMORY_BYTE :  0.00008T
-  -      STORAGE_WRITE_BASE :  0.0642T
-  -      STORAGE_WRITE_KEY_BYTE :  0.0007T
-  -      STORAGE_WRITE_VALUE_BYTE :  0.00031T
-  -      TOUCHING_TRIE_NODE :  0.0322T
-  -      WASM_INSTRUCTION :  0.00002T
-  - Gas used to refund unused gas: 0.22318T
-  - Total gas used: 5.18T
-- JS lowlevel API contract
-  - Gas used to convert transaction to receipt: 2.43T
-  - Gas used to execute the receipt (actual contract call): 7.8T
-  -      BASE :  0.00026T
-  -      CONTRACT_LOADING_BASE :  0.00004T
-  -      CONTRACT_LOADING_BYTES :  0.11119T
-  -      READ_MEMORY_BASE :  0.00522T
-  -      READ_MEMORY_BYTE :  0.00008T
-  -      STORAGE_WRITE_BASE :  0.0642T
-  -      STORAGE_WRITE_EVICTED_BYTE :  0.00032T
-  -      STORAGE_WRITE_KEY_BYTE :  0.0007T
-  -      STORAGE_WRITE_VALUE_BYTE :  0.00031T
-  -      TOUCHING_TRIE_NODE :  0.09661T
-  -      WASM_INSTRUCTION :  5.09T
-  -      WRITE_REGISTER_BASE :  0.00287T
-  -      WRITE_REGISTER_BYTE :  0.00004T
-  - Gas used to refund unused gas: 0.22318T
-  - Total gas used: 10.45T
-- JS lowlevel API contract, call many
-  - Gas used to convert transaction to receipt: 2.43T
-  - Gas used to execute the receipt (actual contract call): 8.47T
-  -      BASE :  0.00265T
-  -      CONTRACT_LOADING_BASE :  0.00004T
-  -      CONTRACT_LOADING_BYTES :  0.11119T
-  -      READ_MEMORY_BASE :  0.0522T
-  -      READ_MEMORY_BYTE :  0.00076T
-  -      STORAGE_WRITE_BASE :  0.64197T
-  -      STORAGE_WRITE_EVICTED_BYTE :  0.00289T
-  -      STORAGE_WRITE_KEY_BYTE :  0.00705T
-  -      STORAGE_WRITE_VALUE_BYTE :  0.0031T
-  -      TOUCHING_TRIE_NODE :  0.04831T
-  -      WASM_INSTRUCTION :  5.14T
-  -      WRITE_REGISTER_BASE :  0.02579T
-  -      WRITE_REGISTER_BYTE :  0.00034T
-  - Gas used to refund unused gas: 0.22318T
-  - Total gas used: 11.12T
+JS `@NearBindgen` is more expensive, the major difference is in `WASM_INSTRUCTION`, because `@NearBindgen` does some class, object manipulation work, but Rust `near_bindgen` is a compile-time code generation macro. Deduct the `4.5T` loading VM and near-sdk-js, it's about `1.04T` gas overhead.
+The JavaScript implementation using `@NearBindgen` is more expensive, primarily due to the overhead in `WASM_INSTRUCTION`. This difference arises because `@NearBindgen` performs runtime class and object manipulation, whereas the Rust `near_bindgen` is a compile-time code generation macro, which is more efficient.
 
-In this case, JS lowlevel API contract uses same gas in the storage write API part (`STORAGE_WRITE_BASE` / `STORAGE_WRITE_KEY_BYTE` / `STORAGE_WRITE_VALUE_BYTE` ). The major excessive gas is due to the overhead of initialize QuickJS VM and loading near-sdk-js. We can see this more obviously by calling storage write for 10 times ("call many tests" in above).
+<br />
+
+---
+
+### Low-Level API
+
+|                                         | Rust                | JS Before Opt       | JS After Opt        | JS % Diff        |
+| :-------------------------------------- | ------------------: | ------------------: | ------------------: | ---------------: |
+| Convert transaction to receipt          | 2.43T               | 2.43T               | 2.43T               | 0%               |
+| Execute the receipt (actual contract call)  | 2.53T           | 7.8T                | 5.19T               | -33.46%          |
+| BASE                                    | 0.00026T            | 0.00026T            | 0.00026T            | 0%               |
+| CONTRACT_LOADING_BASE                   | 0.00004T            | 0.00004T            | 0.00004T            | 0%               |
+| CONTRACT_LOADING_BYTES                  | 0.00008T            | 0.11119T            | 0.10377T            | -6.68%           |
+| READ_MEMORY_BASE                        | 0.00522T            | 0.00522T            | 0.00522T            | 0%               |
+| READ_MEMORY_BYTE                        | 0.00008T            | 0.00008T            | 0.00008T            | 0%               |
+| STORAGE_WRITE_BASE                      | 0.0642T             | 0.0642T             | 0.0642T             | 0%               |
+| STORAGE_WRITE_KEY_BYTE                  | 0.0007T             | 0.0007T             | 0.0007T             | 0%               |
+| STORAGE_WRITE_VALUE_BYTE                | 0.00031T            | 0.00031T            | 0.00031T            | 0%               |
+| TOUCHING_TRIE_NODE                      | 0.0322T             | 0.09661T            | 0.06441T            | -33.31%          |
+| WASM_INSTRUCTION                        | 0.00002T            | 5.09T               | 2.52T               | -50.49%          |
+| WRITE_REGISTER_BASE                     | 0.00287T            | 0.00287T            | 0.00287T            | 0%               |
+| WRITE_REGISTER_BYTE                     | 0.00004T            | 0.00004T            | 0.00004T            | 0%               |
+| Refund unused gas                       | 0.22318T            | 0.22318T            | 0.22318T            | 0%               |
+| Total gas used                          | 5.18T               | 10.45T              | 7.85T               | -24.89%          |
+
+<br />
+
+### Low-Level API (Call Many)
+
+|                                         | Rust                | JS Before Opt       | JS After Opt        | JS % Diff        |
+| :-------------------------------------- | ------------------: | ------------------: | ------------------: | ---------------: |
+| Convert transaction to receipt          | 2.43T               | 2.43T               | 2.43T               | 0%               |
+| Execute the receipt (actual contract call)  | 2.53T           | 8.47T               | 5.85T               | -30.93%          |
+| BASE                                    | 0.00026T            | 0.00265T            | 0.00265T            | 0%               |
+| CONTRACT_LOADING_BASE                   | 0.00004T            | 0.00004T            | 0.00004T            | 0%               |
+| CONTRACT_LOADING_BYTES                  | 0.00008T            | 0.11119T            | 0.10377T            | -6.68%           |
+| READ_MEMORY_BASE                        | 0.00522T            | 0.0522T             | 0.0522T             | 0%               |
+| READ_MEMORY_BYTE                        | 0.00008T            | 0.00076T            | 0.00076T            | 0%               |
+| STORAGE_WRITE_BASE                      | 0.0642T             | 0.64197T            | 0.64197T            | 0%               |
+| STORAGE_WRITE_EVICTED_BYTE              | 0.00032T            | 0.00289T            | 0.00289T            | 0%               |
+| STORAGE_WRITE_KEY_BYTE                  | 0.0007T             | 0.00705T            | 0.00705T            | 0%               |
+| STORAGE_WRITE_VALUE_BYTE                | 0.00031T            | 0.0031T             | 0.0031T             | 0%               |
+| TOUCHING_TRIE_NODE                      | 0.04831T            | 0.0322T             | 0.0322T             | 0%               |
+| WASM_INSTRUCTION                        | 0.00002T            | 5.14T               | 2.55T               | -50.48%          |
+| WRITE_REGISTER_BASE                     | 0.00287T            | 0.02579T            | 0.02579T            | 0%               |
+| WRITE_REGISTER_BYTE                     | 0.00004T            | 0.00034T            | 0.00034T            | 0%               |
+| Refund unused gas                       | 0.22318T            | 0.22318T            | 0.22318T            | 0%               |
+| Total gas used                          | 5.18T               | 11.12T              | 8.51T               | -23.47%          |
+
+In this case, the JS low-level API contract uses the same gas in the storage write API part (`STORAGE_WRITE_BASE` / `STORAGE_WRITE_KEY_BYTE` / `STORAGE_WRITE_VALUE_BYTE`). The major excessive gas is due to the overhead of initializing QuickJS VM and loading near-sdk-js. We can see this more obviously by calling storage write 10 times ("call many tests" in above).
+
+<br />
+
+---
 
 ### Highlevel collection
 
-- RS highlevel collection contract
-  - Gas used to convert transaction to receipt: 2.43T
-  - Gas used to execute the receipt (actual contract call): 3.32T
-  -      BASE :  3.18G
-  -      CONTRACT_LOADING_BASE :  0.04G
-  -      CONTRACT_LOADING_BYTES :  70.94G
-  -      READ_CACHED_TRIE_NODE :  95.76G
-  -      READ_MEMORY_BASE :  26.1G
-  -      READ_MEMORY_BYTE :  1.87G
-  -      READ_REGISTER_BASE :  5.03G
-  -      READ_REGISTER_BYTE :  0.03G
-  -      STORAGE_READ_BASE :  112.71G
-  -      STORAGE_READ_KEY_BYTE :  3.44G
-  -      STORAGE_READ_VALUE_BYTE :  0.19G
-  -      STORAGE_WRITE_BASE :  256.79G
-  -      STORAGE_WRITE_EVICTED_BYTE :  1.09G
-  -      STORAGE_WRITE_KEY_BYTE :  9.23G
-  -      STORAGE_WRITE_VALUE_BYTE :  7.75G
-  -      TOUCHING_TRIE_NODE :  257.63G
-  -      WASM_INSTRUCTION :  16.36G
-  -      WRITE_MEMORY_BASE :  8.41G
-  -      WRITE_MEMORY_BYTE :  0.74G
-  -      WRITE_REGISTER_BASE :  8.6G
-  -      WRITE_REGISTER_BYTE :  1.1G
-  - Gas used to refund unused gas: 223.18G
-  - Total gas used: 5.97T
-- JS highlevel collection contract
-  - Gas used to convert transaction to receipt: 2.43T
-  - Gas used to execute the receipt (actual contract call): 10.06T
-  -      BASE :  2.91G
-  -      CONTRACT_LOADING_BASE :  0.04G
-  -      CONTRACT_LOADING_BYTES :  113.46G
-  -      READ_CACHED_TRIE_NODE :  72.96G
-  -      READ_MEMORY_BASE :  20.88G
-  -      READ_MEMORY_BYTE :  2G
-  -      READ_REGISTER_BASE :  5.03G
-  -      READ_REGISTER_BYTE :  0.03G
-  -      STORAGE_READ_BASE :  112.71G
-  -      STORAGE_READ_KEY_BYTE :  3.31G
-  -      STORAGE_READ_VALUE_BYTE :  0.53G
-  -      STORAGE_WRITE_BASE :  192.59G
-  -      STORAGE_WRITE_EVICTED_BYTE :  3.02G
-  -      STORAGE_WRITE_KEY_BYTE :  7.96G
-  -      STORAGE_WRITE_VALUE_BYTE :  9.49G
-  -      TOUCHING_TRIE_NODE :  209.33G
-  -      WASM_INSTRUCTION :  6.86T
-  -      WRITE_MEMORY_BASE :  8.41G
-  -      WRITE_MEMORY_BYTE :  0.9G
-  -      WRITE_REGISTER_BASE :  8.6G
-  -      WRITE_REGISTER_BYTE :  1.55G
-  - Gas used to refund unused gas: 223.18G
-  - Total gas used: 12.71T
+| Highlevel collection                    | Rust                | JS Before Opt       | JS After Opt        | JS % Diff        |
+| :-------------------------------------- | ------------------: | ------------------: | ------------------: | ---------------: |
+| Convert transaction to receipt          | 2.43T               | 2.43T               | 2.43T               | 0%               |
+| Execute the receipt (actual contract call)  | 3.32T           | 10.06T              | 6.86T               | -31.8%           |
+| BASE                                    | 0.00318T            | 0.00291T            | 0.00291T            | 0%               |
+| CONTRACT_LOADING_BASE                   | 0.00004T            | 0.00004T            | 0.00004T            | 0%               |
+| CONTRACT_LOADING_BYTES                  | 0.07094T            | 0.11346T            | 0.10634T            | -6.28%           |
+| READ_CACHED_TRIE_NODE                   | 0.05472T            | 0.0342T             | 0.0342T             | 0%               |
+| READ_MEMORY_BASE                        | 0.0261T             | 0.02088T            | 0.02088T            | 0%               |
+| READ_MEMORY_BYTE                        | 0.00187T            | 0.002T              | 0.002T              | 6.95%            |
+| READ_REGISTER_BASE                      | 0.00503T            | 0.00503T            | 0.00503T            | 0%               |
+| READ_REGISTER_BYTE                      | 0.00003T            | 0.00003T            | 0.00003T            | 0%               |
+| STORAGE_READ_BASE                       | 0.11271T            | 0.11271T            | 0.11271T            | 0%               |
+| STORAGE_READ_KEY_BYTE                   | 0.00344T            | 0.00331T            | 0.00331T            | -3.78%           |
+| STORAGE_READ_VALUE_BYTE                 | 0.00019T            | 0.00053T            | 0.00053T            | 0%               |
+| STORAGE_WRITE_BASE                      | 0.25679T            | 0.19259T            | 0.19259T            | -24.97%          |
+| STORAGE_WRITE_EVICTED_BYTE              | 0.00109T            | 0.00302T            | 0.00302T            | 0%               |
+| STORAGE_WRITE_KEY_BYTE                  | 0.00923T            | 0.00796T            | 0.00796T            | -13.76%          |
+| STORAGE_WRITE_VALUE_BYTE                | 0.00775T            | 0.00949T            | 0.00949T            | 22.45%           |
+| TOUCHING_TRIE_NODE                      | 0.25763T            | 0.20933T            | 0.20933T            | -18.77%          |
+| WASM_INSTRUCTION                        | 0.01848T            | 3.71T               | 3.71T               | 0%               |
+| WRITE_MEMORY_BASE                       | 0.00841T            | 0.00841T            | 0.00841T            | 0%               |
+| WRITE_MEMORY_BYTE                       | 0.00074T            | 0.0009T             | 0.0009T             | 21.62%           |
+| WRITE_REGISTER_BASE                     | 0.0086T             | 0.0086T             | 0.0086T             | 0%               |
+| WRITE_REGISTER_BYTE                     | 0.0011T             | 0.00155T            | 0.00155T            | 40.91%           |
+| Refund unused gas                       | 0.22318T            | 0.22318T            | 0.22318T            | 0%               |
+| Total gas used                          | 5.97T               | 12.71T              | 9.51T               | -25.16%          |
 
-JS SDK's collection has about 1T overhead, deduct the 4.5T VM/near-sdk-js loading and 1T `@NearBindgen`. Note this benches the most complicated `UnorderedMap`, which gas usage is strictly greater than the other collections. And the gas used in actual writing the collection to storage is similar (`STORAGE_WRITE_BASE` / `STORAGE_WRITE_KEY_BYTE` / `STORAGE_WRITE_VALUE_BYTE` ).
+The JS SDK's collection has about `3.54T` overhead compared to the Rust version after deducting the `4.5T` VM/near-sdk-js loading and the `1.04T` `@NearBindgen` overhead. Note that this benchmarks the most complicated `UnorderedMap`, where gas usage is strictly greater than other collections. The gas used in actual writing the collection to storage is similar (`STORAGE_WRITE_BASE`, `STORAGE_WRITE_KEY_BYTE`, `STORAGE_WRITE_VALUE_BYTE`).
+
+<br />
+
+---
 
 ### Computational expensive contract
 
-- JS expensive contract, iterate 20000 times
-  - Gas used to convert transaction to receipt: 2.43T
-  - Gas used to execute the receipt (actual contract call): 123.26T
-  -      BASE :  1.85G
-  -      CONTRACT_LOADING_BASE :  0.04G
-  -      CONTRACT_LOADING_BYTES :  112.09G
-  -      READ_CACHED_TRIE_NODE :  4.56G
-  -      READ_MEMORY_BASE :  10.44G
-  -      READ_MEMORY_BYTE :  0.07G
-  -      READ_REGISTER_BASE :  2.52G
-  -      READ_REGISTER_BYTE :  0G
-  -      STORAGE_READ_BASE :  56.36G
-  -      STORAGE_READ_KEY_BYTE :  0.15G
-  -      STORAGE_WRITE_BASE :  64.2G
-  -      STORAGE_WRITE_KEY_BYTE :  0.35G
-  -      STORAGE_WRITE_VALUE_BYTE :  0.06G
-  -      TOUCHING_TRIE_NODE :  32.2G
-  -      WASM_INSTRUCTION :  120.54T
-  -      WRITE_MEMORY_BASE :  5.61G
-  -      WRITE_MEMORY_BYTE :  0.07G
-  -      WRITE_REGISTER_BASE :  2.87G
-  -      WRITE_REGISTER_BYTE :  0.04G
-  - Gas used to refund unused gas: 223.18G
-  - Total gas used: 125.91T
-- RS expensive contract. iterate 20000 times
-  - Gas used to convert transaction to receipt: 2.43T
-  - Gas used to execute the receipt (actual contract call): 3.01T
-  -      BASE :  1.85G
-  -      CONTRACT_LOADING_BASE :  0.04G
-  -      CONTRACT_LOADING_BYTES :  67.77G
-  -      READ_CACHED_TRIE_NODE :  6.84G
-  -      READ_MEMORY_BASE :  10.44G
-  -      READ_MEMORY_BYTE :  0.06G
-  -      READ_REGISTER_BASE :  2.52G
-  -      READ_REGISTER_BYTE :  0G
-  -      STORAGE_READ_BASE :  56.36G
-  -      STORAGE_READ_KEY_BYTE :  0.15G
-  -      STORAGE_WRITE_BASE :  64.2G
-  -      STORAGE_WRITE_KEY_BYTE :  0.35G
-  -      TOUCHING_TRIE_NODE :  48.31G
-  -      WASM_INSTRUCTION :  315.17G
-  -      WRITE_MEMORY_BASE :  5.61G
-  -      WRITE_MEMORY_BYTE :  0.07G
-  -      WRITE_REGISTER_BASE :  2.87G
-  -      WRITE_REGISTER_BYTE :  0.04G
-  - Gas used to refund unused gas: 223.18G
-  - Total gas used: 5.66T
-- RS expensive contract. iterate 10000 times
-  - Gas used to convert transaction to receipt: 2.43T
-  - Gas used to execute the receipt (actual contract call): 2.9T
-  -      BASE :  2.38G
-  -      CONTRACT_LOADING_BASE :  0.04G
-  -      CONTRACT_LOADING_BYTES :  67.77G
-  -      READ_CACHED_TRIE_NODE :  13.68G
-  -      READ_MEMORY_BASE :  10.44G
-  -      READ_MEMORY_BYTE :  0.06G
-  -      READ_REGISTER_BASE :  5.03G
-  -      READ_REGISTER_BYTE :  0G
-  -      STORAGE_READ_BASE :  56.36G
-  -      STORAGE_READ_KEY_BYTE :  0.15G
-  -      STORAGE_WRITE_BASE :  64.2G
-  -      STORAGE_WRITE_KEY_BYTE :  0.35G
-  -      TOUCHING_TRIE_NODE :  80.51G
-  -      WASM_INSTRUCTION :  158.89G
-  -      WRITE_MEMORY_BASE :  8.41G
-  -      WRITE_MEMORY_BYTE :  0.07G
-  -      WRITE_REGISTER_BASE :  8.6G
-  -      WRITE_REGISTER_BYTE :  0.04G
-  - Gas used to refund unused gas: 223.18G
-  - Total gas used: 5.56T
-- RS expensive contract. iterate 100 times
-  - Gas used to convert transaction to receipt: 2.43T
-  - Gas used to execute the receipt (actual contract call): 2.75T
-  -      BASE :  2.38G
-  -      CONTRACT_LOADING_BASE :  0.04G
-  -      CONTRACT_LOADING_BYTES :  67.77G
-  -      READ_CACHED_TRIE_NODE :  13.68G
-  -      READ_MEMORY_BASE :  10.44G
-  -      READ_MEMORY_BYTE :  0.05G
-  -      READ_REGISTER_BASE :  5.03G
-  -      READ_REGISTER_BYTE :  0G
-  -      STORAGE_READ_BASE :  56.36G
-  -      STORAGE_READ_KEY_BYTE :  0.15G
-  -      STORAGE_WRITE_BASE :  64.2G
-  -      STORAGE_WRITE_KEY_BYTE :  0.35G
-  -      TOUCHING_TRIE_NODE :  80.51G
-  -      WASM_INSTRUCTION :  4.02G
-  -      WRITE_MEMORY_BASE :  8.41G
-  -      WRITE_MEMORY_BYTE :  0.07G
-  -      WRITE_REGISTER_BASE :  8.6G
-  -      WRITE_REGISTER_BYTE :  0.03G
-  - Gas used to refund unused gas: 223.18G
-  - Total gas used: 5.4T
-- JS expensive contract, iterate 100 times
-  - Gas used to convert transaction to receipt: 2.43T
-  - Gas used to execute the receipt (actual contract call): 9.09T
-  -      BASE :  2.38G
-  -      CONTRACT_LOADING_BASE :  0.04G
-  -      CONTRACT_LOADING_BYTES :  112.09G
-  -      READ_CACHED_TRIE_NODE :  13.68G
-  -      READ_MEMORY_BASE :  10.44G
-  -      READ_MEMORY_BYTE :  0.06G
-  -      READ_REGISTER_BASE :  5.03G
-  -      READ_REGISTER_BYTE :  0G
-  -      STORAGE_READ_BASE :  56.36G
-  -      STORAGE_READ_KEY_BYTE :  0.15G
-  -      STORAGE_READ_VALUE_BYTE :  0.01G
-  -      STORAGE_WRITE_BASE :  64.2G
-  -      STORAGE_WRITE_EVICTED_BYTE :  0.06G
-  -      STORAGE_WRITE_KEY_BYTE :  0.35G
-  -      STORAGE_WRITE_VALUE_BYTE :  0.06G
-  -      TOUCHING_TRIE_NODE :  80.51G
-  -      WASM_INSTRUCTION :  6.3T
-  -      WRITE_MEMORY_BASE :  8.41G
-  -      WRITE_MEMORY_BYTE :  0.07G
-  -      WRITE_REGISTER_BASE :  8.6G
-  -      WRITE_REGISTER_BYTE :  0.05G
-  - Gas used to refund unused gas: 223.18G
-  - Total gas used: 11.75T
-- JS expensive contract, iterate 10000 times
-  - Gas used to convert transaction to receipt: 2.43T
-  - Gas used to execute the receipt (actual contract call): 65.94T
-  -      BASE :  2.38G
-  -      CONTRACT_LOADING_BASE :  0.04G
-  -      CONTRACT_LOADING_BYTES :  112.09G
-  -      READ_CACHED_TRIE_NODE :  13.68G
-  -      READ_MEMORY_BASE :  10.44G
-  -      READ_MEMORY_BYTE :  0.06G
-  -      READ_REGISTER_BASE :  5.03G
-  -      READ_REGISTER_BYTE :  0G
-  -      STORAGE_READ_BASE :  56.36G
-  -      STORAGE_READ_KEY_BYTE :  0.15G
-  -      STORAGE_READ_VALUE_BYTE :  0.01G
-  -      STORAGE_WRITE_BASE :  64.2G
-  -      STORAGE_WRITE_EVICTED_BYTE :  0.06G
-  -      STORAGE_WRITE_KEY_BYTE :  0.35G
-  -      STORAGE_WRITE_VALUE_BYTE :  0.06G
-  -      TOUCHING_TRIE_NODE :  80.51G
-  -      WASM_INSTRUCTION :  63.15T
-  -      WRITE_MEMORY_BASE :  8.41G
-  -      WRITE_MEMORY_BYTE :  0.08G
-  -      WRITE_REGISTER_BASE :  8.6G
-  -      WRITE_REGISTER_BYTE :  0.06G
-  - Gas used to refund unused gas: 223.18G
-  - Total gas used: 68.59T
+`20000 iterations`
+|                                         | Rust                | JS Before Opt       | JS After Opt        | JS % Diff        |
+| :-------------------------------------- | ------------------: | ------------------: | ------------------: | ---------------: |
+| Convert transaction to receipt          | 2.43T               | 2.43T               | 2.43T               | 0%               |
+| Execute the receipt (actual contract call)  | 3.01T           | 123.26T             | 34.93T              | -71.65%          |
+| BASE                                    | 0.00185T            | 0.00185T            | 0.00185T            | 0%               |
+| CONTRACT_LOADING_BASE                   | 0.00004T            | 0.00004T            | 0.00004T            | 0%               |
+| CONTRACT_LOADING_BYTES                  | 0.06777T            | 0.11209T            | 0.10483T            | -6.48%           |
+| READ_MEMORY_BASE                        | 0.01044T            | 0.01044T            | 0.01044T            | 0%               |
+| READ_MEMORY_BYTE                        | 0.00006T            | 0.00007T            | 0.00007T            | 0%               |
+| READ_REGISTER_BASE                      | 0.00252T            | 0.00252T            | 0.00252T            | 0%               |
+| STORAGE_READ_BASE                       | 0.05636T            | 0.05636T            | 0.05636T            | 0%               |
+| STORAGE_READ_KEY_BYTE                   | 0.00015T            | 0.00015T            | 0.00015T            | 0%               |
+| STORAGE_WRITE_BASE                      | 0.0642T             | 0.0642T             | 0.0642T             | 0%               |
+| STORAGE_WRITE_KEY_BYTE                  | 0.00035T            | 0.00035T            | 0.00035T            | 0%               |
+| TOUCHING_TRIE_NODE                      | 0.0322T             | 0.04831T            | 0.04831T            | 0%               |
+| WASM_INSTRUCTION                        | 0.33187T            | 120.54T             | 32.19T              | -73.3%           |
+| WRITE_MEMORY_BASE                       | 0.00561T            | 0.00561T            | 0.00561T            | 0%               |
+| WRITE_MEMORY_BYTE                       | 0.00007T            | 0.00007T            | 0.00007T            | 0%               |
+| WRITE_REGISTER_BASE                     | 0.00287T            | 0.00287T            | 0.00287T            | 0%               |
+| WRITE_REGISTER_BYTE                     | 0.00004T            | 0.00004T            | 0.00004T            | 0%               |
+| Refund unused gas                       | 0.22318T            | 0.22318T            | 0.22318T            | 0%               |
+| Total gas used                          | 5.66T               | 125.91T             | 37.58T              | -70.15%          |
 
-In this case, JS uses much more gas. Because JS Number is object and that's a lot of overhead compare to native integer arithmetic. It's even a lot of overhead compare to native float arithmetic. Also in QuickJS there's no JIT. If your contract does a lot of calculation or complex algorithm in JavaScript, it'd be better to do a similar benchmark.
+<br />
 
-### Deploy and cross contract call
+`10000 iterations`
+|                                         | Rust                | JS Before Opt       | JS After Opt        | JS % Diff        |
+| :-------------------------------------- | ------------------: | ------------------: | ------------------: | ---------------: |
+| Convert transaction to receipt          | 2.43T               | 2.43T               | 2.43T               | 0%               |
+| Execute the receipt (actual contract call)  | 2.87T           | 65.94T              | 20.08T              | -69.54%          |
+| BASE                                    | 0.00238T            | 0.00238T            | 0.00238T            | 0%               |
+| CONTRACT_LOADING_BASE                   | 0.00004T            | 0.00004T            | 0.00004T            | 0%               |
+| CONTRACT_LOADING_BYTES                  | 0.06777T            | 0.11209T            | 0.10483T            | -6.48%           |
+| READ_CACHED_TRIE_NODE                   | 0.00228T            | 0.00228T            | 0.00228T            | 0%               |
+| READ_MEMORY_BASE                        | 0.01044T            | 0.01044T            | 0.01044T            | 0%               |
+| READ_MEMORY_BYTE                        | 0.00006T            | 0.00006T            | 0.00006T            | 0%               |
+| READ_REGISTER_BASE                      | 0.00503T            | 0.00503T            | 0.00503T            | 0%               |
+| READ_REGISTER_BYTE                      | 0T                  | 0T                  | 0T                  | 0%               |
+| STORAGE_READ_BASE                       | 0.05636T            | 0.05636T            | 0.05636T            | 0%               |
+| STORAGE_READ_KEY_BYTE                   | 0.00015T            | 0.00015T            | 0.00015T            | 0%               |
+| STORAGE_WRITE_BASE                      | 0.0642T             | 0.0642T             | 0.0642T             | 0%               |
+| STORAGE_WRITE_KEY_BYTE                  | 0.00035T            | 0.00035T            | 0.00035T            | 0%               |
+| TOUCHING_TRIE_NODE                      | 0.08051T            | 0.08051T            | 0.08051T            | 0%               |
+| WASM_INSTRUCTION                        | 0.16738T            | 63.15T              | 17.37T              | -72.5%           |
+| WRITE_MEMORY_BASE                       | 0.00841T            | 0.00841T            | 0.00841T            | 0%               |
+| WRITE_MEMORY_BYTE                       | 0.00007T            | 0.00007T            | 0.00007T            | 0%               |
+| WRITE_REGISTER_BASE                     | 0.0086T             | 0.0086T             | 0.0086T             | 0%               |
+| WRITE_REGISTER_BYTE                     | 0.00004T            | 0.00004T            | 0.00004T            | 0%               |
+| Refund unused gas                       | 0.22318T            | 0.22318T            | 0.22318T            | 0%               |
+| Total gas used                          | 5.55T               | 68.59T              | 22.73T              | -66.85%          |
 
-- JS promise batch deploy contract and call
+<br />
 
-  - Gas used to convert transaction to receipt: 2.43T
-  - Gas used to execute the receipt (actual contract call): 25.86T
-  -      CREATE_ACCOUNT :  0.09961T
-  -      DEPLOY_CONTRACT :  3.71T
-  -      FUNCTION_CALL :  2.32T
-  -      NEW_RECEIPT :  0.10806T
-  -      TRANSFER :  0.11512T
-  -      BASE :  0.00159T
-  -      CONTRACT_LOADING_BASE :  0.00004T
-  -      CONTRACT_LOADING_BYTES :  0.22386T
-  -      PROMISE_RETURN :  0.00056T
-  -      READ_MEMORY_BASE :  0.01566T
-  -      READ_MEMORY_BYTE :  1.97T
-  -      UTF8_DECODING_BASE :  0.00311T
-  -      UTF8_DECODING_BYTE :  0.00525T
-  -      WASM_INSTRUCTION :  14.86T
-  - Gas used to execute the cross contract call: 41.9T
-  -      BASE :  0.00344T
-  -      CONTRACT_LOADING_BASE :  0.00004T
-  -      CONTRACT_LOADING_BYTES :  0.11228T
-  -      READ_MEMORY_BASE :  0.00261T
-  -      READ_MEMORY_BYTE :  0.0005T
-  -      READ_REGISTER_BASE :  0.01007T
-  -      READ_REGISTER_BYTE :  0T
-  -      WASM_INSTRUCTION :  5.47T
-  -      WRITE_MEMORY_BASE :  0.01122T
-  -      WRITE_MEMORY_BYTE :  0.00014T
-  -      WRITE_REGISTER_BASE :  0.01146T
-  -      WRITE_REGISTER_BYTE :  0.00019T
-  - Gas used to refund unused gas for cross contract call: 0.22318T
-  - Gas used to refund unused gas: 0.22318T
-  - Total gas used: 70.63T
+`100 iterations`
+|                                         | Rust                | JS Before Opt       | JS After Opt        | JS % Diff        |
+| :-------------------------------------- | ------------------: | ------------------: | ------------------: | ---------------: |
+| Convert transaction to receipt          | 2.43T               | 2.43T               | 2.43T               | 0%               |
+| Execute the receipt (actual contract call)  | 2.71T           | 9.09T               | 5.52T               | -39.23%          |
+| BASE                                    | 0.00238T            | 0.00238T            | 0.00238T            | 0%               |
+| CONTRACT_LOADING_BASE                   | 0.00004T            | 0.00004T            | 0.00004T            | 0%               |
+| CONTRACT_LOADING_BYTES                  | 0.06777T            | 0.11209T            | 0.10483T            | -6.48%           |
+| READ_CACHED_TRIE_NODE                   | 0.00228T            | 0.00228T            | 0.00228T            | 0%               |
+| READ_MEMORY_BASE                        | 0.01044T            | 0.01044T            | 0.01044T            | 0%               |
+| READ_MEMORY_BYTE                        | 0.00005T            | 0.00006T            | 0.00006T            | 0%               |
+| READ_REGISTER_BASE                      | 0.00503T            | 0.00503T            | 0.00503T            | 0%               |
+| READ_REGISTER_BYTE                      | 0T                  | 0T                  | 0T                  | 0%               |
+| STORAGE_READ_BASE                       | 0.05636T            | 0.05636T            | 0.05636T            | 0%               |
+| STORAGE_READ_KEY_BYTE                   | 0.00015T            | 0.00015T            | 0.00015T            | 0%               |
+| STORAGE_WRITE_BASE                      | 0.0642T             | 0.0642T             | 0.0642T             | 0%               |
+| STORAGE_WRITE_KEY_BYTE                  | 0.00035T            | 0.00035T            | 0.00035T            | 0%               |
+| TOUCHING_TRIE_NODE                      | 0.08051T            | 0.08051T            | 0.08051T            | 0%               |
+| WASM_INSTRUCTION                        | 0.00437T            | 6.3T                | 2.75T               | -56.35%          |
+| WRITE_MEMORY_BASE                       | 0.00841T            | 0.00841T            | 0.00841T            | 0%               |
+| WRITE_MEMORY_BYTE                       | 0.00007T            | 0.00007T            | 0.00007T            | 0%               |
+| WRITE_REGISTER_BASE                     | 0.0086T             | 0.0086T             | 0.0086T             | 0%               |
+| WRITE_REGISTER_BYTE                     | 0.00003T            | 0.00003T            | 0.00003T            | 0%               |
+| Refund unused gas                       | 0.22318T            | 0.22318T            | 0.22318T            | 0%               |
+| Total gas used                          | 5.36T               | 11.75T              | 8.17T               | -30.43%          |
 
-- RS promise batch deploy contract and call
-  - Gas used to convert transaction to receipt: 2.43T
-  - Gas used to execute the receipt (actual contract call): 10.89T
-  -      CREATE_ACCOUNT :  0.09961T
-  -      DEPLOY_CONTRACT :  3.71T
-  -      FUNCTION_CALL :  2.32T
-  -      NEW_RECEIPT :  0.10806T
-  -      TRANSFER :  0.11512T
-  -      BASE :  0.00159T
-  -      CONTRACT_LOADING_BASE :  0.00004T
-  -      CONTRACT_LOADING_BYTES :  0.11283T
-  -      PROMISE_RETURN :  0.00056T
-  -      READ_MEMORY_BASE :  0.01566T
-  -      READ_MEMORY_BYTE :  1.97T
-  -      UTF8_DECODING_BASE :  0.00311T
-  -      UTF8_DECODING_BYTE :  0.00525T
-  -      WASM_INSTRUCTION :  0.00038T
-  - Gas used to execute the cross contract call: 41.9T
-  -      BASE :  0.00344T
-  -      CONTRACT_LOADING_BASE :  0.00004T
-  -      CONTRACT_LOADING_BYTES :  0.11228T
-  -      READ_MEMORY_BASE :  0.00261T
-  -      READ_MEMORY_BYTE :  0.0005T
-  -      READ_REGISTER_BASE :  0.01007T
-  -      READ_REGISTER_BYTE :  0T
-  -      WASM_INSTRUCTION :  5.47T
-  -      WRITE_MEMORY_BASE :  0.01122T
-  -      WRITE_MEMORY_BYTE :  0.00014T
-  -      WRITE_REGISTER_BASE :  0.01146T
-  -      WRITE_REGISTER_BYTE :  0.00019T
-  - Gas used to refund unused gas for cross contract call: 0.22318T
-  - Gas used to refund unused gas: 0.22318T
-  - Total gas used: 55.67T
+<br />
 
-In this test, we use a JS contract and RS contract to both deploy a JS contract and cross contract call this newly deployed contract. We can see the gas to do the cross contract call is the same. JS SDK has a `~10T` overhead to parse a `~500K` contract in byte. This is because JS, either represent code in Uint8Array or string has some overhead while rust compiler can directly turn it into data section in wasm. In practice, a 10T overhead for a one time contract deploy is not a big deal.
+In this case, JS uses much more gas. This is because the JS `Number` is an object, which has a lot of overhead compared to native integer arithmetic. It's even a lot of overhead compared to native float arithmetic. Also, in QuickJS, there's no JIT. If your contract does a lot of calculation or complex algorithm in JavaScript, it'd be better to do a similar benchmark.
 
-## Tips to do your own benchmark
+<br />
 
-If the above cases don't cover use case or you have a complex algorithm to implement in JavaScript, it's a good idea to benchmark your specific algorithm before choose near-sdk-js for your project.
+---
 
-You don't have to implement the exact algorithm to estimate the gas usage. Instead, you can find out the most expensive execution path of the algorithm, and estimate it by using the upper bound. For example, store the biggest possible objects into the collection and iterate for most possible times. Then goes to write the benchmark and the total gas cannot be more than 300T to be a valid contract. Also, if it has cross contract call, make sure the total gas, that's a sum of all cross contract calls, is less than 300T.
+### Promise batch deploy contract and call
 
-To add your benchmark, write a one function contract of your most expensive operation. And write a test to call this function. If it doesn't involve cross contract call or promises, creating such test is simple. You can refer to `bench/src/expensive-calc.js` and `bench/__tests__/test-expensive-calc.ava.js` on how to write such test and print the gas breakdown. If it involves create promises or cross contract calls, printing the gas breakdown is a little bit more complex, you can refer to `bench/__tests__/test-deploy-contract.ava.js` for the recipe.
+| Deploy and cross-contract call          | Rust                | JS Before Opt       | JS After Opt        | JS % Diff        |
+| :-------------------------------------- | ------------------: | ------------------: | ------------------: | ---------------: |
+| Convert transaction to receipt          | 2.43T               | 2.43T               | 2.43T               | 0%               |
+| Execute the receipt (actual contract call)  | 14.64T          | 25.86T              | 25.88T              | 0.08%            |
+| CREATE_ACCOUNT                          | 3.85T               | 3.85T               | 3.85T               | 0%               |
+| DEPLOY_CONTRACT_BASE                    | 0.18477T            | 0.18477T            | 0.18477T            | 0%               |
+| DEPLOY_CONTRACT_BYTE                    | 3.53T               | 3.53T               | 3.28T               | -7.08%           |
+| FUNCTION_CALL_BASE                      | 2.32T               | 2.32T               | 2.32T               | 0%               |
+| FUNCTION_CALL_BYTE                      | 0.00005T            | 0.00005T            | 0.00005T            | 0%               |
+| NEW_ACTION_RECEIPT                      | 0.10806T            | 0.10806T            | 0.10806T            | 0%               |
+| TRANSFER                                | 0.11512T            | 0.11512T            | 0.11512T            | 0%               |
+| CONTRACT_LOADING_BASE                   | 0.00004T            | 0.00004T            | 0.00004T            | 0%               |
+| CONTRACT_LOADING_BYTES                  | 0.11283T            | 0.22386T            | 0.2085T             | -6.87%           |
+| PROMISE_RETURN                          | 0.00056T            | 0.00056T            | 0.00056T            | 0%               |
+| READ_MEMORY_BASE                        | 0.01566T            | 0.01566T            | 0.01566T            | 0%               |
+| READ_MEMORY_BYTE                        | 1.97T               | 1.97T               | 1.83T               | -7.11%           |
+| UTF8_DECODING_BASE                      | 0.00311T            | 0.00311T            | 0.00311T            | 0%               |
+| UTF8_DECODING_BYTE                      | 0.00525T            | 0.00525T            | 0.00525T            | 0%               |
+| WASM_INSTRUCTION                        | 0.00043T            | 11.54T              | 11.53T              | -0.09%           |
+| Gas used to execute the cross-contract call | 45.58T          | 41.9T               | 40.62T              | -3.06%           |
+| Refund unused gas                       | 0.22318T            | 0.22318T            | 0.22318T            | 0%               |
+| Total gas used                          | 63.1T               | 70.63T              | 69.37T              | -1.79%           |
+
+In this test, we use a JS contract and an RS contract to both deploy a JS contract and cross-contract call this newly deployed contract. We can see the gas used for the cross-contract call is the same. The JS SDK has a `~9.4T` overhead to parse a `~961K` contract in bytes. This is because JS, either representing code in Uint8Array or string, has some overhead, while the Rust compiler can directly turn it into the data section in WASM. In practice, a `~9.4T` overhead for a one-time contract deployment is not a big deal.
+
+<br />
+
+---
 
 ## Details of size benchmark
 
-### JS Contract
+| File Name                               | Rust Contract (KB)  | JS Before Opt (KB)  | JS After Opt (KB)   | JS % Diff        |
+| :-------------------------------------- | ------------------: | ------------------: | ------------------: | ---------------: |
+| deploy-contract.wasm                    | 508.37              | 947.53              | 939.41              | -0.86%           |
+| expensive-calc.wasm                     | 305.34              | 495.32              | 472.33              | -4.64%           |
+| highlevel-collection.wasm               | 319.64              | 502.68              | 479.13              | -4.68%           |
+| highlevel-minimal.wasm                  | 159.75              | 495.07              | 472.19              | -4.63%           |
+| lowlevel-api.wasm                       | 0.38                | 471.08              | 467.53              | -0.75%           |
+| lowlevel-minimal.wasm                   | 0.21                | 471.96              | 468.51              | -0.73%           |
 
-```
 
--rwxrwxr-x 1 bo bo 1009K Feb  9 10:49 ./build/deploy-contract.wasm
--rwxrwxr-x 1 bo bo  506K Feb  8 12:11 ./build/expensive-calc.wasm
--rwxrwxr-x 1 bo bo  512K Feb  7 15:57 ./build/highlevel-collection.wasm
--rwxrwxr-x 1 bo bo  505K Feb  7 10:53 ./build/highlevel-minimal.wasm
--rwxrwxr-x 1 bo bo  502K Feb 10 11:32 ./build/lowlevel-api.wasm
--rwxrwxr-x 1 bo bo  502K Feb 10 11:47 ./build/lowlevel-minimal.wasm
-```
+<br />
 
-### Rust Contract
-
-```
--rwxrwxr-x 1 bo bo  509K Feb 10 10:02 ./res/deploy_contract.wasm
--rwxrwxr-x 1 bo bo  306K Feb  8 12:18 ./res/expensive_calc.wasm
--rwxrwxr-x 1 bo bo  320K Feb  8 11:26 ./res/highlevel_collection.wasm
--rwxrwxr-x 1 bo bo  160K Feb  7 10:51 ./res/highlevel_minimal.wasm
--rwxrwxr-x 1 bo bo   387 Feb  7 11:56 ./res/lowlevel_api.wasm
--rwxrwxr-x 1 bo bo   219 Feb  7 10:33 ./res/lowlevel_minimal.wasm
-```
+---
 
 ## Appendix
 
