@@ -1,6 +1,6 @@
 /**
  * This module gets exported as `near`
- * @module near 
+ * @module near
  * */
 import {
   assert,
@@ -297,11 +297,11 @@ export function storageReadRaw(key: Uint8Array): Uint8Array | null {
  * Reads the utf-8 string value from NEAR storage that is stored under the provided key.
  *
  * @param key - The utf-8 string key to read from storage.
- * 
+ *
  * @example
  * ```ts
  * import { near } from "near-sdk-js";
- * 
+ *
  * near.storageRead("key"); // -> null
  * near.storageWrite("key", "value");
  * near.storageRead("key"); // -> "value"
@@ -328,11 +328,11 @@ export function storageHasKeyRaw(key: Uint8Array): boolean {
  * Checks for the existence of a value under the provided utf-8 string key in NEAR storage.
  *
  * @param key - The utf-8 string key to check for in storage.
- * 
+ *
  * @example
  * ```ts
  * import { near } from "near-sdk-js";
- * 
+ *
  * near.storageHasKey("key"); // -> false
  * near.storageWrite("key", "value");
  * near.storageHasKey("key"); // -> true
@@ -378,11 +378,11 @@ export function storageWriteRaw(key: Uint8Array, value: Uint8Array): boolean {
  *
  * @param key - The utf-8 string key under which to store the value.
  * @param value - The utf-8 string value to store.
- * 
+ *
  * @example
  * ```ts
  * import { near } from "near-sdk-js";
- * 
+ *
  * near.storageRead("key"); // -> null
  * near.storageWrite("key", "value");
  * near.storageRead("key"); // -> "value"
@@ -405,13 +405,13 @@ export function storageRemoveRaw(key: Uint8Array): boolean {
  * Removes the value of the provided utf-8 string key from NEAR storage.
  *
  * @param key - The utf-8 string key to be removed.
- * 
+ *
  * @returns Removes the value stored under the given key. If key-value existed returns true, otherwise false.
- * 
+ *
  * @example
  * ```ts
  * import { near } from "near-sdk-js";
- * 
+ *
  * near.storageRemove("key"); // -> false
  * near.storageWrite("key", "value");
  * near.storageRemove("key"); // -> true
