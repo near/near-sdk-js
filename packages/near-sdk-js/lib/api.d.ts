@@ -1,3 +1,7 @@
+/**
+ * This module gets exported as `near`
+ * @module near
+ * */
 import { NearAmount, PromiseIndex } from "./utils";
 import { GasWeight } from "./types";
 /**

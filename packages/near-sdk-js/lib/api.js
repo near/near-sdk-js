@@ -1,3 +1,7 @@
+/**
+ * This module gets exported as `near`
+ * @module near
+ * */
 import { assert, str, encode, decode, } from "./utils";
 import { PromiseResult } from "./types";
 const U64_MAX = 2n ** 64n - 1n;
