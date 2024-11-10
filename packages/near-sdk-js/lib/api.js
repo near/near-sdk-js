@@ -121,6 +121,15 @@ export function storageReadRaw(key) {
  * Reads the utf-8 string value from NEAR storage that is stored under the provided key.
  *
  * @param key - The utf-8 string key to read from storage.
+ *
+ * @example
+ * ```ts
+ * import { near } from "near-sdk-js";
+ *
+ * near.storageRead("key"); // -> null
+ * near.storageWrite("key", "value");
+ * near.storageRead("key"); // -> "value"
+ * ```
  */
 export function storageRead(key) {
     const ret = storageReadRaw(encode(key));
@@ -141,6 +150,15 @@ export function storageHasKeyRaw(key) {
  * Checks for the existence of a value under the provided utf-8 string key in NEAR storage.
  *
  * @param key - The utf-8 string key to check for in storage.
+ *
+ * @example
+ * ```ts
+ * import { near } from "near-sdk-js";
+ *
+ * near.storageHasKey("key"); // -> false
+ * near.storageWrite("key", "value");
+ * near.storageHasKey("key"); // -> true
+ * ```
  */
 export function storageHasKey(key) {
     return storageHasKeyRaw(encode(key));
@@ -177,6 +195,15 @@ export function storageWriteRaw(key, value) {
  *
  * @param key - The utf-8 string key under which to store the value.
  * @param value - The utf-8 string value to store.
+ *
+ * @example
+ * ```ts
+ * import { near } from "near-sdk-js";
+ *
+ * near.storageRead("key"); // -> null
+ * near.storageWrite("key", "value");
+ * near.storageRead("key"); // -> "value"
+ * ```
  */
 export function storageWrite(key, value) {
     return storageWriteRaw(encode(key), encode(value));
@@ -193,6 +220,17 @@ export function storageRemoveRaw(key) {
  * Removes the value of the provided utf-8 string key from NEAR storage.
  *
  * @param key - The utf-8 string key to be removed.
+ *
+ * @returns Removes the value stored under the given key. If key-value existed returns true, otherwise false.
+ *
+ * @example
+ * ```ts
+ * import { near } from "near-sdk-js";
+ *
+ * near.storageRemove("key"); // -> false
+ * near.storageWrite("key", "value");
+ * near.storageRemove("key"); // -> true
+ * ```
  */
 export function storageRemove(key) {
     return storageRemoveRaw(encode(key));
