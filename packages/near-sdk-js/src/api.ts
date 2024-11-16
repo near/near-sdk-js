@@ -1,5 +1,5 @@
 /**
- * This module gets exported as `near`
+ * Blockchain-specific methods available to the smart contract.
  * @module near
  * */
 import {
