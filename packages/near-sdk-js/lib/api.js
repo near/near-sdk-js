@@ -287,8 +287,10 @@ export function storageGetEvictedRaw() {
  * near.storageGetEvicted(); // -> "value111"
  *
  * near.storageWrite("key2", "value222");
+ * near.storageGetEvicted(); // -> "value222"
  *
- * near.storageRemove("key"); // -> "value111"
+ * near.storageRemove("key");
+ * near.storageGetEvicted(); // -> "value111"
  * ```
  */
 export function storageGetEvicted() {
