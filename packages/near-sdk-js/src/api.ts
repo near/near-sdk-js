@@ -846,6 +846,7 @@ export function promiseBatchThen(
  * const promise = near.promiseBatchCreate("receiver.near");
  *
  * near.promiseBatchActionCreateAccount(promise);
+ * ```
  */
 export function promiseBatchActionCreateAccount(
   promiseIndex: PromiseIndex

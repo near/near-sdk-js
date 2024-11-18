@@ -496,6 +496,7 @@ export declare function promiseBatchThen(promiseIndex: PromiseIndex, accountId: 
  * const promise = near.promiseBatchCreate("receiver.near");
  *
  * near.promiseBatchActionCreateAccount(promise);
+ * ```
  */
 export declare function promiseBatchActionCreateAccount(promiseIndex: PromiseIndex): void;
 /**
