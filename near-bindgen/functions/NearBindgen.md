@@ -36,4 +36,4 @@ Custom serializer function to use for storing the contract state.
 
 ## Defined in
 
-[packages/near-sdk-js/src/near-bindgen.ts:167](https://github.com/near/near-sdk-js/blob/b58ac04fc6dff2f1120e9098c0cb059493486598/packages/near-sdk-js/src/near-bindgen.ts#L167)
+[packages/near-sdk-js/src/near-bindgen.ts:167](https://github.com/near/near-sdk-js/blob/10e6c4a207004b404f237cea5a0b56ab2aad65a1/packages/near-sdk-js/src/near-bindgen.ts#L167)

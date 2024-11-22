@@ -16,7 +16,7 @@ A promise error can either be due to the promise failing or not yet being ready.
 
 #### Defined in
 
-[packages/near-sdk-js/src/types/vm\_types.ts:26](https://github.com/near/near-sdk-js/blob/b58ac04fc6dff2f1120e9098c0cb059493486598/packages/near-sdk-js/src/types/vm_types.ts#L26)
+[packages/near-sdk-js/src/types/vm\_types.ts:26](https://github.com/near/near-sdk-js/blob/10e6c4a207004b404f237cea5a0b56ab2aad65a1/packages/near-sdk-js/src/types/vm_types.ts#L26)
 
 ***
 
@@ -26,4 +26,4 @@ A promise error can either be due to the promise failing or not yet being ready.
 
 #### Defined in
 
-[packages/near-sdk-js/src/types/vm\_types.ts:27](https://github.com/near/near-sdk-js/blob/b58ac04fc6dff2f1120e9098c0cb059493486598/packages/near-sdk-js/src/types/vm_types.ts#L27)
+[packages/near-sdk-js/src/types/vm\_types.ts:27](https://github.com/near/near-sdk-js/blob/10e6c4a207004b404f237cea5a0b56ab2aad65a1/packages/near-sdk-js/src/types/vm_types.ts#L27)

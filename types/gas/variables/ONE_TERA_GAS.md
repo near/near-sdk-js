@@ -12,4 +12,4 @@ One TGas - Tera Gas. 10^12 yoctoNEAR.
 
 ## Defined in
 
-[packages/near-sdk-js/src/types/gas.ts:8](https://github.com/near/near-sdk-js/blob/b58ac04fc6dff2f1120e9098c0cb059493486598/packages/near-sdk-js/src/types/gas.ts#L8)
+[packages/near-sdk-js/src/types/gas.ts:8](https://github.com/near/near-sdk-js/blob/10e6c4a207004b404f237cea5a0b56ab2aad65a1/packages/near-sdk-js/src/types/gas.ts#L8)

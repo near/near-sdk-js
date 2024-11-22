@@ -12,4 +12,4 @@ The Gas amount specified in yoctoNEAR.
 
 ## Defined in
 
-[packages/near-sdk-js/src/types/gas.ts:4](https://github.com/near/near-sdk-js/blob/b58ac04fc6dff2f1120e9098c0cb059493486598/packages/near-sdk-js/src/types/gas.ts#L4)
+[packages/near-sdk-js/src/types/gas.ts:4](https://github.com/near/near-sdk-js/blob/10e6c4a207004b404f237cea5a0b56ab2aad65a1/packages/near-sdk-js/src/types/gas.ts#L4)

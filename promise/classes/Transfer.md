@@ -34,7 +34,7 @@ The amount of NEAR to transfer.
 
 #### Defined in
 
-[packages/near-sdk-js/src/promise.ts:190](https://github.com/near/near-sdk-js/blob/b58ac04fc6dff2f1120e9098c0cb059493486598/packages/near-sdk-js/src/promise.ts#L190)
+[packages/near-sdk-js/src/promise.ts:190](https://github.com/near/near-sdk-js/blob/10e6c4a207004b404f237cea5a0b56ab2aad65a1/packages/near-sdk-js/src/promise.ts#L190)
 
 ## Properties
 
@@ -46,7 +46,7 @@ The amount of NEAR to transfer.
 
 #### Defined in
 
-[packages/near-sdk-js/src/promise.ts:190](https://github.com/near/near-sdk-js/blob/b58ac04fc6dff2f1120e9098c0cb059493486598/packages/near-sdk-js/src/promise.ts#L190)
+[packages/near-sdk-js/src/promise.ts:190](https://github.com/near/near-sdk-js/blob/10e6c4a207004b404f237cea5a0b56ab2aad65a1/packages/near-sdk-js/src/promise.ts#L190)
 
 ## Methods
 
@@ -72,4 +72,4 @@ The index of the promise batch to attach the action to.
 
 #### Defined in
 
-[packages/near-sdk-js/src/promise.ts:194](https://github.com/near/near-sdk-js/blob/b58ac04fc6dff2f1120e9098c0cb059493486598/packages/near-sdk-js/src/promise.ts#L194)
+[packages/near-sdk-js/src/promise.ts:194](https://github.com/near/near-sdk-js/blob/10e6c4a207004b404f237cea5a0b56ab2aad65a1/packages/near-sdk-js/src/promise.ts#L194)

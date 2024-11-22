@@ -34,7 +34,7 @@ The public key to delete from the account.
 
 #### Defined in
 
-[packages/near-sdk-js/src/promise.ts:289](https://github.com/near/near-sdk-js/blob/b58ac04fc6dff2f1120e9098c0cb059493486598/packages/near-sdk-js/src/promise.ts#L289)
+[packages/near-sdk-js/src/promise.ts:289](https://github.com/near/near-sdk-js/blob/10e6c4a207004b404f237cea5a0b56ab2aad65a1/packages/near-sdk-js/src/promise.ts#L289)
 
 ## Properties
 
@@ -46,7 +46,7 @@ The public key to delete from the account.
 
 #### Defined in
 
-[packages/near-sdk-js/src/promise.ts:289](https://github.com/near/near-sdk-js/blob/b58ac04fc6dff2f1120e9098c0cb059493486598/packages/near-sdk-js/src/promise.ts#L289)
+[packages/near-sdk-js/src/promise.ts:289](https://github.com/near/near-sdk-js/blob/10e6c4a207004b404f237cea5a0b56ab2aad65a1/packages/near-sdk-js/src/promise.ts#L289)
 
 ## Methods
 
@@ -72,4 +72,4 @@ The index of the promise batch to attach the action to.
 
 #### Defined in
 
-[packages/near-sdk-js/src/promise.ts:293](https://github.com/near/near-sdk-js/blob/b58ac04fc6dff2f1120e9098c0cb059493486598/packages/near-sdk-js/src/promise.ts#L293)
+[packages/near-sdk-js/src/promise.ts:293](https://github.com/near/near-sdk-js/blob/10e6c4a207004b404f237cea5a0b56ab2aad65a1/packages/near-sdk-js/src/promise.ts#L293)
