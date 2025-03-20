@@ -38,7 +38,7 @@ The byte prefix to use when storing elements inside this collection.
 
 #### Defined in
 
-[packages/near-sdk-js/src/collections/lookup-map.ts:17](https://github.com/near/near-sdk-js/blob/10e6c4a207004b404f237cea5a0b56ab2aad65a1/packages/near-sdk-js/src/collections/lookup-map.ts#L17)
+[packages/near-sdk-js/src/collections/lookup-map.ts:17](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/collections/lookup-map.ts#L17)
 
 ## Properties
 
@@ -50,7 +50,7 @@ The byte prefix to use when storing elements inside this collection.
 
 #### Defined in
 
-[packages/near-sdk-js/src/collections/lookup-map.ts:17](https://github.com/near/near-sdk-js/blob/10e6c4a207004b404f237cea5a0b56ab2aad65a1/packages/near-sdk-js/src/collections/lookup-map.ts#L17)
+[packages/near-sdk-js/src/collections/lookup-map.ts:17](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/collections/lookup-map.ts#L17)
 
 ## Methods
 
@@ -72,7 +72,7 @@ The value for which to check the presence.
 
 #### Defined in
 
-[packages/near-sdk-js/src/collections/lookup-map.ts:26](https://github.com/near/near-sdk-js/blob/10e6c4a207004b404f237cea5a0b56ab2aad65a1/packages/near-sdk-js/src/collections/lookup-map.ts#L26)
+[packages/near-sdk-js/src/collections/lookup-map.ts:26](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/collections/lookup-map.ts#L26)
 
 ***
 
@@ -98,7 +98,7 @@ Options for storing the data.
 
 #### Defined in
 
-[packages/near-sdk-js/src/collections/lookup-map.ts:102](https://github.com/near/near-sdk-js/blob/10e6c4a207004b404f237cea5a0b56ab2aad65a1/packages/near-sdk-js/src/collections/lookup-map.ts#L102)
+[packages/near-sdk-js/src/collections/lookup-map.ts:102](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/collections/lookup-map.ts#L102)
 
 ***
 
@@ -124,7 +124,7 @@ Options for retrieving the data.
 
 #### Defined in
 
-[packages/near-sdk-js/src/collections/lookup-map.ts:37](https://github.com/near/near-sdk-js/blob/10e6c4a207004b404f237cea5a0b56ab2aad65a1/packages/near-sdk-js/src/collections/lookup-map.ts#L37)
+[packages/near-sdk-js/src/collections/lookup-map.ts:37](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/collections/lookup-map.ts#L37)
 
 ***
 
@@ -150,7 +150,7 @@ Options for retrieving the data.
 
 #### Defined in
 
-[packages/near-sdk-js/src/collections/lookup-map.ts:57](https://github.com/near/near-sdk-js/blob/10e6c4a207004b404f237cea5a0b56ab2aad65a1/packages/near-sdk-js/src/collections/lookup-map.ts#L57)
+[packages/near-sdk-js/src/collections/lookup-map.ts:57](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/collections/lookup-map.ts#L57)
 
 ***
 
@@ -172,7 +172,7 @@ Options for storing the data.
 
 #### Defined in
 
-[packages/near-sdk-js/src/collections/lookup-map.ts:116](https://github.com/near/near-sdk-js/blob/10e6c4a207004b404f237cea5a0b56ab2aad65a1/packages/near-sdk-js/src/collections/lookup-map.ts#L116)
+[packages/near-sdk-js/src/collections/lookup-map.ts:116](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/collections/lookup-map.ts#L116)
 
 ***
 
@@ -202,7 +202,7 @@ Options for retrieving and storing the data.
 
 #### Defined in
 
-[packages/near-sdk-js/src/collections/lookup-map.ts:79](https://github.com/near/near-sdk-js/blob/10e6c4a207004b404f237cea5a0b56ab2aad65a1/packages/near-sdk-js/src/collections/lookup-map.ts#L79)
+[packages/near-sdk-js/src/collections/lookup-map.ts:79](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/collections/lookup-map.ts#L79)
 
 ***
 
@@ -224,7 +224,7 @@ Options for retrieving and storing the data.
 
 #### Defined in
 
-[packages/near-sdk-js/src/collections/subtype.ts:8](https://github.com/near/near-sdk-js/blob/10e6c4a207004b404f237cea5a0b56ab2aad65a1/packages/near-sdk-js/src/collections/subtype.ts#L8)
+[packages/near-sdk-js/src/collections/subtype.ts:8](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/collections/subtype.ts#L8)
 
 ***
 
@@ -242,7 +242,7 @@ Options for retrieving and storing the data.
 
 #### Defined in
 
-[packages/near-sdk-js/src/collections/subtype.ts:6](https://github.com/near/near-sdk-js/blob/10e6c4a207004b404f237cea5a0b56ab2aad65a1/packages/near-sdk-js/src/collections/subtype.ts#L6)
+[packages/near-sdk-js/src/collections/subtype.ts:6](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/collections/subtype.ts#L6)
 
 ***
 
@@ -268,4 +268,4 @@ The deserialized data to create an instance from.
 
 #### Defined in
 
-[packages/near-sdk-js/src/collections/lookup-map.ts:125](https://github.com/near/near-sdk-js/blob/10e6c4a207004b404f237cea5a0b56ab2aad65a1/packages/near-sdk-js/src/collections/lookup-map.ts#L125)
+[packages/near-sdk-js/src/collections/lookup-map.ts:125](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/collections/lookup-map.ts#L125)

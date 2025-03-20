@@ -46,7 +46,7 @@ The amount of Gas to attach to the call.
 
 #### Defined in
 
-[packages/near-sdk-js/src/promise.ts:91](https://github.com/near/near-sdk-js/blob/10e6c4a207004b404f237cea5a0b56ab2aad65a1/packages/near-sdk-js/src/promise.ts#L91)
+[packages/near-sdk-js/src/promise.ts:91](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/promise.ts#L91)
 
 ## Properties
 
@@ -58,7 +58,7 @@ The amount of NEAR to attach to the call.
 
 #### Defined in
 
-[packages/near-sdk-js/src/promise.ts:94](https://github.com/near/near-sdk-js/blob/10e6c4a207004b404f237cea5a0b56ab2aad65a1/packages/near-sdk-js/src/promise.ts#L94)
+[packages/near-sdk-js/src/promise.ts:94](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/promise.ts#L94)
 
 ***
 
@@ -70,7 +70,7 @@ The arguments to be passed to the function.
 
 #### Defined in
 
-[packages/near-sdk-js/src/promise.ts:93](https://github.com/near/near-sdk-js/blob/10e6c4a207004b404f237cea5a0b56ab2aad65a1/packages/near-sdk-js/src/promise.ts#L93)
+[packages/near-sdk-js/src/promise.ts:93](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/promise.ts#L93)
 
 ***
 
@@ -82,7 +82,7 @@ The name of the function to be called.
 
 #### Defined in
 
-[packages/near-sdk-js/src/promise.ts:92](https://github.com/near/near-sdk-js/blob/10e6c4a207004b404f237cea5a0b56ab2aad65a1/packages/near-sdk-js/src/promise.ts#L92)
+[packages/near-sdk-js/src/promise.ts:92](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/promise.ts#L92)
 
 ***
 
@@ -94,7 +94,7 @@ The amount of Gas to attach to the call.
 
 #### Defined in
 
-[packages/near-sdk-js/src/promise.ts:95](https://github.com/near/near-sdk-js/blob/10e6c4a207004b404f237cea5a0b56ab2aad65a1/packages/near-sdk-js/src/promise.ts#L95)
+[packages/near-sdk-js/src/promise.ts:95](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/promise.ts#L95)
 
 ## Methods
 
@@ -120,4 +120,4 @@ The index of the promise batch to attach the action to.
 
 #### Defined in
 
-[packages/near-sdk-js/src/promise.ts:100](https://github.com/near/near-sdk-js/blob/10e6c4a207004b404f237cea5a0b56ab2aad65a1/packages/near-sdk-js/src/promise.ts#L100)
+[packages/near-sdk-js/src/promise.ts:100](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/promise.ts#L100)

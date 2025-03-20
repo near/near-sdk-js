@@ -43,7 +43,7 @@ The initial length of the collection. By default 0.
 
 #### Defined in
 
-[packages/near-sdk-js/src/collections/vector.ts:31](https://github.com/near/near-sdk-js/blob/10e6c4a207004b404f237cea5a0b56ab2aad65a1/packages/near-sdk-js/src/collections/vector.ts#L31)
+[packages/near-sdk-js/src/collections/vector.ts:31](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/collections/vector.ts#L31)
 
 ## Properties
 
@@ -55,7 +55,7 @@ The initial length of the collection. By default 0.
 
 #### Defined in
 
-[packages/near-sdk-js/src/collections/vector.ts:31](https://github.com/near/near-sdk-js/blob/10e6c4a207004b404f237cea5a0b56ab2aad65a1/packages/near-sdk-js/src/collections/vector.ts#L31)
+[packages/near-sdk-js/src/collections/vector.ts:31](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/collections/vector.ts#L31)
 
 ***
 
@@ -67,7 +67,7 @@ The byte prefix to use when storing elements inside this collection.
 
 #### Defined in
 
-[packages/near-sdk-js/src/collections/vector.ts:31](https://github.com/near/near-sdk-js/blob/10e6c4a207004b404f237cea5a0b56ab2aad65a1/packages/near-sdk-js/src/collections/vector.ts#L31)
+[packages/near-sdk-js/src/collections/vector.ts:31](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/collections/vector.ts#L31)
 
 ## Methods
 
@@ -81,7 +81,7 @@ The byte prefix to use when storing elements inside this collection.
 
 #### Defined in
 
-[packages/near-sdk-js/src/collections/vector.ts:174](https://github.com/near/near-sdk-js/blob/10e6c4a207004b404f237cea5a0b56ab2aad65a1/packages/near-sdk-js/src/collections/vector.ts#L174)
+[packages/near-sdk-js/src/collections/vector.ts:174](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/collections/vector.ts#L174)
 
 ***
 
@@ -97,7 +97,7 @@ Remove all of the elements stored within the collection.
 
 #### Defined in
 
-[packages/near-sdk-js/src/collections/vector.ts:211](https://github.com/near/near-sdk-js/blob/10e6c4a207004b404f237cea5a0b56ab2aad65a1/packages/near-sdk-js/src/collections/vector.ts#L211)
+[packages/near-sdk-js/src/collections/vector.ts:211](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/collections/vector.ts#L211)
 
 ***
 
@@ -119,7 +119,7 @@ The elements to extend the collection with.
 
 #### Defined in
 
-[packages/near-sdk-js/src/collections/vector.ts:168](https://github.com/near/near-sdk-js/blob/10e6c4a207004b404f237cea5a0b56ab2aad65a1/packages/near-sdk-js/src/collections/vector.ts#L168)
+[packages/near-sdk-js/src/collections/vector.ts:168](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/collections/vector.ts#L168)
 
 ***
 
@@ -145,7 +145,7 @@ Options for retrieving the data.
 
 #### Defined in
 
-[packages/near-sdk-js/src/collections/vector.ts:48](https://github.com/near/near-sdk-js/blob/10e6c4a207004b404f237cea5a0b56ab2aad65a1/packages/near-sdk-js/src/collections/vector.ts#L48)
+[packages/near-sdk-js/src/collections/vector.ts:48](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/collections/vector.ts#L48)
 
 ***
 
@@ -161,7 +161,7 @@ Checks whether the collection is empty.
 
 #### Defined in
 
-[packages/near-sdk-js/src/collections/vector.ts:38](https://github.com/near/near-sdk-js/blob/10e6c4a207004b404f237cea5a0b56ab2aad65a1/packages/near-sdk-js/src/collections/vector.ts#L38)
+[packages/near-sdk-js/src/collections/vector.ts:38](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/collections/vector.ts#L38)
 
 ***
 
@@ -183,7 +183,7 @@ Options for retrieving the data.
 
 #### Defined in
 
-[packages/near-sdk-js/src/collections/vector.ts:118](https://github.com/near/near-sdk-js/blob/10e6c4a207004b404f237cea5a0b56ab2aad65a1/packages/near-sdk-js/src/collections/vector.ts#L118)
+[packages/near-sdk-js/src/collections/vector.ts:118](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/collections/vector.ts#L118)
 
 ***
 
@@ -209,7 +209,7 @@ Options for storing the data.
 
 #### Defined in
 
-[packages/near-sdk-js/src/collections/vector.ts:100](https://github.com/near/near-sdk-js/blob/10e6c4a207004b404f237cea5a0b56ab2aad65a1/packages/near-sdk-js/src/collections/vector.ts#L100)
+[packages/near-sdk-js/src/collections/vector.ts:100](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/collections/vector.ts#L100)
 
 ***
 
@@ -239,7 +239,7 @@ Options for retrieving and storing the data.
 
 #### Defined in
 
-[packages/near-sdk-js/src/collections/vector.ts:141](https://github.com/near/near-sdk-js/blob/10e6c4a207004b404f237cea5a0b56ab2aad65a1/packages/near-sdk-js/src/collections/vector.ts#L141)
+[packages/near-sdk-js/src/collections/vector.ts:141](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/collections/vector.ts#L141)
 
 ***
 
@@ -261,7 +261,7 @@ Options for storing the data.
 
 #### Defined in
 
-[packages/near-sdk-js/src/collections/vector.ts:225](https://github.com/near/near-sdk-js/blob/10e6c4a207004b404f237cea5a0b56ab2aad65a1/packages/near-sdk-js/src/collections/vector.ts#L225)
+[packages/near-sdk-js/src/collections/vector.ts:225](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/collections/vector.ts#L225)
 
 ***
 
@@ -283,7 +283,7 @@ Options for storing the data.
 
 #### Defined in
 
-[packages/near-sdk-js/src/collections/subtype.ts:8](https://github.com/near/near-sdk-js/blob/10e6c4a207004b404f237cea5a0b56ab2aad65a1/packages/near-sdk-js/src/collections/subtype.ts#L8)
+[packages/near-sdk-js/src/collections/subtype.ts:8](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/collections/subtype.ts#L8)
 
 ***
 
@@ -301,7 +301,7 @@ Options for storing the data.
 
 #### Defined in
 
-[packages/near-sdk-js/src/collections/subtype.ts:6](https://github.com/near/near-sdk-js/blob/10e6c4a207004b404f237cea5a0b56ab2aad65a1/packages/near-sdk-js/src/collections/subtype.ts#L6)
+[packages/near-sdk-js/src/collections/subtype.ts:6](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/collections/subtype.ts#L6)
 
 ***
 
@@ -329,7 +329,7 @@ Options for retrieving and storing the data.
 
 #### Defined in
 
-[packages/near-sdk-js/src/collections/vector.ts:70](https://github.com/near/near-sdk-js/blob/10e6c4a207004b404f237cea5a0b56ab2aad65a1/packages/near-sdk-js/src/collections/vector.ts#L70)
+[packages/near-sdk-js/src/collections/vector.ts:70](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/collections/vector.ts#L70)
 
 ***
 
@@ -351,7 +351,7 @@ Options for retrieving and storing the data.
 
 #### Defined in
 
-[packages/near-sdk-js/src/collections/vector.ts:196](https://github.com/near/near-sdk-js/blob/10e6c4a207004b404f237cea5a0b56ab2aad65a1/packages/near-sdk-js/src/collections/vector.ts#L196)
+[packages/near-sdk-js/src/collections/vector.ts:196](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/collections/vector.ts#L196)
 
 ***
 
@@ -377,4 +377,4 @@ The deserialized data to create an instance from.
 
 #### Defined in
 
-[packages/near-sdk-js/src/collections/vector.ts:234](https://github.com/near/near-sdk-js/blob/10e6c4a207004b404f237cea5a0b56ab2aad65a1/packages/near-sdk-js/src/collections/vector.ts#L234)
+[packages/near-sdk-js/src/collections/vector.ts:234](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/collections/vector.ts#L234)

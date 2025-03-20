@@ -26,7 +26,7 @@
 
 #### Defined in
 
-[packages/near-sdk-js/src/promise.ts:341](https://github.com/near/near-sdk-js/blob/10e6c4a207004b404f237cea5a0b56ab2aad65a1/packages/near-sdk-js/src/promise.ts#L341)
+[packages/near-sdk-js/src/promise.ts:341](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/promise.ts#L341)
 
 ## Properties
 
@@ -36,7 +36,7 @@
 
 #### Defined in
 
-[packages/near-sdk-js/src/promise.ts:342](https://github.com/near/near-sdk-js/blob/10e6c4a207004b404f237cea5a0b56ab2aad65a1/packages/near-sdk-js/src/promise.ts#L342)
+[packages/near-sdk-js/src/promise.ts:342](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/promise.ts#L342)
 
 ***
 
@@ -46,7 +46,7 @@
 
 #### Defined in
 
-[packages/near-sdk-js/src/promise.ts:343](https://github.com/near/near-sdk-js/blob/10e6c4a207004b404f237cea5a0b56ab2aad65a1/packages/near-sdk-js/src/promise.ts#L343)
+[packages/near-sdk-js/src/promise.ts:343](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/promise.ts#L343)
 
 ***
 
@@ -56,7 +56,7 @@
 
 #### Defined in
 
-[packages/near-sdk-js/src/promise.ts:344](https://github.com/near/near-sdk-js/blob/10e6c4a207004b404f237cea5a0b56ab2aad65a1/packages/near-sdk-js/src/promise.ts#L344)
+[packages/near-sdk-js/src/promise.ts:344](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/promise.ts#L344)
 
 ## Methods
 
@@ -70,4 +70,4 @@
 
 #### Defined in
 
-[packages/near-sdk-js/src/promise.ts:347](https://github.com/near/near-sdk-js/blob/10e6c4a207004b404f237cea5a0b56ab2aad65a1/packages/near-sdk-js/src/promise.ts#L347)
+[packages/near-sdk-js/src/promise.ts:347](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/promise.ts#L347)
