@@ -38,7 +38,7 @@ The byte prefix to use when storing elements inside this collection.
 
 #### Defined in
 
-[packages/near-sdk-js/src/collections/unordered-map.ts:27](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/collections/unordered-map.ts#L27)
+[packages/near-sdk-js/src/collections/unordered-map.ts:27](https://github.com/near/near-sdk-js/blob/8431739ff5e4ec78361e18c49c68fee0ad8984cf/packages/near-sdk-js/src/collections/unordered-map.ts#L27)
 
 ## Properties
 
@@ -48,7 +48,7 @@ The byte prefix to use when storing elements inside this collection.
 
 #### Defined in
 
-[packages/near-sdk-js/src/collections/unordered-map.ts:21](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/collections/unordered-map.ts#L21)
+[packages/near-sdk-js/src/collections/unordered-map.ts:21](https://github.com/near/near-sdk-js/blob/8431739ff5e4ec78361e18c49c68fee0ad8984cf/packages/near-sdk-js/src/collections/unordered-map.ts#L21)
 
 ***
 
@@ -60,7 +60,7 @@ The byte prefix to use when storing elements inside this collection.
 
 #### Defined in
 
-[packages/near-sdk-js/src/collections/unordered-map.ts:27](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/collections/unordered-map.ts#L27)
+[packages/near-sdk-js/src/collections/unordered-map.ts:27](https://github.com/near/near-sdk-js/blob/8431739ff5e4ec78361e18c49c68fee0ad8984cf/packages/near-sdk-js/src/collections/unordered-map.ts#L27)
 
 ***
 
@@ -70,7 +70,7 @@ The byte prefix to use when storing elements inside this collection.
 
 #### Defined in
 
-[packages/near-sdk-js/src/collections/unordered-map.ts:22](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/collections/unordered-map.ts#L22)
+[packages/near-sdk-js/src/collections/unordered-map.ts:22](https://github.com/near/near-sdk-js/blob/8431739ff5e4ec78361e18c49c68fee0ad8984cf/packages/near-sdk-js/src/collections/unordered-map.ts#L22)
 
 ## Accessors
 
@@ -86,7 +86,7 @@ The number of elements stored in the collection.
 
 #### Defined in
 
-[packages/near-sdk-js/src/collections/unordered-map.ts:36](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/collections/unordered-map.ts#L36)
+[packages/near-sdk-js/src/collections/unordered-map.ts:36](https://github.com/near/near-sdk-js/blob/8431739ff5e4ec78361e18c49c68fee0ad8984cf/packages/near-sdk-js/src/collections/unordered-map.ts#L36)
 
 ## Methods
 
@@ -100,7 +100,7 @@ The number of elements stored in the collection.
 
 #### Defined in
 
-[packages/near-sdk-js/src/collections/unordered-map.ts:145](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/collections/unordered-map.ts#L145)
+[packages/near-sdk-js/src/collections/unordered-map.ts:145](https://github.com/near/near-sdk-js/blob/8431739ff5e4ec78361e18c49c68fee0ad8984cf/packages/near-sdk-js/src/collections/unordered-map.ts#L145)
 
 ***
 
@@ -116,7 +116,7 @@ Remove all of the elements stored within the collection.
 
 #### Defined in
 
-[packages/near-sdk-js/src/collections/unordered-map.ts:136](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/collections/unordered-map.ts#L136)
+[packages/near-sdk-js/src/collections/unordered-map.ts:136](https://github.com/near/near-sdk-js/blob/8431739ff5e4ec78361e18c49c68fee0ad8984cf/packages/near-sdk-js/src/collections/unordered-map.ts#L136)
 
 ***
 
@@ -138,7 +138,7 @@ The key-value pairs to extend the collection with.
 
 #### Defined in
 
-[packages/near-sdk-js/src/collections/unordered-map.ts:184](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/collections/unordered-map.ts#L184)
+[packages/near-sdk-js/src/collections/unordered-map.ts:184](https://github.com/near/near-sdk-js/blob/8431739ff5e4ec78361e18c49c68fee0ad8984cf/packages/near-sdk-js/src/collections/unordered-map.ts#L184)
 
 ***
 
@@ -164,7 +164,7 @@ Options for retrieving the data.
 
 #### Defined in
 
-[packages/near-sdk-js/src/collections/unordered-map.ts:53](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/collections/unordered-map.ts#L53)
+[packages/near-sdk-js/src/collections/unordered-map.ts:53](https://github.com/near/near-sdk-js/blob/8431739ff5e4ec78361e18c49c68fee0ad8984cf/packages/near-sdk-js/src/collections/unordered-map.ts#L53)
 
 ***
 
@@ -180,7 +180,7 @@ Checks whether the collection is empty.
 
 #### Defined in
 
-[packages/near-sdk-js/src/collections/unordered-map.ts:43](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/collections/unordered-map.ts#L43)
+[packages/near-sdk-js/src/collections/unordered-map.ts:43](https://github.com/near/near-sdk-js/blob/8431739ff5e4ec78361e18c49c68fee0ad8984cf/packages/near-sdk-js/src/collections/unordered-map.ts#L43)
 
 ***
 
@@ -202,7 +202,7 @@ Checks whether the collection is empty.
 
 #### Defined in
 
-[packages/near-sdk-js/src/collections/unordered-map.ts:220](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/collections/unordered-map.ts#L220)
+[packages/near-sdk-js/src/collections/unordered-map.ts:220](https://github.com/near/near-sdk-js/blob/8431739ff5e4ec78361e18c49c68fee0ad8984cf/packages/near-sdk-js/src/collections/unordered-map.ts#L220)
 
 ***
 
@@ -228,7 +228,7 @@ Options for retrieving the data.
 
 #### Defined in
 
-[packages/near-sdk-js/src/collections/unordered-map.ts:105](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/collections/unordered-map.ts#L105)
+[packages/near-sdk-js/src/collections/unordered-map.ts:105](https://github.com/near/near-sdk-js/blob/8431739ff5e4ec78361e18c49c68fee0ad8984cf/packages/near-sdk-js/src/collections/unordered-map.ts#L105)
 
 ***
 
@@ -250,7 +250,7 @@ Options for storing the data.
 
 #### Defined in
 
-[packages/near-sdk-js/src/collections/unordered-map.ts:195](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/collections/unordered-map.ts#L195)
+[packages/near-sdk-js/src/collections/unordered-map.ts:195](https://github.com/near/near-sdk-js/blob/8431739ff5e4ec78361e18c49c68fee0ad8984cf/packages/near-sdk-js/src/collections/unordered-map.ts#L195)
 
 ***
 
@@ -280,7 +280,7 @@ Options for retrieving and storing the data.
 
 #### Defined in
 
-[packages/near-sdk-js/src/collections/unordered-map.ts:76](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/collections/unordered-map.ts#L76)
+[packages/near-sdk-js/src/collections/unordered-map.ts:76](https://github.com/near/near-sdk-js/blob/8431739ff5e4ec78361e18c49c68fee0ad8984cf/packages/near-sdk-js/src/collections/unordered-map.ts#L76)
 
 ***
 
@@ -302,7 +302,7 @@ Options for retrieving and storing the data.
 
 #### Defined in
 
-[packages/near-sdk-js/src/collections/subtype.ts:8](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/collections/subtype.ts#L8)
+[packages/near-sdk-js/src/collections/subtype.ts:8](https://github.com/near/near-sdk-js/blob/8431739ff5e4ec78361e18c49c68fee0ad8984cf/packages/near-sdk-js/src/collections/subtype.ts#L8)
 
 ***
 
@@ -320,7 +320,7 @@ Options for retrieving and storing the data.
 
 #### Defined in
 
-[packages/near-sdk-js/src/collections/subtype.ts:6](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/collections/subtype.ts#L6)
+[packages/near-sdk-js/src/collections/subtype.ts:6](https://github.com/near/near-sdk-js/blob/8431739ff5e4ec78361e18c49c68fee0ad8984cf/packages/near-sdk-js/src/collections/subtype.ts#L6)
 
 ***
 
@@ -342,7 +342,7 @@ Options for retrieving and storing the data.
 
 #### Defined in
 
-[packages/near-sdk-js/src/collections/unordered-map.ts:167](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/collections/unordered-map.ts#L167)
+[packages/near-sdk-js/src/collections/unordered-map.ts:167](https://github.com/near/near-sdk-js/blob/8431739ff5e4ec78361e18c49c68fee0ad8984cf/packages/near-sdk-js/src/collections/unordered-map.ts#L167)
 
 ***
 
@@ -368,4 +368,4 @@ The deserialized data to create an instance from.
 
 #### Defined in
 
-[packages/near-sdk-js/src/collections/unordered-map.ts:204](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/collections/unordered-map.ts#L204)
+[packages/near-sdk-js/src/collections/unordered-map.ts:204](https://github.com/near/near-sdk-js/blob/8431739ff5e4ec78361e18c49c68fee0ad8984cf/packages/near-sdk-js/src/collections/unordered-map.ts#L204)

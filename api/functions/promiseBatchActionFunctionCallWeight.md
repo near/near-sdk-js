@@ -42,4 +42,4 @@ The weight of unused Gas to use.
 
 ## Defined in
 
-[packages/near-sdk-js/src/api.ts:792](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/api.ts#L792)
+[packages/near-sdk-js/src/api.ts:792](https://github.com/near/near-sdk-js/blob/8431739ff5e4ec78361e18c49c68fee0ad8984cf/packages/near-sdk-js/src/api.ts#L792)

@@ -30,7 +30,7 @@ The byte prefix to use when storing elements inside this collection.
 
 #### Defined in
 
-[packages/near-sdk-js/src/collections/unordered-set.ts:35](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/collections/unordered-set.ts#L35)
+[packages/near-sdk-js/src/collections/unordered-set.ts:35](https://github.com/near/near-sdk-js/blob/8431739ff5e4ec78361e18c49c68fee0ad8984cf/packages/near-sdk-js/src/collections/unordered-set.ts#L35)
 
 ## Properties
 
@@ -40,7 +40,7 @@ The byte prefix to use when storing elements inside this collection.
 
 #### Defined in
 
-[packages/near-sdk-js/src/collections/unordered-set.ts:30](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/collections/unordered-set.ts#L30)
+[packages/near-sdk-js/src/collections/unordered-set.ts:30](https://github.com/near/near-sdk-js/blob/8431739ff5e4ec78361e18c49c68fee0ad8984cf/packages/near-sdk-js/src/collections/unordered-set.ts#L30)
 
 ***
 
@@ -50,7 +50,7 @@ The byte prefix to use when storing elements inside this collection.
 
 #### Defined in
 
-[packages/near-sdk-js/src/collections/unordered-set.ts:29](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/collections/unordered-set.ts#L29)
+[packages/near-sdk-js/src/collections/unordered-set.ts:29](https://github.com/near/near-sdk-js/blob/8431739ff5e4ec78361e18c49c68fee0ad8984cf/packages/near-sdk-js/src/collections/unordered-set.ts#L29)
 
 ***
 
@@ -62,7 +62,7 @@ The byte prefix to use when storing elements inside this collection.
 
 #### Defined in
 
-[packages/near-sdk-js/src/collections/unordered-set.ts:35](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/collections/unordered-set.ts#L35)
+[packages/near-sdk-js/src/collections/unordered-set.ts:35](https://github.com/near/near-sdk-js/blob/8431739ff5e4ec78361e18c49c68fee0ad8984cf/packages/near-sdk-js/src/collections/unordered-set.ts#L35)
 
 ## Accessors
 
@@ -78,7 +78,7 @@ The number of elements stored in the collection.
 
 #### Defined in
 
-[packages/near-sdk-js/src/collections/unordered-set.ts:43](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/collections/unordered-set.ts#L43)
+[packages/near-sdk-js/src/collections/unordered-set.ts:43](https://github.com/near/near-sdk-js/blob/8431739ff5e4ec78361e18c49c68fee0ad8984cf/packages/near-sdk-js/src/collections/unordered-set.ts#L43)
 
 ## Methods
 
@@ -92,7 +92,7 @@ The number of elements stored in the collection.
 
 #### Defined in
 
-[packages/near-sdk-js/src/collections/unordered-set.ts:157](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/collections/unordered-set.ts#L157)
+[packages/near-sdk-js/src/collections/unordered-set.ts:157](https://github.com/near/near-sdk-js/blob/8431739ff5e4ec78361e18c49c68fee0ad8984cf/packages/near-sdk-js/src/collections/unordered-set.ts#L157)
 
 ***
 
@@ -112,7 +112,7 @@ Remove all of the elements stored within the collection.
 
 #### Defined in
 
-[packages/near-sdk-js/src/collections/unordered-set.ts:147](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/collections/unordered-set.ts#L147)
+[packages/near-sdk-js/src/collections/unordered-set.ts:147](https://github.com/near/near-sdk-js/blob/8431739ff5e4ec78361e18c49c68fee0ad8984cf/packages/near-sdk-js/src/collections/unordered-set.ts#L147)
 
 ***
 
@@ -138,7 +138,7 @@ Options for storing data.
 
 #### Defined in
 
-[packages/near-sdk-js/src/collections/unordered-set.ts:60](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/collections/unordered-set.ts#L60)
+[packages/near-sdk-js/src/collections/unordered-set.ts:60](https://github.com/near/near-sdk-js/blob/8431739ff5e4ec78361e18c49c68fee0ad8984cf/packages/near-sdk-js/src/collections/unordered-set.ts#L60)
 
 ***
 
@@ -162,7 +162,7 @@ Options for storing data.
 
 #### Defined in
 
-[packages/near-sdk-js/src/collections/unordered-set.ts:230](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/collections/unordered-set.ts#L230)
+[packages/near-sdk-js/src/collections/unordered-set.ts:230](https://github.com/near/near-sdk-js/blob/8431739ff5e4ec78361e18c49c68fee0ad8984cf/packages/near-sdk-js/src/collections/unordered-set.ts#L230)
 
 ***
 
@@ -184,7 +184,7 @@ The elements to extend the collection with.
 
 #### Defined in
 
-[packages/near-sdk-js/src/collections/unordered-set.ts:196](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/collections/unordered-set.ts#L196)
+[packages/near-sdk-js/src/collections/unordered-set.ts:196](https://github.com/near/near-sdk-js/blob/8431739ff5e4ec78361e18c49c68fee0ad8984cf/packages/near-sdk-js/src/collections/unordered-set.ts#L196)
 
 ***
 
@@ -200,7 +200,7 @@ Checks whether the collection is empty.
 
 #### Defined in
 
-[packages/near-sdk-js/src/collections/unordered-set.ts:50](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/collections/unordered-set.ts#L50)
+[packages/near-sdk-js/src/collections/unordered-set.ts:50](https://github.com/near/near-sdk-js/blob/8431739ff5e4ec78361e18c49c68fee0ad8984cf/packages/near-sdk-js/src/collections/unordered-set.ts#L50)
 
 ***
 
@@ -226,7 +226,7 @@ Options for retrieving and storing data.
 
 #### Defined in
 
-[packages/near-sdk-js/src/collections/unordered-set.ts:101](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/collections/unordered-set.ts#L101)
+[packages/near-sdk-js/src/collections/unordered-set.ts:101](https://github.com/near/near-sdk-js/blob/8431739ff5e4ec78361e18c49c68fee0ad8984cf/packages/near-sdk-js/src/collections/unordered-set.ts#L101)
 
 ***
 
@@ -248,7 +248,7 @@ Options for storing the data.
 
 #### Defined in
 
-[packages/near-sdk-js/src/collections/unordered-set.ts:207](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/collections/unordered-set.ts#L207)
+[packages/near-sdk-js/src/collections/unordered-set.ts:207](https://github.com/near/near-sdk-js/blob/8431739ff5e4ec78361e18c49c68fee0ad8984cf/packages/near-sdk-js/src/collections/unordered-set.ts#L207)
 
 ***
 
@@ -275,7 +275,7 @@ Options for storing the data.
 
 #### Defined in
 
-[packages/near-sdk-js/src/collections/unordered-set.ts:76](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/collections/unordered-set.ts#L76)
+[packages/near-sdk-js/src/collections/unordered-set.ts:76](https://github.com/near/near-sdk-js/blob/8431739ff5e4ec78361e18c49c68fee0ad8984cf/packages/near-sdk-js/src/collections/unordered-set.ts#L76)
 
 ***
 
@@ -297,7 +297,7 @@ Options for retrieving and storing the data.
 
 #### Defined in
 
-[packages/near-sdk-js/src/collections/unordered-set.ts:179](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/collections/unordered-set.ts#L179)
+[packages/near-sdk-js/src/collections/unordered-set.ts:179](https://github.com/near/near-sdk-js/blob/8431739ff5e4ec78361e18c49c68fee0ad8984cf/packages/near-sdk-js/src/collections/unordered-set.ts#L179)
 
 ***
 
@@ -323,4 +323,4 @@ The deserialized data to create an instance from.
 
 #### Defined in
 
-[packages/near-sdk-js/src/collections/unordered-set.ts:216](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/collections/unordered-set.ts#L216)
+[packages/near-sdk-js/src/collections/unordered-set.ts:216](https://github.com/near/near-sdk-js/blob/8431739ff5e4ec78361e18c49c68fee0ad8984cf/packages/near-sdk-js/src/collections/unordered-set.ts#L216)

@@ -12,4 +12,4 @@ A number that specifies the amount of NEAR in yoctoNEAR.
 
 ## Defined in
 
-[packages/near-sdk-js/src/utils.ts:20](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/utils.ts#L20)
+[packages/near-sdk-js/src/utils.ts:20](https://github.com/near/near-sdk-js/blob/8431739ff5e4ec78361e18c49c68fee0ad8984cf/packages/near-sdk-js/src/utils.ts#L20)

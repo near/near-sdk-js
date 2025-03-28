@@ -50,7 +50,7 @@ The weight of unused Gas to use.
 
 #### Defined in
 
-[packages/near-sdk-js/src/promise.ts:124](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/promise.ts#L124)
+[packages/near-sdk-js/src/promise.ts:124](https://github.com/near/near-sdk-js/blob/8431739ff5e4ec78361e18c49c68fee0ad8984cf/packages/near-sdk-js/src/promise.ts#L124)
 
 ## Properties
 
@@ -62,7 +62,7 @@ The amount of NEAR to attach to the call.
 
 #### Defined in
 
-[packages/near-sdk-js/src/promise.ts:127](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/promise.ts#L127)
+[packages/near-sdk-js/src/promise.ts:127](https://github.com/near/near-sdk-js/blob/8431739ff5e4ec78361e18c49c68fee0ad8984cf/packages/near-sdk-js/src/promise.ts#L127)
 
 ***
 
@@ -74,7 +74,7 @@ The utf-8 string arguments to be passed to the function.
 
 #### Defined in
 
-[packages/near-sdk-js/src/promise.ts:126](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/promise.ts#L126)
+[packages/near-sdk-js/src/promise.ts:126](https://github.com/near/near-sdk-js/blob/8431739ff5e4ec78361e18c49c68fee0ad8984cf/packages/near-sdk-js/src/promise.ts#L126)
 
 ***
 
@@ -86,7 +86,7 @@ The name of the function to be called.
 
 #### Defined in
 
-[packages/near-sdk-js/src/promise.ts:125](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/promise.ts#L125)
+[packages/near-sdk-js/src/promise.ts:125](https://github.com/near/near-sdk-js/blob/8431739ff5e4ec78361e18c49c68fee0ad8984cf/packages/near-sdk-js/src/promise.ts#L125)
 
 ***
 
@@ -98,7 +98,7 @@ The amount of Gas to attach to the call.
 
 #### Defined in
 
-[packages/near-sdk-js/src/promise.ts:128](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/promise.ts#L128)
+[packages/near-sdk-js/src/promise.ts:128](https://github.com/near/near-sdk-js/blob/8431739ff5e4ec78361e18c49c68fee0ad8984cf/packages/near-sdk-js/src/promise.ts#L128)
 
 ***
 
@@ -110,7 +110,7 @@ The weight of unused Gas to use.
 
 #### Defined in
 
-[packages/near-sdk-js/src/promise.ts:129](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/promise.ts#L129)
+[packages/near-sdk-js/src/promise.ts:129](https://github.com/near/near-sdk-js/blob/8431739ff5e4ec78361e18c49c68fee0ad8984cf/packages/near-sdk-js/src/promise.ts#L129)
 
 ## Methods
 
@@ -136,4 +136,4 @@ The index of the promise batch to attach the action to.
 
 #### Defined in
 
-[packages/near-sdk-js/src/promise.ts:134](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/promise.ts#L134)
+[packages/near-sdk-js/src/promise.ts:134](https://github.com/near/near-sdk-js/blob/8431739ff5e4ec78361e18c49c68fee0ad8984cf/packages/near-sdk-js/src/promise.ts#L134)

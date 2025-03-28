@@ -22,7 +22,7 @@
 
 #### Defined in
 
-[packages/near-sdk-js/src/utils.ts:7](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/utils.ts#L7)
+[packages/near-sdk-js/src/utils.ts:7](https://github.com/near/near-sdk-js/blob/8431739ff5e4ec78361e18c49c68fee0ad8984cf/packages/near-sdk-js/src/utils.ts#L7)
 
 ***
 
@@ -40,7 +40,7 @@
 
 #### Defined in
 
-[packages/near-sdk-js/src/utils.ts:5](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/utils.ts#L5)
+[packages/near-sdk-js/src/utils.ts:5](https://github.com/near/near-sdk-js/blob/8431739ff5e4ec78361e18c49c68fee0ad8984cf/packages/near-sdk-js/src/utils.ts#L5)
 
 ***
 
@@ -58,7 +58,7 @@
 
 #### Defined in
 
-[packages/near-sdk-js/src/utils.ts:6](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/utils.ts#L6)
+[packages/near-sdk-js/src/utils.ts:6](https://github.com/near/near-sdk-js/blob/8431739ff5e4ec78361e18c49c68fee0ad8984cf/packages/near-sdk-js/src/utils.ts#L6)
 
 ***
 
@@ -76,4 +76,4 @@
 
 #### Defined in
 
-[packages/near-sdk-js/src/utils.ts:8](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/utils.ts#L8)
+[packages/near-sdk-js/src/utils.ts:8](https://github.com/near/near-sdk-js/blob/8431739ff5e4ec78361e18c49c68fee0ad8984cf/packages/near-sdk-js/src/utils.ts#L8)

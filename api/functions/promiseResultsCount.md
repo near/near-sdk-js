@@ -16,4 +16,4 @@ The number of promise results available.
 
 ## Defined in
 
-[packages/near-sdk-js/src/api.ts:813](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/api.ts#L813)
+[packages/near-sdk-js/src/api.ts:813](https://github.com/near/near-sdk-js/blob/8431739ff5e4ec78361e18c49c68fee0ad8984cf/packages/near-sdk-js/src/api.ts#L813)

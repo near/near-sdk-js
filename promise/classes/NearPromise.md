@@ -30,7 +30,7 @@ Whether the promise should return.
 
 #### Defined in
 
-[packages/near-sdk-js/src/promise.ts:372](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/promise.ts#L372)
+[packages/near-sdk-js/src/promise.ts:372](https://github.com/near/near-sdk-js/blob/8431739ff5e4ec78361e18c49c68fee0ad8984cf/packages/near-sdk-js/src/promise.ts#L372)
 
 ## Methods
 
@@ -65,7 +65,7 @@ The names of functions to authorize.
 
 #### Defined in
 
-[packages/near-sdk-js/src/promise.ts:535](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/promise.ts#L535)
+[packages/near-sdk-js/src/promise.ts:535](https://github.com/near/near-sdk-js/blob/8431739ff5e4ec78361e18c49c68fee0ad8984cf/packages/near-sdk-js/src/promise.ts#L535)
 
 ***
 
@@ -104,7 +104,7 @@ The nonce to use.
 
 #### Defined in
 
-[packages/near-sdk-js/src/promise.ts:560](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/promise.ts#L560)
+[packages/near-sdk-js/src/promise.ts:560](https://github.com/near/near-sdk-js/blob/8431739ff5e4ec78361e18c49c68fee0ad8984cf/packages/near-sdk-js/src/promise.ts#L560)
 
 ***
 
@@ -127,7 +127,7 @@ The public key to add as a full access key.
 
 #### Defined in
 
-[packages/near-sdk-js/src/promise.ts:511](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/promise.ts#L511)
+[packages/near-sdk-js/src/promise.ts:511](https://github.com/near/near-sdk-js/blob/8431739ff5e4ec78361e18c49c68fee0ad8984cf/packages/near-sdk-js/src/promise.ts#L511)
 
 ***
 
@@ -154,7 +154,7 @@ The nonce to use.
 
 #### Defined in
 
-[packages/near-sdk-js/src/promise.ts:522](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/promise.ts#L522)
+[packages/near-sdk-js/src/promise.ts:522](https://github.com/near/near-sdk-js/blob/8431739ff5e4ec78361e18c49c68fee0ad8984cf/packages/near-sdk-js/src/promise.ts#L522)
 
 ***
 
@@ -176,7 +176,7 @@ The promise to join with the current promise.
 
 #### Defined in
 
-[packages/near-sdk-js/src/promise.ts:595](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/promise.ts#L595)
+[packages/near-sdk-js/src/promise.ts:595](https://github.com/near/near-sdk-js/blob/8431739ff5e4ec78361e18c49c68fee0ad8984cf/packages/near-sdk-js/src/promise.ts#L595)
 
 ***
 
@@ -192,7 +192,7 @@ Sets the shouldReturn field to true.
 
 #### Defined in
 
-[packages/near-sdk-js/src/promise.ts:624](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/promise.ts#L624)
+[packages/near-sdk-js/src/promise.ts:624](https://github.com/near/near-sdk-js/blob/8431739ff5e4ec78361e18c49c68fee0ad8984cf/packages/near-sdk-js/src/promise.ts#L624)
 
 ***
 
@@ -214,7 +214,7 @@ method.
 
 #### Defined in
 
-[packages/near-sdk-js/src/promise.ts:654](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/promise.ts#L654)
+[packages/near-sdk-js/src/promise.ts:654](https://github.com/near/near-sdk-js/blob/8431739ff5e4ec78361e18c49c68fee0ad8984cf/packages/near-sdk-js/src/promise.ts#L654)
 
 ***
 
@@ -230,7 +230,7 @@ Recursively goes through the current promise to get the promise index.
 
 #### Defined in
 
-[packages/near-sdk-js/src/promise.ts:632](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/promise.ts#L632)
+[packages/near-sdk-js/src/promise.ts:632](https://github.com/near/near-sdk-js/blob/8431739ff5e4ec78361e18c49c68fee0ad8984cf/packages/near-sdk-js/src/promise.ts#L632)
 
 ***
 
@@ -246,7 +246,7 @@ Creates a create account promise action and adds it to the current promise.
 
 #### Defined in
 
-[packages/near-sdk-js/src/promise.ts:397](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/promise.ts#L397)
+[packages/near-sdk-js/src/promise.ts:397](https://github.com/near/near-sdk-js/blob/8431739ff5e4ec78361e18c49c68fee0ad8984cf/packages/near-sdk-js/src/promise.ts#L397)
 
 ***
 
@@ -268,7 +268,7 @@ The beneficiary of the account deletion - the account to receive all of the rema
 
 #### Defined in
 
-[packages/near-sdk-js/src/promise.ts:586](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/promise.ts#L586)
+[packages/near-sdk-js/src/promise.ts:586](https://github.com/near/near-sdk-js/blob/8431739ff5e4ec78361e18c49c68fee0ad8984cf/packages/near-sdk-js/src/promise.ts#L586)
 
 ***
 
@@ -290,7 +290,7 @@ The public key to delete from the account.
 
 #### Defined in
 
-[packages/near-sdk-js/src/promise.ts:577](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/promise.ts#L577)
+[packages/near-sdk-js/src/promise.ts:577](https://github.com/near/near-sdk-js/blob/8431739ff5e4ec78361e18c49c68fee0ad8984cf/packages/near-sdk-js/src/promise.ts#L577)
 
 ***
 
@@ -312,7 +312,7 @@ The code of the contract to be deployed.
 
 #### Defined in
 
-[packages/near-sdk-js/src/promise.ts:406](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/promise.ts#L406)
+[packages/near-sdk-js/src/promise.ts:406](https://github.com/near/near-sdk-js/blob/8431739ff5e4ec78361e18c49c68fee0ad8984cf/packages/near-sdk-js/src/promise.ts#L406)
 
 ***
 
@@ -346,7 +346,7 @@ The amount of Gas to attach to the call.
 
 #### Defined in
 
-[packages/near-sdk-js/src/promise.ts:418](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/promise.ts#L418)
+[packages/near-sdk-js/src/promise.ts:418](https://github.com/near/near-sdk-js/blob/8431739ff5e4ec78361e18c49c68fee0ad8984cf/packages/near-sdk-js/src/promise.ts#L418)
 
 ***
 
@@ -380,7 +380,7 @@ The amount of Gas to attach to the call.
 
 #### Defined in
 
-[packages/near-sdk-js/src/promise.ts:435](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/promise.ts#L435)
+[packages/near-sdk-js/src/promise.ts:435](https://github.com/near/near-sdk-js/blob/8431739ff5e4ec78361e18c49c68fee0ad8984cf/packages/near-sdk-js/src/promise.ts#L435)
 
 ***
 
@@ -418,7 +418,7 @@ The weight of unused Gas to use.
 
 #### Defined in
 
-[packages/near-sdk-js/src/promise.ts:453](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/promise.ts#L453)
+[packages/near-sdk-js/src/promise.ts:453](https://github.com/near/near-sdk-js/blob/8431739ff5e4ec78361e18c49c68fee0ad8984cf/packages/near-sdk-js/src/promise.ts#L453)
 
 ***
 
@@ -456,7 +456,7 @@ The weight of unused Gas to use.
 
 #### Defined in
 
-[packages/near-sdk-js/src/promise.ts:474](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/promise.ts#L474)
+[packages/near-sdk-js/src/promise.ts:474](https://github.com/near/near-sdk-js/blob/8431739ff5e4ec78361e18c49c68fee0ad8984cf/packages/near-sdk-js/src/promise.ts#L474)
 
 ***
 
@@ -472,7 +472,7 @@ Called by NearBindgen, when return object is a NearPromise instance.
 
 #### Defined in
 
-[packages/near-sdk-js/src/promise.ts:645](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/promise.ts#L645)
+[packages/near-sdk-js/src/promise.ts:645](https://github.com/near/near-sdk-js/blob/8431739ff5e4ec78361e18c49c68fee0ad8984cf/packages/near-sdk-js/src/promise.ts#L645)
 
 ***
 
@@ -498,7 +498,7 @@ The public key to use for staking.
 
 #### Defined in
 
-[packages/near-sdk-js/src/promise.ts:501](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/promise.ts#L501)
+[packages/near-sdk-js/src/promise.ts:501](https://github.com/near/near-sdk-js/blob/8431739ff5e4ec78361e18c49c68fee0ad8984cf/packages/near-sdk-js/src/promise.ts#L501)
 
 ***
 
@@ -520,7 +520,7 @@ The promise to be executed as the promise.
 
 #### Defined in
 
-[packages/near-sdk-js/src/promise.ts:605](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/promise.ts#L605)
+[packages/near-sdk-js/src/promise.ts:605](https://github.com/near/near-sdk-js/blob/8431739ff5e4ec78361e18c49c68fee0ad8984cf/packages/near-sdk-js/src/promise.ts#L605)
 
 ***
 
@@ -542,7 +542,7 @@ The amount of NEAR to transfer.
 
 #### Defined in
 
-[packages/near-sdk-js/src/promise.ts:491](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/promise.ts#L491)
+[packages/near-sdk-js/src/promise.ts:491](https://github.com/near/near-sdk-js/blob/8431739ff5e4ec78361e18c49c68fee0ad8984cf/packages/near-sdk-js/src/promise.ts#L491)
 
 ***
 
@@ -564,4 +564,4 @@ The account ID on which to call the promise.
 
 #### Defined in
 
-[packages/near-sdk-js/src/promise.ts:379](https://github.com/near/near-sdk-js/blob/dad7401ff5db9410681d25d6ee1129ed52c88da9/packages/near-sdk-js/src/promise.ts#L379)
+[packages/near-sdk-js/src/promise.ts:379](https://github.com/near/near-sdk-js/blob/8431739ff5e4ec78361e18c49c68fee0ad8984cf/packages/near-sdk-js/src/promise.ts#L379)
