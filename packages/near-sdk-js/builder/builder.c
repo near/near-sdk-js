@@ -37,16 +37,20 @@ static JSContext *JS_NewCustomContext(JSRuntime *rt)
     fun_obj = JS_GetProperty(ctx, mod_obj, JS_NewAtom(ctx, #name));\
     result = JS_Call(ctx, fun_obj, mod_obj, 0, NULL);\
     if (JS_IsException(result)) {\
-      error = JS_GetException(ctx);\
-      error_message = JS_GetPropertyStr(ctx, error, "message");\
-      error_stack = JS_GetPropertyStr(ctx, error, "stack");\
-      error_message_c = JS_ToCStringLen(ctx, &msg_len, error_message);\
-      error_stack_c = JS_ToCStringLen(ctx, &stack_len, error_stack);\
-      error_c = malloc(msg_len+1+stack_len);\
-      strncpy(error_c, error_message_c, msg_len);\
-      error_c[msg_len] = '\n';\
-      strncpy(error_c+msg_len+1, error_stack_c, stack_len);\
-      panic_utf8(msg_len+1+stack_len, (uint64_t)error_c);\
+        error = JS_GetException(ctx);\
+        error_message_c = JS_ToCString(ctx, JS_GetPropertyStr(ctx, error, "message"));\
+        error_stack_c = JS_ToCString(ctx, JS_GetPropertyStr(ctx, error, "stack"));\
+        if (error_message_c && error_stack_c) {\
+          size_t total_len = strlen(error_message_c) + 1 + strlen(error_stack_c);\
+          error_c = malloc(total_len);\
+          if (error_c) {\
+            snprintf(error_c, total_len + 1, "%s\n%s", error_message_c, error_stack_c);\
+            panic_utf8(total_len, (uint64_t)error_c);\
+            free(error_c);\
+          }\
+        }\
+        JS_FreeCString(ctx, error_message_c);\
+        JS_FreeCString(ctx, error_stack_c);\
     }\
     js_std_loop(ctx);\
   }
@@ -95,7 +99,7 @@ extern void panic_utf8(uint64_t len, uint64_t ptr);
 extern void log_utf8(uint64_t len, uint64_t ptr);
 extern void log_utf16(uint64_t len, uint64_t ptr);
 // Name confliction with WASI. Can be re-exported with a different name on NEAR side with a protocol upgrade
-// Or, this is actually not a primitive, can be implement with log and panic host functions in C side or JS side. 
+// Or, this is actually not a primitive, can be implement with log and panic host functions in C side or JS side.
 // extern void abort(uint32_t msg_ptr, uint32_t filename_ptr, uint32_t u32, uint32_t col);
 // ################
 // # Promises API #
@@ -202,7 +206,7 @@ static JSValue near_write_register(JSContext *ctx, JSValueConst this_val, int ar
   }
   data_ptr = JS_Uint8Array_to_C(ctx, argv[1], &data_len);
   if (data_ptr == NULL) {
-    return JS_ThrowTypeError(ctx, "Expect Uint8Array for data"); 
+    return JS_ThrowTypeError(ctx, "Expect Uint8Array for data");
   }
 
   write_register(register_id, data_len, (uint64_t)data_ptr);
@@ -310,7 +314,7 @@ static JSValue u128_to_quickjs(JSContext *ctx, uint64_t* ptr) {
   bf_set_ui(&b, ptr[0]);
   bf_add(bn, bn, &b, BF_PREC_INF, BF_RNDZ);
   bf_delete(&b);
-  
+
   return value;
 }
 
@@ -332,33 +336,29 @@ static int quickjs_bigint_to_u128(JSContext *ctx, JSValueConst val, uint64_t* pt
   bf_set_ui(&one, 1);
   bf_add(&b, &b, &one, BF_PREC_INF, BF_RNDZ);
   bf_divrem(&q, &r, a, &b, BF_PREC_INF, BF_RNDZ, BF_RNDZ);
-  
+
   bf_get_uint64(ptr, &r);
   bf_get_uint64(ptr+1, &q);
   return 0;
 }
 
-static int quickjs_int_to_u128(JSContext *ctx, JSValueConst val, uint64_t* ptr) {
-  if (JS_ToUint64Ext(ctx, ptr, val) < 0) {
-    return 1;
-  }
-  ptr[1] = 0;
-  return 0;
-}
-
 static int quickjs_to_u128(JSContext *ctx, JSValueConst val, uint64_t* ptr) {
-  if (JS_IsBigInt(ctx, val))
+  if (JS_IsBigInt(ctx, val)) {
     return quickjs_bigint_to_u128(ctx, val, ptr);
-  else {
-    return quickjs_int_to_u128(ctx, val, ptr);
+  } else {
+    if (JS_ToUint64Ext(ctx, ptr, val) < 0) {
+      return 1;
+    }
+    ptr[1] = 0;
+    return 0;
   }
 }
 
 static JSValue near_account_balance(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
-{  
+{
   uint64_t ptr[2];
 
-  account_balance((uint64_t)ptr); 
+  account_balance((uint64_t)ptr);
   return u128_to_quickjs(ctx, ptr);
 }
 
@@ -413,12 +413,12 @@ static JSValue near_sha256(JSContext *ctx, JSValueConst this_val, int argc, JSVa
 
   data_ptr = JS_Uint8Array_to_C(ctx, argv[0], &data_len);
   if (data_ptr == NULL) {
-    return JS_ThrowTypeError(ctx, "Expect Uint8Array for data"); 
+    return JS_ThrowTypeError(ctx, "Expect Uint8Array for data");
   }
   if (JS_ToUint64Ext(ctx, &register_id, argv[1]) < 0) {
     return JS_ThrowTypeError(ctx, "Expect Uint64 for register_id");
   }
-  
+
   sha256(data_len, (uint64_t)data_ptr, register_id);
   return JS_UNDEFINED;
 }
@@ -431,11 +431,11 @@ static JSValue near_keccak256(JSContext *ctx, JSValueConst this_val, int argc, J
 
   data_ptr = JS_Uint8Array_to_C(ctx, argv[0], &data_len);
   if (data_ptr == NULL) {
-    return JS_ThrowTypeError(ctx, "Expect Uint8Array for data"); 
+    return JS_ThrowTypeError(ctx, "Expect Uint8Array for data");
   }
   if (JS_ToUint64Ext(ctx, &register_id, argv[1]) < 0) {
     return JS_ThrowTypeError(ctx, "Expect Uint64 for register_id");
-  }  
+  }
   keccak256(data_len, (uint64_t)data_ptr, register_id);
   return JS_UNDEFINED;
 }
@@ -448,12 +448,12 @@ static JSValue near_keccak512(JSContext *ctx, JSValueConst this_val, int argc, J
 
   data_ptr = JS_Uint8Array_to_C(ctx, argv[0], &data_len);
   if (data_ptr == NULL) {
-    return JS_ThrowTypeError(ctx, "Expect Uint8Array for data"); 
+    return JS_ThrowTypeError(ctx, "Expect Uint8Array for data");
   }
   if (JS_ToUint64Ext(ctx, &register_id, argv[1]) < 0) {
     return JS_ThrowTypeError(ctx, "Expect Uint64 for register_id");
   }
-  
+
   keccak512(data_len, (uint64_t)data_ptr, register_id);
   return JS_UNDEFINED;
 }
@@ -466,12 +466,12 @@ static JSValue near_ripemd160(JSContext *ctx, JSValueConst this_val, int argc, J
 
   data_ptr = JS_Uint8Array_to_C(ctx, argv[0], &data_len);
   if (data_ptr == NULL) {
-    return JS_ThrowTypeError(ctx, "Expect Uint8Array for data"); 
+    return JS_ThrowTypeError(ctx, "Expect Uint8Array for data");
   }
   if (JS_ToUint64Ext(ctx, &register_id, argv[1]) < 0) {
     return JS_ThrowTypeError(ctx, "Expect Uint64 for register_id");
   }
-  
+
   ripemd160(data_len, (uint64_t)data_ptr, register_id);
   return JS_UNDEFINED;
 }
@@ -484,11 +484,11 @@ static JSValue near_ecrecover(JSContext *ctx, JSValueConst this_val, int argc, J
 
   hash_ptr = JS_Uint8Array_to_C(ctx, argv[0], &hash_len);
   if (hash_ptr == NULL) {
-    return JS_ThrowTypeError(ctx, "Expect Uint8Array for hash"); 
+    return JS_ThrowTypeError(ctx, "Expect Uint8Array for hash");
   }
   sig_ptr = JS_Uint8Array_to_C(ctx, argv[1], &sign_len);
   if (sig_ptr == NULL) {
-    return JS_ThrowTypeError(ctx, "Expect Uint8Array for sig"); 
+    return JS_ThrowTypeError(ctx, "Expect Uint8Array for sig");
   }
   if (JS_ToUint64Ext(ctx, &malleability_flag, argv[2]) < 0) {
     return JS_ThrowTypeError(ctx, "Expect Uint64 for malleability_flag");
@@ -499,19 +499,19 @@ static JSValue near_ecrecover(JSContext *ctx, JSValueConst this_val, int argc, J
   if (JS_ToUint64Ext(ctx, &register_id, argv[4]) < 0) {
     return JS_ThrowTypeError(ctx, "Expect Uint64 for register_id");
   }
- 
+
   result = ecrecover(hash_len, (uint64_t)hash_ptr, sign_len, (uint64_t)sig_ptr, malleability_flag, v, register_id);
   return JS_NewBigUint64(ctx, result);
 }
 
-static JSValue near_value_return(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) 
+static JSValue near_value_return(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
 {
   uint8_t *value_ptr;
   size_t value_len;
 
   value_ptr = JS_Uint8Array_to_C(ctx, argv[0], &value_len);
   if (value_ptr == NULL) {
-    return JS_ThrowTypeError(ctx, "Expect Uint8Array for value"); 
+    return JS_ThrowTypeError(ctx, "Expect Uint8Array for value");
   }
   value_return(value_len, (uint64_t)(value_ptr));
   return JS_UNDEFINED;
@@ -538,9 +538,9 @@ static JSValue near_panic_utf8(JSContext *ctx, JSValueConst this_val, int argc, 
 
   data_ptr = JS_Uint8Array_to_C(ctx, argv[0], &data_len);
   if (data_ptr == NULL) {
-    return JS_ThrowTypeError(ctx, "Expect Uint8Array for message"); 
+    return JS_ThrowTypeError(ctx, "Expect Uint8Array for message");
   }
-  
+
   panic_utf8(data_len, (uint64_t)data_ptr);
   return JS_UNDEFINED;
 }
@@ -551,7 +551,7 @@ static JSValue near_log(JSContext *ctx, JSValueConst this_val, int argc, JSValue
   size_t data_len;
 
   data_ptr = JS_ToCStringLen(ctx, &data_len, argv[0]);
-  
+
   log_utf8(data_len, (uint64_t)data_ptr);
   return JS_UNDEFINED;
 }
@@ -563,7 +563,7 @@ static JSValue near_log_utf8(JSContext *ctx, JSValueConst this_val, int argc, JS
 
   data_ptr = JS_Uint8Array_to_C(ctx, argv[0], &data_len);
   if (data_ptr == NULL) {
-    return JS_ThrowTypeError(ctx, "Expect Uint8Array for message"); 
+    return JS_ThrowTypeError(ctx, "Expect Uint8Array for message");
   }
 
   log_utf8(data_len, (uint64_t)data_ptr);
@@ -577,7 +577,7 @@ static JSValue near_log_utf16(JSContext *ctx, JSValueConst this_val, int argc, J
 
   data_ptr = JS_Uint8Array_to_C(ctx, argv[0], &data_len);
   if (data_ptr == NULL) {
-    return JS_ThrowTypeError(ctx, "Expect Uint8Array for message"); 
+    return JS_ThrowTypeError(ctx, "Expect Uint8Array for message");
   }
 
   log_utf16(data_len, (uint64_t)data_ptr);
@@ -596,7 +596,7 @@ static JSValue near_promise_create(JSContext *ctx, JSValueConst this_val, int ar
   method_name_ptr = JS_ToCStringLen(ctx, &method_name_len, argv[1]);
   arguments_ptr = JS_Uint8Array_to_C(ctx, argv[2], &arguments_len);
   if (arguments_ptr == NULL) {
-    return JS_ThrowTypeError(ctx, "Expect Uint8Array for arguments"); 
+    return JS_ThrowTypeError(ctx, "Expect Uint8Array for arguments");
   }
   if (quickjs_to_u128(ctx, argv[3], amount_ptr) != 0) {
     return JS_ThrowTypeError(ctx, "Expect Uint128 for amount");
@@ -606,39 +606,51 @@ static JSValue near_promise_create(JSContext *ctx, JSValueConst this_val, int ar
   }
 
   ret = promise_create(account_id_len, (uint64_t)account_id_ptr, method_name_len, (uint64_t)method_name_ptr, arguments_len, (uint64_t)arguments_ptr, (uint64_t)amount_ptr, gas);
-  
+
   return JS_NewBigUint64(ctx, ret);
 }
 
-static JSValue near_promise_then(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
-{
-  uint64_t promise_index;
-  const char *account_id_ptr, *method_name_ptr;
-  uint8_t *arguments_ptr;
-  size_t account_id_len, method_name_len, arguments_len;
-  uint64_t amount_ptr[2]; // amount is u128
-  uint64_t gas, ret;
+static JSValue near_promise_then(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv) {
+    uint64_t promise_index, gas, ret, amount_ptr[2]; // amount is u128
+    size_t account_id_len, method_name_len, arguments_len;
+    const char *account_id_ptr;
+    const char *method_name_ptr;
+    uint8_t *arguments_ptr;
 
-  if (JS_ToUint64Ext(ctx, &promise_index, argv[0]) < 0) {
-    return JS_ThrowTypeError(ctx, "Expect Uint64 for promise_index");
-  }
-  account_id_ptr = JS_ToCStringLen(ctx, &account_id_len, argv[1]);
-  method_name_ptr = JS_ToCStringLen(ctx, &method_name_len, argv[2]);
-  arguments_ptr = JS_Uint8Array_to_C(ctx, argv[3], &arguments_len);
-  if (arguments_ptr == NULL) {
-    return JS_ThrowTypeError(ctx, "Expect Uint8Array for arguments"); 
-  }  
-  if (quickjs_to_u128(ctx, argv[4], amount_ptr) != 0) {
-    return JS_ThrowTypeError(ctx, "Expect Uint128 for amount");
-  }
-  if (JS_ToUint64Ext(ctx, &gas, argv[5]) < 0) {
-    return JS_ThrowTypeError(ctx, "Expect Uint64 for gas");
-  }
+    if (JS_ToUint64Ext(ctx, &promise_index, argv[0]) < 0) {
+        return JS_ThrowTypeError(ctx, "Expect Uint64 for promise_index");
+    }
 
-  ret = promise_then(promise_index, account_id_len, (uint64_t)account_id_ptr, method_name_len, (uint64_t)method_name_ptr, arguments_len, (uint64_t)arguments_ptr, (uint64_t)amount_ptr, gas);
-  
-  return JS_NewBigUint64(ctx, ret);
+    account_id_ptr = JS_ToCStringLen(ctx, &account_id_len, argv[1]);
+    if (!account_id_ptr) {
+        return JS_ThrowTypeError(ctx, "Expect string for account_id");
+    }
+
+    method_name_ptr = JS_ToCStringLen(ctx, &method_name_len, argv[2]);
+    if (!method_name_ptr) {
+        return JS_ThrowTypeError(ctx, "Expect string for method_name");
+    }
+
+    arguments_ptr = JS_Uint8Array_to_C(ctx, argv[3], &arguments_len);
+    if (!arguments_ptr) {
+        return JS_ThrowTypeError(ctx, "Expect Uint8Array for arguments");
+    }
+
+    if (quickjs_to_u128(ctx, argv[4], amount_ptr) != 0) {
+        return JS_ThrowTypeError(ctx, "Expect Uint128 for amount");
+    }
+
+    if (JS_ToUint64Ext(ctx, &gas, argv[5]) < 0) {
+        return JS_ThrowTypeError(ctx, "Expect Uint64 for gas");
+    }
+
+    ret = promise_then(promise_index, account_id_len, (uint64_t)account_id_ptr, method_name_len,
+                       (uint64_t)method_name_ptr, arguments_len, (uint64_t)arguments_ptr,
+                       (uint64_t)amount_ptr, gas);
+
+    return JS_NewBigUint64(ctx, ret);
 }
+
 
 static JSValue near_promise_and(JSContext *ctx, JSValueConst this_val, int argc, JSValueConst *argv)
 {
@@ -701,7 +713,7 @@ static JSValue near_promise_batch_action_deploy_contract(JSContext *ctx, JSValue
   }
   code_ptr = JS_Uint8Array_to_C(ctx, argv[1], &code_len);
   if (code_ptr == NULL) {
-    return JS_ThrowTypeError(ctx, "Expect Uint8Array for code"); 
+    return JS_ThrowTypeError(ctx, "Expect Uint8Array for code");
   }
   promise_batch_action_deploy_contract(promise_index, code_len, (uint64_t)code_ptr);
   return JS_UNDEFINED;
@@ -722,7 +734,7 @@ static JSValue near_promise_batch_action_function_call(JSContext *ctx, JSValueCo
   method_name_ptr = JS_ToCStringLen(ctx, &method_name_len, argv[1]);
   arguments_ptr = JS_Uint8Array_to_C(ctx, argv[2], &arguments_len);
   if (arguments_ptr == NULL) {
-    return JS_ThrowTypeError(ctx, "Expect Uint8Array for arguments"); 
+    return JS_ThrowTypeError(ctx, "Expect Uint8Array for arguments");
   }
   if (quickjs_to_u128(ctx, argv[3], amount_ptr) != 0) {
     return JS_ThrowTypeError(ctx, "Expect Uint128 for amount");
@@ -764,7 +776,7 @@ static JSValue near_promise_batch_action_stake(JSContext *ctx, JSValueConst this
   }
   public_key_ptr = JS_Uint8Array_to_C(ctx, argv[2], &public_key_len);
   if (public_key_ptr == NULL) {
-    return JS_ThrowTypeError(ctx, "Expect Uint8Array for public key"); 
+    return JS_ThrowTypeError(ctx, "Expect Uint8Array for public key");
   }
 
   promise_batch_action_stake(promise_index, (uint64_t)amount_ptr, public_key_len, (uint64_t)public_key_ptr);
@@ -783,7 +795,7 @@ static JSValue near_promise_batch_action_add_key_with_full_access(JSContext *ctx
   }
   public_key_ptr = JS_Uint8Array_to_C(ctx, argv[1], &public_key_len);
   if (public_key_ptr == NULL) {
-    return JS_ThrowTypeError(ctx, "Expect Uint8Array for public key"); 
+    return JS_ThrowTypeError(ctx, "Expect Uint8Array for public key");
   }
   if (JS_ToUint64Ext(ctx, &nonce, argv[2]) < 0) {
     return JS_ThrowTypeError(ctx, "Expect Uint64 for nonce");
@@ -805,7 +817,7 @@ static JSValue near_promise_batch_action_add_key_with_function_call(JSContext *c
   }
   public_key_ptr = JS_Uint8Array_to_C(ctx, argv[1], &public_key_len);
   if (public_key_ptr == NULL) {
-    return JS_ThrowTypeError(ctx, "Expect Uint8Array for public key"); 
+    return JS_ThrowTypeError(ctx, "Expect Uint8Array for public key");
   }
   if (JS_ToUint64Ext(ctx, &nonce, argv[2]) < 0) {
     return JS_ThrowTypeError(ctx, "Expect Uint64 for nonce");
@@ -831,7 +843,7 @@ static JSValue near_promise_batch_action_delete_key(JSContext *ctx, JSValueConst
   }
   public_key_ptr = JS_Uint8Array_to_C(ctx, argv[1], &public_key_len);
   if (public_key_ptr == NULL) {
-    return JS_ThrowTypeError(ctx, "Expect Uint8Array for public key"); 
+    return JS_ThrowTypeError(ctx, "Expect Uint8Array for public key");
   }
   promise_batch_action_delete_key(promise_index, public_key_len, (uint64_t)public_key_ptr);
   return JS_UNDEFINED;
@@ -909,7 +921,7 @@ static JSValue near_promise_return(JSContext *ctx, JSValueConst this_val, int ar
     return JS_ThrowTypeError(ctx, "Expect Uint64 for promise_idx");
   }
   promise_return(promise_idx);
-  
+
   return JS_UNDEFINED;
 }
 
@@ -921,11 +933,11 @@ static JSValue near_storage_write(JSContext *ctx, JSValueConst this_val, int arg
 
   key_ptr = JS_Uint8Array_to_C(ctx, argv[0], &key_len);
   if (key_ptr == NULL) {
-    return JS_ThrowTypeError(ctx, "Expect Uint8Array for key"); 
+    return JS_ThrowTypeError(ctx, "Expect Uint8Array for key");
   }
   value_ptr = JS_Uint8Array_to_C(ctx, argv[1], &value_len);
   if (value_ptr == NULL) {
-    return JS_ThrowTypeError(ctx, "Expect Uint8Array for value"); 
+    return JS_ThrowTypeError(ctx, "Expect Uint8Array for value");
   }
   if (JS_ToUint64Ext(ctx, &register_id, argv[2]) < 0) {
     return JS_ThrowTypeError(ctx, "Expect Uint64 for register_id");
@@ -943,7 +955,7 @@ static JSValue near_storage_read(JSContext *ctx, JSValueConst this_val, int argc
 
   key_ptr = JS_Uint8Array_to_C(ctx, argv[0], &key_len);
   if (key_ptr == NULL) {
-    return JS_ThrowTypeError(ctx, "Expect Uint8Array for key"); 
+    return JS_ThrowTypeError(ctx, "Expect Uint8Array for key");
   }
   if (JS_ToUint64Ext(ctx, &register_id, argv[1]) < 0) {
     return JS_ThrowTypeError(ctx, "Expect Uint64 for register_id");
@@ -961,7 +973,7 @@ static JSValue near_storage_remove(JSContext *ctx, JSValueConst this_val, int ar
 
   key_ptr = JS_Uint8Array_to_C(ctx, argv[0], &key_len);
   if (key_ptr == NULL) {
-    return JS_ThrowTypeError(ctx, "Expect Uint8Array for key"); 
+    return JS_ThrowTypeError(ctx, "Expect Uint8Array for key");
   }
   if (JS_ToUint64Ext(ctx, &register_id, argv[1]) < 0) {
     return JS_ThrowTypeError(ctx, "Expect Uint64 for register_id");
@@ -978,7 +990,7 @@ static JSValue near_storage_has_key(JSContext *ctx, JSValueConst this_val, int a
 
   key_ptr = JS_Uint8Array_to_C(ctx, argv[0], &key_len);
   if (key_ptr == NULL) {
-    return JS_ThrowTypeError(ctx, "Expect Uint8Array for key"); 
+    return JS_ThrowTypeError(ctx, "Expect Uint8Array for key");
   }
   ret = storage_has_key(key_len, (uint64_t)key_ptr);
   return JS_NewBigUint64(ctx, ret);
@@ -1050,7 +1062,7 @@ static JSValue near_uint8array_to_utf8_string(JSContext *ctx, JSValueConst this_
   if (data_ptr == NULL) {
     return JS_ThrowTypeError(ctx, "Expect Uint8Array");
   }
-  
+
   return JS_NewStringLen(ctx, (const char *)data_ptr, data_len);
 }
 
@@ -1062,7 +1074,7 @@ static JSValue near_alt_bn128_g1_multiexp(JSContext *ctx, JSValueConst this_val,
 
   data_ptr = JS_Uint8Array_to_C(ctx, argv[0], &data_len);
   if (data_ptr == NULL) {
-    return JS_ThrowTypeError(ctx, "Expect Uint8Array for data"); 
+    return JS_ThrowTypeError(ctx, "Expect Uint8Array for data");
   }
   if (JS_ToUint64Ext(ctx, &register_id, argv[1]) < 0) {
     return JS_ThrowTypeError(ctx, "Expect Uint64 for register_id");
@@ -1080,7 +1092,7 @@ static JSValue near_alt_bn128_g1_sum(JSContext *ctx, JSValueConst this_val, int 
 
   data_ptr = JS_Uint8Array_to_C(ctx, argv[0], &data_len);
   if (data_ptr == NULL) {
-    return JS_ThrowTypeError(ctx, "Expect Uint8Array for data"); 
+    return JS_ThrowTypeError(ctx, "Expect Uint8Array for data");
   }
   if (JS_ToUint64Ext(ctx, &register_id, argv[1]) < 0) {
     return JS_ThrowTypeError(ctx, "Expect Uint64 for register_id");
@@ -1098,8 +1110,8 @@ static JSValue near_alt_bn128_pairing_check(JSContext *ctx, JSValueConst this_va
 
   data_ptr = JS_Uint8Array_to_C(ctx, argv[0], &data_len);
   if (data_ptr == NULL) {
-    return JS_ThrowTypeError(ctx, "Expect Uint8Array for data"); 
-  }  
+    return JS_ThrowTypeError(ctx, "Expect Uint8Array for data");
+  }
   ret = alt_bn128_pairing_check(data_len, (uint64_t)data_ptr);
   return JS_NewBigUint64(ctx, ret);
 }

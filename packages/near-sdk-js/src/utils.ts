@@ -1,5 +1,4 @@
 import { GetOptions } from "./types/collections";
-import { cloneDeep } from "lodash-es";
 
 export interface Env {
   uint8array_to_latin1_string(a: Uint8Array): string;
@@ -266,7 +265,8 @@ export function decodeObj2class(class_instance, obj) {
       class_instance[key] = obj[key];
     }
   }
-  const instance_tmp = cloneDeep(class_instance);
+  const instance_tmp = deepCopy(class_instance);
+
   for (key in obj) {
     if (
       typeof class_instance[key] == "object" &&
@@ -359,4 +359,58 @@ export function decode(a: Uint8Array): string {
  */
 export interface IntoStorageKey {
   into_storage_key(): string;
+}
+
+export function deepCopy<T>(obj: T): T {
+  // Handle primitives and null
+  if (obj === null || typeof obj !== "object") {
+    return obj;
+  }
+
+  // Handle Date objects
+  if (obj instanceof Date) {
+    return new Date(obj.getTime()) as unknown as T;
+  }
+
+  // Handle RegExp objects
+  if (obj instanceof RegExp) {
+    return new RegExp(obj.source, obj.flags) as unknown as T;
+  }
+
+  // Handle Map objects
+  if (obj instanceof Map) {
+    const mapCopy = new Map();
+    obj.forEach((value, key) => {
+      mapCopy.set(deepCopy(key), deepCopy(value));
+    });
+    return mapCopy as unknown as T;
+  }
+
+  // Handle Set objects
+  if (obj instanceof Set) {
+    const setCopy = new Set();
+    obj.forEach((value) => {
+      setCopy.add(deepCopy(value));
+    });
+    return setCopy as unknown as T;
+  }
+
+  // Handle Arrays
+  if (Array.isArray(obj)) {
+    return obj.map((item) => deepCopy(item)) as unknown as T;
+  }
+
+  // Handle Objects
+  const copy = Object.create(Object.getPrototypeOf(obj));
+  Object.getOwnPropertyNames(obj).forEach((key) => {
+    copy[key] = deepCopy(obj[key]);
+  });
+
+  // Handle symbol properties
+  const symbols = Object.getOwnPropertySymbols(obj);
+  symbols.forEach((sym) => {
+    copy[sym] = deepCopy(obj[sym]);
+  });
+
+  return copy as T;
 }

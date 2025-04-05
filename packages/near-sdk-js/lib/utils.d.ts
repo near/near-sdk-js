@@ -92,3 +92,4 @@ export declare function decode(a: Uint8Array): string;
 export interface IntoStorageKey {
     into_storage_key(): string;
 }
+export declare function deepCopy<T>(obj: T): T;
