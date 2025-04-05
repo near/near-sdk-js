@@ -1,3 +1,7 @@
+/**
+ * Blockchain-specific methods available to the smart contract.
+ * @module near
+ * */
 import {
   assert,
   NearAmount,
@@ -154,8 +158,19 @@ declare const env: Env;
 
 /**
  * Logs parameters in the NEAR WASM virtual machine.
+ * This message is stored on chain.
  *
  * @param params - Parameters to log.
+ *
+ * @example
+ * ```ts
+ * import { near } from "near-sdk-js";
+ *
+ * near.log("hello world"); // -> "hello world"
+ * near.log("key", 2024); // -> "key 2024"
+ * near.log("user", { id: 1, name: "Test" }); // `user {"id": 1, "name": "Test"}`
+ * near.log("text", undefined, "user", { id: 1, name: "Test" }); // `text undefined user {"id": 1, "name": "Test"}`
+ * ```
  */
 export function log(...params: unknown[]): void {
   env.log(
@@ -178,6 +193,13 @@ export function log(...params: unknown[]): void {
 /**
  * Returns the account ID of the account that signed the transaction.
  * Can only be called in a call or initialize function.
+ *
+ * @example
+ * ```ts
+ * import { near } from "near-sdk-js";
+ *
+ * near.signerAccountId(); // -> "test.near"
+ * ```
  */
 export function signerAccountId(): string {
   env.signer_account_id(0);
@@ -187,6 +209,13 @@ export function signerAccountId(): string {
 /**
  * Returns the public key of the account that signed the transaction.
  * Can only be called in a call or initialize function.
+ *
+ * @example
+ * ```ts
+ * import { near } from "near-sdk-js";
+ *
+ * near.signerAccountPk(); // -> [56, 91, 91, 85, 17, 172, 223, ...]
+ * ```
  */
 export function signerAccountPk(): Uint8Array {
   env.signer_account_pk(0);
@@ -196,6 +225,13 @@ export function signerAccountPk(): Uint8Array {
 /**
  * Returns the account ID of the account that called the function.
  * Can only be called in a call or initialize function.
+ *
+ * @example
+ * ```ts
+ * import { near } from "near-sdk-js";
+ *
+ * near.predecessorAccountId(); // -> "caller.near"
+ * ```
  */
 export function predecessorAccountId(): string {
   env.predecessor_account_id(0);
@@ -204,6 +240,14 @@ export function predecessorAccountId(): string {
 
 /**
  * Returns the account ID of the current contract - the contract that is being executed.
+ * The id of the account that owns the current contract.
+ *
+ * @example
+ * ```ts
+ * import { near } from "near-sdk-js";
+ *
+ * near.currentAccountId(); // -> "example.near"
+ * ```
  */
 export function currentAccountId(): string {
   env.current_account_id(0);
@@ -212,6 +256,13 @@ export function currentAccountId(): string {
 
 /**
  * Returns the current block index.
+ *
+ * @example
+ * ```ts
+ * import { near } from "near-sdk-js";
+ *
+ * near.blockIndex(); // -> bigint("681923959192")
+ * ```
  */
 export function blockIndex(): bigint {
   return env.block_index();
@@ -219,13 +270,27 @@ export function blockIndex(): bigint {
 
 /**
  * Returns the current block height.
+ *
+ * @example
+ * ```ts
+ * import { near } from "near-sdk-js";
+ *
+ * near.blockHeight(); // -> bigint("681923959192")
+ * ```
  */
 export function blockHeight(): bigint {
   return blockIndex();
 }
 
 /**
- * Returns the current block timestamp.
+ * Returns the current block timestamp, number of non-leap-nanoseconds since January 1, 1970 0:00:00 UTC.
+ *
+ * @example
+ * ```ts
+ * import { near } from "near-sdk-js";
+ *
+ * near.blockTimestamp(); // -> bigint("1704124941241242141")
+ * ```
  */
 export function blockTimestamp(): bigint {
   return env.block_timestamp();
@@ -233,6 +298,13 @@ export function blockTimestamp(): bigint {
 
 /**
  * Returns the current epoch height.
+ *
+ * @example
+ * ```ts
+ * import { near } from "near-sdk-js";
+ *
+ * near.epochHeight(); // -> bigint("185829414")
+ * ```
  */
 export function epochHeight(): bigint {
   return env.epoch_height();
@@ -241,6 +313,13 @@ export function epochHeight(): bigint {
 /**
  * Returns the amount of NEAR attached to this function call.
  * Can only be called in payable functions.
+ *
+ * @example
+ * ```ts
+ * import { near } from "near-sdk-js";
+ *
+ * near.attachedDeposit(); // -> bigint("210000000000000")
+ * ```
  */
 export function attachedDeposit(): bigint {
   return env.attached_deposit();
@@ -248,6 +327,13 @@ export function attachedDeposit(): bigint {
 
 /**
  * Returns the amount of Gas that was attached to this function call.
+ *
+ * @example
+ * ```ts
+ * import { near } from "near-sdk-js";
+ *
+ * near.prepaidGas(); // -> bigint("30000000000000")
+ * ```
  */
 export function prepaidGas(): bigint {
   return env.prepaid_gas();
@@ -255,20 +341,41 @@ export function prepaidGas(): bigint {
 
 /**
  * Returns the amount of Gas that has been used by this function call until now.
+ *
+ * @example
+ * ```ts
+ * import { near } from "near-sdk-js";
+ *
+ * near.usedGas(); // -> bigint("5003005000000")
+ * ```
  */
 export function usedGas(): bigint {
   return env.used_gas();
 }
 
 /**
- * Returns the current account's account balance.
+ * Returns the current account's account balance. This includes the attached_deposit that was attached to the transaction.
+ *
+ * @example
+ * ```ts
+ * import { near } from "near-sdk-js";
+ *
+ * near.accountBalance(); // -> bigint("10500000210000000")
+ * ```
  */
 export function accountBalance(): bigint {
   return env.account_balance();
 }
 
 /**
- * Returns the current account's locked balance.
+ * Returns the current account's locked balance. The balance locked for potential validator staking.
+ *
+ * @example
+ * ```ts
+ * import { near } from "near-sdk-js";
+ *
+ * near.accountLockedBalance(); // -> bigint("10500000210000000")
+ * ```
  */
 export function accountLockedBalance(): bigint {
   return env.account_locked_balance();
@@ -293,6 +400,15 @@ export function storageReadRaw(key: Uint8Array): Uint8Array | null {
  * Reads the utf-8 string value from NEAR storage that is stored under the provided key.
  *
  * @param key - The utf-8 string key to read from storage.
+ *
+ * @example
+ * ```ts
+ * import { near } from "near-sdk-js";
+ *
+ * near.storageRead("key"); // -> null
+ * near.storageWrite("key", "value");
+ * near.storageRead("key"); // -> "value"
+ * ```
  */
 export function storageRead(key: string): string | null {
   const ret = storageReadRaw(encode(key));
@@ -315,6 +431,15 @@ export function storageHasKeyRaw(key: Uint8Array): boolean {
  * Checks for the existence of a value under the provided utf-8 string key in NEAR storage.
  *
  * @param key - The utf-8 string key to check for in storage.
+ *
+ * @example
+ * ```ts
+ * import { near } from "near-sdk-js";
+ *
+ * near.storageHasKey("key"); // -> false
+ * near.storageWrite("key", "value");
+ * near.storageHasKey("key"); // -> true
+ * ```
  */
 export function storageHasKey(key: string): boolean {
   return storageHasKeyRaw(encode(key));
@@ -329,6 +454,20 @@ export function storageGetEvictedRaw(): Uint8Array {
 
 /**
  * Get the last written or removed value from NEAR storage as utf-8 string.
+ *
+ * @example
+ * ```ts
+ * import { near } from "near-sdk-js";
+ *
+ * near.storageWrite("key", "value111");
+ * near.storageGetEvicted(); // -> "value111"
+ *
+ * near.storageWrite("key2", "value222");
+ * near.storageGetEvicted(); // -> "value222"
+ *
+ * near.storageRemove("key");
+ * near.storageGetEvicted(); // -> "value111"
+ * ```
  */
 export function storageGetEvicted(): string {
   return decode(storageGetEvictedRaw());
@@ -336,6 +475,13 @@ export function storageGetEvicted(): string {
 
 /**
  * Returns the current accounts NEAR storage usage.
+ *
+ * @example
+ * ```ts
+ * import { near } from "near-sdk-js";
+ *
+ * near.storageUsage(); // -> bigint("73841284183493")
+ * ```
  */
 export function storageUsage(): bigint {
   return env.storage_usage();
@@ -356,6 +502,15 @@ export function storageWriteRaw(key: Uint8Array, value: Uint8Array): boolean {
  *
  * @param key - The utf-8 string key under which to store the value.
  * @param value - The utf-8 string value to store.
+ *
+ * @example
+ * ```ts
+ * import { near } from "near-sdk-js";
+ *
+ * near.storageRead("key"); // -> null
+ * near.storageWrite("key", "value");
+ * near.storageRead("key"); // -> "value"
+ * ```
  */
 export function storageWrite(key: string, value: string): boolean {
   return storageWriteRaw(encode(key), encode(value));
@@ -374,6 +529,17 @@ export function storageRemoveRaw(key: Uint8Array): boolean {
  * Removes the value of the provided utf-8 string key from NEAR storage.
  *
  * @param key - The utf-8 string key to be removed.
+ *
+ * @returns Removes the value stored under the given key. If key-value existed returns true, otherwise false.
+ *
+ * @example
+ * ```ts
+ * import { near } from "near-sdk-js";
+ *
+ * near.storageRemove("key"); // -> false
+ * near.storageWrite("key", "value");
+ * near.storageRemove("key"); // -> true
+ * ```
  */
 export function storageRemove(key: string): boolean {
   return storageRemoveRaw(encode(key));
@@ -381,13 +547,27 @@ export function storageRemove(key: string): boolean {
 
 /**
  * Returns the cost of storing 0 Byte on NEAR storage.
+ *
+ * @example
+ * ```ts
+ * import { near } from "near-sdk-js";
+ *
+ * near.storageByteCost(); // -> bigint("10000000000000000000")
+ * ```
  */
 export function storageByteCost(): bigint {
   return 10_000_000_000_000_000_000n;
 }
 
 /**
- * Returns the arguments passed to the current smart contract call.
+ * Returns the arguments passed to the current smart contract call as bytes.
+ *
+ * @example
+ * ```ts
+ * import { near } from "near-sdk-js";
+ *
+ * near.inputRaw(); // -> Uint8Array([0, 128, 255, 15, ...])
+ * ```
  */
 export function inputRaw(): Uint8Array {
   env.input(0);
@@ -396,6 +576,13 @@ export function inputRaw(): Uint8Array {
 
 /**
  * Returns the arguments passed to the current smart contract call as utf-8 string.
+ *
+ * @example
+ * ```ts
+ * import { near } from "near-sdk-js";
+ *
+ * near.input(); // -> `{"key": "value"}`
+ * ```
  */
 export function input(): string {
   return decode(inputRaw());
@@ -412,15 +599,35 @@ export function valueReturnRaw(value: Uint8Array): void {
 
 /**
  * Returns the utf-8 string value from the NEAR WASM virtual machine.
+ * Sets the utf-8 string as the return value of this function.
  *
  * @param value - The utf-8 string value to return.
+ *
+ * @example
+ * ```ts
+ * import { near } from "near-sdk-js";
+ *
+ * const user = {
+ *  id: 128,
+ *  name: "Test",
+ *  key: "value"
+ * };
+ * near.valueReturn(JSON.stringify(user));
+ * ```
  */
 export function valueReturn(value: string): void {
   valueReturnRaw(encode(value));
 }
 
 /**
- * Returns a random string of bytes.
+ * Returns a random string of bytes. This returns a 32 byte hash.
+ *
+ * @example
+ * ```ts
+ * import { near } from "near-sdk-js";
+ *
+ * near.randomSeed(); // -> [2, 4, 98, 124, 0, 224, ...]
+ * ```
  */
 export function randomSeed(): Uint8Array {
   env.random_seed(0);
@@ -460,6 +667,19 @@ export function promiseCreateRaw(
  * @param args - The utf-8 string arguments to call the method with.
  * @param amount - The amount of NEAR attached to the call.
  * @param gas - The amount of Gas attached to the call.
+ *
+ * @example
+ * ```ts
+ * import { near } from "near-sdk-js";
+ *
+ * const promise = near.promiseCreate(
+ *  "contract.near",
+ *  "increase",
+ *  `{"value": 5}`,
+ *  bigint("0"),
+ *  bigint("30000000000000")
+ * );
+ * ```
  */
 export function promiseCreate(
   accountId: string,
@@ -508,6 +728,28 @@ export function promiseThenRaw(
  * @param args - The utf-8 string arguments to call the method with.
  * @param amount - The amount of NEAR to attach to the call.
  * @param gas - The amount of Gas to attach to the call.
+ *
+ * @example
+ * ```ts
+ * import { near } from "near-sdk-js";
+ *
+ * const promise = near.promiseCreate(
+ *  "contract.near",
+ *  "increase",
+ *  `{"value": 5}`,
+ *  bigint("0"),
+ *  bigint("30000000000000")
+ * );
+ *
+ * const chainedPromise = near.promiseThen(
+ *  promise,
+ *  "contract2.near",
+ *  "set_greeting",
+ *  `{"text": "Hello, world!"}`,
+ *  bigint("1000000000000"),
+ *  bigint("30000000000000")
+ * );
+ * ```
  */
 export function promiseThen(
   promiseIndex: PromiseIndex,
@@ -531,6 +773,19 @@ export function promiseThen(
  * Join an arbitrary array of NEAR promises.
  *
  * @param promiseIndexes - An arbitrary array of NEAR promise indexes to join.
+ *
+ * @example
+ * ```ts
+ * import { near } from "near-sdk-js";
+ *
+ * const promise1 = near.promiseBatchCreate("receiver1.near");
+ * near.promiseBatchActionTransfer(promise1, bigint("10000000000000000"));
+ *
+ * const promise2 = near.promiseBatchCreate("receiver2.near");
+ * near.promiseBatchActionTransfer(promise2, bigint("30500050000000000"));
+ *
+ * const promise = near.promiseAnd(promise1, promise2);
+ * ```
  */
 export function promiseAnd(...promiseIndexes: PromiseIndex[]): PromiseIndex {
   return env.promise_and(
@@ -542,6 +797,13 @@ export function promiseAnd(...promiseIndexes: PromiseIndex[]): PromiseIndex {
  * Create a NEAR promise which will have multiple promise actions inside.
  *
  * @param accountId - The account ID of the target contract.
+ *
+ * @example
+ * ```ts
+ * import { near } from "near-sdk-js";
+ *
+ * const promise = near.promiseBatchCreate("receiver.near");
+ * ```
  */
 export function promiseBatchCreate(accountId: string): PromiseIndex {
   return env.promise_batch_create(accountId) as unknown as PromiseIndex;
@@ -552,6 +814,17 @@ export function promiseBatchCreate(accountId: string): PromiseIndex {
  *
  * @param promiseIndex - The NEAR promise index of the batch.
  * @param accountId - The account ID of the target contract.
+ *
+ * @example
+ * ```ts
+ * import { near } from "near-sdk-js";
+ *
+ * const promise1 = near.promiseBatchCreate("receiver1.near");
+ * near.promiseBatchActionTransfer(promise1, bigint("10000000000000000"));
+ *
+ * const promise2 = near.promiseBatchThen(promise1, "receiver2.near");
+ * near.promiseBatchActionTransfer(promise2, bigint("2500000000000000000"));
+ * ```
  */
 export function promiseBatchThen(
   promiseIndex: PromiseIndex,
@@ -567,6 +840,15 @@ export function promiseBatchThen(
  * Attach a create account promise action to the NEAR promise index with the provided promise index.
  *
  * @param promiseIndex - The index of the promise to attach a create account action to.
+ *
+ * @example
+ * ```ts
+ * import { near } from "near-sdk-js";
+ *
+ * const promise = near.promiseBatchCreate("receiver.near");
+ *
+ * near.promiseBatchActionCreateAccount(promise);
+ * ```
  */
 export function promiseBatchActionCreateAccount(
   promiseIndex: PromiseIndex
@@ -579,6 +861,15 @@ export function promiseBatchActionCreateAccount(
  *
  * @param promiseIndex - The index of the promise to attach a deploy contract action to.
  * @param code - The WASM byte code of the contract to be deployed.
+ *
+ * @example
+ * ```ts
+ * import { near } from "near-sdk-js";
+ *
+ * const promise = near.promiseBatchCreate("contract.near");
+ *
+ * near.promiseBatchActionDeployContract(promise, [21, 24, 9, 6, 53, 229, ...]);
+ * ```
  */
 export function promiseBatchActionDeployContract(
   promiseIndex: PromiseIndex,
@@ -623,6 +914,21 @@ export function promiseBatchActionFunctionCallRaw(
  * @param args - The utf-8 string arguments to call the method with.
  * @param amount - The amount of NEAR to attach to the call.
  * @param gas - The amount of Gas to attach to the call.
+ *
+ * @example
+ * ```ts
+ * import { near } from "near-sdk-js";
+ *
+ * const promise = near.promiseBatchCreate("counter.near");
+ *
+ * near.promiseBatchActionFunctionCall(
+ *  promise,
+ *  "increase",
+ *  `{"value": 5}`,
+ *  bigint("0"),
+ *  bigint("30000000000000")
+ * );
+ * ```
  */
 export function promiseBatchActionFunctionCall(
   promiseIndex: PromiseIndex,
@@ -645,6 +951,14 @@ export function promiseBatchActionFunctionCall(
  *
  * @param promiseIndex - The index of the promise to attach a transfer action to.
  * @param amount - The amount of NEAR to transfer.
+ *
+ * @example
+ * ```ts
+ * import { near } from "near-sdk-js";
+ *
+ * const promise = near.promiseBatchCreate("receiver.near");
+ * near.promiseBatchActionTransfer(promise, bigint("10000000000000000"));
+ * ```
  */
 export function promiseBatchActionTransfer(
   promiseIndex: PromiseIndex,
@@ -659,6 +973,19 @@ export function promiseBatchActionTransfer(
  * @param promiseIndex - The index of the promise to attach a stake action to.
  * @param amount - The amount of NEAR to stake.
  * @param publicKey - The public key with which to stake.
+ *
+ * @example
+ * ```ts
+ * import { near } from "near-sdk-js";
+ *
+ * const promise = near.promiseBatchCreate("contract.near");
+ *
+ * near.promiseBatchActionStake(
+ *  promise,
+ *  bigint("59319390502334010"),
+ *  [2, 4, 59, 12, 48, 91, ...]
+ * );
+ * ```
  */
 export function promiseBatchActionStake(
   promiseIndex: PromiseIndex,
@@ -678,6 +1005,21 @@ export function promiseBatchActionStake(
  * @param promiseIndex - The index of the promise to attach a add full access key action to.
  * @param publicKey - The public key to add as a full access key.
  * @param nonce - The nonce to use.
+ *
+ * @example
+ * ```ts
+ * import { near } from "near-sdk-js";
+ *
+ * const promise = near.promiseBatchCreate("receiver.near");
+ *
+ * near.promiseBatchActionCreateAccount(promise);
+ *
+ * near.promiseBatchActionAddKeyWithFullAccess(
+ *  promise,
+ *  [5, 11, 41, 58, 248, ...],
+ *  572981
+ * );
+ * ```
  */
 export function promiseBatchActionAddKeyWithFullAccess(
   promiseIndex: PromiseIndex,
@@ -700,6 +1042,24 @@ export function promiseBatchActionAddKeyWithFullAccess(
  * @param allowance - The allowance of the access key.
  * @param receiverId - The account ID of the receiver.
  * @param methodNames - The names of the method to allow the key for.
+ *
+ * @example
+ * ```ts
+ * import { near } from "near-sdk-js";
+ *
+ * const promise = near.promiseBatchCreate("receiver.near");
+ *
+ * near.promiseBatchActionCreateAccount(promise);
+ *
+ * near.promiseBatchActionAddKeyWithFunctionCall(
+ *  promise,
+ *  [5, 11, 41, 58, 248, ...],
+ *  572981,
+ *  bigint("25000000000000000000000"),
+ *  "counter.near",
+ *  "increase,decrease"
+ * );
+ * ```
  */
 export function promiseBatchActionAddKeyWithFunctionCall(
   promiseIndex: PromiseIndex,
@@ -724,6 +1084,15 @@ export function promiseBatchActionAddKeyWithFunctionCall(
  *
  * @param promiseIndex - The index of the promise to attach a delete key action to.
  * @param publicKey - The public key to delete.
+ *
+ * @example
+ * ```ts
+ * import { near } from "near-sdk-js";
+ *
+ * const promise = near.promiseBatchCreate("receiver.near");
+ *
+ * near.promiseBatchActionDeleteKey(promise, [2, 4, 69, 26, 253, 129, ...]);
+ * ```
  */
 export function promiseBatchActionDeleteKey(
   promiseIndex: PromiseIndex,
@@ -740,6 +1109,15 @@ export function promiseBatchActionDeleteKey(
  *
  * @param promiseIndex - The index of the promise to attach a delete account action to.
  * @param beneficiaryId - The account ID of the beneficiary - the account that receives the remaining amount of NEAR.
+ *
+ * @example
+ * ```ts
+ * import { near } from "near-sdk-js";
+ *
+ * const promise = near.promiseBatchCreate("receiver.near");
+ *
+ * near.promiseBatchActionDeleteAccount(promise, "beneficiary.near");
+ * ```
  */
 export function promiseBatchActionDeleteAccount(
   promiseIndex: PromiseIndex,
@@ -788,6 +1166,22 @@ export function promiseBatchActionFunctionCallWeightRaw(
  * @param amount - The amount of NEAR to attach to the call.
  * @param gas - The amount of Gas to attach to the call.
  * @param weight - The weight of unused Gas to use.
+ *
+ * @example
+ * ```ts
+ * import { near } from "near-sdk-js";
+ *
+ * const promise = near.promiseBatchCreate("counter.near");
+ *
+ * near.promiseBatchActionFunctionCallWeight(
+ *  promise,
+ *  "increase",
+ *  `{"value": 5}`,
+ *  bigint("0"),
+ *  bigint("30000000000000"),
+ *  bigint("1")
+ * );
+ * ```
  */
 export function promiseBatchActionFunctionCallWeight(
   promiseIndex: PromiseIndex,
@@ -809,6 +1203,13 @@ export function promiseBatchActionFunctionCallWeight(
 
 /**
  * The number of promise results available.
+ *
+ * @example
+ * ```ts
+ * import { near } from "near-sdk-js";
+ *
+ * near.promiseResultsCount(); // -> bigint("1")
+ * ```
  */
 export function promiseResultsCount(): bigint {
   return env.promise_results_count();
@@ -840,6 +1241,13 @@ export function promiseResultRaw(promiseIndex: PromiseIndex): Uint8Array {
  * Returns the result of the NEAR promise for the passed promise index as utf-8 string
  *
  * @param promiseIndex - The index of the promise to return the result for.
+ *
+ * @example
+ * ```ts
+ * import { near } from "near-sdk-js";
+ *
+ * near.promiseResult(0); // -> `{"key": "value", "nested": {"key2": "value2"}}`
+ * ```
  */
 export function promiseResult(promiseIndex: PromiseIndex): string {
   return decode(promiseResultRaw(promiseIndex));
@@ -847,17 +1255,39 @@ export function promiseResult(promiseIndex: PromiseIndex): string {
 
 /**
  * Executes the promise in the NEAR WASM virtual machine.
+ * Consider the execution result of promise under promiseIndex as execution result of this function.
  *
  * @param promiseIndex - The index of the promise to execute.
+ *
+ * @example
+ * ```ts
+ * import { near } from "near-sdk-js";
+ *
+ * const promise = near.promiseCreate(
+ *  "contract.near",
+ *  "increase",
+ *  `{"value": 5}`,
+ *  bigint("0"),
+ *  bigint("30000000000000")
+ * );
+ * near.promiseReturn(promise);
+ * ```
  */
 export function promiseReturn(promiseIndex: PromiseIndex): void {
   env.promise_return(promiseIndex as unknown as bigint);
 }
 
 /**
- * Returns sha256 hash of given value
+ * Returns sha256 hash of given value. This returns a 32 byte hash.
  * @param value - value to be hashed, in Bytes
  * @returns hash result in Bytes
+ *
+ * @example
+ * ```ts
+ * import { near } from "near-sdk-js";
+ *
+ * near.sha256([1, 4, 18, 31, 5, 91, 224]); // -> [0, 7, 18, 94, 228, 11, 15, ...]
+ * ```
  */
 export function sha256(value: Uint8Array): Uint8Array {
   env.sha256(value, 0);
@@ -868,6 +1298,13 @@ export function sha256(value: Uint8Array): Uint8Array {
  * Returns keccak256 hash of given value
  * @param value - value to be hashed, in Bytes
  * @returns hash result in Bytes
+ *
+ * @example
+ * ```ts
+ * import { near } from "near-sdk-js";
+ *
+ * near.keccak256([0, 24, 81, 31]); // -> [1, 3, 48, 94, 248, 11, 35, ...]
+ * ```
  */
 export function keccak256(value: Uint8Array): Uint8Array {
   env.keccak256(value, 0);
@@ -878,6 +1315,13 @@ export function keccak256(value: Uint8Array): Uint8Array {
  * Returns keccak512 hash of given value
  * @param value - value to be hashed, in Bytes
  * @returns hash result in Bytes
+ *
+ * @example
+ * ```ts
+ * import { near } from "near-sdk-js";
+ *
+ * near.keccak512([0, 24, 81, 31]); // -> [1, 3, 48, 94, 248, 11, 35, ...]
+ * ```
  */
 export function keccak512(value: Uint8Array): Uint8Array {
   env.keccak512(value, 0);
@@ -885,9 +1329,16 @@ export function keccak512(value: Uint8Array): Uint8Array {
 }
 
 /**
- * Returns ripemd160 hash of given value
+ * Returns ripemd160 hash of given value. This returns a 20 byte hash.
  * @param value - value to be hashed, in Bytes
  * @returns hash result in Bytes
+ *
+ * @example
+ * ```ts
+ * import { near } from "near-sdk-js";
+ *
+ * near.ripemd160([5, 14, 51, 31, 15, 69]); // -> [2, 0, 0, 0, 18, 11, 65, ...]
+ * ```
  */
 export function ripemd160(value: Uint8Array): Uint8Array {
   env.ripemd160(value, 0);
@@ -924,6 +1375,8 @@ export function ecrecover(
 
 /**
  * Panic the transaction execution with given message
+ * There's no way to panic with a utf-8 string, use "throw Error(msg)" for that
+ *
  * @param msg - panic message in raw bytes, which should be a valid UTF-8 sequence
  */
 export function panicUtf8(msg: Uint8Array): never {
@@ -947,17 +1400,34 @@ export function logUtf16(msg: Uint8Array) {
 }
 
 /**
- * Returns the number of staked NEAR of given validator, in yoctoNEAR
+ * Returns the number of staked NEAR of given validator, in yoctoNEAR.
+ * If the account is not a validator, returns 0.
+ *
  * @param accountId - validator's AccountID
  * @returns - staked amount
+ *
+ * @example
+ * ```ts
+ * import { near } from "near-sdk-js";
+ *
+ * near.validatorStake("non-validator.near"); // -> bigint("0")
+ * near.validatorStake("validator.near"); // -> bigint("157201939492990")
+ * ```
  */
 export function validatorStake(accountId: string): bigint {
   return env.validator_stake(accountId);
 }
 
 /**
- * Returns the number of staked NEAR of all validators, in yoctoNEAR
+ * Returns the number of staked NEAR of all validators, in yoctoNEAR, in the current epoch.
  * @returns total staked amount
+ *
+ * @example
+ * ```ts
+ * import { near } from "near-sdk-js";
+ *
+ * near.validatorTotalStake(); // -> bigint("412929490100000")
+ * ```
  */
 export function validatorTotalStake(): bigint {
   return env.validator_total_stake();
@@ -974,6 +1444,8 @@ export function validatorTotalStake(): bigint {
  * `[((u256, u256), u256)]` slice.
  *
  * @returns multi exp sum
+ *
+ * @see [EIP-196](https://eips.ethereum.org/EIPS/eip-196)
  */
 export function altBn128G1Multiexp(value: Uint8Array): Uint8Array {
   env.alt_bn128_g1_multiexp(value, 0);
@@ -991,6 +1463,8 @@ export function altBn128G1Multiexp(value: Uint8Array): Uint8Array {
  * `[((u256, u256), ((u256, u256), (u256, u256)))]` slice.
  *
  * @returns sum over Fq.
+ *
+ * @see [EIP-196](https://eips.ethereum.org/EIPS/eip-196)
  */
 export function altBn128G1Sum(value: Uint8Array): Uint8Array {
   env.alt_bn128_g1_sum(value, 0);
@@ -1011,6 +1485,8 @@ export function altBn128G1Sum(value: Uint8Array): Uint8Array {
  * `[((u256, u256), ((u256, u256), (u256, u256)))]` slice.
  *
  * @returns whether pairing check pass
+ *
+ * @see [EIP-197](https://eips.ethereum.org/EIPS/eip-197)
  */
 export function altBn128PairingCheck(value: Uint8Array): boolean {
   return env.alt_bn128_pairing_check(value) === 1n;
