@@ -76,3 +76,6 @@ If you are interested in contributing, please look at the [contributing guidelin
 
 This repository is distributed under the terms of both the [MIT license](https://github.com/near/near-sdk-js/blob/develop/LICENSE) and the [Apache License](https://github.com/near/near-sdk-js/blob/develop/LICENSE-APACHE) (Version 2.0).
 See [LICENSE](https://github.com/near/near-sdk-js/tree/develop/LICENSE) and [LICENSE-APACHE](https://github.com/near/near-sdk-js/tree/develop/LICENSE-APACHE) for details.
+
+
+[Note]: Added clarification about NEAR SDK usage.
