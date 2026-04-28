@@ -6,6 +6,7 @@ import {
     FungibleTokenResolver,
     FungibleToken,
     FungibleTokenMetadata,
+    FungibleTokenMetadataProvider,
 } from "near-contract-standards/lib"; //TODO: delete lib
 
 import {
@@ -31,7 +32,7 @@ class FTPrefix implements IntoStorageKey {
 }
 
 @NearBindgen({ requireInit: true })
-export class MyFt implements FungibleTokenCore, StorageManagement, FungibleTokenResolver {
+export class MyFt implements FungibleTokenCore, StorageManagement, FungibleTokenResolver, FungibleTokenMetadataProvider {
     token: FungibleToken;
     metadata: FungibleTokenMetadata;
 
@@ -123,6 +124,11 @@ export class MyFt implements FungibleTokenCore, StorageManagement, FungibleToken
     @view({})
     ft_balance_of({ account_id }: { account_id: AccountId }): Balance {
         return this.token.ft_balance_of({ account_id });
+    }
+
+    @view({})
+    ft_metadata(): FungibleTokenMetadata {
+        return this.metadata;
     }
 
     @call({ payableFunction: true })
