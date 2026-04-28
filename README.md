@@ -64,6 +64,27 @@ Use [`create-near-app`](https://github.com/near/create-near-app) to quickly get 
 
 This will scaffold a basic template for you 😎
 
+### Building and Deploying via CLI
+
+Once you have a contract, build it and deploy using the [NEAR CLI](https://docs.near.org/tools/near-cli):
+
+```bash
+# Build the contract
+npx near-sdk-js build src/contract.ts build/contract.wasm
+
+# Create a NEAR testnet account (if you don't have one)
+near create-account my-contract.testnet --useFaucet
+
+# Deploy the contract
+near deploy my-contract.testnet build/contract.wasm
+
+# Call a view method (free, no gas required)
+near view my-contract.testnet get_greeting
+
+# Call a change method (requires gas)
+near call my-contract.testnet set_greeting '{"greeting": "Hi!"}' --accountId your-account.testnet
+```
+
 ## Contributing
 
 If you are interested in contributing, please look at the [contributing guidelines](https://github.com/near/near-sdk-js/tree/develop/CONTRIBUTING.md).
