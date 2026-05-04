@@ -71,7 +71,7 @@ export class MyNFT
   }
 
   @view({})
-  nft_total_supply(): number {
+  nft_total_supply(): string {
     return this.tokens.nft_total_supply();
   }
 
@@ -87,7 +87,7 @@ export class MyNFT
   }
 
   @view({})
-  nft_supply_for_owner({ account_id }: { account_id: string }): number {
+  nft_supply_for_owner({ account_id }: { account_id: string }): string {
     return this.tokens.nft_supply_for_owner({ account_id });
   }
 

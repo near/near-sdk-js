@@ -86,7 +86,7 @@ test("Enumerate NFT tokens total supply", async (t) => {
   const { nft } = t.context.accounts;
 
   let totalSupply = await nft.view("nft_total_supply");
-  t.is(totalSupply, 4);
+  t.is(totalSupply, "4");
 });
 
 test("Enumerate NFT tokens", async (t) => {
@@ -110,12 +110,12 @@ test("Enumerate NFT tokens supply for owner", async (t) => {
   let aliNfts = await nft.view("nft_supply_for_owner", {
     account_id: ali.accountId,
   });
-  t.is(aliNfts, 0);
+  t.is(aliNfts, "0");
 
   let ownerNfts = await nft.view("nft_supply_for_owner", {
     account_id: nftOwner.accountId,
   });
-  t.is(ownerNfts, 4);
+  t.is(ownerNfts, "4");
 });
 
 test("Enumerate NFT tokens for owner", async (t) => {
