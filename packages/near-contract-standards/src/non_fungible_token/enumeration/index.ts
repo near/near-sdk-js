@@ -3,8 +3,8 @@ import { Token } from "../token";
 
 /** Offers methods helpful in determining account ownership of NFTs and provides a way to page through NFTs per owner, determine total supply, etc. */
 export interface NonFungibleTokenEnumeration {
-  /** Returns the total supply of non-fungible tokens */
-  nft_total_supply(): number;
+  /** Returns the total supply of non-fungible tokens as a string per NEP-181 */
+  nft_total_supply(): string;
 
   /** Get a list of all tokens
    *
@@ -23,9 +23,9 @@ export interface NonFungibleTokenEnumeration {
   /** Get number of tokens owned by a given account
    *
    * @param account_id - A valid NEAR account
-   * @returns - The number of non-fungible tokens owned by given `account_id`
+   * @returns - The number of non-fungible tokens owned by given `account_id` as a string per NEP-181
    */
-  nft_supply_for_owner({ account_id }: { account_id: AccountId }): number;
+  nft_supply_for_owner({ account_id }: { account_id: AccountId }): string;
 
   /** Get list of all tokens owned by a given account
    *

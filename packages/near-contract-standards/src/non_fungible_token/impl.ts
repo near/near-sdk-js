@@ -85,8 +85,8 @@ export class NonFungibleToken
     this.next_approval_id_by_id = null;
   }
 
-  nft_total_supply(): number {
-    return this.owner_by_id.length;
+  nft_total_supply(): string {
+    return this.owner_by_id.length.toString();
   }
 
   private enum_get_token(owner_id: AccountId, token_id: TokenId): Token {
@@ -123,7 +123,7 @@ export class NonFungibleToken
     return ret;
   }
 
-  nft_supply_for_owner({ account_id }: { account_id: AccountId }): number {
+  nft_supply_for_owner({ account_id }: { account_id: AccountId }): string {
     const tokens_per_owner = this.tokens_per_owner;
     assert(
       tokens_per_owner !== null,
@@ -133,7 +133,7 @@ export class NonFungibleToken
     const account_tokens = tokens_per_owner.get(account_id, {
       reconstructor: UnorderedSet.reconstruct,
     });
-    return account_tokens === null ? 0 : account_tokens.length;
+    return account_tokens === null ? "0" : account_tokens.length.toString();
   }
 
   nft_tokens_for_owner({
